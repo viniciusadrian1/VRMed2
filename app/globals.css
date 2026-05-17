@@ -1,26 +1,228 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+/* Variante de tema escuro acionada pela classe .dark (gerenciada por next-themes) */
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Paleta clínica do VRmed.
+  Cores em hexadecimal por decisão de projeto: o export em PDF usa html2canvas,
+  que não interpreta a função oklch() — manter hex/rgb garante a captura correta.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.75rem;
+
+  --background: #f8f7f4;
+  --foreground: #1a1a1a;
+
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+
+  --primary: #0f4c81;
+  --primary-foreground: #f8f7f4;
+
+  --secondary: #efede8;
+  --secondary-foreground: #1a1a1a;
+
+  --muted: #efede8;
+  --muted-foreground: #6f6e69;
+
+  --accent: #e9eef3;
+  --accent-foreground: #0f4c81;
+
+  --destructive: #b42318;
+  --destructive-foreground: #fef7f6;
+
+  --success: #15724f;
+  --warning: #b25d10;
+
+  --border: #e5e2db;
+  --input: #e5e2db;
+  --ring: #0f4c81;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #0f4c81;
+  --sidebar-primary-foreground: #f8f7f4;
+  --sidebar-accent: #e9eef3;
+  --sidebar-accent-foreground: #0f4c81;
+  --sidebar-border: #e5e2db;
+  --sidebar-ring: #0f4c81;
 }
 
+.dark {
+  --background: #121211;
+  --foreground: #eae8e3;
+
+  --card: #1b1a18;
+  --card-foreground: #eae8e3;
+
+  --popover: #1b1a18;
+  --popover-foreground: #eae8e3;
+
+  --primary: #5896c8;
+  --primary-foreground: #0b0b0a;
+
+  --secondary: #26241f;
+  --secondary-foreground: #eae8e3;
+
+  --muted: #26241f;
+  --muted-foreground: #a8a59d;
+
+  --accent: #1e2a34;
+  --accent-foreground: #9fc3dd;
+
+  --destructive: #e06a5c;
+  --destructive-foreground: #1a0e0c;
+
+  --success: #4fae89;
+  --warning: #d9954a;
+
+  --border: #2c2a26;
+  --input: #322f2a;
+  --ring: #5896c8;
+
+  --sidebar: #1b1a18;
+  --sidebar-foreground: #eae8e3;
+  --sidebar-primary: #5896c8;
+  --sidebar-primary-foreground: #0b0b0a;
+  --sidebar-accent: #1e2a34;
+  --sidebar-accent-foreground: #9fc3dd;
+  --sidebar-border: #2c2a26;
+  --sidebar-ring: #5896c8;
+}
+
+/* Mapeia as variáveis CSS para tokens de tema do Tailwind v4 */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Animações de altura para o componente Accordion (Radix) */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/40;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Foco visível e consistente para acessibilidade (navegação por teclado) */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
+
+@layer utilities {
+  /* Fundo em gradiente sutil usado no canvas 3D e em seções hero */
+  .vrmed-radial {
+    background-image:
+      radial-gradient(60% 55% at 50% 32%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 70%),
+      linear-gradient(180deg, var(--background), color-mix(in srgb, var(--primary) 4%, var(--background)));
+  }
+
+  .vrmed-grid {
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  /* Esconde elementos visualmente mantendo-os para leitores de tela */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
+/* Scrollbar discreta alinhada à estética clínica */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 18%, transparent) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--foreground) 28%, transparent);
 }

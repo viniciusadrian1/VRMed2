@@ -1,0 +1,6 @@
+{
+  "name": "Neurologia — Sistema nervoso",
+  "shortDescription": "Estudo do sistema nervoso central e periférico.",
+  "fullDescription": "A neurologia estuda o sistema nervoso, dividido em central — encéfalo e medula espinal — e periférico — nervos e gânglios. O encéfalo coordena funções cognitivas, sensoriais e motoras. A medula espinal conduz informações entre o encéfalo e o corpo e media reflexos. Os nervos periféricos levam impulsos sensitivos aos centros nervosos e comandos motores aos efetores. O tecido nervoso organiza-se em substância cinzenta, formada pelos corpos dos neurônios, e substância branca, formada pelos axônios mielinizados. Este modelo apresenta as estruturas nervosas centrais e periféricas distribuídas pelo corpo.",
+  "sources": ["Gray's Anatomy, 42ª ed.", "Netter — Atlas de Anatomia Humana", "NIH / MedlinePlus"]
+}

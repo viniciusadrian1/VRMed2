@@ -1,0 +1,6 @@
+{
+  "name": "Inserções musculares",
+  "shortDescription": "Os pontos em que os músculos se fixam ao esqueleto: origens e inserções.",
+  "fullDescription": "As inserções musculares são os pontos em que os músculos se fixam ao esqueleto, geralmente por meio de tendões. Por convenção, chama-se de origem a fixação mais proximal ou relativamente fixa, e de inserção a fixação mais distal ou móvel — embora esses papéis possam se inverter conforme o movimento executado. Conhecer as origens e inserções é essencial para compreender a ação de cada músculo: a linha que une esses pontos define a direção da força produzida durante a contração e, portanto, o movimento resultante na articulação. Este modelo evidencia, sobre o esqueleto, as áreas de origem e de inserção dos músculos.",
+  "sources": ["Gray's Anatomy, 42ª ed.", "Moore — Anatomia Orientada para a Clínica", "Sobotta"]
+}
