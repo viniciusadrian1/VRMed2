@@ -24,6 +24,7 @@ import {
   prepareModel,
 } from "@/lib/model-utils";
 import { useVRMedStore } from "@/lib/store";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GLBModel } from "./GLBModel";
 import { PlaceholderOrgan } from "./PlaceholderOrgan";
 
@@ -197,9 +198,20 @@ export function OrganModel() {
       >
         <group key={`${organId}-${availability}`} ref={contentRef}>
           {availability === "real" && (
-            <Suspense fallback={null}>
-              <GLBModel path={organ.modelPath} onReady={handleReady} />
-            </Suspense>
+            // Se o .glb existir mas falhar ao decodificar (arquivo corrompido,
+            // Draco indisponível), recai no modelo de demonstração em vez de
+            // derrubar o canvas inteiro.
+            <ErrorBoundary
+              key={organId}
+              onError={() => {
+                setAvailability("placeholder");
+                setModelKind("placeholder");
+              }}
+            >
+              <Suspense fallback={null}>
+                <GLBModel path={organ.modelPath} onReady={handleReady} />
+              </Suspense>
+            </ErrorBoundary>
           )}
           {availability === "placeholder" && (
             <PlaceholderOrgan onReady={handleReady} />

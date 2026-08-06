@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
+
+// Painel interno de pesquisa: nunca deve ser indexado por buscadores.
+export const metadata: Metadata = {
+  title: "Painel do pesquisador",
+  robots: { index: false, follow: false },
+};
 
 export default function AdminLayout({
   children,

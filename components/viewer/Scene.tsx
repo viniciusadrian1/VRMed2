@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { XR, XROrigin, createXRStore } from "@react-three/xr";
@@ -111,6 +111,10 @@ export function Scene() {
   // emulate:false desativa o emulador de headset (e o botão "Enter XR" que ele
   // injeta) — o WebXR real continua funcionando em dispositivos compatíveis.
   const xrStore = useMemo(() => createXRStore({ emulate: false }), []);
+  // Numa sessão XR a renderização precisa ser contínua ("always"). O modo
+  // "demand" (usado no 2D para economizar GPU) não é suportado pelo WebXR
+  // e deixaria o headset com a tela preta.
+  const [inXR, setInXR] = useState(false);
 
   // Registra a entrada em VR na ponte e mede a duração das sessões.
   useEffect(() => {
@@ -120,6 +124,7 @@ export function Scene() {
     let enteredAt = 0;
     const unsubscribe = xrStore.subscribe((state) => {
       const active = Boolean(state.session);
+      setInXR(active);
       if (active && enteredAt === 0) {
         enteredAt = Date.now();
         track("vr_entered");
@@ -142,7 +147,7 @@ export function Scene() {
     <Canvas
       shadows="percentage"
       dpr={[1, 2]}
-      frameloop="demand"
+      frameloop={inXR ? "always" : "demand"}
       camera={{ position: DEFAULT_CAMERA, fov: 45 }}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
       onCreated={(state) => {

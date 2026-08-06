@@ -43,15 +43,21 @@ export function loadVoices(timeoutMs = 1500): Promise<SpeechSynthesisVoice[]> {
   });
 }
 
-/** Seleciona a melhor voz em português a partir de uma lista de vozes. */
+/**
+ * Seleciona a melhor voz em português: prefere pt-BR sobre outras variantes
+ * e vozes locais (offline) sobre vozes de rede — estas dependem de conexão e
+ * às vezes não produzem som. Devolve null se não houver voz em português.
+ */
 export function pickPortugueseVoice(
   voices: SpeechSynthesisVoice[],
 ): SpeechSynthesisVoice | null {
-  return (
-    voices.find((v) => v.lang.toLowerCase() === "pt-br") ??
-    voices.find((v) => v.lang.toLowerCase().startsWith("pt")) ??
-    null
+  const portuguese = voices.filter((v) =>
+    v.lang.toLowerCase().startsWith("pt"),
   );
+  if (portuguese.length === 0) return null;
+  const brazilian = portuguese.filter((v) => v.lang.toLowerCase() === "pt-br");
+  const pool = brazilian.length > 0 ? brazilian : portuguese;
+  return pool.find((v) => v.localService) ?? pool[0];
 }
 
 export interface SpeakOptions {
@@ -76,6 +82,19 @@ export function createUtterance(
   if (options.onEnd) utterance.onend = options.onEnd;
   if (options.onError) utterance.onerror = options.onError;
   return utterance;
+}
+
+/**
+ * Inicia a narração de um texto. Cancela qualquer fala anterior e adia o
+ * início alguns milissegundos: o Chrome descarta a fala quando `speak()` é
+ * chamado no mesmo instante que `cancel()`.
+ */
+export function speak(text: string, options: SpeakOptions = {}): void {
+  if (!isSpeechSupported()) return;
+  window.speechSynthesis.cancel();
+  window.setTimeout(() => {
+    window.speechSynthesis.speak(createUtterance(text, options));
+  }, 80);
 }
 
 /** Interrompe imediatamente qualquer narração em andamento. */

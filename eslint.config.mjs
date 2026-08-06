@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Assets estáticos e bibliotecas de terceiros (decodificador Draco) — não
+    // são código-fonte do projeto e não devem ser verificados pelo linter.
+    "public/**",
   ]),
 ]);
 

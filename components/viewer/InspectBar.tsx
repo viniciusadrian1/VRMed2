@@ -19,7 +19,10 @@ export function InspectBar() {
   if (!hasModel || annotationMode) return null;
 
   return (
-    <div className="pointer-events-auto absolute bottom-5 left-1/2 -translate-x-1/2">
+    <div
+      className="pointer-events-auto absolute bottom-5 left-1/2 -translate-x-1/2"
+      aria-live="polite"
+    >
       {inspectedLabel ? (
         <div className="flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-3 pr-1 shadow-lg">
           <MousePointerClick className="size-4 shrink-0 text-primary" />

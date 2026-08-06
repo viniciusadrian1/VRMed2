@@ -44,6 +44,16 @@ function CrossSectionModel() {
             />
           </mesh>
         ))}
+        {/* Malha externa em arame — dá profundidade e leitura de "modelo 3D". */}
+        <mesh>
+          <sphereGeometry args={[1.16, 28, 28]} />
+          <meshBasicMaterial
+            color="#0f4c81"
+            wireframe
+            transparent
+            opacity={0.12}
+          />
+        </mesh>
       </group>
     </Float>
   );
@@ -83,6 +93,7 @@ export function HeroScene() {
         scale={6}
         blur={2.6}
         far={3}
+        frames={1}
       />
     </Canvas>
   );

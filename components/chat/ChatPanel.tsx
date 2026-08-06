@@ -34,11 +34,25 @@ function ChatPanelContent() {
   const [isStreaming, setIsStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Controla o streaming em andamento para poder abortá-lo.
+  const abortRef = useRef<AbortController | null>(null);
 
   // Mantém a conversa rolada para a mensagem mais recente.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [chat]);
+
+  // Aborta qualquer streaming pendente ao desmontar (fechar o painel / sair).
+  useEffect(() => {
+    return () => abortRef.current?.abort();
+  }, []);
+
+  // Limpa a conversa, interrompendo antes um streaming em curso.
+  const handleClearChat = () => {
+    abortRef.current?.abort();
+    setIsStreaming(false);
+    clearChat();
+  };
 
   const sendMessage = async (text: string) => {
     const trimmed = text.trim();
@@ -55,7 +69,9 @@ function ChatPanelContent() {
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
-    const history = [...chat, userMessage]
+    // Lê o estado mais recente da store (evita um `chat` desatualizado em
+    // envios rápidos e sucessivos).
+    const history = [...useVRMedStore.getState().chat, userMessage]
       .filter((message) => message.content.trim().length > 0)
       .map((message) => ({ role: message.role, content: message.content }));
 
@@ -69,6 +85,9 @@ function ChatPanelContent() {
     });
     setIsStreaming(true);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     // Telemetria anônima: hash + categoria da pergunta, nunca o texto.
     track("chat_message_sent", {
       organ: organId,
@@ -80,15 +99,19 @@ function ChatPanelContent() {
       await streamChatResponse(
         { messages: history, currentOrgan: organ?.name },
         (chunk) => appendToChatMessage(assistantId, chunk),
+        controller.signal,
       );
     } catch (error) {
+      // Abortos (troca de órgão, fechar painel, limpar) não são erros.
+      if (controller.signal.aborted) return;
       const message =
         error instanceof Error ? error.message : "Erro ao falar com o tutor.";
       appendToChatMessage(
         assistantId,
-        `_Não foi possível obter a resposta: ${message}_`,
+        `\n\n⚠️ Não foi possível obter a resposta: ${message}`,
       );
     } finally {
+      if (abortRef.current === controller) abortRef.current = null;
       setIsStreaming(false);
     }
   };
@@ -108,8 +131,8 @@ function ChatPanelContent() {
         <Button
           variant="ghost"
           size="icon-sm"
-          onClick={clearChat}
-          disabled={chat.length === 0 || isStreaming}
+          onClick={handleClearChat}
+          disabled={chat.length === 0}
           aria-label="Limpar conversa"
           title="Limpar conversa"
         >

@@ -17,14 +17,22 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
+/**
+ * URL base do site. Resolve todas as URLs absolutas (Open Graph, ícones,
+ * manifesto). Defina NEXT_PUBLIC_SITE_URL no ambiente de produção.
+ */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vrmed.vercel.app";
+
+const SITE_DESCRIPTION =
+  "Plataforma de estudo de anatomia com visualização 3D interativa, cortes anatômicos, comparação saudável × patológico, realidade virtual e um tutor de IA fundamentado em fontes médicas confiáveis.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://vrmed.local"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "VRmed — Estudo de anatomia em 3D e realidade virtual",
     template: "%s · VRmed",
   },
-  description:
-    "Plataforma de estudo médico com visualização 3D interativa, cortes anatômicos, suporte a VR e um tutor de IA baseado em fontes médicas confiáveis.",
+  description: SITE_DESCRIPTION,
   applicationName: "VRmed",
   keywords: [
     "anatomia",
@@ -33,8 +41,24 @@ export const metadata: Metadata = {
     "realidade virtual",
     "WebXR",
     "estudo de medicina",
+    "tutor de IA",
+    "anatomia 3D",
   ],
   authors: [{ name: "Projeto de Iniciação Científica VRmed" }],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "VRmed",
+    title: "VRmed — Estudo de anatomia em 3D e realidade virtual",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VRmed — Estudo de anatomia em 3D e realidade virtual",
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export const viewport: Viewport = {

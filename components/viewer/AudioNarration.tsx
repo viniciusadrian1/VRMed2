@@ -10,11 +10,12 @@ import {
 import { useVRMedStore } from "@/lib/store";
 import {
   cancelSpeech,
-  createUtterance,
   isSpeechSupported,
   loadVoices,
   pickPortugueseVoice,
+  speak,
 } from "@/lib/tts";
+import { useMounted } from "@/hooks/use-mounted";
 import {
   Accordion,
   AccordionContent,
@@ -32,6 +33,7 @@ type PlayStatus = "idle" | "playing" | "paused";
 /** Painel de narração em áudio e descrição textual do órgão. */
 export function AudioNarration() {
   const organId = useVRMedStore((s) => s.currentOrganId);
+  const mounted = useMounted();
 
   const [description, setDescription] = useState<OrganDescription | null>(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,10 @@ export function AudioNarration() {
   const [audioError, setAudioError] = useState(false);
   const startedAtRef = useRef(0);
 
-  const useSpeech = isSpeechSupported() && voiceRef.current !== null;
+  // Usa a síntese de voz sempre que o navegador a suporta. A voz pt-BR é
+  // apenas uma preferência (voiceRef); sem ela, o navegador narra com a voz
+  // padrão a partir do `lang`. O áudio pré-gravado é só o último recurso.
+  const useSpeech = mounted && isSpeechSupported();
 
   // Carrega as vozes do navegador uma única vez.
   useEffect(() => {
@@ -132,8 +137,7 @@ export function AudioNarration() {
     startedAtRef.current = Date.now();
 
     if (useSpeech) {
-      cancelSpeech();
-      const utterance = createUtterance(description.fullDescription, {
+      speak(description.fullDescription, {
         voice: voiceRef.current,
         rate,
         onEnd: () => {
@@ -142,7 +146,6 @@ export function AudioNarration() {
         },
         onError: () => setStatus("idle"),
       });
-      window.speechSynthesis.speak(utterance);
     } else if (audioRef.current) {
       audioRef.current.currentTime = 0;
       audioRef.current.playbackRate = rate;

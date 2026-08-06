@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, type ReactNode } from "react";
+import { Children, memo, type ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
@@ -102,7 +102,7 @@ const components: Components = {
 };
 
 /** Renderiza o conteúdo Markdown de uma mensagem do tutor, com citações. */
-export function MarkdownContent({
+function MarkdownContentComponent({
   content,
   className,
 }: {
@@ -117,3 +117,6 @@ export function MarkdownContent({
     </div>
   );
 }
+
+/** Memoizado: só re-parseia o Markdown quando o texto muda. */
+export const MarkdownContent = memo(MarkdownContentComponent);

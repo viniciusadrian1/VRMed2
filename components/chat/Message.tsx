@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Sparkles } from "lucide-react";
 import type { ChatMessage } from "@/types";
 import { FeedbackButtons } from "./FeedbackButtons";
@@ -31,7 +32,7 @@ interface MessageProps {
 }
 
 /** Renderiza uma mensagem do chat (usuário ou tutor de IA). */
-export function Message({ message, isStreaming }: MessageProps) {
+function MessageComponent({ message, isStreaming }: MessageProps) {
   if (message.role === "user") {
     return (
       <div className="flex justify-end">
@@ -47,7 +48,12 @@ export function Message({ message, isStreaming }: MessageProps) {
       <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
         <Sparkles className="size-4" />
       </span>
-      <div className="min-w-0 flex-1">
+      {/* Região viva: a resposta do tutor é anunciada a leitores de tela. */}
+      <div
+        className="min-w-0 flex-1"
+        aria-live={isStreaming ? "polite" : undefined}
+        aria-busy={isStreaming || undefined}
+      >
         {message.content ? (
           <MarkdownContent content={message.content} />
         ) : isStreaming ? (
@@ -58,3 +64,9 @@ export function Message({ message, isStreaming }: MessageProps) {
     </div>
   );
 }
+
+/**
+ * Memoizado: durante o streaming, apenas a mensagem que recebe os tokens
+ * é re-renderizada — as demais permanecem estáticas (evita custo O(n²)).
+ */
+export const Message = memo(MessageComponent);

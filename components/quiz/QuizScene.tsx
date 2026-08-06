@@ -75,6 +75,7 @@ export function QuizScene({
     <Canvas
       shadows="percentage"
       dpr={[1, 2]}
+      frameloop="demand"
       camera={{ position: [3, 2.2, 4.6], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
     >

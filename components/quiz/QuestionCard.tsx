@@ -49,6 +49,15 @@ export function QuestionCard({
                 type="button"
                 disabled={answered}
                 onClick={() => onSelect(option)}
+                aria-label={
+                  answered
+                    ? isCorrectOption
+                      ? `${option} — correta`
+                      : isChosen
+                        ? `${option} — incorreta`
+                        : option
+                    : option
+                }
                 className={cn(
                   "flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
                   !answered && "border-border hover:bg-muted",
@@ -79,7 +88,7 @@ export function QuestionCard({
 
         {answered && (
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm">
+            <p className="text-sm" role="status" aria-live="polite">
               {isRight ? (
                 <span className="font-medium text-success">
                   Resposta correta!

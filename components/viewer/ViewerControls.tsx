@@ -41,16 +41,23 @@ function ToolButton({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          variant={active ? "default" : "ghost"}
-          size="icon"
-          onClick={onClick}
-          disabled={disabled}
-          aria-label={label}
-          aria-pressed={active}
-        >
-          {icon}
-        </Button>
+        {/*
+          Um <span> embrulha o botão para que a tooltip apareça mesmo quando
+          ele está desabilitado (botões desabilitados não emitem eventos de
+          ponteiro) — preserva a dica "por que está desabilitado".
+        */}
+        <span className="inline-flex">
+          <Button
+            variant={active ? "default" : "ghost"}
+            size="icon"
+            onClick={onClick}
+            disabled={disabled}
+            aria-label={label}
+            aria-pressed={active}
+          >
+            {icon}
+          </Button>
+        </span>
       </TooltipTrigger>
       <TooltipContent side="right">{label}</TooltipContent>
     </Tooltip>

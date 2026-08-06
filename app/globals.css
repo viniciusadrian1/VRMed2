@@ -28,7 +28,8 @@
   --secondary-foreground: #1a1a1a;
 
   --muted: #efede8;
-  --muted-foreground: #6f6e69;
+  /* Escurecido para passar no contraste WCAG AA também sobre fundos --muted. */
+  --muted-foreground: #5c5b56;
 
   --accent: #e9eef3;
   --accent-foreground: #0f4c81;
@@ -158,6 +159,16 @@
   }
 }
 
+/* Rolagem contínua da faixa de fontes (landing page) */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/40;
@@ -176,6 +187,23 @@
   /* Foco visível e consistente para acessibilidade (navegação por teclado) */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  /*
+    Respeita a preferência do sistema por menos movimento: neutraliza as
+    animações CSS (marquee, bounce, accordion) e transições para quem ativou
+    "reduzir movimento". As animações do framer-motion já são tratadas via
+    useReducedMotion nos componentes.
+  */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
