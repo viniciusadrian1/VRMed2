@@ -23,8 +23,17 @@ const HINT_AFTER = 6;
 const MISS_PENALTY = 2;
 /** Volta sozinho ao modo ocioso depois deste tempo na tela de resultado. */
 const RESULT_TIMEOUT = 20;
-/** Modelo principal do jogo (18k triângulos, ~20 estruturas nomeadas). */
-const MODEL_PATH = "/models/organs/larynx.glb";
+
+/**
+ * As fases da partida, jogadas em sequência com placar acumulado.
+ * Só entram modelos leves E com estruturas nomeadas — laringe (18k
+ * triângulos, ~20 estruturas) e fígado (60k, ~26). Os demais modelos
+ * regionais têm 390–490k triângulos e derrubariam o Quest.
+ */
+const STAGES = [
+  { path: "/models/organs/larynx.glb", nome: "Laringe" },
+  { path: "/models/healthy/figado.glb", nome: "Fígado" },
+] as const;
 
 /**
  * Vigia de entrada: se após alguns segundos de sessão nenhum controle ou mão
@@ -111,6 +120,8 @@ export function ArenaGame() {
   const [feedback, setFeedback] = useState<"acerto" | "erro" | null>(null);
   /** Incrementa a cada rodada; devolve o modelo à pose original. */
   const [roundId, setRoundId] = useState(0);
+  /** Fase de conteúdo atual (0 = Laringe, 1 = Fígado). */
+  const [stageIndex, setStageIndex] = useState(0);
 
   // Tempo em ponto flutuante; o estado guarda só o segundo exibido.
   const remaining = useRef(ROUND_SECONDS);
@@ -118,10 +129,17 @@ export function ArenaGame() {
   const sinceResult = useRef(0);
   const countdownTimer = useRef(0);
   const feedbackTimer = useRef(0);
+  /**
+   * Espelho das estruturas para o useFrame: na troca de fase o modelo novo
+   * carrega de forma assíncrona, e a contagem regressiva NÃO PODE liberar o
+   * jogo antes de as estruturas chegarem — seria a partida sem alvo de novo.
+   */
+  const structuresRef = useRef<ArenaStructure[]>([]);
 
   const [modelReady, setModelReady] = useState(false);
 
   const handleStructures = useCallback((list: ArenaStructure[]) => {
+    structuresRef.current = list;
     setStructures(list);
     setModelReady(true);
     // Já deixa um alvo pronto: derivar aqui evita um efeito extra e o
@@ -129,26 +147,43 @@ export function ArenaGame() {
     setTarget(pickTarget(list, null));
   }, []);
 
+  /**
+   * Prepara e inicia uma fase (contagem 3·2·1 → jogo). Ao trocar de modelo,
+   * limpa estruturas e alvo — o `handleStructures` do modelo novo repõe os
+   * dois assim que o arquivo decodifica, e a contagem espera por isso.
+   */
+  const beginStage = useCallback(
+    (index: number) => {
+      remaining.current = ROUND_SECONDS;
+      countdownTimer.current = 0;
+      setSeconds(ROUND_SECONDS);
+      setCountdown(3);
+      if (index !== stageIndex) {
+        structuresRef.current = [];
+        setStructures([]);
+        setModelReady(false);
+        setTarget(null);
+        setStageIndex(index);
+      } else {
+        // Mesmo modelo: sorteia o primeiro alvo da fase imediatamente.
+        setTarget(pickTarget(structures, null));
+      }
+      setShowHint(false);
+      setRoundId((id) => id + 1);
+      setPhase("contagem");
+      playTick();
+    },
+    [stageIndex, structures],
+  );
+
   const startRound = useCallback(() => {
     if (structures.length === 0) return;
-    remaining.current = ROUND_SECONDS;
-    countdownTimer.current = 0;
-    setSeconds(ROUND_SECONDS);
-    setCountdown(3);
     setScore(0);
     setCombo(0);
     setHits(0);
     setAttempts([]);
-    // Sorteia o PRIMEIRO alvo da rodada aqui. A versão anterior fazia
-    // setTarget(null) — e nada voltava a sortear: a partida começava com
-    // "ENCONTRE ..." sem nome e todo clique era ignorado (handleHit exige
-    // alvo). Era o jogo inteiro nascendo morto.
-    setTarget(pickTarget(structures, null));
-    setShowHint(false);
-    setRoundId((id) => id + 1);
-    setPhase("contagem");
-    playTick();
-  }, [structures]);
+    beginStage(0);
+  }, [structures, beginStage]);
 
   const endRound = useCallback(() => {
     setPhase("resultado");
@@ -218,7 +253,10 @@ export function ArenaGame() {
         if (step > 0) playTick();
         setCountdown(step);
       }
-      if (countdownTimer.current >= 3) {
+      // Só libera o jogo com as estruturas da fase JÁ carregadas — na troca
+      // de modelo elas chegam async, e entrar sem alvo mataria a partida.
+      // Se o modelo demorar, a contagem segura no "JÁ!" até ele chegar.
+      if (countdownTimer.current >= 3 && structuresRef.current.length > 0) {
         sinceTarget.current = 0;
         setPhase("jogando");
         playStart();
@@ -234,7 +272,11 @@ export function ArenaGame() {
       sinceTarget.current += delta;
       if (!showHint && sinceTarget.current > HINT_AFTER) setShowHint(true);
 
-      if (remaining.current <= 0) endRound();
+      if (remaining.current <= 0) {
+        // Acabou o tempo: próxima fase, ou resultado se era a última.
+        if (stageIndex < STAGES.length - 1) beginStage(stageIndex + 1);
+        else endRound();
+      }
       return;
     }
 
@@ -264,7 +306,7 @@ export function ArenaGame() {
       >
         <Suspense fallback={<CarregandoModelo />}>
           <ArenaModel
-            path={MODEL_PATH}
+            path={STAGES[stageIndex].path}
             scale={1.3}
             roundId={roundId}
             onStructuresReady={handleStructures}
@@ -291,7 +333,7 @@ export function ArenaGame() {
               color={ARENA_COLORS.muted}
               maxWidth={1.9}
             >
-              Encontre as estruturas da laringe em 60 segundos
+              2 fases · Laringe e Fígado · 60 segundos cada
             </Text3D>
             {/* Instrução explícita: quem nunca usou VR não sabe que o gatilho
                 fica embaixo do dedo indicador, e tenta apertar o grip. */}
@@ -334,9 +376,14 @@ export function ArenaGame() {
 
       {/* ---------------- Contagem regressiva ---------------- */}
       {phase === "contagem" && (
-        <Text3D position={[0, 0.9, 1.0]} size={0.55}>
-          {countdown > 0 ? String(countdown) : "JÁ!"}
-        </Text3D>
+        <group position={[0, 0.9, 1.0]}>
+          <Text3D position={[0, 0.5, 0]} size={0.13} color={ARENA_COLORS.primary}>
+            {`Fase ${stageIndex + 1} de ${STAGES.length} · ${STAGES[stageIndex].nome}`}
+          </Text3D>
+          <Text3D size={0.55}>
+            {countdown > 0 ? String(countdown) : "JÁ!"}
+          </Text3D>
+        </group>
       )}
 
       {/*
@@ -355,7 +402,7 @@ export function ArenaGame() {
               size={0.055}
               color={ARENA_COLORS.muted}
             >
-              ENCONTRE
+              {`FASE ${stageIndex + 1}/${STAGES.length} · ${STAGES[stageIndex].nome.toUpperCase()} — ENCONTRE`}
             </Text3D>
             <Text3D
               position={[0, -0.04, 0.01]}

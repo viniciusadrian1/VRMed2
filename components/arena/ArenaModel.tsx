@@ -166,4 +166,7 @@ export function ArenaModel({
   );
 }
 
+// Pré-carrega os modelos das duas fases: a troca Laringe→Fígado acontece no
+// meio da partida, e ninguém deve esperar download/decodificação de headset.
 useGLTF.preload("/models/organs/larynx.glb", DRACO_PATH);
+useGLTF.preload("/models/healthy/figado.glb", DRACO_PATH);
