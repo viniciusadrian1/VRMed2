@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
-import { XR, XROrigin, createXRStore } from "@react-three/xr";
+import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { track } from "@/lib/analytics";
 import { clamp } from "@/lib/format";
@@ -20,6 +20,8 @@ import { StructureHotspots } from "./StructureHotspots";
 const DEFAULT_CAMERA: [number, number, number] = [3.2, 2.3, 4.6];
 const MIN_DISTANCE = 1.7;
 const MAX_DISTANCE = 14;
+/** Altura do chão da cena (o modelo é normalizado em ~2 unidades no centro). */
+const FLOOR_Y = -1.3;
 
 interface OrbitLike {
   target: THREE.Vector3;
@@ -105,6 +107,101 @@ function SceneInvalidator() {
   return null;
 }
 
+/**
+ * Cenário exclusivo da sessão VR: chão em grade e um anel sob o modelo.
+ *
+ * Resolve o "tudo preto ao redor" — sem nenhuma referência espacial, o headset
+ * mostra um vazio preto e fica impossível saber para onde olhar. A grade também
+ * prova que a renderização está funcionando, separando "não renderiza" de
+ * "o modelo não carregou". Usa geometria pura (nada de rede, nada de fonte).
+ */
+function XRStage() {
+  return (
+    <>
+      <hemisphereLight args={["#dfe9f2", "#1b2229", 1.1]} />
+      {/* Chão: referência espacial imediata ao entrar em VR. */}
+      <gridHelper
+        args={[24, 24, "#3d7ab0", "#243542"]}
+        position={[0, FLOOR_Y, 0]}
+      />
+      {/* Anel sob o modelo: mostra onde o órgão está, mesmo de costas. */}
+      <mesh position={[0, FLOOR_Y + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.05, 1.25, 48]} />
+        <meshBasicMaterial color="#5896c8" transparent opacity={0.55} />
+      </mesh>
+    </>
+  );
+}
+
+/**
+ * Conteúdo da cena. Em VR, remove tudo que é DOM, custoso ou que disputa a
+ * câmera do headset:
+ *  - OrbitControls e CameraRig escrevem em `camera.position` a cada quadro
+ *    (o OrbitControls do drei não tem consciência de XR) e, numa sessão, essa
+ *    câmera é a do headset — brigando com o rastreamento da cabeça.
+ *  - Environment busca um HDR na rede (falha em wifi ruim/offline).
+ *  - Html (hotspots) é DOM: invisível em VR e ainda faz raycast por quadro.
+ */
+function SceneContents() {
+  const inSession = useXR((state) => Boolean(state.session));
+
+  return (
+    <>
+      {/* Posiciona o usuário à frente do modelo ao entrar em VR. */}
+      <XROrigin position={[0, FLOOR_Y, 3]} />
+
+      <ambientLight intensity={inSession ? 0.85 : 0.5} />
+      <directionalLight
+        position={[5, 7, 5]}
+        intensity={2.1}
+        castShadow={!inSession}
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.0002}
+      >
+        <orthographicCamera
+          attach="shadow-camera"
+          args={[-4, 4, 4, -4, 0.1, 30]}
+        />
+      </directionalLight>
+      <directionalLight
+        position={[-6, 3, -5]}
+        intensity={0.55}
+        color="#9fc3dd"
+      />
+
+      <OrganModel />
+
+      {inSession ? (
+        <XRStage />
+      ) : (
+        <>
+          <SafeEnvironment />
+          <ClipPlaneHelpers />
+          <StructureHotspots />
+          <AnnotationHotspots />
+          <ContactShadows
+            position={[0, -1.25, 0]}
+            opacity={0.4}
+            scale={9}
+            blur={2.8}
+            far={4}
+          />
+          <OrbitControls
+            makeDefault
+            enableDamping
+            dampingFactor={0.08}
+            minDistance={MIN_DISTANCE}
+            maxDistance={MAX_DISTANCE}
+          />
+          <CameraRig />
+        </>
+      )}
+
+      <SceneInvalidator />
+    </>
+  );
+}
+
 /** Canvas 3D principal do visualizador, com suporte a WebXR. */
 export function Scene() {
   const mounted = useMounted();
@@ -145,8 +242,9 @@ export function Scene() {
 
   return (
     <Canvas
-      shadows="percentage"
-      dpr={[1, 2]}
+      // Sombras (PCSS + mapa 2048²) são caras demais para o Quest.
+      shadows={inXR ? false : "percentage"}
+      dpr={inXR ? 1 : [1, 2]}
       frameloop={inXR ? "always" : "demand"}
       camera={{ position: DEFAULT_CAMERA, fov: 45 }}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
@@ -161,51 +259,7 @@ export function Scene() {
       }}
     >
       <XR store={xrStore}>
-        {/* Posiciona o usuário à frente do modelo ao entrar em VR. */}
-        <XROrigin position={[0, -1.3, 3]} />
-
-        <ambientLight intensity={0.5} />
-        <directionalLight
-          position={[5, 7, 5]}
-          intensity={2.1}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
-          shadow-bias={-0.0002}
-        >
-          <orthographicCamera
-            attach="shadow-camera"
-            args={[-4, 4, 4, -4, 0.1, 30]}
-          />
-        </directionalLight>
-        <directionalLight
-          position={[-6, 3, -5]}
-          intensity={0.55}
-          color="#9fc3dd"
-        />
-
-        <SafeEnvironment />
-        <OrganModel />
-        <ClipPlaneHelpers />
-        <StructureHotspots />
-        <AnnotationHotspots />
-
-        <ContactShadows
-          position={[0, -1.25, 0]}
-          opacity={0.4}
-          scale={9}
-          blur={2.8}
-          far={4}
-        />
-
-        <OrbitControls
-          makeDefault
-          enableDamping
-          dampingFactor={0.08}
-          minDistance={MIN_DISTANCE}
-          maxDistance={MAX_DISTANCE}
-        />
-        <CameraRig />
-        <SceneInvalidator />
+        <SceneContents />
       </XR>
     </Canvas>
   );
