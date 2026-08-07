@@ -50,7 +50,7 @@ function VigiaDeControles() {
   if (!alerta) return null;
   return (
     <Text3D
-      position={[0, 1.1, 0.6]}
+      position={[0, 0.85, 1.0]}
       size={0.09}
       color={ARENA_COLORS.danger}
       maxWidth={2.2}
@@ -119,8 +119,11 @@ export function ArenaGame() {
   const countdownTimer = useRef(0);
   const feedbackTimer = useRef(0);
 
+  const [modelReady, setModelReady] = useState(false);
+
   const handleStructures = useCallback((list: ArenaStructure[]) => {
     setStructures(list);
+    setModelReady(true);
     // Já deixa um alvo pronto: derivar aqui evita um efeito extra e o
     // render em cascata que ele causaria.
     setTarget(pickTarget(list, null));
@@ -289,12 +292,30 @@ export function ArenaGame() {
             {/* Instrução explícita: quem nunca usou VR não sabe que o gatilho
                 fica embaixo do dedo indicador, e tenta apertar o grip. */}
             <Text3D
-              position={[0, -0.24, 0.01]}
+              position={[0, -0.2, 0.01]}
               size={0.07}
               color={ARENA_COLORS.primary}
               maxWidth={1.9}
             >
               Mire com o raio e puxe o gatilho (dedo indicador)
+            </Text3D>
+            {/* Diagnóstico visível: quantos alvos o modelo rendeu. Se o
+                carregamento falhar em produzir estruturas, o problema fica
+                LEGÍVEL dentro do headset em vez de virar um botão morto. */}
+            <Text3D
+              position={[0, -0.36, 0.01]}
+              size={0.05}
+              color={
+                modelReady && structures.length === 0
+                  ? ARENA_COLORS.danger
+                  : ARENA_COLORS.muted
+              }
+            >
+              {!modelReady
+                ? "Preparando o modelo…"
+                : structures.length === 0
+                  ? "ERRO: nenhuma estrutura nomeada no modelo"
+                  : `${structures.length} estruturas prontas`}
             </Text3D>
           </Panel>
           <Button3D
@@ -309,26 +330,33 @@ export function ArenaGame() {
 
       {/* ---------------- Contagem regressiva ---------------- */}
       {phase === "contagem" && (
-        <Text3D position={[0, 0.6, 1.2]} size={0.6}>
+        <Text3D position={[0, 0.9, 1.0]} size={0.55}>
           {countdown > 0 ? String(countdown) : "JÁ!"}
         </Text3D>
       )}
 
-      {/* ---------------- Painel da partida ---------------- */}
+      {/*
+        Painel da partida — na LINHA DO OLHAR, não no teto.
+        A cabeça do jogador fica a ~0,35 de altura no mundo, olhando para o
+        modelo; a versão anterior (y=1,55, atrás) exigia olhar para cima, e
+        em VR ninguém olha para cima sem motivo — o alvo "não aparecia".
+        Aqui o painel surge no MESMO lugar da contagem regressiva, onde o
+        olhar já está.
+      */}
       {phase === "jogando" && (
-        <group position={[0, 1.55, 0.2]}>
-          <Panel width={2.6} height={0.62}>
+        <group position={[0, 1.02, 0.9]}>
+          <Panel width={2.1} height={0.5}>
             <Text3D
-              position={[0, 0.17, 0.01]}
-              size={0.07}
+              position={[0, 0.14, 0.01]}
+              size={0.055}
               color={ARENA_COLORS.muted}
             >
               ENCONTRE
             </Text3D>
             <Text3D
-              position={[0, -0.03, 0.01]}
-              size={0.15}
-              maxWidth={2.4}
+              position={[0, -0.04, 0.01]}
+              size={0.12}
+              maxWidth={1.9}
               color={
                 feedback === "acerto"
                   ? ARENA_COLORS.success
@@ -342,25 +370,43 @@ export function ArenaGame() {
           </Panel>
 
           {/* Tempo à esquerda, pontos à direita — leitura periférica. */}
-          <Text3D
-            position={[-1.5, 0, 0.01]}
-            size={0.22}
-            color={seconds <= 10 ? ARENA_COLORS.danger : ARENA_COLORS.text}
-          >
-            {String(seconds)}
-          </Text3D>
-          <Text3D position={[1.5, 0.04, 0.01]} size={0.16}>
-            {String(score)}
-          </Text3D>
-          {combo > 1 && (
+          <Panel width={0.42} height={0.34} position={[-1.35, -0.05, 0]}>
             <Text3D
-              position={[1.5, -0.14, 0.01]}
-              size={0.08}
-              color={ARENA_COLORS.success}
+              position={[0, 0.09, 0.01]}
+              size={0.045}
+              color={ARENA_COLORS.muted}
             >
-              {`combo x${combo}`}
+              TEMPO
             </Text3D>
-          )}
+            <Text3D
+              position={[0, -0.05, 0.01]}
+              size={0.15}
+              color={seconds <= 10 ? ARENA_COLORS.danger : ARENA_COLORS.text}
+            >
+              {String(seconds)}
+            </Text3D>
+          </Panel>
+          <Panel width={0.52} height={0.34} position={[1.35, -0.05, 0]}>
+            <Text3D
+              position={[0, 0.09, 0.01]}
+              size={0.045}
+              color={ARENA_COLORS.muted}
+            >
+              PONTOS
+            </Text3D>
+            <Text3D position={[0, -0.05, 0.01]} size={0.13}>
+              {String(score)}
+            </Text3D>
+            {combo > 1 && (
+              <Text3D
+                position={[0, -0.22, 0.01]}
+                size={0.06}
+                color={ARENA_COLORS.success}
+              >
+                {`combo x${combo}`}
+              </Text3D>
+            )}
+          </Panel>
         </group>
       )}
 

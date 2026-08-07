@@ -87,6 +87,8 @@ export function Text3D({
       // escalá-lo até 6× e cobrir o painel que ele precisa clicar.
       material-depthTest={false}
       renderOrder={999}
+      // Texto não intercepta o laser: o clique atravessa até o modelo.
+      raycast={() => null}
     >
       {children}
     </Text>
@@ -111,7 +113,9 @@ export function Panel({
 }) {
   return (
     <group position={position}>
-      <mesh renderOrder={998}>
+      {/* raycast nulo: o painel é pano de fundo, não alvo do laser — sem
+          isso ele bloquearia os cliques no modelo atrás dele. */}
+      <mesh renderOrder={998} raycast={() => null}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial
           color={color}
