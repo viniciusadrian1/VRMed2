@@ -100,9 +100,15 @@ export function XRManipulation({
   /** Pinça ativa em cada mão, para aplicar a histerese. */
   const pinching = useRef({ left: false, right: false });
 
-  useFrame((state, delta, frame) => {
+  useFrame((state, rawDelta, frame) => {
     const model = target.current;
     if (!model) return;
+
+    // Limita o passo de tempo. Ao tirar o headset da cabeça a sessão pausa e,
+    // ao voltar, o primeiro `delta` vem com dezenas de segundos acumulados —
+    // sem esse teto, um polegar apenas encostado no analógico faria a escala
+    // saltar direto para o limite.
+    const delta = Math.min(rawDelta, 1 / 30);
 
     // Guarda a pose inicial na primeira vez que o modelo existe.
     if (!home.current) {
