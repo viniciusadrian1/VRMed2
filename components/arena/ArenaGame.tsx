@@ -139,7 +139,11 @@ export function ArenaGame() {
     setCombo(0);
     setHits(0);
     setAttempts([]);
-    setTarget(null);
+    // Sorteia o PRIMEIRO alvo da rodada aqui. A versão anterior fazia
+    // setTarget(null) — e nada voltava a sortear: a partida começava com
+    // "ENCONTRE ..." sem nome e todo clique era ignorado (handleHit exige
+    // alvo). Era o jogo inteiro nascendo morto.
+    setTarget(pickTarget(structures, null));
     setShowHint(false);
     setRoundId((id) => id + 1);
     setPhase("contagem");
