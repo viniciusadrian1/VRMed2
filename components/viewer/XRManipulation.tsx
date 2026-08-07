@@ -205,10 +205,13 @@ export function XRManipulation({
 
     /* ---------------- Analógico: aumentar / diminuir ---------------- */
     // Só existe em controles; com as mãos, usa-se o gesto de duas pinças.
+    // Vale o analógico mais inclinado, para servir a destro e canhoto.
+    const rightStick =
+      rightController?.gamepad?.["xr-standard-thumbstick"]?.yAxis ?? 0;
+    const leftStick =
+      leftController?.gamepad?.["xr-standard-thumbstick"]?.yAxis ?? 0;
     const stick =
-      rightController?.gamepad?.["xr-standard-thumbstick"]?.yAxis ??
-      leftController?.gamepad?.["xr-standard-thumbstick"]?.yAxis ??
-      0;
+      Math.abs(rightStick) >= Math.abs(leftStick) ? rightStick : leftStick;
     if (Math.abs(stick) > STICK_DEADZONE) {
       // Empurrar para frente (yAxis negativo) aumenta o modelo.
       const factor = 1 - stick * delta * STICK_SPEED;
