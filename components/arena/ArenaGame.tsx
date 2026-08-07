@@ -297,11 +297,11 @@ export function ArenaGame() {
                 fica embaixo do dedo indicador, e tenta apertar o grip. */}
             <Text3D
               position={[0, -0.2, 0.01]}
-              size={0.07}
+              size={0.065}
               color={ARENA_COLORS.primary}
-              maxWidth={1.9}
+              maxWidth={2.0}
             >
-              Mire com o raio e puxe o gatilho (dedo indicador)
+              Gatilho: selecionar · Analógico: girar e aproximar o órgão
             </Text3D>
             {/* Diagnóstico visível: quantos alvos o modelo rendeu. Se o
                 carregamento falhar em produzir estruturas, o problema fica

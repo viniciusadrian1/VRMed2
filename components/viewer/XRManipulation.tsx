@@ -10,7 +10,18 @@ const MIN_SCALE = 0.2;
 const MAX_SCALE = 6;
 /** Zona morta do analógico — evita deriva com o polegar em repouso. */
 const STICK_DEADZONE = 0.15;
-const STICK_SPEED = 1.4;
+/** Giro pelo analógico (rad/s com o eixo no máximo). */
+const SPIN_SPEED = 2.4;
+/** Aproximar/afastar pelo analógico (m/s com o eixo no máximo). */
+const APPROACH_SPEED = 1.3;
+/** Distância cabeça→órgão permitida (m): nem dentro do rosto, nem longe demais. */
+const MIN_HEAD_DISTANCE = 0.45;
+const MAX_HEAD_DISTANCE = 5;
+
+// Reutilizados a cada quadro para não alocar vetores a 72–90 Hz.
+const WORLD_Y = new THREE.Vector3(0, 1, 0);
+const TMP_HEAD = new THREE.Vector3();
+const TMP_DIR = new THREE.Vector3();
 /**
  * Limiares do gesto de pinça (metros, entre as pontas do polegar e do
  * indicador). Fechar e abrir têm valores diferentes de propósito: sem essa
@@ -74,7 +85,8 @@ interface Snapshot {
  *    mantendo a posição relativa de onde foi agarrado.
  *  - **Pegar com as duas** — afastar/aproximar aumenta e diminui;
  *    mover as duas juntas arrasta o modelo.
- *  - **Analógico (frente/trás)** — aumenta e diminui (só nos controles).
+ *  - **Analógico ⇄ (esquerda/direita)** — gira o órgão como um torno.
+ *  - **Analógico ↕ (frente/trás)** — traz para perto do rosto / afasta.
  *  - **Botão A ou X** — devolve o modelo à posição original (essencial num
  *    estande: a próxima pessoa sempre começa do mesmo jeito).
  *
@@ -209,21 +221,41 @@ export function XRManipulation({
     }
     grabOffset.current = null;
 
-    /* ---------------- Analógico: aumentar / diminuir ---------------- */
-    // Só existe em controles; com as mãos, usa-se o gesto de duas pinças.
-    // Vale o analógico mais inclinado, para servir a destro e canhoto.
-    const rightStick =
-      rightController?.gamepad?.["xr-standard-thumbstick"]?.yAxis ?? 0;
-    const leftStick =
-      leftController?.gamepad?.["xr-standard-thumbstick"]?.yAxis ?? 0;
-    const stick =
-      Math.abs(rightStick) >= Math.abs(leftStick) ? rightStick : leftStick;
-    if (Math.abs(stick) > STICK_DEADZONE) {
-      // Empurrar para frente (yAxis negativo) aumenta o modelo.
-      const factor = 1 - stick * delta * STICK_SPEED;
-      model.scale.setScalar(
-        THREE.MathUtils.clamp(model.scale.x * factor, minScale, maxScale),
+    /* ------------- Analógicos: girar e aproximar (torno) ------------- */
+    // Virar o modelo pela pegada 1:1 exige contorção do punho (180° de giro
+    // = 180° de pulso). O analógico faz isso sem esforço, como um torno:
+    //   eixo X  → gira o órgão em torno do próprio centro
+    //   eixo Y  → aproxima/afasta do rosto (empurrar para frente aproxima)
+    // Vale o analógico mais inclinado por eixo, para destro e canhoto.
+    const leftPad = leftController?.gamepad?.["xr-standard-thumbstick"];
+    const rightPad = rightController?.gamepad?.["xr-standard-thumbstick"];
+    const lx = leftPad?.xAxis ?? 0;
+    const rx = rightPad?.xAxis ?? 0;
+    const ly = leftPad?.yAxis ?? 0;
+    const ry = rightPad?.yAxis ?? 0;
+    const spin = Math.abs(rx) >= Math.abs(lx) ? rx : lx;
+    const approach = Math.abs(ry) >= Math.abs(ly) ? ry : ly;
+
+    if (Math.abs(spin) > STICK_DEADZONE) {
+      // Sinal invertido: analógico para a direita gira a face do modelo
+      // para a direita do jogador (sentido natural de "girar a vitrine").
+      model.rotateOnWorldAxis(WORLD_Y, -spin * delta * SPIN_SPEED);
+    }
+
+    if (Math.abs(approach) > STICK_DEADZONE) {
+      // Move ao longo da linha cabeça→órgão: ao aproximar, ele também sobe
+      // até a altura do olhar — vem "para a mão" do jogador.
+      const head = state.camera.getWorldPosition(TMP_HEAD);
+      const direction = TMP_DIR.copy(model.position).sub(head);
+      const distance = direction.length() || 1;
+      direction.normalize();
+      // yAxis é negativo com o analógico para frente → aproxima.
+      const next = THREE.MathUtils.clamp(
+        distance + approach * delta * APPROACH_SPEED,
+        MIN_HEAD_DISTANCE,
+        MAX_HEAD_DISTANCE,
       );
+      model.position.copy(head).addScaledVector(direction, next);
     }
   });
 
