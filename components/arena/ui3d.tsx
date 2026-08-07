@@ -78,8 +78,15 @@ export function Text3D({
       anchorX="center"
       anchorY={anchorY}
       textAlign="center"
+      // Contorno escuro: o texto passa por cima de um modelo claro.
+      outlineWidth={size * 0.05}
+      outlineColor="#04070c"
       // Sem tonemapping o texto mantém o contraste dentro do headset.
       material-toneMapped={false}
+      // A interface nunca pode ser engolida pelo modelo — o jogador pode
+      // escalá-lo até 6× e cobrir o painel que ele precisa clicar.
+      material-depthTest={false}
+      renderOrder={999}
     >
       {children}
     </Text>
@@ -104,7 +111,7 @@ export function Panel({
 }) {
   return (
     <group position={position}>
-      <mesh>
+      <mesh renderOrder={998}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial
           color={color}
@@ -112,6 +119,7 @@ export function Panel({
           opacity={opacity}
           side={THREE.DoubleSide}
           toneMapped={false}
+          depthTest={false}
         />
       </mesh>
       {children}
@@ -169,9 +177,14 @@ export function Button3D({
         hovered.current = false;
       }}
     >
-      <mesh>
+      <mesh renderOrder={998}>
         <planeGeometry args={[width, height]} />
-        <meshBasicMaterial color={color} toneMapped={false} />
+        <meshBasicMaterial
+          color={color}
+          toneMapped={false}
+          depthTest={false}
+          side={THREE.DoubleSide}
+        />
       </mesh>
       <Text3D position={[0, 0, 0.005]} size={height * 0.42}>
         {label}

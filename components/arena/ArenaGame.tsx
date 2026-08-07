@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useXRStore } from "@react-three/xr";
 import {
@@ -10,6 +10,7 @@ import {
   playStart,
   playTick,
 } from "@/lib/arena-audio";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ArenaModel } from "./ArenaModel";
 import { ARENA_COLORS, Button3D, Panel, Text3D } from "./ui3d";
 import type { ArenaAttempt, ArenaPhase, ArenaStructure } from "./types";
@@ -24,6 +25,17 @@ const MISS_PENALTY = 2;
 const RESULT_TIMEOUT = 20;
 /** Modelo principal do jogo (18k triângulos, ~20 estruturas nomeadas). */
 const MODEL_PATH = "/models/organs/larynx.glb";
+
+/** Mostrado enquanto o modelo baixa e decodifica, no lugar dele. */
+function CarregandoModelo() {
+  return (
+    <group position={[0, 0.2, 0]}>
+      <Text3D size={0.13} color={ARENA_COLORS.muted}>
+        Carregando o modelo…
+      </Text3D>
+    </group>
+  );
+}
 
 /** Sorteia o próximo alvo, evitando repetir o atual. */
 function pickTarget(
@@ -193,15 +205,31 @@ export function ArenaGame() {
 
   return (
     <>
-      <ArenaModel
-        path={MODEL_PATH}
-        scale={1.3}
-        roundId={roundId}
-        onStructuresReady={handleStructures}
-        onHit={handleHit}
-        hintPosition={showHint && target ? target.local : null}
-        interactive={phase === "jogando"}
-      />
+      {/*
+        O `useGLTF` do modelo SUSPENDE enquanto carrega. Sem esta fronteira,
+        a suspensão sobe e leva junto toda a interface — painel, botão e alvo
+        desaparecem enquanto o modelo baixa, e somem para sempre se ele falhar.
+        Isolando aqui, a interface aparece na hora e o modelo chega depois.
+      */}
+      <ErrorBoundary
+        fallback={
+          <Text3D position={[0, 0.2, 0]} size={0.11} color={ARENA_COLORS.danger}>
+            Falha ao carregar o modelo — recarregue a página
+          </Text3D>
+        }
+      >
+        <Suspense fallback={<CarregandoModelo />}>
+          <ArenaModel
+            path={MODEL_PATH}
+            scale={1.3}
+            roundId={roundId}
+            onStructuresReady={handleStructures}
+            onHit={handleHit}
+            hintPosition={showHint && target ? target.local : null}
+            interactive={phase === "jogando"}
+          />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* ---------------- Ocioso: convite para começar ---------------- */}
       {phase === "ocioso" && (
@@ -211,17 +239,29 @@ export function ArenaGame() {
               VRmed · Arena
             </Text3D>
             <Text3D
-              position={[0, 0.02, 0.01]}
+              position={[0, 0.04, 0.01]}
               size={0.085}
               color={ARENA_COLORS.muted}
               maxWidth={1.9}
             >
               Encontre as estruturas da laringe em 60 segundos
             </Text3D>
+            {/* Instrução explícita: quem nunca usou VR não sabe que o gatilho
+                fica embaixo do dedo indicador, e tenta apertar o grip. */}
+            <Text3D
+              position={[0, -0.24, 0.01]}
+              size={0.07}
+              color={ARENA_COLORS.primary}
+              maxWidth={1.9}
+            >
+              Mire com o raio e puxe o gatilho (dedo indicador)
+            </Text3D>
           </Panel>
           <Button3D
             label="Começar"
-            position={[0, -0.42, 0.02]}
+            position={[0, -0.45, 0.02]}
+            width={1.4}
+            height={0.36}
             onClick={startRound}
           />
         </group>

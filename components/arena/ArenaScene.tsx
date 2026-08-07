@@ -28,9 +28,9 @@ export function ArenaScene() {
     () =>
       createXRStore({
         baseAssetPath: "/webxr-profiles/",
-        // Modelos 3D de controle e mão também vêm de CDN; a Arena dispensa.
-        controller: { model: false },
-        hand: { model: false },
+        // Os modelos 3D dos controles ficam LIGADOS e são servidos daqui.
+        // Ver o controle desenhado na frente do rosto é o que ensina um leigo
+        // qual botão apertar — sem isso ele fica com um raio saindo do nada.
         // Recursos de realidade mista desligados: por padrão a biblioteca os
         // pede como opcionais, e detecção de planos/malhas pode disparar o
         // diálogo de dados espaciais da Meta — um pop-up do sistema na cara
