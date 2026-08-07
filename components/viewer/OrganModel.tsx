@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useThree, type ThreeEvent } from "@react-three/fiber";
 import { TransformControls } from "@react-three/drei";
+import { useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { track } from "@/lib/analytics";
 import { genId } from "@/lib/format";
@@ -27,6 +28,7 @@ import { useVRMedStore } from "@/lib/store";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GLBModel } from "./GLBModel";
 import { PlaceholderOrgan } from "./PlaceholderOrgan";
+import { XRManipulation } from "./XRManipulation";
 
 type Availability = "checking" | "real" | "placeholder";
 
@@ -73,6 +75,7 @@ export function OrganModel() {
   const addAnnotation = useVRMedStore((s) => s.addAnnotation);
   const setInspectedLabel = useVRMedStore((s) => s.setInspectedLabel);
   const invalidate = useThree((s) => s.invalidate);
+  const inSession = useXR((state) => Boolean(state.session));
   const organ = getOrganById(organId);
 
   const rootRef = useRef<THREE.Group>(null);
@@ -220,7 +223,10 @@ export function OrganModel() {
         <ModelStateApplier rootRef={rootRef} />
       </group>
 
-      {transformMode !== "none" && modelReady && rootRef.current && (
+      {/* Em VR o modelo é manipulado pelos controles do headset. */}
+      {inSession && modelReady && <XRManipulation target={rootRef} />}
+
+      {!inSession && transformMode !== "none" && modelReady && rootRef.current && (
         <TransformControls object={rootRef.current} mode={transformMode} />
       )}
     </>
