@@ -34,6 +34,7 @@ export function ArenaModel({
   onHit,
   hintPosition,
   interactive = true,
+  spinning = false,
 }: {
   path: string;
   scale?: number;
@@ -44,11 +45,14 @@ export function ArenaModel({
   /** Posição (local) da estrutura a destacar como dica, ou null. */
   hintPosition: THREE.Vector3 | null;
   interactive?: boolean;
+  /** Giro lento de vitrine (modo ocioso). */
+  spinning?: boolean;
 }) {
   const gltf = useGLTF(path, DRACO_PATH);
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
   const pivot = useRef<THREE.Group>(null);
+  const spinner = useRef<THREE.Group>(null);
   const content = useRef<THREE.Group>(null);
   const hint = useRef<THREE.Mesh>(null);
 
@@ -60,6 +64,25 @@ export function ArenaModel({
 
     normalizeContent(group);
     group.updateWorldMatrix(true, true);
+
+    // A cena da Arena não tem mapa de ambiente (o preset do drei busca um HDR
+    // na rede — proibido no evento). Sem envmap, material PBR metálico
+    // renderiza quase preto. Clona os materiais (para não contaminar o cache
+    // do useGLTF, compartilhado com o visualizador) e limita o metalness.
+    group.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const materials = Array.isArray(mesh.material)
+        ? mesh.material
+        : [mesh.material];
+      const cloned = materials.map((mat) => {
+        const copy = mat.clone() as THREE.MeshStandardMaterial;
+        if ("metalness" in copy) copy.metalness = Math.min(copy.metalness, 0.1);
+        if ("roughness" in copy) copy.roughness = Math.max(copy.roughness, 0.55);
+        return copy;
+      });
+      mesh.material = Array.isArray(mesh.material) ? cloned : cloned[0];
+    });
 
     const points = detectStructures(group);
     // Converte de mundo para o espaço do pivot (ver comentário do componente).
@@ -88,13 +111,22 @@ export function ArenaModel({
     root.position.set(0, 0, 0);
     root.quaternion.identity();
     root.scale.setScalar(scale);
+    // O giro de vitrine também zera: as posições das estruturas (e a dica)
+    // foram capturadas com o giro em zero.
+    spinner.current?.rotation.set(0, 0, 0);
   }, [roundId, scale]);
 
-  // Pulso suave da dica — chama atenção sem entregar de forma agressiva.
-  useFrame((state) => {
-    if (!hint.current) return;
-    const pulse = 1 + Math.sin(state.clock.elapsedTime * 4) * 0.25;
-    hint.current.scale.setScalar(pulse);
+  useFrame((state, delta) => {
+    // Giro lento de vitrine, só no ocioso (o grupo `spinner` gira em torno do
+    // centro do modelo; o pivot fica livre para o XRManipulation).
+    if (spinning && spinner.current) {
+      spinner.current.rotation.y += Math.min(delta, 1 / 30) * 0.35;
+    }
+    // Pulso suave da dica — chama atenção sem entregar de forma agressiva.
+    if (hint.current) {
+      const pulse = 1 + Math.sin(state.clock.elapsedTime * 4) * 0.25;
+      hint.current.scale.setScalar(pulse);
+    }
   });
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
@@ -105,8 +137,12 @@ export function ArenaModel({
 
   return (
     <group ref={pivot} scale={scale}>
-      <group ref={content} onClick={handleClick}>
-        <primitive object={scene} />
+      {/* O conteúdo é centrado na origem pelo normalizeContent, então o
+          spinner gira o modelo em torno do próprio centro. */}
+      <group ref={spinner}>
+        <group ref={content} onClick={handleClick}>
+          <primitive object={scene} />
+        </group>
       </group>
 
       {/* Dica: esfera luminosa sobre a estrutura procurada.

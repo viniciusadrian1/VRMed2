@@ -57,14 +57,52 @@ export function ArenaScene() {
 
   return (
     <>
+      {/*
+        Fora da sessão, toda a interface é DOM — limpa e organizada por cima
+        do modelo girando. A UI 3D do jogo só existe DENTRO do VR (onde DOM é
+        invisível); misturar as duas na mesma tela era o que deixava a página
+        bagunçada, com painéis 3D atravessando o texto.
+      */}
       {!inSession && (
-        <button
-          type="button"
-          onClick={() => void store.enterVR()}
-          className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-xl"
-        >
-          Entrar em VR
-        </button>
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col">
+          <header className="flex items-center gap-2.5 p-6">
+            <span className="size-2.5 rounded-full bg-[#5896c8]" />
+            <span className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
+              VRmed
+            </span>
+          </header>
+
+          <div className="mt-auto flex flex-col items-center gap-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-6 pb-16 pt-28 text-center">
+            <h1 className="font-serif text-5xl font-medium tracking-tight text-white md:text-6xl">
+              Arena
+            </h1>
+            <p className="max-w-md text-pretty text-base text-white/70">
+              Encontre as estruturas anatômicas contra o relógio — 60 segundos
+              dentro do corpo humano.
+            </p>
+            <button
+              type="button"
+              onClick={() => void store.enterVR()}
+              className="pointer-events-auto mt-1 rounded-full bg-[#5896c8] px-12 py-4 text-lg font-semibold text-[#0b1220] shadow-[0_0_45px_rgba(88,150,200,0.45)] transition-transform hover:scale-105"
+            >
+              Entrar em VR
+            </button>
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-white/60">
+              <span className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5">
+                1 · Mire com o laser
+              </span>
+              <span className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5">
+                2 · Puxe o gatilho
+              </span>
+              <span className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5">
+                3 · Marque pontos em 60s
+              </span>
+            </div>
+            <p className="text-[11px] text-white/40">
+              Requer um headset compatível com WebXR (Meta Quest)
+            </p>
+          </div>
+        </div>
       )}
 
       <Canvas

@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useXRStore } from "@react-three/xr";
+import { useXR, useXRStore } from "@react-three/xr";
 import {
   playEnd,
   playHit,
@@ -59,6 +59,9 @@ function pickTarget(
  */
 export function ArenaGame() {
   const store = useXRStore();
+  // Só para decidir o que renderizar — a UI 3D existe apenas dentro do VR
+  // (fora dela, a página DOM cuida da apresentação).
+  const inSession = useXR((state) => Boolean(state.session));
 
   const [phase, setPhase] = useState<ArenaPhase>("ocioso");
   const [structures, setStructures] = useState<ArenaStructure[]>([]);
@@ -227,12 +230,13 @@ export function ArenaGame() {
             onHit={handleHit}
             hintPosition={showHint && target ? target.local : null}
             interactive={phase === "jogando"}
+            spinning={phase === "ocioso"}
           />
         </Suspense>
       </ErrorBoundary>
 
       {/* ---------------- Ocioso: convite para começar ---------------- */}
-      {phase === "ocioso" && (
+      {inSession && phase === "ocioso" && (
         <group position={[0, 0.35, 1.4]}>
           <Panel width={2.2} height={0.95}>
             <Text3D position={[0, 0.28, 0.01]} size={0.16}>
@@ -258,7 +262,7 @@ export function ArenaGame() {
             </Text3D>
           </Panel>
           <Button3D
-            label="Começar"
+            label={structures.length > 0 ? "Começar" : "Carregando…"}
             position={[0, -0.45, 0.02]}
             width={1.4}
             height={0.36}
