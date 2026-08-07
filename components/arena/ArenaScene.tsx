@@ -27,7 +27,18 @@ export function ArenaScene() {
   const store = useMemo(
     () =>
       createXRStore({
-        baseAssetPath: "/webxr-profiles/",
+        // PRECISA ser URL absoluta: a biblioteca resolve os perfis com
+        // `new URL(caminho, baseAssetPath)`, e um caminho relativo não é uma
+        // base válida — lança "Invalid URL", o erro é engolido num
+        // console.error e o controle simplesmente nunca é criado (sem laser,
+        // sem gatilho, sem nada). Foi exatamente o bug do primeiro teste.
+        baseAssetPath:
+          typeof window !== "undefined"
+            ? `${window.location.origin}/webxr-profiles/`
+            : "https://localhost/webxr-profiles/",
+        // O modelo 3D da mão vem de outro CDN; o rastreamento (pinça)
+        // funciona igual sem ele.
+        hand: { model: false },
         // Os modelos 3D dos controles ficam LIGADOS e são servidos daqui.
         // Ver o controle desenhado na frente do rosto é o que ensina um leigo
         // qual botão apertar — sem isso ele fica com um raio saindo do nada.

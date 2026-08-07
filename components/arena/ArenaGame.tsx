@@ -26,6 +26,40 @@ const RESULT_TIMEOUT = 20;
 /** Modelo principal do jogo (18k triângulos, ~20 estruturas nomeadas). */
 const MODEL_PATH = "/models/organs/larynx.glb";
 
+/**
+ * Vigia de entrada: se após alguns segundos de sessão nenhum controle ou mão
+ * foi detectado, avisa DENTRO do VR. A falha de carregamento de perfil de
+ * controle é silenciosa (console.error que ninguém vê no headset) — sem este
+ * aviso, o jogador fica parado num mundo bonito em que nada responde.
+ */
+function VigiaDeControles() {
+  const inputs = useXR((state) => state.inputSourceStates.length);
+  const [alerta, setAlerta] = useState(false);
+  const semInput = useRef(0);
+
+  useFrame((_, delta) => {
+    if (inputs > 0) {
+      semInput.current = 0;
+      if (alerta) setAlerta(false);
+      return;
+    }
+    semInput.current += Math.min(delta, 1 / 30);
+    if (!alerta && semInput.current > 5) setAlerta(true);
+  });
+
+  if (!alerta) return null;
+  return (
+    <Text3D
+      position={[0, 1.1, 0.6]}
+      size={0.09}
+      color={ARENA_COLORS.danger}
+      maxWidth={2.2}
+    >
+      Controles não detectados — segure os controles e aperte qualquer botão
+    </Text3D>
+  );
+}
+
 /** Mostrado enquanto o modelo baixa e decodifica, no lugar dele. */
 function CarregandoModelo() {
   return (
@@ -234,6 +268,8 @@ export function ArenaGame() {
           />
         </Suspense>
       </ErrorBoundary>
+
+      {inSession && <VigiaDeControles />}
 
       {/* ---------------- Ocioso: convite para começar ---------------- */}
       {inSession && phase === "ocioso" && (
