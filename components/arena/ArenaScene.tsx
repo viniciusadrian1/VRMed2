@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin, createXRStore } from "@react-three/xr";
 import { useMounted } from "@/hooks/use-mounted";
@@ -23,6 +23,12 @@ const FLOOR_Y = -1.3;
 export function ArenaScene() {
   const mounted = useMounted();
   const [inSession, setInSession] = useState(false);
+  /**
+   * Erro ao entrar/configurar a sessão VR, para mostrar NA TELA. Sem isso a
+   * falha vira um console.error que ninguém lê no headset — foi assim que
+   * "não aparece nada, só fundo escuro" virou um mistério de dias.
+   */
+  const [xrError, setXrError] = useState<string | null>(null);
 
   const store = useMemo(
     () =>
@@ -51,9 +57,15 @@ export function ArenaScene() {
         planeDetection: false,
         hitTest: false,
         depthSensing: false,
-        // 72fps fixo: num estande o headset esquenta, e mirar 90/120 no
-        // Quest 3 só antecipa o throttling térmico.
-        frameRate: () => 72,
+        // Menor taxa que o aparelho SUPORTA (72 no Quest 2/3): num estande o
+        // headset esquenta, e mirar 90/120 só antecipa o throttling térmico.
+        //
+        // Antes era um `72` fixo — e isso quebrava o Quest 2: a biblioteca
+        // chama session.updateTargetFrameRate(valor) dentro do Promise.all
+        // que configura a sessão inteira; se o aparelho rejeita o valor, a
+        // sessão morre meio-inicializada e sobra só um fundo escuro. Escolher
+        // a partir da lista suportada nunca rejeita.
+        frameRate: (supported) => Math.min(...Array.from(supported)),
         foveation: 0.5,
       }),
     [],
@@ -63,6 +75,15 @@ export function ArenaScene() {
     () => store.subscribe((state) => setInSession(Boolean(state.session))),
     [store],
   );
+
+  const enterVR = useCallback(() => {
+    setXrError(null);
+    store.enterVR().catch((error: unknown) => {
+      const message =
+        error instanceof Error ? error.message : String(error ?? "erro");
+      setXrError(message);
+    });
+  }, [store]);
 
   if (!mounted) return null;
 
@@ -93,11 +114,23 @@ export function ArenaScene() {
             </p>
             <button
               type="button"
-              onClick={() => void store.enterVR()}
+              onClick={enterVR}
               className="pointer-events-auto mt-1 rounded-full bg-[#5896c8] px-12 py-4 text-lg font-semibold text-[#0b1220] shadow-[0_0_45px_rgba(88,150,200,0.45)] transition-transform hover:scale-105"
             >
               Entrar em VR
             </button>
+            {xrError && (
+              <p
+                role="alert"
+                className="pointer-events-auto max-w-lg rounded-lg border border-red-400/40 bg-red-950/60 px-4 py-2.5 text-sm text-red-200"
+              >
+                Não foi possível iniciar o VR: <code className="text-xs">{xrError}</code>
+                <br />
+                <span className="text-red-200/70">
+                  Fotografe esta mensagem e envie para a equipe.
+                </span>
+              </p>
+            )}
             <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-white/60">
               <span className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5">
                 1 · Mire com o laser
@@ -157,6 +190,28 @@ export function ArenaScene() {
               opacity={0.5}
             />
           </mesh>
+
+          {/*
+            Sentinela de renderização: 3 barras coloridas ao lado do anel,
+            geometria pura (sem fonte, sem rede, sem modelo). Aparecem no
+            PRIMEIRO quadro da sessão. Se dentro do headset você vê as barras
+            mas nada mais, o problema é carregamento (fonte/modelo/perfil);
+            se não vê nem as barras, a sessão em si não está renderizando.
+          */}
+          <group position={[-1.9, FLOOR_Y + 0.4, 0]}>
+            <mesh position={[0, 0, 0]}>
+              <boxGeometry args={[0.12, 0.8, 0.12]} />
+              <meshBasicMaterial color="#e06a5c" />
+            </mesh>
+            <mesh position={[0.2, 0.1, 0]}>
+              <boxGeometry args={[0.12, 1.0, 0.12]} />
+              <meshBasicMaterial color="#5896c8" />
+            </mesh>
+            <mesh position={[0.4, 0.2, 0]}>
+              <boxGeometry args={[0.12, 1.2, 0.12]} />
+              <meshBasicMaterial color="#4fae89" />
+            </mesh>
+          </group>
 
           <ArenaGame />
         </XR>
