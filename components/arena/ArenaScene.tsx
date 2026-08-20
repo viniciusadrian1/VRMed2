@@ -11,6 +11,13 @@ import { ARENA_COLORS } from "./ui3d";
 const FLOOR_Y = -1.3;
 
 /**
+ * Versão visível da Arena — bump a cada mudança que vai a teste.
+ * O navegador do Quest cacheia builds antigas de forma agressiva; sem este
+ * carimbo, já testamos versão velha achando que era a nova.
+ */
+const ARENA_BUILD = "v7 · frameRate off";
+
+/**
  * Cena da Arena: canvas e sessão XR próprios, isolados do visualizador.
  *
  * `baseAssetPath` aponta para perfis de controle servidos pelo próprio app.
@@ -64,15 +71,14 @@ export function ArenaScene() {
         planeDetection: false,
         hitTest: false,
         depthSensing: false,
-        // Menor taxa que o aparelho SUPORTA (72 no Quest 2/3): num estande o
-        // headset esquenta, e mirar 90/120 só antecipa o throttling térmico.
-        //
-        // Antes era um `72` fixo — e isso quebrava o Quest 2: a biblioteca
-        // chama session.updateTargetFrameRate(valor) dentro do Promise.all
-        // que configura a sessão inteira; se o aparelho rejeita o valor, a
-        // sessão morre meio-inicializada e sobra só um fundo escuro. Escolher
-        // a partir da lista suportada nunca rejeita.
-        frameRate: (supported) => Math.min(...Array.from(supported)),
+        // NÃO mexer na taxa de quadros. A biblioteca aplica o valor com
+        // session.updateTargetFrameRate() dentro do mesmo passo que configura
+        // a sessão inteira — e essa chamada pode ser REJEITADA dependendo do
+        // estado do aparelho (economia de bateria, térmico), matando a sessão
+        // meio-inicializada: o headset mostra só o vazio escuro do sistema
+        // com o guardian. Era o "às vezes aparece, às vezes não" do Quest 2.
+        // O padrão do aparelho já é 72; o ganho não paga o risco.
+        frameRate: false,
         foveation: 0.5,
       }),
     [],
@@ -150,7 +156,8 @@ export function ArenaScene() {
               </span>
             </div>
             <p className="text-[11px] text-white/40">
-              Requer um headset compatível com WebXR (Meta Quest)
+              Requer um headset compatível com WebXR (Meta Quest) ·{" "}
+              <span className="font-mono">{ARENA_BUILD}</span>
             </p>
           </div>
         </div>
