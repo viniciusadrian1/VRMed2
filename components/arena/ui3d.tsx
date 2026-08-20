@@ -190,7 +190,18 @@ export function Button3D({
           side={THREE.DoubleSide}
         />
       </mesh>
-      <Text3D position={[0, 0, 0.005]} size={height * 0.42}>
+      {/* Triângulo "play" em geometria pura: o botão continua reconhecível
+          como clicável mesmo se a fonte falhar em carregar (rede ruim). */}
+      <mesh
+        position={[-width / 2 + height * 0.42, 0, 0.004]}
+        rotation={[0, 0, -Math.PI / 2]}
+        renderOrder={999}
+        raycast={() => null}
+      >
+        <circleGeometry args={[height * 0.22, 3]} />
+        <meshBasicMaterial color="#ffffff" toneMapped={false} depthTest={false} />
+      </mesh>
+      <Text3D position={[height * 0.14, 0, 0.005]} size={height * 0.42}>
         {label}
       </Text3D>
     </group>

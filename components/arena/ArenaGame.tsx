@@ -193,9 +193,9 @@ export function ArenaGame() {
     playEnd();
   }, [score]);
 
-  /** Clique numa estrutura durante a partida. */
+  /** Clique numa estrutura durante a partida. Devolve acerto para o flash. */
   const handleHit = useCallback(
-    (label: string) => {
+    (label: string): boolean | void => {
       if (phase !== "jogando" || !target) return;
 
       const acertou = label === target.label;
@@ -217,6 +217,7 @@ export function ArenaGame() {
         remaining.current = Math.max(0, remaining.current - MISS_PENALTY);
         playMiss();
       }
+      return acertou;
     },
     [phase, target, combo, structures],
   );
@@ -299,9 +300,17 @@ export function ArenaGame() {
       */}
       <ErrorBoundary
         fallback={
-          <Text3D position={[0, 0.2, 0]} size={0.11} color={ARENA_COLORS.danger}>
-            Falha ao carregar o modelo — recarregue a página
-          </Text3D>
+          <group position={[0, 0.2, 0]}>
+            {/* Caixa vermelha em geometria pura: o sinal de erro sobrevive
+                mesmo se a própria fonte do texto tiver falhado. */}
+            <mesh>
+              <boxGeometry args={[0.5, 0.5, 0.5]} />
+              <meshBasicMaterial color={ARENA_COLORS.danger} wireframe />
+            </mesh>
+            <Text3D position={[0, -0.5, 0]} size={0.11} color={ARENA_COLORS.danger}>
+              Falha ao carregar o modelo — recarregue a página
+            </Text3D>
+          </group>
         }
       >
         <Suspense fallback={<CarregandoModelo />}>

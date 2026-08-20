@@ -42,9 +42,16 @@ export function ArenaScene() {
           typeof window !== "undefined"
             ? `${window.location.origin}/webxr-profiles/`
             : "https://localhost/webxr-profiles/",
+        // SÓ o ponteiro de raio fica ativo. O ponteiro de "grab" é uma esfera
+        // curta no próprio controle, e o CombinedPointer ativa apenas o
+        // ponteiro de MENOR distância: quando o jogador aproxima o órgão
+        // (analógico ↕) e ele envolve a mão, o grab vence e o raio é
+        // DESATIVADO — o gatilho para de clicar onde a mira aponta. A nossa
+        // manipulação lê o grip direto do gamepad, então não perde nada.
+        controller: { grabPointer: false, teleportPointer: false },
         // O modelo 3D da mão vem de outro CDN; o rastreamento (pinça)
-        // funciona igual sem ele.
-        hand: { model: false },
+        // funciona igual sem ele. Mesma regra do grab vale para o toque.
+        hand: { model: false, grabPointer: false, touchPointer: false },
         // Os modelos 3D dos controles ficam LIGADOS e são servidos daqui.
         // Ver o controle desenhado na frente do rosto é o que ensina um leigo
         // qual botão apertar — sem isso ele fica com um raio saindo do nada.

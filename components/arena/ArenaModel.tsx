@@ -41,7 +41,8 @@ export function ArenaModel({
   /** Muda a cada rodada: devolve o modelo à pose original para o próximo da fila. */
   roundId: number;
   onStructuresReady: (structures: ArenaStructure[]) => void;
-  onHit: (label: string, point: THREE.Vector3) => void;
+  /** Devolve true/false (acerto/erro) para o flash na malha; void fora do jogo. */
+  onHit: (label: string, point: THREE.Vector3) => boolean | void;
   /** Posição (local) da estrutura a destacar como dica, ou null. */
   hintPosition: THREE.Vector3 | null;
   interactive?: boolean;
@@ -129,10 +130,37 @@ export function ArenaModel({
     }
   });
 
+  /** Flash de emissivo na malha clicada (materiais já são clones por malha). */
+  const flashTimeout = useRef(0);
+  const flashed = useRef<{ mats: THREE.MeshStandardMaterial[]; original: THREE.Color[] } | null>(null);
+
+  const restoreFlash = () => {
+    flashed.current?.mats.forEach((mat, i) => {
+      mat.emissive.copy(flashed.current!.original[i]);
+    });
+    flashed.current = null;
+  };
+
+  const flashMesh = (mesh: THREE.Mesh, acertou: boolean) => {
+    window.clearTimeout(flashTimeout.current);
+    restoreFlash();
+    const mats = (Array.isArray(mesh.material) ? mesh.material : [mesh.material])
+      .filter((m): m is THREE.MeshStandardMaterial => Boolean(m) && "emissive" in m);
+    flashed.current = { mats, original: mats.map((m) => m.emissive.clone()) };
+    const color = acertou ? 0x2e8f5f : 0x9c2f24;
+    mats.forEach((m) => m.emissive.setHex(color));
+    flashTimeout.current = window.setTimeout(restoreFlash, 350);
+  };
+
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     if (!interactive) return;
     event.stopPropagation();
-    onHit(identifyStructure(event.object), event.point);
+    const acertou = onHit(identifyStructure(event.object), event.point);
+    // Feedback NA PRÓPRIA estrutura: verde/vermelho, independente de fonte
+    // ou de HUD — o clique sempre responde algo visível.
+    if (typeof acertou === "boolean" && (event.object as THREE.Mesh).isMesh) {
+      flashMesh(event.object as THREE.Mesh, acertou);
+    }
   };
 
   return (
