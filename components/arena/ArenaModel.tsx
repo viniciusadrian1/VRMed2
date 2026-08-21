@@ -112,16 +112,19 @@ export function ArenaModel({
     root.position.set(0, 0, 0);
     root.quaternion.identity();
     root.scale.setScalar(scale);
-    // O giro de vitrine também zera: as posições das estruturas (e a dica)
-    // foram capturadas com o giro em zero.
+    // O giro/flutuação de vitrine também zera: as posições das estruturas
+    // (e a dica) foram capturadas com o spinner na identidade.
     spinner.current?.rotation.set(0, 0, 0);
+    spinner.current?.position.set(0, 0, 0);
   }, [roundId, scale]);
 
   useFrame((state, delta) => {
-    // Giro lento de vitrine, só no ocioso (o grupo `spinner` gira em torno do
-    // centro do modelo; o pivot fica livre para o XRManipulation).
+    // Vitrine no ocioso: giro lento + flutuação suave (o grupo `spinner`
+    // gira/flutua em torno do centro; o pivot fica com o XRManipulation).
     if (spinning && spinner.current) {
       spinner.current.rotation.y += Math.min(delta, 1 / 30) * 0.35;
+      spinner.current.position.y =
+        Math.sin(state.clock.elapsedTime * 0.9) * 0.05;
     }
     // Pulso suave da dica — chama atenção sem entregar de forma agressiva.
     if (hint.current) {

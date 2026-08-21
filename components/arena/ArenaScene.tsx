@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin, createXRStore } from "@react-three/xr";
+import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ArenaGame } from "./ArenaGame";
 import { ARENA_COLORS } from "./ui3d";
@@ -15,7 +16,67 @@ const FLOOR_Y = -1.3;
  * O navegador do Quest cacheia builds antigas de forma agressiva; sem este
  * carimbo, já testamos versão velha achando que era a nova.
  */
-const ARENA_BUILD = "v7 · frameRate off";
+const ARENA_BUILD = "v8 · visual + tombar";
+
+/**
+ * Palco da Arena: plataforma circular com anéis concêntricos e brilho sob o
+ * modelo — vitrine de museu no lugar do gridHelper de ferramenta de debug.
+ * Geometria pura: zero rede, zero asset.
+ */
+function ArenaStage() {
+  return (
+    <group position={[0, FLOOR_Y, 0]}>
+      {/* Base da plataforma */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[9, 64]} />
+        <meshBasicMaterial color="#0c1219" />
+      </mesh>
+      {/* Anéis concêntricos, esmaecendo para fora */}
+      {[
+        { inner: 1.15, outer: 1.28, opacity: 0.75 },
+        { inner: 2.4, outer: 2.46, opacity: 0.3 },
+        { inner: 4.2, outer: 4.24, opacity: 0.16 },
+        { inner: 6.4, outer: 6.43, opacity: 0.08 },
+      ].map((ring) => (
+        <mesh
+          key={ring.inner}
+          position={[0, 0.005, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <ringGeometry args={[ring.inner, ring.outer, 64]} />
+          <meshBasicMaterial
+            color="#5896c8"
+            transparent
+            opacity={ring.opacity}
+          />
+        </mesh>
+      ))}
+      {/* Brilho suave sob o órgão — o "pedestal de luz" da vitrine */}
+      <mesh position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[1.1, 48]} />
+        <meshBasicMaterial
+          color="#17324a"
+          transparent
+          opacity={0.85}
+        />
+      </mesh>
+      {/* Raios de referência discretos (substituem a grade) */}
+      {Array.from({ length: 12 }, (_, i) => {
+        const angle = (i / 12) * Math.PI * 2;
+        return (
+          <mesh
+            key={i}
+            position={[Math.cos(angle) * 5.2, 0.004, Math.sin(angle) * 5.2]}
+            rotation={[-Math.PI / 2, 0, angle]}
+          >
+            <planeGeometry args={[3.4, 0.015]} />
+            <meshBasicMaterial color="#24425e" transparent opacity={0.35} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
 
 /**
  * Cena da Arena: canvas e sessão XR próprios, isolados do visualizador.
@@ -179,40 +240,30 @@ export function ArenaScene() {
           {/* Jogador de pé, a 2,6 m do modelo. */}
           <XROrigin position={[0, FLOOR_Y, 2.6]} />
 
-          <ambientLight intensity={0.9} />
-          <directionalLight position={[4, 6, 4]} intensity={1.8} />
-          <directionalLight
-            position={[-5, 2, -4]}
-            intensity={0.5}
-            color="#9fc3dd"
-          />
-          <hemisphereLight args={["#dfe9f2", "#1b2229", 1]} />
+          <ambientLight intensity={0.85} />
+          {/* Luz principal levemente quente + contraluz fria: dá volume ao
+              órgão em vez do achatado de luz branca uniforme. */}
+          <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />
+          <directionalLight position={[-5, 3, -4]} intensity={0.7} color="#9fc3dd" />
+          <hemisphereLight args={["#dfe9f2", "#141a22", 1]} />
 
-          {/* Chão: referência espacial — sem ele o headset é um vazio preto. */}
-          <gridHelper
-            args={[24, 24, "#3d7ab0", "#243542"]}
-            position={[0, FLOOR_Y, 0]}
-          />
-          <mesh
-            position={[0, FLOOR_Y + 0.01, 0]}
-            rotation={[-Math.PI / 2, 0, 0]}
-          >
-            <ringGeometry args={[1.15, 1.35, 48]} />
-            <meshBasicMaterial
-              color={ARENA_COLORS.primary}
-              transparent
-              opacity={0.5}
-            />
+          <ArenaStage />
+
+          {/* Cúpula com gradiente: profundidade em volta, em vez do vazio
+              preto de fundo (referência espacial + acabamento). */}
+          <mesh>
+            <sphereGeometry args={[28, 24, 16]} />
+            <meshBasicMaterial color="#0a1017" side={THREE.BackSide} />
           </mesh>
 
           {/*
-            Sentinela de renderização: 3 barras coloridas ao lado do anel,
+            Sentinela de renderização: 3 barras pequenas na periferia, em
             geometria pura (sem fonte, sem rede, sem modelo). Aparecem no
-            PRIMEIRO quadro da sessão. Se dentro do headset você vê as barras
-            mas nada mais, o problema é carregamento (fonte/modelo/perfil);
-            se não vê nem as barras, a sessão em si não está renderizando.
+            PRIMEIRO quadro. Barras visíveis + resto ausente = falha de
+            carregamento; nem barras = a sessão não renderiza. Agora que a
+            cena está estável, ficam discretas — mas continuam lá.
           */}
-          <group position={[-1.9, FLOOR_Y + 0.4, 0]}>
+          <group position={[-5.5, FLOOR_Y + 0.15, -3]} scale={0.35}>
             <mesh position={[0, 0, 0]}>
               <boxGeometry args={[0.12, 0.8, 0.12]} />
               <meshBasicMaterial color="#e06a5c" />

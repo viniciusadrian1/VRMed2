@@ -11,7 +11,9 @@ const MAX_SCALE = 6;
 /** Zona morta do analógico — evita deriva com o polegar em repouso. */
 const STICK_DEADZONE = 0.15;
 /** Giro pelo analógico (rad/s com o eixo no máximo). */
-const SPIN_SPEED = 2.4;
+const SPIN_SPEED = 3.2;
+/** Tombamento (pitch) pelo analógico esquerdo (rad/s no máximo). */
+const PITCH_SPEED = 2.4;
 /** Aproximar/afastar pelo analógico (m/s com o eixo no máximo). */
 const APPROACH_SPEED = 1.3;
 /** Distância cabeça→órgão permitida (m): nem dentro do rosto, nem longe demais. */
@@ -85,8 +87,10 @@ interface Snapshot {
  *    mantendo a posição relativa de onde foi agarrado.
  *  - **Pegar com as duas** — afastar/aproximar aumenta e diminui;
  *    mover as duas juntas arrasta o modelo.
- *  - **Analógico ⇄ (esquerda/direita)** — gira o órgão como um torno.
- *  - **Analógico ↕ (frente/trás)** — traz para perto do rosto / afasta.
+ *  - **Analógico ⇄ (qualquer um)** — gira o órgão como um torno (yaw).
+ *  - **Analógico direito ↕** — traz para perto do rosto / afasta.
+ *  - **Analógico esquerdo ↕** — tomba o órgão (pitch), para alcançar
+ *    estruturas no topo ou embaixo.
  *  - **Botão A ou X** — devolve o modelo à posição original (essencial num
  *    estande: a próxima pessoa sempre começa do mesmo jeito).
  *
@@ -221,12 +225,13 @@ export function XRManipulation({
     }
     grabOffset.current = null;
 
-    /* ------------- Analógicos: girar e aproximar (torno) ------------- */
+    /* ------------- Analógicos: girar, tombar e aproximar ------------- */
     // Virar o modelo pela pegada 1:1 exige contorção do punho (180° de giro
-    // = 180° de pulso). O analógico faz isso sem esforço, como um torno:
-    //   eixo X  → gira o órgão em torno do próprio centro
-    //   eixo Y  → aproxima/afasta do rosto (empurrar para frente aproxima)
-    // Vale o analógico mais inclinado por eixo, para destro e canhoto.
+    // = 180° de pulso). Os analógicos fazem isso sem esforço:
+    //   direito  X → gira (yaw)      | direito  Y → aproxima/afasta
+    //   esquerdo X → gira (yaw)      | esquerdo Y → TOMBA (pitch)
+    // O tombamento é o que faltava: estrutura no topo ou embaixo do órgão
+    // era inalcançável só com o giro horizontal.
     const leftPad = leftController?.gamepad?.["xr-standard-thumbstick"];
     const rightPad = rightController?.gamepad?.["xr-standard-thumbstick"];
     const lx = leftPad?.xAxis ?? 0;
@@ -234,12 +239,25 @@ export function XRManipulation({
     const ly = leftPad?.yAxis ?? 0;
     const ry = rightPad?.yAxis ?? 0;
     const spin = Math.abs(rx) >= Math.abs(lx) ? rx : lx;
-    const approach = Math.abs(ry) >= Math.abs(ly) ? ry : ly;
+    const pitch = ly;
+    const approach = ry;
 
     if (Math.abs(spin) > STICK_DEADZONE) {
       // Sinal invertido: analógico para a direita gira a face do modelo
       // para a direita do jogador (sentido natural de "girar a vitrine").
       model.rotateOnWorldAxis(WORLD_Y, -spin * delta * SPIN_SPEED);
+    }
+
+    if (Math.abs(pitch) > STICK_DEADZONE) {
+      // Tomba em torno do eixo "direita da câmera" projetado na horizontal:
+      // o movimento acompanha o ponto de vista do jogador, de onde quer que
+      // ele esteja olhando. Empurrar para frente tomba o topo para longe.
+      TMP_DIR.setFromMatrixColumn(state.camera.matrixWorld, 0);
+      TMP_DIR.y = 0;
+      if (TMP_DIR.lengthSq() > 0.0001) {
+        TMP_DIR.normalize();
+        model.rotateOnWorldAxis(TMP_DIR, -pitch * delta * PITCH_SPEED);
+      }
     }
 
     if (Math.abs(approach) > STICK_DEADZONE) {

@@ -95,12 +95,54 @@ export function Text3D({
   );
 }
 
+/**
+ * Textura de painel desenhada em runtime (canvas): cantos arredondados,
+ * preenchimento com leve gradiente e borda de acento. Gerada localmente —
+ * zero rede, zero asset — e cacheada por proporção e cor.
+ */
+const panelTextureCache = new Map<string, THREE.CanvasTexture>();
+
+function panelTexture(
+  aspect: number,
+  fill: string,
+  stroke: string,
+  fillBottom = "#070b10",
+): THREE.CanvasTexture {
+  const key = `${aspect.toFixed(1)}|${fill}|${stroke}|${fillBottom}`;
+  const cached = panelTextureCache.get(key);
+  if (cached) return cached;
+
+  const w = 512;
+  const h = Math.round(Math.min(512, Math.max(96, 512 / aspect)));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  const r = Math.min(28, h * 0.22);
+
+  ctx.beginPath();
+  ctx.roundRect(3, 3, w - 6, h - 6, r);
+  const gradient = ctx.createLinearGradient(0, 0, 0, h);
+  gradient.addColorStop(0, fill);
+  gradient.addColorStop(1, fillBottom);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = stroke;
+  ctx.stroke();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 4;
+  panelTextureCache.set(key, texture);
+  return texture;
+}
+
 /** Painel de fundo arredondado, para dar leitura ao texto sobre qualquer cena. */
 export function Panel({
   width,
   height,
-  color = ARENA_COLORS.panel,
-  opacity = 0.85,
+  color = "#0d141c",
+  opacity = 0.92,
   position,
   children,
 }: {
@@ -118,7 +160,7 @@ export function Panel({
       <mesh renderOrder={998} raycast={() => null}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial
-          color={color}
+          map={panelTexture(width / height, color, "rgba(88,150,200,0.45)")}
           transparent
           opacity={opacity}
           side={THREE.DoubleSide}
@@ -184,7 +226,8 @@ export function Button3D({
       <mesh renderOrder={998}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial
-          color={color}
+          map={panelTexture(width / height, color, "rgba(255,255,255,0.55)", "#2d5a80")}
+          transparent
           toneMapped={false}
           depthTest={false}
           side={THREE.DoubleSide}

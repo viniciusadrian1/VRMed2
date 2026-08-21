@@ -3,6 +3,8 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useXR, useXRStore } from "@react-three/xr";
+import type * as THREE from "three";
+import type { Group } from "three";
 import {
   playEnd,
   playHit,
@@ -66,6 +68,36 @@ function VigiaDeControles() {
     >
       Controles não detectados — segure os controles e aperte qualquer botão
     </Text3D>
+  );
+}
+
+/** "+100" que sobe e some no ponto do acerto — resposta imediata e local. */
+function Floater({
+  value,
+  position,
+}: {
+  value: number;
+  position: [number, number, number];
+}) {
+  const group = useRef<Group>(null);
+  const life = useRef(0);
+
+  useFrame((_, delta) => {
+    if (!group.current) return;
+    life.current += Math.min(delta, 1 / 30);
+    const t = life.current;
+    group.current.position.y = position[1] + t * 0.35;
+    // Cresce rápido no início, encolhe até sumir no fim.
+    const scale = t < 0.12 ? t / 0.12 : Math.max(0, 1 - (t - 0.45) / 0.35);
+    group.current.scale.setScalar(Math.max(0.001, scale));
+  });
+
+  return (
+    <group ref={group} position={position}>
+      <Text3D size={0.11} color={ARENA_COLORS.success}>
+        {`+${value}`}
+      </Text3D>
+    </group>
   );
 }
 
@@ -193,9 +225,17 @@ export function ArenaGame() {
     playEnd();
   }, [score]);
 
+  /** "+pontos" flutuante no local do acerto (key força remontagem por hit). */
+  const [floater, setFloater] = useState<{
+    key: number;
+    value: number;
+    position: [number, number, number];
+  } | null>(null);
+  const floaterKey = useRef(0);
+
   /** Clique numa estrutura durante a partida. Devolve acerto para o flash. */
   const handleHit = useCallback(
-    (label: string): boolean | void => {
+    (label: string, point?: THREE.Vector3): boolean | void => {
       if (phase !== "jogando" || !target) return;
 
       const acertou = label === target.label;
@@ -209,6 +249,13 @@ export function ArenaGame() {
         setScore((value) => value + 100 * nextCombo);
         setHits((value) => value + 1);
         playHit(nextCombo);
+        if (point) {
+          setFloater({
+            key: floaterKey.current++,
+            value: 100 * nextCombo,
+            position: [point.x, point.y + 0.12, point.z],
+          });
+        }
         setTarget((current) => pickTarget(structures, current));
         sinceTarget.current = 0;
         setShowHint(false);
@@ -352,7 +399,7 @@ export function ArenaGame() {
               color={ARENA_COLORS.primary}
               maxWidth={2.0}
             >
-              Gatilho: selecionar · Analógico: girar e aproximar o órgão
+              Gatilho: selecionar · Direito: girar e aproximar · Esquerdo: tombar
             </Text3D>
             {/* Diagnóstico visível: quantos alvos o modelo rendeu. Se o
                 carregamento falhar em produzir estruturas, o problema fica
@@ -393,6 +440,15 @@ export function ArenaGame() {
             {countdown > 0 ? String(countdown) : "JÁ!"}
           </Text3D>
         </group>
+      )}
+
+      {/* "+pontos" no local do acerto */}
+      {floater && (
+        <Floater
+          key={floater.key}
+          value={floater.value}
+          position={floater.position}
+        />
       )}
 
       {/*
