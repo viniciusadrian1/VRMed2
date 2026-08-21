@@ -16,7 +16,7 @@ const FLOOR_Y = -1.3;
  * O navegador do Quest cacheia builds antigas de forma agressiva; sem este
  * carimbo, já testamos versão velha achando que era a nova.
  */
-const ARENA_BUILD = "v8 · visual + tombar";
+const ARENA_BUILD = "v9 · analógico suave";
 
 /**
  * Palco da Arena: plataforma circular com anéis concêntricos e brilho sob o

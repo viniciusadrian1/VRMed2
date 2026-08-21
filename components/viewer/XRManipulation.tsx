@@ -9,7 +9,20 @@ import * as THREE from "three";
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 6;
 /** Zona morta do analógico — evita deriva com o polegar em repouso. */
-const STICK_DEADZONE = 0.15;
+const STICK_DEADZONE = 0.2;
+
+/**
+ * Resposta suavizada do analógico: zero dentro da zona morta e curva
+ * quadrática fora dela. Sem isso o comando "liga de repente" quando o
+ * polegar cruza a borda da zona morta — a sensação de travado/aos trancos —
+ * e não há controle fino perto do centro.
+ */
+function shapedAxis(value: number): number {
+  const magnitude = Math.abs(value);
+  if (magnitude < STICK_DEADZONE) return 0;
+  const t = (magnitude - STICK_DEADZONE) / (1 - STICK_DEADZONE);
+  return Math.sign(value) * t * t;
+}
 /** Giro pelo analógico (rad/s com o eixo no máximo). */
 const SPIN_SPEED = 3.2;
 /** Tombamento (pitch) pelo analógico esquerdo (rad/s no máximo). */
@@ -238,17 +251,24 @@ export function XRManipulation({
     const rx = rightPad?.xAxis ?? 0;
     const ly = leftPad?.yAxis ?? 0;
     const ry = rightPad?.yAxis ?? 0;
-    const spin = Math.abs(rx) >= Math.abs(lx) ? rx : lx;
-    const pitch = ly;
-    const approach = ry;
 
-    if (Math.abs(spin) > STICK_DEADZONE) {
+    // Por analógico, age só o eixo DOMINANTE. Ninguém empurra o polegar
+    // perfeitamente para o lado — sempre vai um resto de "frente" junto, e
+    // com os eixos independentes tentar girar disparava o aproximar.
+    const rightSpin = Math.abs(rx) >= Math.abs(ry) ? shapedAxis(rx) : 0;
+    const approach = Math.abs(ry) > Math.abs(rx) ? shapedAxis(ry) : 0;
+    const leftSpin = Math.abs(lx) >= Math.abs(ly) ? shapedAxis(lx) : 0;
+    const pitch = Math.abs(ly) > Math.abs(lx) ? shapedAxis(ly) : 0;
+    const spin =
+      Math.abs(rightSpin) >= Math.abs(leftSpin) ? rightSpin : leftSpin;
+
+    if (spin !== 0) {
       // Sinal invertido: analógico para a direita gira a face do modelo
       // para a direita do jogador (sentido natural de "girar a vitrine").
       model.rotateOnWorldAxis(WORLD_Y, -spin * delta * SPIN_SPEED);
     }
 
-    if (Math.abs(pitch) > STICK_DEADZONE) {
+    if (pitch !== 0) {
       // Tomba em torno do eixo "direita da câmera" projetado na horizontal:
       // o movimento acompanha o ponto de vista do jogador, de onde quer que
       // ele esteja olhando. Empurrar para frente tomba o topo para longe.
@@ -260,7 +280,7 @@ export function XRManipulation({
       }
     }
 
-    if (Math.abs(approach) > STICK_DEADZONE) {
+    if (approach !== 0) {
       // Move ao longo da linha cabeça→órgão: ao aproximar, ele também sobe
       // até a altura do olhar — vem "para a mão" do jogador.
       const head = state.camera.getWorldPosition(TMP_HEAD);
