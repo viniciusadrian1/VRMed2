@@ -13,6 +13,8 @@ export interface CasoClinico {
   glb: string;
   dataProcessamento: string;
   fonteDados: string;
+  /** JSON do scripts/achados-pulmao.py — habilita o mapa de achados. */
+  achados?: string;
 }
 
 /**

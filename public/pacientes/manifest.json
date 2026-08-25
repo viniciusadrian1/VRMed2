@@ -2,10 +2,11 @@
   {
     "slug": "torax-alta",
     "titulo": "Tórax em alta resolução (TC 1,25mm)",
-    "descricao": "Tomografia moderna de fatias finas, segmentada automaticamente: coração, os cinco lobos pulmonares, aorta, traqueia e esôfago com superfícies mais orgânicas.",
+    "descricao": "Tomografia moderna de fatias finas com mapa de achados: enfisema quantificado por densidade e opacidades candidatas projetadas no modelo ilustrativo de pulmão.",
     "glb": "/pacientes/torax-alta.glb",
     "dataProcessamento": "2026-08-24",
-    "fonteDados": "TCIA · LIDC-IDRI — exame público e anonimizado"
+    "fonteDados": "TCIA · LIDC-IDRI — exame público e anonimizado",
+    "achados": "/pacientes/torax-alta-achados.json"
   },
   {
     "slug": "torax-completo",

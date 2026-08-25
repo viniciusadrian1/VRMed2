@@ -1,0 +1,153 @@
+{
+  "metodo": {
+    "enfisema": "LAA-950: %% de voxels do parênquima < -950 HU",
+    "lesoes": "componentes conexos > -300 HU no núcleo do pulmão, 65-50000 mm³, alongamento < 3.5",
+    "limitacoes": "candidatos educacionais; lesões justapleurais/justavasculares podem ser perdidas; localização no modelo ilustrativo é aproximada",
+    "candidatosMenoresOmitidos": 17
+  },
+  "enfisemaPctTotal": 0.53,
+  "bboxMm": [
+    268.6,
+    272.5,
+    185.4
+  ],
+  "lobos": {
+    "lung_upper_lobe_left": {
+      "volumeMl": 1317.6,
+      "enfisemaPct": 0.91,
+      "huMedio": -848.6
+    },
+    "lung_lower_lobe_left": {
+      "volumeMl": 1150.2,
+      "enfisemaPct": 0.25,
+      "huMedio": -815.1
+    },
+    "lung_upper_lobe_right": {
+      "volumeMl": 1088.2,
+      "enfisemaPct": 0.43,
+      "huMedio": -850.3
+    },
+    "lung_middle_lobe_right": {
+      "volumeMl": 445.4,
+      "enfisemaPct": 0.78,
+      "huMedio": -847.2
+    },
+    "lung_lower_lobe_right": {
+      "volumeMl": 1254.4,
+      "enfisemaPct": 0.37,
+      "huMedio": -822.0
+    }
+  },
+  "lesoes": [
+    {
+      "posNorm": [
+        0.1853,
+        0.2615,
+        0.6158
+      ],
+      "diametroMm": 32.3,
+      "volumeMm3": 17661.3,
+      "huMedio": -97.0,
+      "lobo": "lung_lower_lobe_left"
+    },
+    {
+      "posNorm": [
+        0.731,
+        0.2661,
+        0.5827
+      ],
+      "diametroMm": 29.8,
+      "volumeMm3": 13909.4,
+      "huMedio": -103.6,
+      "lobo": "lung_lower_lobe_right"
+    },
+    {
+      "posNorm": [
+        0.6815,
+        0.7867,
+        0.6783
+      ],
+      "diametroMm": 17.6,
+      "volumeMm3": 2847.6,
+      "huMedio": -104.0,
+      "lobo": "lung_upper_lobe_right"
+    },
+    {
+      "posNorm": [
+        0.1904,
+        0.4748,
+        0.3621
+      ],
+      "diametroMm": 17.5,
+      "volumeMm3": 2793.6,
+      "huMedio": -125.2,
+      "lobo": "lung_upper_lobe_left"
+    },
+    {
+      "posNorm": [
+        0.2208,
+        0.7592,
+        0.6397
+      ],
+      "diametroMm": 16.5,
+      "volumeMm3": 2356.9,
+      "huMedio": -109.1,
+      "lobo": "lung_upper_lobe_left"
+    },
+    {
+      "posNorm": [
+        0.6548,
+        0.5161,
+        0.7463
+      ],
+      "diametroMm": 16.4,
+      "volumeMm3": 2328.4,
+      "huMedio": -113.9,
+      "lobo": "lung_lower_lobe_right"
+    },
+    {
+      "posNorm": [
+        0.2652,
+        0.5115,
+        0.7647
+      ],
+      "diametroMm": 15.8,
+      "volumeMm3": 2067.0,
+      "huMedio": -115.1,
+      "lobo": "lung_lower_lobe_left"
+    },
+    {
+      "posNorm": [
+        0.7449,
+        0.4633,
+        0.3897
+      ],
+      "diametroMm": 14.6,
+      "volumeMm3": 1616.9,
+      "huMedio": -116.7,
+      "lobo": "lung_middle_lobe_right"
+    },
+    {
+      "posNorm": [
+        0.6916,
+        0.3326,
+        0.2702
+      ],
+      "diametroMm": 14.6,
+      "volumeMm3": 1636.1,
+      "huMedio": -117.4,
+      "lobo": "lung_middle_lobe_right"
+    },
+    {
+      "posNorm": [
+        0.2931,
+        0.6697,
+        0.3438
+      ],
+      "diametroMm": 12.6,
+      "volumeMm3": 1047.2,
+      "huMedio": -114.9,
+      "lobo": "lung_upper_lobe_left"
+    }
+  ]
+}

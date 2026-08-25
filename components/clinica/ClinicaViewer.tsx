@@ -21,6 +21,7 @@ import { XRManipulation } from "@/components/viewer/XRManipulation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
 import { useMounted } from "@/hooks/use-mounted";
+import { MapaAchados, type AchadosPulmao } from "./MapaAchados";
 import type { CasoClinico } from "./ClinicaApp";
 
 const FLOOR_Y = -1.3;
@@ -66,10 +67,12 @@ function ModeloPaciente({
 /** Conteúdo da cena; alterna controles de desktop × VR (padrão do Scene.tsx). */
 function CenaClinica({
   glb,
+  achados,
   onIdentify,
   labelVR,
 }: {
   glb: string;
+  achados: AchadosPulmao | null;
   onIdentify: (label: string) => void;
   labelVR: string | null;
 }) {
@@ -112,7 +115,11 @@ function CenaClinica({
             </Text3D>
           }
         >
-          <ModeloPaciente glb={glb} onIdentify={onIdentify} />
+          {achados ? (
+            <MapaAchados achados={achados} onIdentify={onIdentify} />
+          ) : (
+            <ModeloPaciente glb={glb} onIdentify={onIdentify} />
+          )}
         </Suspense>
       </ErrorBoundary>
 
@@ -143,6 +150,27 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
   const [label, setLabel] = useState<string | null>(null);
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
+  const [achados, setAchados] = useState<AchadosPulmao | null>(null);
+  // "mapa" = achados reais sobre o modelo ilustrativo; "malha" = superfície medida na TC.
+  const [modo, setModo] = useState<"mapa" | "malha">(
+    caso.achados ? "mapa" : "malha",
+  );
+
+  useEffect(() => {
+    if (!caso.achados) return;
+    let cancelado = false;
+    fetch(caso.achados)
+      .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then((data: AchadosPulmao) => {
+        if (!cancelado) setAchados(data);
+      })
+      .catch(() => {
+        if (!cancelado) setModo("malha");
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [caso.achados]);
 
   const store = useMemo(
     () =>
@@ -184,8 +212,59 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
   return (
     <>
       {/* Barra de identificação (DOM, fora do VR) */}
+      {/* Resumo dos achados medidos (só no modo mapa) */}
+      {!inSession && modo === "mapa" && achados && (
+        <div className="absolute right-4 top-16 z-10 w-64 rounded-xl border border-white/10 bg-black/60 p-4 text-white backdrop-blur">
+          <h3 className="text-sm font-semibold">Achados do exame</h3>
+          <dl className="mt-2 space-y-1 text-xs text-white/80">
+            <div className="flex justify-between">
+              <dt>Enfisema (LAA-950)</dt>
+              <dd className="font-medium text-white">
+                {achados.enfisemaPctTotal}%
+              </dd>
+            </div>
+            <div className="flex justify-between">
+              <dt>Opacidades candidatas</dt>
+              <dd className="font-medium text-white">
+                {achados.lesoes.length}
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-[10px] leading-snug text-white/50">
+            Medidas reais da TC projetadas num modelo ilustrativo — a posição
+            dos marcadores é aproximada. Clique num marcador para detalhes.
+          </p>
+        </div>
+      )}
+
       {!inSession && (
         <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-3">
+          {caso.achados && (
+            <div className="pointer-events-auto flex overflow-hidden rounded-full border border-white/15 bg-black/50 text-xs font-medium backdrop-blur">
+              {(
+                [
+                  ["mapa", "Mapa de achados"],
+                  ["malha", "Reconstrução real"],
+                ] as const
+              ).map(([valor, rotulo]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  onClick={() => {
+                    setModo(valor);
+                    setLabel(null);
+                  }}
+                  className={
+                    modo === valor
+                      ? "bg-[#5896c8] px-4 py-1.5 text-[#0b1220]"
+                      : "px-4 py-1.5 text-white/70 hover:text-white"
+                  }
+                >
+                  {rotulo}
+                </button>
+              ))}
+            </div>
+          )}
           {label ? (
             <p className="rounded-full border border-white/15 bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur">
               Estrutura: <span className="text-[#7fb2d9]">{label}</span>
@@ -223,7 +302,12 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
         onCreated={({ gl }) => gl.setClearColor("#101820")}
       >
         <XR store={store}>
-          <CenaClinica glb={caso.glb} onIdentify={setLabel} labelVR={label} />
+          <CenaClinica
+            glb={caso.glb}
+            achados={modo === "mapa" ? achados : null}
+            onIdentify={setLabel}
+            labelVR={label}
+          />
         </XR>
       </Canvas>
     </>
