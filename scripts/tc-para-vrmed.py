@@ -73,6 +73,32 @@ RAS_PARA_GLTF = np.array(
 )
 MM_PARA_M = 0.001
 
+# Cores anatômicas (RGB 0–1) por prefixo de estrutura — aproximação didática,
+# não convenção clínica. Sem isso o GLB sai cinza uniforme.
+CORES: list[tuple[str, tuple[float, float, float]]] = [
+    ("lung", (0.87, 0.62, 0.62)),
+    ("heart", (0.72, 0.25, 0.22)),
+    ("aorta", (0.80, 0.20, 0.20)),
+    ("pulmonary", (0.55, 0.30, 0.55)),
+    ("trachea", (0.85, 0.83, 0.75)),
+    ("esophagus", (0.76, 0.60, 0.48)),
+    ("liver", (0.55, 0.27, 0.17)),
+    ("spleen", (0.45, 0.18, 0.25)),
+    ("kidney", (0.58, 0.32, 0.28)),
+    ("gallbladder", (0.35, 0.52, 0.30)),
+    ("pancreas", (0.85, 0.72, 0.50)),
+    ("stomach", (0.83, 0.65, 0.58)),
+    ("inferior_vena_cava", (0.25, 0.35, 0.65)),
+]
+COR_PADRAO = (0.75, 0.72, 0.68)
+
+
+def cor_para(nome: str) -> tuple[float, float, float]:
+    for prefixo, cor in CORES:
+        if nome.startswith(prefixo):
+            return cor
+    return COR_PADRAO
+
 
 def log(msg: str) -> None:
     print(f"[tc-para-vrmed] {msg}", flush=True)
@@ -178,7 +204,9 @@ def main() -> int:
         masks_dir = Path(args.masks_dir)
         log(f"reusando máscaras de {masks_dir}")
     else:
-        masks_dir = saida.with_suffix("").parent / (saida.stem + "_masks")
+        # Máscaras são intermediário volumoso: ficam FORA de public/ (nunca
+        # devem ir para o site nem para o git).
+        masks_dir = Path(".clinica-dados") / (saida.stem + "_masks")
         masks_dir.mkdir(parents=True, exist_ok=True)
         relatorio["etapas_s"]["segmentacao"] = round(
             rodar_segmentacao(entrada, masks_dir, estruturas, args.fast), 1
@@ -214,6 +242,14 @@ def main() -> int:
             relatorio["estruturas"][nome] = {"presente": False}
             continue
         malha, info = resultado
+        r, g, b = cor_para(nome)
+        malha.visual = trimesh.visual.texture.TextureVisuals(
+            material=trimesh.visual.material.PBRMaterial(
+                baseColorFactor=(r, g, b, 1.0),
+                metallicFactor=0.05,
+                roughnessFactor=0.65,
+            )
+        )
         cena.add_geometry(malha, node_name=nome, geom_name=nome)
         total_tris += info["triangulos_finais"]
         relatorio["estruturas"][nome] = {"presente": True, **info}
