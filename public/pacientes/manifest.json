@@ -1,10 +1,10 @@
 [
   {
-    "slug": "exemplo-torax",
-    "titulo": "Tórax de exemplo (TC pública)",
-    "descricao": "Recorte de tomografia de tórax segmentado automaticamente: aorta e lobos pulmonares. Demonstração do pipeline da Clínica.",
-    "glb": "/pacientes/exemplo-torax.glb",
+    "slug": "torax-completo",
+    "titulo": "Tórax completo (TC pública)",
+    "descricao": "Tomografia de tórax completa segmentada automaticamente: coração, os cinco lobos pulmonares, aorta, traqueia e esôfago.",
+    "glb": "/pacientes/torax-completo.glb",
     "dataProcessamento": "2026-08-24",
-    "fonteDados": "TotalSegmentator — exame de teste público e anonimizado"
+    "fonteDados": "3D Slicer Sample Data (CTChest) — exame público e anonimizado"
   }
 ]
