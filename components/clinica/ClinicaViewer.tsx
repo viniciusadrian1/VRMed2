@@ -67,11 +67,13 @@ function ModeloPaciente({
 /** Conteúdo da cena; alterna controles de desktop × VR (padrão do Scene.tsx). */
 function CenaClinica({
   glb,
+  mapaGlb,
   achados,
   onIdentify,
   labelVR,
 }: {
   glb: string;
+  mapaGlb: string | null;
   achados: AchadosPulmao | null;
   onIdentify: (label: string) => void;
   labelVR: string | null;
@@ -115,8 +117,12 @@ function CenaClinica({
             </Text3D>
           }
         >
-          {achados ? (
-            <MapaAchados achados={achados} onIdentify={onIdentify} />
+          {achados && mapaGlb ? (
+            <MapaAchados
+              mapaGlb={mapaGlb}
+              achados={achados}
+              onIdentify={onIdentify}
+            />
           ) : (
             <ModeloPaciente glb={glb} onIdentify={onIdentify} />
           )}
@@ -153,11 +159,11 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
   const [achados, setAchados] = useState<AchadosPulmao | null>(null);
   // "mapa" = achados reais sobre o modelo ilustrativo; "malha" = superfície medida na TC.
   const [modo, setModo] = useState<"mapa" | "malha">(
-    caso.achados ? "mapa" : "malha",
+    caso.achados && caso.mapaGlb ? "mapa" : "malha",
   );
 
   useEffect(() => {
-    if (!caso.achados) return;
+    if (!caso.achados || !caso.mapaGlb) return;
     let cancelado = false;
     fetch(caso.achados)
       .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
@@ -231,15 +237,16 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
             </div>
           </dl>
           <p className="mt-3 text-[10px] leading-snug text-white/50">
-            Medidas reais da TC projetadas num modelo ilustrativo — a posição
-            dos marcadores é aproximada. Clique num marcador para detalhes.
+            Textura gerada a partir das medidas da TC sobre um modelo
+            ilustrativo — a posição das manchas é aproximada. Clique numa
+            mancha escura para detalhes.
           </p>
         </div>
       )}
 
       {!inSession && (
         <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-3">
-          {caso.achados && (
+          {caso.achados && caso.mapaGlb && (
             <div className="pointer-events-auto flex overflow-hidden rounded-full border border-white/15 bg-black/50 text-xs font-medium backdrop-blur">
               {(
                 [
@@ -304,6 +311,7 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
         <XR store={store}>
           <CenaClinica
             glb={caso.glb}
+            mapaGlb={caso.mapaGlb ?? null}
             achados={modo === "mapa" ? achados : null}
             onIdentify={setLabel}
             labelVR={label}

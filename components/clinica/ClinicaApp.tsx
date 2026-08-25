@@ -15,6 +15,8 @@ export interface CasoClinico {
   fonteDados: string;
   /** JSON do scripts/achados-pulmao.py — habilita o mapa de achados. */
   achados?: string;
+  /** GLB com a textura pintada pelo scripts/pintar-pulmao.py. */
+  mapaGlb?: string;
 }
 
 /**

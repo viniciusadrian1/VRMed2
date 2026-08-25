@@ -2,11 +2,12 @@
   {
     "slug": "torax-alta",
     "titulo": "Tórax em alta resolução (TC 1,25mm)",
-    "descricao": "Tomografia moderna de fatias finas com mapa de achados: enfisema quantificado por densidade e opacidades candidatas projetadas no modelo ilustrativo de pulmão.",
+    "descricao": "Tomografia moderna de fatias finas: o modelo ilustrativo recebe uma textura gerada a partir do exame — manchas onde a TC encontrou opacidades e escurecimento proporcional ao enfisema medido.",
     "glb": "/pacientes/torax-alta.glb",
     "dataProcessamento": "2026-08-24",
     "fonteDados": "TCIA · LIDC-IDRI — exame público e anonimizado",
-    "achados": "/pacientes/torax-alta-achados.json"
+    "achados": "/pacientes/torax-alta-achados.json",
+    "mapaGlb": "/pacientes/torax-alta-mapa.glb"
   },
   {
     "slug": "torax-completo",
