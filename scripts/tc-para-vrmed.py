@@ -147,10 +147,15 @@ def extrair_malha_bruta(caminho_mask: Path) -> tuple[trimesh.Trimesh, int] | Non
     # "degraus" — o filtro gaussiano em mm (anisotrópico por eixo) remove o
     # serrilhado na origem, o que nenhuma suavização de malha alcança depois.
     espacamento = np.abs(np.diag(img.affine)[:3])
-    sigma_voxels = 1.1 / np.maximum(espacamento, 1e-6)  # ~1,1mm de sigma
+    sigma_voxels = 1.3 / np.maximum(espacamento, 1e-6)  # ~1,3mm de sigma
     campo = ndimage.gaussian_filter(volume.astype(np.float32), sigma=sigma_voxels)
 
-    verts, faces, _normals, _values = measure.marching_cubes(campo, level=0.5)
+    # Nível ACIMA de 0,5 de propósito: encolhe cada superfície uma fração de
+    # milímetro. Estruturas vizinhas (os lobos, nas fissuras) compartilham a
+    # fronteira exata — extraídas em 0,5 elas saem coplanares e uma FURA a
+    # outra, aparecendo como linhas finas claras. Com a folga, a divisão vira
+    # um vinco escuro e limpo, legível como anatomia.
+    verts, faces, _normals, _values = measure.marching_cubes(campo, level=0.56)
     affine = img.affine
     verts_mm = verts @ affine[:3, :3].T + affine[:3, 3]
     verts_gltf = (verts_mm @ RAS_PARA_GLTF.T) * MM_PARA_M
