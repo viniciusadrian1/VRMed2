@@ -46,3 +46,5 @@ next-env.d.ts
 
 # dados de pesquisa gerados em runtime (feedback do tutor)
 /feedback.jsonl
+.venv-pipeline/
+.clinica-dados/

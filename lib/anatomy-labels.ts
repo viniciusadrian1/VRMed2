@@ -164,6 +164,31 @@ const LABEL_MAP: Record<string, string> = {
   "round ligament of liver": "Ligamento redondo do fígado",
   "hepataduodenal ligament": "Ligamento hepatoduodenal",
   "ligamentum venosum": "Ligamento venoso",
+  // Estruturas do TotalSegmentator (VRmed Clínica — nomes da tarefa "total";
+  // o pipeline preserva o nome em cada malha, e a identificação traduz aqui).
+  "lung upper lobe left": "Lobo superior esquerdo",
+  "lung lower lobe left": "Lobo inferior esquerdo",
+  "lung upper lobe right": "Lobo superior direito",
+  "lung middle lobe right": "Lobo médio direito",
+  "lung lower lobe right": "Lobo inferior direito",
+  esophagus: "Esôfago",
+  spleen: "Baço",
+  "kidney left": "Rim esquerdo",
+  "kidney right": "Rim direito",
+  gallbladder: "Vesícula biliar",
+  pancreas: "Pâncreas",
+  "inferior vena cava": "Veia cava inferior",
+  "portal vein and splenic vein": "Veia porta e veia esplênica",
+  "urinary bladder": "Bexiga urinária",
+  duodenum: "Duodeno",
+  "small bowel": "Intestino delgado",
+  colon: "Cólon",
+  "thyroid gland": "Glândula tireoide",
+  "adrenal gland left": "Glândula suprarrenal esquerda",
+  "adrenal gland right": "Glândula suprarrenal direita",
+  "pulmonary vein": "Veia pulmonar",
+  "brachiocephalic trunk": "Tronco braquiocefálico",
+  "superior vena cava": "Veia cava superior",
 };
 
 /** Termos que indicam estruturas externas (pele/gordura). */
