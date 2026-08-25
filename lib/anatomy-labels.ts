@@ -166,6 +166,8 @@ const LABEL_MAP: Record<string, string> = {
   "ligamentum venosum": "Ligamento venoso",
   // Estruturas do TotalSegmentator (VRmed Clínica — nomes da tarefa "total";
   // o pipeline preserva o nome em cada malha, e a identificação traduz aqui).
+  "lung left": "Pulmão esquerdo",
+  "lung right": "Pulmão direito",
   "lung upper lobe left": "Lobo superior esquerdo",
   "lung lower lobe left": "Lobo inferior esquerdo",
   "lung upper lobe right": "Lobo superior direito",

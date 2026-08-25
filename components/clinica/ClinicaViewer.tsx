@@ -47,6 +47,17 @@ function ModeloPaciente({
     // cache do useGLTF (compartilhado com o resto do app) — e marca cada
     // malha com sua camada. O retorno (lista de camadas) fica para a fase 2.
     prepareModel(group, "mesh");
+    // Órgão vivo é úmido: especular baixo-rugoso por cima das cores por
+    // vértice (densidade da TC) tira o aspecto de plástico fosco.
+    group.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) {
+        const mat = obj.material as THREE.MeshStandardMaterial;
+        if ("roughness" in mat) {
+          mat.roughness = 0.34;
+          mat.metalness = 0.02;
+        }
+      }
+    });
   }, [scene]);
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
@@ -157,10 +168,9 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
   const [achados, setAchados] = useState<AchadosPulmao | null>(null);
-  // "mapa" = achados reais sobre o modelo ilustrativo; "malha" = superfície medida na TC.
-  const [modo, setModo] = useState<"mapa" | "malha">(
-    caso.achados && caso.mapaGlb ? "mapa" : "malha",
-  );
+  // "malha" = superfície medida na TC (padrão); "mapa" = achados sobre o
+  // modelo ilustrativo (alternativa, enquanto não há modelo de artista melhor).
+  const [modo, setModo] = useState<"mapa" | "malha">("malha");
 
   useEffect(() => {
     if (!caso.achados || !caso.mapaGlb) return;
