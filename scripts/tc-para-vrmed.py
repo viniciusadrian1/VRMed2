@@ -75,8 +75,15 @@ MM_PARA_M = 0.001
 
 # Cores anatômicas (RGB 0–1) por prefixo de estrutura — aproximação didática,
 # não convenção clínica. Sem isso o GLB sai cinza uniforme.
+# Os lobos pulmonares têm tons DISTINTOS de propósito: as fissuras entre eles
+# são anatomia real, e com uma cor só pareciam rachadura de defeito.
 CORES: list[tuple[str, tuple[float, float, float]]] = [
-    ("lung", (0.87, 0.62, 0.62)),
+    ("lung_upper_lobe_left", (0.89, 0.58, 0.58)),
+    ("lung_lower_lobe_left", (0.78, 0.47, 0.50)),
+    ("lung_upper_lobe_right", (0.91, 0.64, 0.55)),
+    ("lung_middle_lobe_right", (0.83, 0.52, 0.44)),
+    ("lung_lower_lobe_right", (0.74, 0.42, 0.44)),
+    ("lung", (0.85, 0.55, 0.55)),
     ("heart", (0.72, 0.25, 0.22)),
     ("aorta", (0.80, 0.20, 0.20)),
     ("pulmonary", (0.55, 0.30, 0.55)),
@@ -126,19 +133,24 @@ def rodar_segmentacao(
     return time.time() - inicio
 
 
-def mascara_para_malha(
-    caminho_mask: Path, orcamento_tris: int
-) -> tuple[trimesh.Trimesh, dict] | None:
-    """Converte uma máscara NIfTI numa malha suavizada e decimada."""
+def extrair_malha_bruta(caminho_mask: Path) -> tuple[trimesh.Trimesh, int] | None:
+    """Máscara NIfTI → malha suavizada (ainda sem decimação)."""
+    from scipy import ndimage
+
     img = nib.load(str(caminho_mask))
     volume = np.asarray(img.dataobj) > 0.5
     if volume.sum() < 50:  # estrutura ausente ou ruído
         return None
 
-    # Marching cubes no espaço de voxels; o affine leva para mm em RAS.
-    verts, faces, _normals, _values = measure.marching_cubes(
-        volume.astype(np.uint8), level=0.5
-    )
+    # Suaviza a MÁSCARA antes do marching cubes. As fatias de TC costumam ser
+    # grossas (ex.: 2,5mm contra 0,76mm no plano) e a superfície sai em
+    # "degraus" — o filtro gaussiano em mm (anisotrópico por eixo) remove o
+    # serrilhado na origem, o que nenhuma suavização de malha alcança depois.
+    espacamento = np.abs(np.diag(img.affine)[:3])
+    sigma_voxels = 1.1 / np.maximum(espacamento, 1e-6)  # ~1,1mm de sigma
+    campo = ndimage.gaussian_filter(volume.astype(np.float32), sigma=sigma_voxels)
+
+    verts, faces, _normals, _values = measure.marching_cubes(campo, level=0.5)
     affine = img.affine
     verts_mm = verts @ affine[:3, :3].T + affine[:3, 3]
     verts_gltf = (verts_mm @ RAS_PARA_GLTF.T) * MM_PARA_M
@@ -146,27 +158,24 @@ def mascara_para_malha(
     malha = trimesh.Trimesh(vertices=verts_gltf, faces=faces, process=True)
     tris_brutos = len(malha.faces)
 
-    # Suavização leve tira o "degrau" de voxel sem derreter o detalhe.
-    trimesh.smoothing.filter_taubin(malha, lamb=0.5, nu=-0.53, iterations=8)
+    # Retoque leve pós-marching (o grosso do serrilhado já saiu na máscara).
+    trimesh.smoothing.filter_taubin(malha, lamb=0.5, nu=-0.53, iterations=5)
+    return malha, tris_brutos
 
-    # Decimação controlada (regra do projeto: NUNCA o --simplify do
-    # gltf-transform em anatomia — aqui controlamos o alvo por estrutura).
-    if len(malha.faces) > orcamento_tris:
-        import fast_simplification
 
-        verts_d, faces_d = fast_simplification.simplify(
-            malha.vertices.astype(np.float32),
-            malha.faces.astype(np.int64),
-            target_count=orcamento_tris,
-        )
-        malha = trimesh.Trimesh(vertices=verts_d, faces=faces_d, process=True)
+def decimar(malha: trimesh.Trimesh, orcamento_tris: int) -> trimesh.Trimesh:
+    """Decimação controlada (regra do projeto: nunca o --simplify do
+    gltf-transform em anatomia — o alvo é decidido por estrutura, aqui)."""
+    if len(malha.faces) <= orcamento_tris:
+        return malha
+    import fast_simplification
 
-    info = {
-        "triangulos_brutos": int(tris_brutos),
-        "triangulos_finais": int(len(malha.faces)),
-        "componentes": int(len(malha.split(only_watertight=False))),
-    }
-    return malha, info
+    verts_d, faces_d = fast_simplification.simplify(
+        malha.vertices.astype(np.float32),
+        malha.faces.astype(np.int64),
+        target_count=orcamento_tris,
+    )
+    return trimesh.Trimesh(vertices=verts_d, faces=faces_d, process=True)
 
 
 def main() -> int:
@@ -226,22 +235,30 @@ def main() -> int:
         return 1
     log(f"{len(mascaras)} máscaras para converter")
 
-    # ----- 2. Máscaras → malhas -----
+    # ----- 2. Máscaras → malhas (duas passadas) -----
     inicio = time.time()
-    # Orçamento por estrutura: proporcional, com piso para não pulverizar
-    # estruturas pequenas (mínimo 2k triângulos cada).
-    por_estrutura = max(2_000, args.max_tris // max(1, len(mascaras)))
 
-    cena = trimesh.Scene()
-    total_tris = 0
+    # Passada 1: extrai todas as malhas brutas para conhecer os tamanhos.
+    brutas: list[tuple[str, trimesh.Trimesh, int]] = []
     for caminho in mascaras:
         nome = caminho.name.removesuffix(".nii.gz")
-        resultado = mascara_para_malha(caminho, por_estrutura)
+        resultado = extrair_malha_bruta(caminho)
         if resultado is None:
             log(f"  - {nome}: vazia no exame, pulando")
             relatorio["estruturas"][nome] = {"presente": False}
             continue
-        malha, info = resultado
+        brutas.append((nome, *resultado))
+
+    # Passada 2: orçamento PROPORCIONAL ao tamanho real de cada estrutura
+    # (um pulmão merece dezenas de vezes mais triângulos que um esôfago;
+    # dividir por igual deixava os órgãos grandes facetados), com piso para
+    # as pequenas não virarem poliedros.
+    total_bruto = sum(tris for _, _, tris in brutas) or 1
+    cena = trimesh.Scene()
+    total_tris = 0
+    for nome, malha_bruta, tris_brutos in brutas:
+        orcamento = max(3_000, round(args.max_tris * tris_brutos / total_bruto))
+        malha = decimar(malha_bruta, orcamento)
         r, g, b = cor_para(nome)
         malha.visual = trimesh.visual.texture.TextureVisuals(
             material=trimesh.visual.material.PBRMaterial(
@@ -251,9 +268,13 @@ def main() -> int:
             )
         )
         cena.add_geometry(malha, node_name=nome, geom_name=nome)
+        info = {
+            "triangulos_brutos": int(tris_brutos),
+            "triangulos_finais": int(len(malha.faces)),
+        }
         total_tris += info["triangulos_finais"]
         relatorio["estruturas"][nome] = {"presente": True, **info}
-        log(f"  + {nome}: {info['triangulos_finais']} tris")
+        log(f"  + {nome}: {info['triangulos_finais']} tris (bruto {tris_brutos})")
 
     relatorio["etapas_s"]["malhas"] = round(time.time() - inicio, 1)
     relatorio["triangulos_total"] = total_tris
