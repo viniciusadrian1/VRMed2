@@ -1,7 +1,42 @@
 # VRmed — contexto do projeto
 
 > Documento de continuidade. Se você (ou uma IA assistente) está abrindo este projeto numa
-> máquina nova, leia isto primeiro. Última atualização: 2026-07-07.
+> máquina nova, leia isto primeiro. Última atualização: 2026-08-26.
+
+## VRmed Clínica (modo 3) — estado em 2026-08-26
+
+Terceiro modo do app, em `/clinica`: casos 3D gerados de **exames reais anonimizados**
+(TCIA/LIDC-IDRI e 3D Slicer sample data). Master prompt com regras e fases:
+`docs/PROMPT-CLINICA.md` (ler antes de mexer). Enquadramento obrigatório: "visualização
+educacional — não substitui laudo" (nunca "diagnóstico/assistência", território ANVISA).
+
+**Pipeline (Python, roda SÓ no PC Windows com RTX 4060 Ti — TotalSegmentator usa CUDA):**
+
+- `scripts/tc-para-vrmed.py` — TC (DICOM/NIfTI) → GLB nomeado. Flags novas:
+  `--pulmoes-inteiros` (une lobos → pulmão esq/dir sem linhas de fissura) e
+  `--cores-tc exame.nii.gz` (cor por vértice pela densidade HU real + oclusão de cavidade —
+  a "textura" vem do próprio exame). Depois SEMPRE `npx gltf-transform draco` (nunca --simplify).
+- `scripts/achados-pulmao.py` — TC + máscaras → JSON de achados (enfisema LAA-950 por lobo,
+  opacidades candidatas com posição normalizada).
+- `scripts/pintar-pulmao.py` — pinta os achados na TEXTURA do modelo ilustrativo de pulmão
+  (modo "Mapa de achados", secundário).
+- Dados brutos/máscaras em `.clinica-dados/` (gitignored, só existe no PC). Os GLBs finais
+  vão para `public/pacientes/` + `manifest.json` (commitados — o site funciona em qualquer máquina).
+- venv: `.venv-pipeline` (Windows). Torch 2.6.0+cu124 fixado — NÃO deixar pip trocar por CPU.
+
+**Frontend Clínica:** `components/clinica/` (ClinicaApp, ClinicaViewer, MapaAchados) — canvas
+e XR store próprios, isolados da store global. Visão padrão = "Reconstrução real" (malha medida,
+pulmões inteiros, cores da TC); alternativa = "Mapa de achados". Lição aprendida: marching cubes
+exporta normais para DENTRO — `fix_normals(multibody=True)` no pipeline é obrigatório (sem isso
+a iluminação inverte e a amostragem de HU cai na parede torácica).
+
+**Pendências Clínica:** validação de acurácia (§5 do prompt: Dice/HD95 vs ground truth, script
+`validar-segmentacao.py` ainda não existe); caso de enfisema grave (DPOC) para o contraste
+saudável×fumante; teste em Quest; Fase 3 (upload → processamento na nuvem: R2 + Modal + Neon).
+
+**Multi-máquina:** no Mac dá para editar frontend, rodar `npm run dev`, commitar e push
+(Render faz deploy automático do GitHub). Processamento de exames novos: só no PC (CUDA).
+`.env` (OPENAI_API_KEY) não está no git — copiar manualmente se precisar do tutor local.
 
 ## O que é
 
