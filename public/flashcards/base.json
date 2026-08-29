@@ -1,0 +1,65 @@
+{
+  "fonte": "Fatos de anatomia básica de livro-texto (domínio comum: Gray's Anatomy for Students, OpenStax Anatomy & Physiology). Revisão humana pendente — marcado como conteúdo educacional.",
+  "temas": [
+    {
+      "id": "cardiovascular",
+      "nome": "Cardiovascular",
+      "cartas": [
+        { "pergunta": "Quantas câmaras tem o coração humano e quais são?", "resposta": "Quatro: dois átrios (direito e esquerdo) e dois ventrículos (direito e esquerdo)." },
+        { "pergunta": "Qual valva separa o átrio esquerdo do ventrículo esquerdo?", "resposta": "A valva mitral (bicúspide)." },
+        { "pergunta": "Quais artérias irrigam o próprio músculo cardíaco?", "resposta": "As artérias coronárias direita e esquerda — os primeiros ramos da aorta." },
+        { "pergunta": "Qual câmara cardíaca tem a parede mais espessa e por quê?", "resposta": "O ventrículo esquerdo: bombeia sangue para a circulação sistêmica inteira, contra a maior resistência." }
+      ]
+    },
+    {
+      "id": "respiratorio",
+      "nome": "Respiratório",
+      "cartas": [
+        { "pergunta": "Quantos lobos tem cada pulmão?", "resposta": "O direito tem três (superior, médio e inferior); o esquerdo tem dois (superior e inferior)." },
+        { "pergunta": "Onde ocorre a troca gasosa (hematose)?", "resposta": "Nos alvéolos pulmonares, através da membrana alveolocapilar." },
+        { "pergunta": "Qual é o principal músculo da respiração?", "resposta": "O diafragma, inervado pelos nervos frênicos (C3–C5)." },
+        { "pergunta": "O que é a carina da traqueia?", "resposta": "A crista na bifurcação da traqueia nos dois brônquios principais, aproximadamente ao nível de T4–T5." }
+      ]
+    },
+    {
+      "id": "digestorio",
+      "nome": "Digestório",
+      "cartas": [
+        { "pergunta": "Quais são as quatro camadas da parede do trato gastrointestinal?", "resposta": "Mucosa, submucosa, muscular e serosa (ou adventícia)." },
+        { "pergunta": "Qual é a maior glândula do corpo humano?", "resposta": "O fígado — cerca de 1,2 a 1,5 kg no adulto." },
+        { "pergunta": "Onde desemboca o ducto colédoco?", "resposta": "Na segunda porção do duodeno, na papila maior (ampola hepatopancreática)." },
+        { "pergunta": "Quais são as três partes do intestino delgado?", "resposta": "Duodeno, jejuno e íleo." }
+      ]
+    },
+    {
+      "id": "nervoso",
+      "nome": "Nervoso",
+      "cartas": [
+        { "pergunta": "Quantos pares de nervos cranianos existem?", "resposta": "Doze pares." },
+        { "pergunta": "Qual estrutura conecta os dois hemisférios cerebrais?", "resposta": "O corpo caloso." },
+        { "pergunta": "Qual região do encéfalo coordena o equilíbrio e a motricidade fina?", "resposta": "O cerebelo." },
+        { "pergunta": "O que circula dentro dos ventrículos cerebrais?", "resposta": "O líquido cefalorraquidiano (líquor), produzido pelos plexos corióideos." }
+      ]
+    },
+    {
+      "id": "urinario",
+      "nome": "Urinário",
+      "cartas": [
+        { "pergunta": "Qual é a unidade funcional do rim?", "resposta": "O néfron — cada rim tem cerca de 1 milhão." },
+        { "pergunta": "Qual é o trajeto da urina do rim até o exterior?", "resposta": "Rim → ureter → bexiga urinária → uretra." },
+        { "pergunta": "Em que região do rim ficam os corpúsculos renais (glomérulos)?", "resposta": "No córtex renal." },
+        { "pergunta": "De onde vem o sangue filtrado pelos rins?", "resposta": "Das artérias renais, ramos diretos da aorta abdominal." }
+      ]
+    },
+    {
+      "id": "cabeca-pescoco",
+      "nome": "Cabeça e pescoço",
+      "cartas": [
+        { "pergunta": "Qual é a maior cartilagem da laringe?", "resposta": "A cartilagem tireóidea — a proeminência dela é o \"pomo de Adão\"." },
+        { "pergunta": "Qual estrutura impede a entrada de alimento na via aérea ao engolir?", "resposta": "A epiglote, que fecha o ádito da laringe durante a deglutição." },
+        { "pergunta": "Onde ficam as pregas vocais?", "resposta": "Na laringe, estendidas entre a cartilagem tireóidea e as cartilagens aritenóideas." },
+        { "pergunta": "Qual osso não se articula com nenhum outro osso?", "resposta": "O hioide, suspenso por músculos e ligamentos no pescoço." }
+      ]
+    }
+  ]
+}

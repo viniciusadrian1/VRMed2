@@ -1,0 +1,220 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
+import Link from "next/link";
+import { ArrowLeft, BookOpen, Send, X } from "lucide-react";
+import { Canvas } from "@react-three/fiber";
+import { XR, createXRStore } from "@react-three/xr";
+import { useMounted } from "@/hooks/use-mounted";
+import { streamChatResponse } from "@/lib/chat-client";
+import { CenaSala } from "./SalaScene";
+
+interface Mensagem {
+  role: "user" | "assistant";
+  content: string;
+}
+
+/**
+ * Sala de Estudos Individual (Modo 1 do plano multi-modo).
+ *
+ * Estado 100%% local (regra do projeto: modos novos não tocam a store
+ * global). O tutor DOM (gaveta) existe só fora do VR; dentro do headset o
+ * livro abre o TutorVR em texto 3D.
+ */
+export function SalaApp() {
+  const mounted = useMounted();
+  const [inSession, setInSession] = useState(false);
+  const [xrError, setXrError] = useState<string | null>(null);
+  const [tutorAberto, setTutorAberto] = useState(false);
+  const [mensagens, setMensagens] = useState<Mensagem[]>([]);
+  const [pergunta, setPergunta] = useState("");
+  const [ocupado, setOcupado] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const store = useMemo(
+    () =>
+      createXRStore({
+        // Mesmo endurecimento da Arena/Clínica (lições dos testes no Quest 2).
+        baseAssetPath:
+          typeof window !== "undefined"
+            ? `${window.location.origin}/webxr-profiles/`
+            : "https://localhost/webxr-profiles/",
+        controller: { grabPointer: false, teleportPointer: false },
+        hand: { model: false, grabPointer: false, touchPointer: false },
+        anchors: false,
+        meshDetection: false,
+        planeDetection: false,
+        hitTest: false,
+        depthSensing: false,
+        frameRate: false,
+        foveation: 0.5,
+      }),
+    [],
+  );
+
+  useEffect(
+    () => store.subscribe((state) => setInSession(Boolean(state.session))),
+    [store],
+  );
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const enterVR = useCallback(() => {
+    setXrError(null);
+    store.enterVR().catch((error: unknown) => {
+      setXrError(error instanceof Error ? error.message : String(error));
+    });
+  }, [store]);
+
+  const enviar = (event: FormEvent) => {
+    event.preventDefault();
+    const texto = pergunta.trim();
+    if (!texto || ocupado) return;
+    setPergunta("");
+    setOcupado(true);
+    const historico: Mensagem[] = [...mensagens, { role: "user", content: texto }];
+    setMensagens([...historico, { role: "assistant", content: "" }]);
+
+    abortRef.current = new AbortController();
+    streamChatResponse(
+      { messages: historico },
+      (chunk) => {
+        setMensagens((atual) => {
+          const copia = [...atual];
+          const ultima = copia[copia.length - 1];
+          copia[copia.length - 1] = {
+            ...ultima,
+            content: ultima.content + chunk,
+          };
+          return copia;
+        });
+      },
+      abortRef.current.signal,
+    )
+      .catch((error: unknown) => {
+        setMensagens((atual) => {
+          const copia = [...atual];
+          copia[copia.length - 1] = {
+            role: "assistant",
+            content:
+              error instanceof Error ? error.message : "Tutor indisponível.",
+          };
+          return copia;
+        });
+      })
+      .finally(() => setOcupado(false));
+  };
+
+  if (!mounted) return null;
+
+  return (
+    <main className="relative h-dvh w-full overflow-hidden bg-[#1a140d]">
+      {!inSession && (
+        <>
+          <Link
+            href="/"
+            className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-medium text-white backdrop-blur hover:bg-black/70"
+          >
+            <ArrowLeft className="size-4" />
+            VRmed
+          </Link>
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-3">
+            <button
+              type="button"
+              onClick={enterVR}
+              className="pointer-events-auto rounded-full bg-[#c8935a] px-8 py-3 font-semibold text-[#221507] shadow-lg transition-transform hover:scale-105"
+            >
+              Entrar em VR
+            </button>
+            {xrError && (
+              <p className="pointer-events-auto max-w-md rounded-lg border border-red-400/40 bg-red-950/70 px-4 py-2 text-xs text-red-200">
+                Não foi possível iniciar o VR: {xrError}
+              </p>
+            )}
+            <p className="max-w-lg px-4 text-center text-[11px] text-white/45">
+              Sala de estudos — clique no rádio, no computador, nos flashcards
+              ou no livro. Conteúdo educacional; o tutor de IA cita fontes
+              médicas reconhecidas.
+            </p>
+          </div>
+
+          {/* Gaveta do tutor (desktop) */}
+          {tutorAberto && (
+            <aside className="absolute bottom-0 right-0 top-0 z-20 flex w-full max-w-md flex-col border-l border-white/10 bg-[#10151c]/95 backdrop-blur">
+              <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                <span className="flex items-center gap-2 text-sm font-semibold text-white">
+                  <BookOpen className="size-4 text-[#c8935a]" />
+                  Tutor de IA
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setTutorAberto(false)}
+                  className="rounded p-1 text-white/60 hover:text-white"
+                  aria-label="Fechar tutor"
+                >
+                  <X className="size-4" />
+                </button>
+              </header>
+              <div className="flex-1 space-y-3 overflow-y-auto p-4">
+                {mensagens.length === 0 && (
+                  <p className="text-sm text-white/50">
+                    Pergunte qualquer coisa de anatomia, fisiologia ou
+                    patologia — as respostas citam apenas fontes reconhecidas.
+                  </p>
+                )}
+                {mensagens.map((m, i) => (
+                  <div
+                    key={i}
+                    className={
+                      m.role === "user"
+                        ? "ml-8 rounded-xl bg-[#c8935a]/20 px-3 py-2 text-sm text-white"
+                        : "mr-8 rounded-xl bg-white/5 px-3 py-2 text-sm text-white/90"
+                    }
+                  >
+                    {m.content || "…"}
+                  </div>
+                ))}
+              </div>
+              <form onSubmit={enviar} className="flex gap-2 border-t border-white/10 p-3">
+                <input
+                  value={pergunta}
+                  onChange={(event) => setPergunta(event.target.value)}
+                  placeholder="Sua dúvida de estudo…"
+                  className="flex-1 rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#c8935a]/60"
+                />
+                <button
+                  type="submit"
+                  disabled={ocupado}
+                  className="rounded-lg bg-[#c8935a] px-3 text-[#221507] disabled:opacity-50"
+                  aria-label="Enviar pergunta"
+                >
+                  <Send className="size-4" />
+                </button>
+              </form>
+            </aside>
+          )}
+        </>
+      )}
+
+      <Canvas
+        shadows={false}
+        dpr={1}
+        frameloop="always"
+        camera={{ position: [0.95, 1.6, -0.15], fov: 55 }}
+        gl={{ antialias: true, alpha: false }}
+        onCreated={({ gl }) => gl.setClearColor("#1a140d")}
+      >
+        <XR store={store}>
+          <CenaSala onAbrirTutorDom={() => setTutorAberto(true)} />
+        </XR>
+      </Canvas>
+    </main>
+  );
+}
