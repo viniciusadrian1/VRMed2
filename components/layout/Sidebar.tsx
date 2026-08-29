@@ -6,8 +6,10 @@ import {
   Box,
   GraduationCap,
   History,
+  Lamp,
   ScanLine,
   SplitSquareHorizontal,
+  Swords,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,6 +26,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/compare", label: "Comparar", icon: SplitSquareHorizontal },
   { href: "/quiz", label: "Quiz", icon: GraduationCap },
   { href: "/clinica", label: "Clínica", icon: ScanLine },
+  { href: "/sala", label: "Sala de estudos", icon: Lamp },
+  { href: "/duelo", label: "Duelo 1×1", icon: Swords },
   { href: "/history", label: "Histórico", icon: History },
 ];
 

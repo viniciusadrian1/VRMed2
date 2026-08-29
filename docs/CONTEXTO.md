@@ -1,7 +1,16 @@
 # VRmed — contexto do projeto
 
 > Documento de continuidade. Se você (ou uma IA assistente) está abrindo este projeto numa
-> máquina nova, leia isto primeiro. Última atualização: 2026-08-26.
+> máquina nova, leia isto primeiro. Última atualização: 2026-08-29.
+
+## Modos novos (2026-08-29): Sala de Estudos e Duelo 1x1
+
+Dois modos do plano multi-modo do grupo implementados DENTRO do app web
+(decisão: sem Unity). `/sala` = quarto 3D com rádio lo-fi sintetizado,
+flashcards (base curada + geração por IA), hub de modos e livro-tutor.
+`/duelo` = quiz 1x1 contra bot (3 dificuldades, 100/200 pts, avatar médico
+procedural); online fica para a fase 2. Detalhes e pendências:
+`docs/PLANO-MULTIMODO.md`.
 
 ## VRmed Clínica (modo 3) — estado em 2026-08-26
 
