@@ -255,7 +255,13 @@ async function gerarCartasIA(tema: Tema): Promise<Carta[]> {
   const fim = texto.lastIndexOf("]");
   if (inicio === -1 || fim === -1) throw new Error("resposta sem JSON");
   const cartas = JSON.parse(texto.slice(inicio, fim + 1)) as Carta[];
-  return cartas.filter((c) => c.pergunta && c.resposta).slice(0, 6);
+  // Só strings entram: um campo objeto ("resposta": {…}) renderizado como
+  // filho de <Text> derruba o React — e a rota inteira junto.
+  return cartas
+    .filter(
+      (c) => typeof c.pergunta === "string" && typeof c.resposta === "string",
+    )
+    .slice(0, 6);
 }
 
 function Flashcards() {
@@ -266,6 +272,10 @@ function Flashcards() {
   const [virada, setVirada] = useState(false);
   const [painel, setPainel] = useState(false);
   const [statusIA, setStatusIA] = useState<string | null>(null);
+  // Id do tema vigente, lido na RESOLUÇÃO da geração por IA: se o usuário
+  // trocou de tema durante o streaming, as cartas antigas são descartadas
+  // (senão cartas de Coração caíam no baralho de Nervoso).
+  const temaVigente = useRef<string | null>(null);
   const pop = useRef(1);
   const carta = useRef<THREE.Group>(null);
 
@@ -287,6 +297,7 @@ function Flashcards() {
   });
 
   const escolherTema = (t: Tema) => {
+    temaVigente.current = t.id;
     setTema(t);
     setFila(embaralhar(t.cartas));
     setIndice(0);
@@ -392,7 +403,10 @@ function Flashcards() {
             width={0.34}
             height={0.11}
             position={[0.2, -0.45, 0]}
-            onClick={() => setTema(null)}
+            onClick={() => {
+              temaVigente.current = null;
+              setTema(null);
+            }}
           />
           <Button3D
             label={statusIA === "gerando" ? "Gerando…" : "+4 com IA"}
@@ -403,12 +417,17 @@ function Flashcards() {
             onClick={() => {
               if (statusIA === "gerando") return;
               setStatusIA("gerando");
+              const pedidoPara = tema.id;
               gerarCartasIA(tema)
                 .then((novas) => {
+                  if (temaVigente.current !== pedidoPara) return;
                   setFila((f) => [...f, ...novas]);
                   setStatusIA(`+${novas.length} cartas geradas`);
                 })
-                .catch(() => setStatusIA("IA indisponível (offline?)"));
+                .catch(() => {
+                  if (temaVigente.current === pedidoPara)
+                    setStatusIA("IA indisponível (offline?)");
+                });
             }}
           />
           {statusIA && statusIA !== "gerando" && (
@@ -442,6 +461,10 @@ function TutorVR() {
   // engasgaria o headset — atualiza a cada ~300ms).
   useFrame(({ clock }) => {
     if (!ocupado) return;
+    // Sem o guard, o primeiro tick sobrescrevia o "…" com string vazia e o
+    // painel voltava ao texto ocioso durante a latência inicial da IA — a
+    // pergunta parecia ignorada.
+    if (!buffer.current) return;
     if (clock.elapsedTime - ultimaAtualizacao.current > 0.3) {
       ultimaAtualizacao.current = clock.elapsedTime;
       setResposta(buffer.current);

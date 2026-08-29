@@ -13,6 +13,8 @@ import { ArrowLeft, BookOpen, Send, X } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import { XR, createXRStore } from "@react-three/xr";
 import { useMounted } from "@/hooks/use-mounted";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Text3D } from "@/components/arena/ui3d";
 import { streamChatResponse } from "@/lib/chat-client";
 import { CenaSala } from "./SalaScene";
 
@@ -212,7 +214,17 @@ export function SalaApp() {
         onCreated={({ gl }) => gl.setClearColor("#1a140d")}
       >
         <XR store={store}>
-          <CenaSala onAbrirTutorDom={() => setTutorAberto(true)} />
+          {/* Sem o boundary, qualquer erro na árvore 3D (ex.: carta de IA
+              malformada) subia até o error.tsx e derrubava a rota inteira. */}
+          <ErrorBoundary
+            fallback={
+              <Text3D position={[0, 1.3, -1.5]} size={0.08} color="#e06a5c">
+                Algo quebrou na sala — recarregue a página
+              </Text3D>
+            }
+          >
+            <CenaSala onAbrirTutorDom={() => setTutorAberto(true)} />
+          </ErrorBoundary>
         </XR>
       </Canvas>
     </main>

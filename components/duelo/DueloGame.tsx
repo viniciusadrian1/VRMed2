@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -102,18 +102,27 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
   const caminho = rodada.tipo === "orgao" ? rodada.modelo! : LARINGE;
   const gltf = useGLTF(caminho, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
-  const grupo = useRef<THREE.Group>(null);
+  // Três grupos aninhados (padrão do ArenaModel): o de fora carrega a escala
+  // de projeto, o do meio gira, e o de dentro recebe normalizeContent — que
+  // sobrescreve scale/position do grupo em que roda. Num grupo só, a
+  // normalização engolia o scale={0.85} e a rotação orbitava o pivô cru do
+  // GLB em vez do centro do modelo.
+  const spinner = useRef<THREE.Group>(null);
+  const content = useRef<THREE.Group>(null);
   const marcador = useRef<THREE.Mesh>(null);
   const [posMarcador, setPosMarcador] = useState<[number, number, number] | null>(null);
 
-  useEffect(() => {
-    const g = grupo.current;
+  // useLayoutEffect, não useEffect: com frameloop="always" um quadro podia
+  // ser desenhado ANTES da normalização — um flash do GLB em unidades cruas
+  // dentro do headset a cada troca de rodada.
+  useLayoutEffect(() => {
+    const g = content.current;
     if (!g) return;
-    g.rotation.y = 0;
+    if (spinner.current) spinner.current.rotation.y = 0;
     normalizeContent(g);
     prepareModel(g, "mesh");
     if (rodada.tipo === "estrutura") {
-      // Posições vêm em coordenadas de mundo com o grupo ainda sem rotação —
+      // Posições vêm em coordenadas de mundo com os grupos ainda sem rotação —
       // convertidas para locais, o marcador gira junto com o modelo.
       const ponto = detectStructures(g).find((p) => p.label === rodada.alvo);
       if (ponto) {
@@ -126,7 +135,7 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
   }, [scene, rodada]);
 
   useFrame((state, delta) => {
-    if (grupo.current) grupo.current.rotation.y += delta * 0.35;
+    if (spinner.current) spinner.current.rotation.y += delta * 0.35;
     if (marcador.current) {
       const s = 1 + 0.25 * Math.sin(state.clock.elapsedTime * 5);
       marcador.current.scale.setScalar(s);
@@ -134,14 +143,18 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
   });
 
   return (
-    <group ref={grupo} scale={0.85}>
-      <primitive object={scene} />
-      {posMarcador && (
-        <mesh ref={marcador} position={posMarcador}>
-          <sphereGeometry args={[0.055, 16, 12]} />
-          <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
-        </mesh>
-      )}
+    <group scale={0.85}>
+      <group ref={spinner}>
+        <group ref={content}>
+          <primitive object={scene} />
+          {posMarcador && (
+            <mesh ref={marcador} position={posMarcador}>
+              <sphereGeometry args={[0.055, 16, 12]} />
+              <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
+            </mesh>
+          )}
+        </group>
+      </group>
     </group>
   );
 }
@@ -172,6 +185,10 @@ export function DueloGame() {
 
   const relogio = useRef(0); // acumulador da fase atual (s)
   const travadoAte = useRef(0); // lockout após erro do jogador
+  // Trava SÍNCRONA da rodada: o clique do jogador pode chegar na janela entre
+  // o frame em que o bot/timeout encerrou e o commit do React (fase ainda lê
+  // "rodada" no closure) — sem o ref, os dois pontuavam na mesma rodada.
+  const rodadaEncerrada = useRef(false);
   const botPlano = useRef({ em: 99, acerta: false, respondeu: false });
   const rodada = rodadas[indice];
 
@@ -191,6 +208,7 @@ export function DueloGame() {
   const iniciarRodada = () => {
     relogio.current = 0;
     travadoAte.current = 0;
+    rodadaEncerrada.current = false;
     setTempoRestante(TEMPO_RODADA);
     setErroJogador(false);
     const bot = BOTS[dificuldade];
@@ -203,6 +221,7 @@ export function DueloGame() {
   };
 
   const encerrarRodada = (texto: string, humor: HumorOponente) => {
+    rodadaEncerrada.current = true;
     setFeedback(texto);
     setHumorBot(humor);
     relogio.current = 0;
@@ -210,7 +229,7 @@ export function DueloGame() {
   };
 
   const responder = (opcao: string) => {
-    if (fase !== "rodada") return;
+    if (fase !== "rodada" || rodadaEncerrada.current) return;
     if (relogio.current < travadoAte.current) return;
     if (opcao === rodada.alvo) {
       playHit();
@@ -242,6 +261,7 @@ export function DueloGame() {
     }
 
     if (fase === "rodada") {
+      if (rodadaEncerrada.current) return;
       const restante = Math.max(0, Math.ceil(TEMPO_RODADA - relogio.current));
       if (restante !== tempoRestante) setTempoRestante(restante);
 
@@ -360,7 +380,17 @@ export function DueloGame() {
   // fase "rodada" ou "feedback"
   return (
     <group>
-      <ModeloRodada rodada={rodada} />
+      {/* Suspense LOCAL: em wifi lento, um GLB de rodada ainda em voo não pode
+          apagar placar, cronômetro e botões — só o modelo espera. */}
+      <Suspense
+        fallback={
+          <Text3D position={[0, 0.2, 0]} size={0.07} color={ARENA_COLORS.muted}>
+            Carregando o modelo…
+          </Text3D>
+        }
+      >
+        <ModeloRodada rodada={rodada} />
+      </Suspense>
 
       {/* Placar e cabeçalho */}
       <Text3D position={[-1.25, 1.5, 0]} size={0.09} color={ARENA_COLORS.success}>
@@ -372,7 +402,7 @@ export function DueloGame() {
 
       {fase === "rodada" && (
         <>
-          <Panel width={2.4} height={0.34} position={[0, 1.18, 0]}>
+          <Panel width={2.4} height={0.34} position={[0, 1.02, 0]}>
             <Text3D position={[0, 0, 0.01]} size={0.075} maxWidth={2.2}>
               {rodada.tipo === "orgao"
                 ? "Qual órgão é este?"
@@ -380,7 +410,7 @@ export function DueloGame() {
             </Text3D>
           </Panel>
           <Text3D
-            position={[0, 0.92, 0]}
+            position={[0, 0.78, 0]}
             size={0.08}
             color={tempoRestante <= 5 ? ARENA_COLORS.danger : ARENA_COLORS.muted}
           >
@@ -394,13 +424,13 @@ export function DueloGame() {
               label={opcao}
               width={1.45}
               height={0.24}
-              position={[i % 2 === 0 ? -0.8 : 0.8, -0.62 - Math.floor(i / 2) * 0.3, 0.45]}
+              position={[i % 2 === 0 ? -0.8 : 0.8, -0.18 - Math.floor(i / 2) * 0.3, 0.75]}
               color={erroJogador ? "#5c6b7a" : ARENA_COLORS.primary}
               onClick={() => responder(opcao)}
             />
           ))}
           {erroJogador && (
-            <Text3D position={[0, -0.4, 0.45]} size={0.06} color={ARENA_COLORS.danger}>
+            <Text3D position={[0, 0.08, 0.75]} size={0.06} color={ARENA_COLORS.danger}>
               Errado — aguarde um instante…
             </Text3D>
           )}
@@ -408,7 +438,7 @@ export function DueloGame() {
       )}
 
       {fase === "feedback" && (
-        <Panel width={2.2} height={0.4} position={[0, 1.18, 0]}>
+        <Panel width={2.2} height={0.4} position={[0, 1.02, 0]}>
           <Text3D position={[0, 0, 0.01]} size={0.08} maxWidth={2}>
             {feedback}
           </Text3D>
