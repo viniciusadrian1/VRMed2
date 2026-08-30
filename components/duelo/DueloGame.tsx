@@ -131,13 +131,20 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
     g.traverse((obj) => {
       if (obj instanceof THREE.Mesh) obj.raycast = () => null;
     });
-    if (rodada.tipo === "estrutura") {
-      // Posições vêm em coordenadas de mundo com os grupos ainda sem rotação —
-      // convertidas para locais, o marcador gira junto com o modelo.
+    if (rodada.tipo === "estrutura" && spinner.current) {
+      // Posições vêm em coordenadas de mundo com os grupos ainda sem rotação.
+      // O marcador vive no SPINNER (fora do content): dentro do content ele
+      // contaminava a medição da rodada seguinte — o normalizeContent media
+      // "órgão novo + marcador velho" e o órgão saía minúsculo/deslocado
+      // (era o cérebro invisível e o coração miniatura do teste do grupo).
       const ponto = detectStructures(g).find((p) => p.label === rodada.alvo);
       if (ponto) {
-        const local = g.worldToLocal(new THREE.Vector3(...ponto.position));
+        const local = spinner.current.worldToLocal(
+          new THREE.Vector3(...ponto.position),
+        );
         setPosMarcador([local.x, local.y, local.z]);
+      } else {
+        setPosMarcador(null);
       }
     } else {
       setPosMarcador(null);
@@ -157,13 +164,13 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
       <group ref={spinner}>
         <group ref={content}>
           <primitive object={scene} />
-          {posMarcador && (
-            <mesh ref={marcador} position={posMarcador} raycast={() => null}>
-              <sphereGeometry args={[0.055, 16, 12]} />
-              <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
-            </mesh>
-          )}
         </group>
+        {posMarcador && (
+          <mesh ref={marcador} position={posMarcador} raycast={() => null}>
+            <sphereGeometry args={[0.055, 16, 12]} />
+            <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
+          </mesh>
+        )}
       </group>
     </group>
   );
