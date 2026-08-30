@@ -119,8 +119,18 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
     const g = content.current;
     if (!g) return;
     if (spinner.current) spinner.current.rotation.y = 0;
+    // Rodando ANTES do primeiro quadro (useLayoutEffect), as matrizes de
+    // mundo ainda carregam a rotação da rodada anterior — medir assim
+    // deslocava o modelo para o lado. Recalcula a cadeia inteira primeiro.
+    g.updateWorldMatrix(true, true);
     normalizeContent(g);
     prepareModel(g, "mesh");
+    // O modelo do Duelo não é clicável (diferente da Arena) — sem isto, as
+    // malhas do órgão interceptavam o laser/mouse na frente dos botões de
+    // resposta e o clique/hover falhava quando o giro passava por cima.
+    g.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) obj.raycast = () => null;
+    });
     if (rodada.tipo === "estrutura") {
       // Posições vêm em coordenadas de mundo com os grupos ainda sem rotação —
       // convertidas para locais, o marcador gira junto com o modelo.
@@ -148,7 +158,7 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
         <group ref={content}>
           <primitive object={scene} />
           {posMarcador && (
-            <mesh ref={marcador} position={posMarcador}>
+            <mesh ref={marcador} position={posMarcador} raycast={() => null}>
               <sphereGeometry args={[0.055, 16, 12]} />
               <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
             </mesh>
@@ -424,13 +434,13 @@ export function DueloGame() {
               label={opcao}
               width={1.45}
               height={0.24}
-              position={[i % 2 === 0 ? -0.8 : 0.8, -0.18 - Math.floor(i / 2) * 0.3, 0.75]}
+              position={[i % 2 === 0 ? -0.78 : 0.78, -0.22 - Math.floor(i / 2) * 0.3, 1.15]}
               color={erroJogador ? "#5c6b7a" : ARENA_COLORS.primary}
               onClick={() => responder(opcao)}
             />
           ))}
           {erroJogador && (
-            <Text3D position={[0, 0.08, 0.75]} size={0.06} color={ARENA_COLORS.danger}>
+            <Text3D position={[0, 0.06, 1.15]} size={0.06} color={ARENA_COLORS.danger}>
               Errado — aguarde um instante…
             </Text3D>
           )}
