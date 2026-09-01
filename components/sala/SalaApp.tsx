@@ -209,7 +209,7 @@ export function SalaApp() {
         shadows={false}
         dpr={1}
         frameloop="always"
-        camera={{ position: [0.95, 1.6, -0.15], fov: 55 }}
+        camera={{ position: [0, 1.62, 0.5], fov: 55 }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => gl.setClearColor("#1a140d")}
       >

@@ -41,7 +41,9 @@ function CadeiraGLB() {
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   return (
     <group position={[0, 0, -1.15]} rotation={[0, Math.PI, 0]}>
-      <group position={[0.033, 0, 0.036]}>
+      {/* x=0: o eixo real da cadeira é o encosto (centrado em 0 no arquivo);
+          centrar pela bbox — assimétrica pela inclinação — a deslocava 3,3cm. */}
+      <group position={[0, 0, 0.036]}>
         <primitive object={scene} />
       </group>
     </group>
