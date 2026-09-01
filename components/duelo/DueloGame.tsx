@@ -29,6 +29,13 @@ const LARINGE = "/models/organs/larynx.glb";
 // wifi de evento; o nome "Pulmão" ainda aparece como alternativa errada.
 const ORGAOS_DUELO = ORGANS.filter((o) => o.id !== "pulmao");
 
+// Layout "sala de aula" (coordenadas de mundo, medidas do GLB do cenário):
+// lousa em x=0.8 com face em z=-3.85; cadeiras da frente em x=-1.81 (bot) e
+// x=+0.62 (jogador, onde fica o XROrigin — ver DueloApp).
+const LOUSA_X = 0.8;
+const LOUSA_Z = -3.85;
+const MESA_JOGADOR_X = 0.62;
+
 const TOTAL_RODADAS = 8;
 const TEMPO_RODADA = 18;
 
@@ -95,6 +102,60 @@ function montarRodadas(estruturas: string[]): Rodada[] {
     rodadas.push(rodadasOrgao[i], rodadasEstrutura[i]);
   }
   return rodadas;
+}
+
+/** Opção clicável escrita em giz na lousa (sem pop-up): texto + plano
+ *  invisível para o raycast + crescimento suave no hover. */
+function BotaoLousa({
+  texto,
+  position,
+  onClick,
+  cor = "#f2f5ec",
+  size = 0.14,
+  width = 2.3,
+}: {
+  texto: string;
+  position: [number, number, number];
+  onClick: () => void;
+  cor?: string;
+  size?: number;
+  width?: number;
+}) {
+  const grupo = useRef<THREE.Group>(null);
+  const hovered = useRef(false);
+  const escala = useRef(1);
+  useFrame((_, delta) => {
+    if (!grupo.current) return;
+    const alvo = hovered.current ? 1.09 : 1;
+    escala.current += (alvo - escala.current) * Math.min(1, delta * 12);
+    grupo.current.scale.setScalar(escala.current);
+  });
+  return (
+    <group
+      ref={grupo}
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        hovered.current = true;
+      }}
+      onPointerOut={() => {
+        hovered.current = false;
+      }}
+    >
+      {/* Panel/Text3D têm raycast desligado — o plano invisível recebe o clique */}
+      <mesh>
+        <planeGeometry args={[width, size * 1.9]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+      <Text3D size={size} color={cor} maxWidth={width}>
+        {texto}
+      </Text3D>
+    </group>
+  );
 }
 
 /** Modelo da rodada girando devagar; estrutura-alvo ganha um marcador pulsante. */
@@ -323,27 +384,29 @@ export function DueloGame() {
 
   if (fase === "menu") {
     return (
-      <group position={[0, 0.35, 0]}>
-        <Panel width={2.3} height={1.5}>
-          <Text3D position={[0, 0.55, 0.01]} size={0.14}>
-            Duelo 1×1
-          </Text3D>
-          <Text3D position={[0, 0.32, 0.01]} size={0.055} color={ARENA_COLORS.muted} maxWidth={2}>
-            Identifique órgãos (100 pts) e estruturas (200 pts) antes do oponente
-          </Text3D>
-          {(Object.keys(BOTS) as Dificuldade[]).map((nivel, i) => (
-            <Button3D
-              key={nivel}
-              label={BOTS[nivel].nome}
-              width={1.7}
-              height={0.24}
-              position={[0, 0.02 - i * 0.3, 0.01]}
-              color={nivel === "especialista" ? ARENA_COLORS.danger : ARENA_COLORS.primary}
-              onClick={() => comecar(nivel)}
-            />
-          ))}
-        </Panel>
-        <Text3D position={[0, -0.98, 0]} size={0.045} color={ARENA_COLORS.muted}>
+      <group>
+        <Text3D position={[LOUSA_X, 2.05, LOUSA_Z]} size={0.24} color="#f2f5ec">
+          Duelo 1×1
+        </Text3D>
+        <Text3D
+          position={[LOUSA_X, 1.76, LOUSA_Z]}
+          size={0.07}
+          color="#cfe0cd"
+          maxWidth={2.3}
+        >
+          Identifique órgãos (100 pts) e estruturas (200 pts) antes do oponente
+        </Text3D>
+        {(Object.keys(BOTS) as Dificuldade[]).map((nivel, i) => (
+          <BotaoLousa
+            key={nivel}
+            texto={BOTS[nivel].nome}
+            position={[LOUSA_X, 1.47 - i * 0.24, LOUSA_Z]}
+            cor={nivel === "especialista" ? "#ffc9bd" : "#f2f5ec"}
+            size={0.13}
+            onClick={() => comecar(nivel)}
+          />
+        ))}
+        <Text3D position={[LOUSA_X, 0.98, LOUSA_Z]} size={0.055} color="#a9c9ad">
           Online por partida — em breve; hoje o oponente é um bot
         </Text3D>
       </group>
@@ -352,7 +415,7 @@ export function DueloGame() {
 
   if (fase === "contagem") {
     return (
-      <Text3D position={[0, 0.4, 0]} size={0.65} color={ARENA_COLORS.primary}>
+      <Text3D position={[LOUSA_X, 1.6, LOUSA_Z]} size={0.85} color="#f2f5ec">
         {String(contagem)}
       </Text3D>
     );
@@ -362,34 +425,30 @@ export function DueloGame() {
     const venceu = pontosJogador > pontosBot;
     const empate = pontosJogador === pontosBot;
     return (
-      <group position={[0, 0.35, 0]}>
-        <Panel width={2.2} height={1.3}>
-          <Text3D
-            position={[0, 0.42, 0.01]}
-            size={0.15}
-            color={venceu ? ARENA_COLORS.success : empate ? ARENA_COLORS.primary : ARENA_COLORS.danger}
-          >
-            {venceu ? "Você venceu!" : empate ? "Empate!" : "O bot venceu"}
-          </Text3D>
-          <Text3D position={[0, 0.16, 0.01]} size={0.085}>
-            {`Você ${pontosJogador} × ${pontosBot} ${BOTS[dificuldade].nome.split(" (")[0]}`}
-          </Text3D>
-          <Button3D
-            label="Jogar de novo"
-            width={1.3}
-            height={0.22}
-            position={[0, -0.14, 0.01]}
-            color={ARENA_COLORS.success}
-            onClick={() => comecar(dificuldade)}
-          />
-          <Button3D
-            label="Trocar dificuldade"
-            width={1.3}
-            height={0.2}
-            position={[0, -0.42, 0.01]}
-            onClick={() => setFase("menu")}
-          />
-        </Panel>
+      <group>
+        <Text3D
+          position={[LOUSA_X, 2.05, LOUSA_Z]}
+          size={0.22}
+          color={venceu ? "#bfe8cf" : empate ? "#f2f5ec" : "#ffc9bd"}
+        >
+          {venceu ? "Você venceu!" : empate ? "Empate!" : "O bot venceu"}
+        </Text3D>
+        <Text3D position={[LOUSA_X, 1.7, LOUSA_Z]} size={0.12} color="#f2f5ec">
+          {`Você ${pontosJogador} × ${pontosBot} ${BOTS[dificuldade].nome.split(" (")[0]}`}
+        </Text3D>
+        <BotaoLousa
+          texto="→ Jogar de novo"
+          position={[LOUSA_X, 1.36, LOUSA_Z]}
+          cor="#bfe8cf"
+          size={0.14}
+          onClick={() => comecar(dificuldade)}
+        />
+        <BotaoLousa
+          texto="→ Trocar dificuldade"
+          position={[LOUSA_X, 1.08, LOUSA_Z]}
+          size={0.12}
+          onClick={() => setFase("menu")}
+        />
       </group>
     );
   }
@@ -399,74 +458,89 @@ export function DueloGame() {
     <group>
       {/* Suspense LOCAL: em wifi lento, um GLB de rodada ainda em voo não pode
           apagar placar, cronômetro e botões — só o modelo espera. */}
-      <Suspense
-        fallback={
-          <Text3D position={[0, 0.2, 0]} size={0.07} color={ARENA_COLORS.muted}>
-            Carregando o modelo…
-          </Text3D>
-        }
-      >
-        <ModeloRodada rodada={rodada} />
-      </Suspense>
+      {/* Órgão AO LADO da lousa, girando no próprio eixo */}
+      <group position={[-1.75, 1.25, -3.4]} scale={0.62}>
+        <Suspense
+          fallback={
+            <Text3D position={[0, 0, 0]} size={0.11} color={ARENA_COLORS.muted}>
+              Carregando…
+            </Text3D>
+          }
+        >
+          <ModeloRodada rodada={rodada} />
+        </Suspense>
+      </group>
 
       {/* Placar e cabeçalho */}
-      <Text3D position={[-1.25, 1.5, 0]} size={0.09} color={ARENA_COLORS.success}>
+      {/* Cantos internos do quadro verde: placar e info da rodada (giz) */}
+      <Text3D position={[LOUSA_X - 0.72, 2.28, LOUSA_Z]} size={0.09} color="#bfe8cf">
         {`Você: ${pontosJogador}`}
       </Text3D>
-      <Text3D position={[1.25, 1.5, 0]} size={0.07} color={ARENA_COLORS.muted}>
+      <Text3D position={[LOUSA_X + 0.62, 2.28, LOUSA_Z]} size={0.08} color="#e8e3c8">
         {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
       </Text3D>
 
       {fase === "rodada" && (
         <>
-          <Panel width={2.4} height={0.34} position={[0, 1.02, 0]}>
-            <Text3D position={[0, 0, 0.01]} size={0.075} maxWidth={2.2}>
-              {rodada.tipo === "orgao"
-                ? "Qual órgão é este?"
-                : "Qual estrutura está marcada em amarelo?"}
-            </Text3D>
-          </Panel>
+          {/* Pergunta escrita na lousa, como giz */}
           <Text3D
-            position={[0, 0.78, 0]}
-            size={0.08}
-            color={tempoRestante <= 5 ? ARENA_COLORS.danger : ARENA_COLORS.muted}
+            position={[LOUSA_X, 2.0, LOUSA_Z]}
+            size={0.15}
+            maxWidth={2.35}
+            color="#f2f5ec"
+          >
+            {rodada.tipo === "orgao"
+              ? "Qual órgão é este?"
+              : "Qual estrutura está marcada em amarelo?"}
+          </Text3D>
+          {/* Cronômetro no canto inferior direito do quadro */}
+          <Text3D
+            position={[LOUSA_X - 0.85, 2.02, LOUSA_Z]}
+            size={0.13}
+            color={tempoRestante <= 5 ? "#ffb0a0" : "#dfe8db"}
           >
             {String(tempoRestante)}
           </Text3D>
 
           {/* Opções em grade 2×2, perto do jogador */}
+          {/* Alternativas escritas na lousa, clicáveis */}
           {rodada.opcoes.map((opcao, i) => (
-            <Button3D
+            <BotaoLousa
               key={opcao}
-              label={opcao}
-              width={1.45}
-              height={0.24}
-              position={[i % 2 === 0 ? -0.78 : 0.78, -0.22 - Math.floor(i / 2) * 0.3, 1.15]}
-              color={erroJogador ? "#5c6b7a" : ARENA_COLORS.primary}
+              texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
+              position={[LOUSA_X, 1.64 - i * 0.23, LOUSA_Z]}
+              cor={erroJogador ? "#8fae94" : "#f8fbef"}
+              size={0.115}
               onClick={() => responder(opcao)}
             />
           ))}
           {erroJogador && (
-            <Text3D position={[0, 0.06, 1.15]} size={0.06} color={ARENA_COLORS.danger}>
-              Errado — aguarde um instante…
+            <Text3D position={[LOUSA_X - 0.85, 1.82, LOUSA_Z]} size={0.07} color="#ffb0a0">
+              Errado!
             </Text3D>
           )}
         </>
       )}
 
       {fase === "feedback" && (
-        <Panel width={2.2} height={0.4} position={[0, 1.02, 0]}>
-          <Text3D position={[0, 0, 0.01]} size={0.08} maxWidth={2}>
-            {feedback}
-          </Text3D>
-        </Panel>
+        <Text3D
+          position={[LOUSA_X, 1.45, LOUSA_Z]}
+          size={0.16}
+          maxWidth={2.35}
+          color="#f2f5ec"
+        >
+          {feedback}
+        </Text3D>
       )}
 
       <Oponente
         humor={humorBot}
         nome={BOTS[dificuldade].nome.split(" (")[0]}
         pontos={pontosBot}
-        position={[0, -1.3, -2.3]}
+        position={[-1.81, -0.82, 0.85]}
+        rotationY={Math.PI}
+        sentado
+        escala={1.35}
       />
     </group>
   );

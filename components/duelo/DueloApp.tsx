@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
@@ -14,40 +14,31 @@ import { DueloGame } from "./DueloGame";
 
 const FLOOR_Y = -1.3;
 
-/** Palco do duelo: duas metades espelhadas com divisória central baixa. */
+// Cenário "Cute Magic Stylized LowPoly" exportado do Unity pelo grupo
+// (29MB de projeto → 142KB: glTFast + webp + draco). Sala em L de ~5×5m,
+// escalada 1.3× para os jogadores caberem dentro com folga.
+const CENARIO_GLB = "/models/props/cenario-duelo.glb";
+
+function CenarioDuelo() {
+  const gltf = useGLTF(CENARIO_GLB, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  return (
+    // Deslocada para trás: as carteiras/quadro viram o fundo atrás do
+    // oponente e a área xadrez livre fica sob o jogo.
+    <group position={[0, FLOOR_Y, -1.5]} scale={1.6}>
+      <primitive object={scene} />
+    </group>
+  );
+}
+useGLTF.preload(CENARIO_GLB, "/draco/");
+
+/** Chão escuro por baixo/fora da sala (a sala de aula ambienta o resto). */
 function PalcoDuelo() {
   return (
-    <group position={[0, FLOOR_Y, 0]}>
+    <group position={[0, FLOOR_Y - 0.01, 0]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[9, 64]} />
+        <circleGeometry args={[12, 64]} />
         <meshBasicMaterial color="#0c1219" />
-      </mesh>
-      {/* Anel do jogador e do oponente — áreas simétricas */}
-      {[2.3, -2.3].map((z) => (
-        <mesh key={z} position={[0, 0.005, z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.85, 0.95, 48]} />
-          <meshBasicMaterial
-            color={z > 0 ? "#4fae89" : "#e06a5c"}
-            transparent
-            opacity={0.55}
-          />
-        </mesh>
-      ))}
-      {/* Divisória central: baixa — separa as estações sem esconder o modelo,
-          que flutua acima dela (ponto em aberto do plano resolvido como
-          separação simbólica). */}
-      <mesh position={[0, 0.42, 0]}>
-        <boxGeometry args={[4.6, 0.84, 0.07]} />
-        <meshStandardMaterial color="#16222e" roughness={0.6} />
-      </mesh>
-      <mesh position={[0, 0.86, 0]}>
-        <boxGeometry args={[4.6, 0.025, 0.09]} />
-        <meshBasicMaterial color="#5896c8" />
-      </mesh>
-      {/* Pedestal de luz sob o modelo */}
-      <mesh position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[1.1, 48]} />
-        <meshBasicMaterial color="#17324a" transparent opacity={0.85} />
       </mesh>
     </group>
   );
@@ -58,7 +49,8 @@ function CenaDuelo() {
 
   return (
     <>
-      <XROrigin position={[0, FLOOR_Y, 2.4]} />
+      {/* Jogador sentado na cadeira da direita da sala de aula */}
+      <XROrigin position={[0.62, FLOOR_Y, 1.05]} />
 
       <ambientLight intensity={0.85} />
       <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />
@@ -66,6 +58,9 @@ function CenaDuelo() {
       <hemisphereLight args={["#dfe9f2", "#141a22", 1]} />
 
       <PalcoDuelo />
+      <Suspense fallback={null}>
+        <CenarioDuelo />
+      </Suspense>
       <mesh>
         <sphereGeometry args={[28, 24, 16]} />
         <meshBasicMaterial color="#0a1017" side={THREE.BackSide} />
@@ -94,7 +89,7 @@ function CenaDuelo() {
           makeDefault
           enableDamping
           dampingFactor={0.08}
-          target={[0, 0.15, 0]}
+          target={[0.6, 0.9, -2.4]}
           minDistance={1.5}
           maxDistance={9}
           maxPolarAngle={Math.PI * 0.55}
@@ -181,7 +176,7 @@ export function DueloApp() {
         shadows={false}
         dpr={1}
         frameloop="always"
-        camera={{ position: [0, 0.5, 3.6], fov: 50 }}
+        camera={{ position: [0.62, 1.15, 2.7], fov: 50 }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => gl.setClearColor("#101820")}
       >
