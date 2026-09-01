@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import { useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { Text3D, Panel, Button3D, ARENA_COLORS } from "@/components/arena/ui3d";
@@ -123,6 +124,26 @@ function Radio() {
 
 /* ------------------------------------------------------- COMPUTADOR (HUB) */
 
+// "Office Monitor / Workstation Monitor" por DatSketch (Sketchfab), CC-BY-4.0
+// — atribuição em public/models/props/CREDITS.md. Substituiu o monitor
+// procedural a pedido do grupo.
+const MONITOR_GLB = "/models/props/monitor.glb";
+
+/** Monitor GLB medido e fixado à mão: tela (815×418 un.) vira para +Z,
+ *  base no y=0 do grupo. Escala 0.00076 → ~0,42m de altura na mesa. */
+function MonitorGLB() {
+  const gltf = useGLTF(MONITOR_GLB, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  return (
+    <group rotation={[0, -Math.PI / 2, 0]} scale={0.00076}>
+      <group position={[-24.7, 50.7, 25.1]}>
+        <primitive object={scene} />
+      </group>
+    </group>
+  );
+}
+useGLTF.preload(MONITOR_GLB, "/draco/");
+
 const MODOS_HUB = [
   { rotulo: "Estudo 3D", href: "/viewer" },
   { rotulo: "Arena VR", href: "/arena" },
@@ -136,42 +157,30 @@ function Computador() {
 
   return (
     <group position={[0, 0.765, -2.08]}>
-      {/* Pé + haste + tela */}
-      <mesh position={[0, 0.015, 0]}>
-        <cylinderGeometry args={[0.09, 0.11, 0.03, 16]} />
-        <meshStandardMaterial color="#2a2f36" roughness={0.5} />
-      </mesh>
-      <mesh position={[0, 0.12, 0]}>
-        <boxGeometry args={[0.035, 0.2, 0.035]} />
-        <meshStandardMaterial color="#2a2f36" roughness={0.5} />
-      </mesh>
       <Interativo
         rotulo={aberto ? "Fechar hub" : "Computador — hub do VRmed"}
-        posRotulo={[0, 0.38, 0.05]}
+        posRotulo={[0, 0.5, 0.08]}
         onClick={() => setAberto((v) => !v)}
       >
-        <mesh position={[0, 0.36, 0]}>
-          <boxGeometry args={[0.62, 0.4, 0.03]} />
-          <meshStandardMaterial color="#1b1f26" roughness={0.4} />
-        </mesh>
-        {/* Tela ligada: fundo + wifi (arco simples) */}
-        <mesh position={[0, 0.36, 0.017]}>
-          <planeGeometry args={[0.56, 0.34]} />
+        <MonitorGLB />
+        {/* Tela ligada por cima do vidro preto do GLB (a tela fica em z≈0.058) */}
+        <mesh position={[0, 0.253, 0.062]}>
+          <planeGeometry args={[0.58, 0.29]} />
           <meshStandardMaterial
             color="#122336"
             emissive="#16324a"
             emissiveIntensity={0.9}
           />
         </mesh>
-        <Text3D position={[0, 0.42, 0.02]} size={0.045} color="#7fb2d9">
+        <Text3D position={[0, 0.3, 0.066]} size={0.05} color="#7fb2d9">
           VRmed
         </Text3D>
-        <Text3D position={[0, 0.33, 0.02]} size={0.022} color={ARENA_COLORS.muted}>
+        <Text3D position={[0, 0.21, 0.066]} size={0.024} color={ARENA_COLORS.muted}>
           {aberto ? "escolha um modo ↓" : "clique para abrir o hub"}
         </Text3D>
         {/* "Wifi" — três arcos, indicando conexão */}
         {[0.012, 0.022, 0.032].map((r, i) => (
-          <mesh key={r} position={[0.23, 0.26, 0.02]}>
+          <mesh key={r} position={[0.24, 0.155, 0.066]}>
             <ringGeometry args={[r, r + 0.004, 16, 1, Math.PI * 0.25, Math.PI * 0.5]} />
             <meshBasicMaterial color="#4fae89" toneMapped={false} transparent opacity={0.9 - i * 0.2} />
           </mesh>
