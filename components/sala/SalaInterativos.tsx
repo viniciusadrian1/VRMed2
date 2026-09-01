@@ -76,7 +76,7 @@ function Radio() {
   useEffect(() => () => pararRadio(), []);
 
   return (
-    <group position={[0.56, 0.795, -1.95]}>
+    <group position={[0.68, 0.765, -1.95]}>
       <Interativo
         rotulo={nome ? `♪ ${nome}` : "Rádio lo-fi — clique para ligar"}
         posRotulo={[0, 0.24, 0.05]}
@@ -319,7 +319,7 @@ function Flashcards() {
   return (
     <group>
       {/* Baralho sobre a mesa */}
-      <group position={[-0.42, 0.775, -1.72]}>
+      <group position={[-0.42, 0.769, -1.72]}>
         <Interativo
           rotulo="Flashcards — clique para estudar"
           posRotulo={[0, 0.16, 0]}
@@ -540,7 +540,7 @@ function Livro({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
 
   return (
     <>
-      <group position={[-0.72, 0.775, -1.95]} rotation={[0, 0.25, 0]}>
+      <group position={[-0.72, 0.765, -1.95]} rotation={[0, 0.25, 0]}>
         <Interativo
           rotulo="Livro — pergunte ao tutor de IA"
           posRotulo={[0, 0.16, 0]}

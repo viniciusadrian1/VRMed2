@@ -21,15 +21,17 @@ import { SalaInterativos } from "./SalaInterativos";
 const MESA_GLB = "/models/props/mesa.glb";
 const CADEIRA_GLB = "/models/props/cadeira.glb";
 
-/** Mesa "Office Desk" (1,78m, já centrada na origem); escala 0.84 põe o
- *  tampo exatamente em y=0.765 — a altura em que o monitor, o rádio, o
- *  livro e os flashcards já estão. Gavetas viradas para o jogador (+Z). */
+/** Mesa Nova U ALARGADA a pedido do grupo: escala anisotrópica — X estica
+ *  para 2,0m de comprimento (mesa lisa, sem gavetas: o esticão é invisível),
+ *  Y/Z em 0.93 põem o tampo exatamente em y=0.765, a altura dos objetos. */
 function MesaGLB() {
   const gltf = useGLTF(MESA_GLB, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   return (
-    <group position={[0, 0, -1.9]} scale={0.84}>
-      <primitive object={scene} />
+    <group position={[0, 0, -1.9]} scale={[1.125, 0.93, 0.93]}>
+      <group position={[-0.509, 0, -0.392]}>
+        <primitive object={scene} />
+      </group>
     </group>
   );
 }
