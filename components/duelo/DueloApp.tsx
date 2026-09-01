@@ -10,7 +10,8 @@ import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
-import { DueloGame } from "./DueloGame";
+import { DueloGame, type Ambiente } from "./DueloGame";
+import { AmbienteHospital } from "./AmbienteHospital";
 
 const FLOOR_Y = -1.3;
 
@@ -44,13 +45,15 @@ function PalcoDuelo() {
   );
 }
 
-function CenaDuelo() {
+function CenaDuelo({ ambiente }: { ambiente: Ambiente }) {
   const inSession = useXR((state) => Boolean(state.session));
+  const escola = ambiente === "escola";
 
   return (
     <>
-      {/* Jogador sentado na cadeira da direita da sala de aula */}
-      <XROrigin position={[0.62, FLOOR_Y, 1.05]} />
+      {/* Escola: sentado na cadeira da direita. Hospital: de pé atrás da
+          sua mesa de instrumentos. */}
+      <XROrigin position={escola ? [0.62, FLOOR_Y, 0.6] : [0, FLOOR_Y, 2.55]} />
 
       <ambientLight intensity={0.85} />
       <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />
@@ -59,7 +62,7 @@ function CenaDuelo() {
 
       <PalcoDuelo />
       <Suspense fallback={null}>
-        <CenarioDuelo />
+        {escola ? <CenarioDuelo /> : <AmbienteHospital />}
       </Suspense>
       <mesh>
         <sphereGeometry args={[28, 24, 16]} />
@@ -80,7 +83,7 @@ function CenaDuelo() {
             </Text3D>
           }
         >
-          <DueloGame />
+          <DueloGame ambiente={ambiente} />
         </Suspense>
       </ErrorBoundary>
 
@@ -89,7 +92,7 @@ function CenaDuelo() {
           makeDefault
           enableDamping
           dampingFactor={0.08}
-          target={[0.6, 0.9, -2.4]}
+          target={escola ? [0.6, 1.0, -2.6] : [0, 0.9, -0.5]}
           minDistance={1.5}
           maxDistance={9}
           maxPolarAngle={Math.PI * 0.55}
@@ -104,6 +107,7 @@ export function DueloApp() {
   const mounted = useMounted();
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
+  const [ambiente, setAmbiente] = useState<Ambiente>("escola");
 
   const store = useMemo(
     () =>
@@ -152,6 +156,28 @@ export function DueloApp() {
             VRmed
           </Link>
           <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-3">
+            {/* Seletor de ambiente do duelo */}
+            <div className="pointer-events-auto flex overflow-hidden rounded-full border border-white/15 bg-black/50 text-sm font-medium backdrop-blur">
+              {(
+                [
+                  ["escola", "🏫 Escola"],
+                  ["hospital", "🏥 Hospital"],
+                ] as const
+              ).map(([valor, rotulo]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  onClick={() => setAmbiente(valor)}
+                  className={
+                    ambiente === valor
+                      ? "bg-[#5896c8] px-5 py-2 text-[#0b1220]"
+                      : "px-5 py-2 text-white/70 hover:text-white"
+                  }
+                >
+                  {rotulo}
+                </button>
+              ))}
+            </div>
             <button
               type="button"
               onClick={enterVR}
@@ -173,15 +199,19 @@ export function DueloApp() {
       )}
 
       <Canvas
+        key={ambiente}
         shadows={false}
         dpr={1}
         frameloop="always"
-        camera={{ position: [0.62, 1.15, 2.7], fov: 50 }}
+        camera={{
+          position: ambiente === "escola" ? [0.62, 1.45, 2.2] : [0, 1.5, 4.3],
+          fov: 50,
+        }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => gl.setClearColor("#101820")}
       >
         <XR store={store}>
-          <CenaDuelo />
+          <CenaDuelo ambiente={ambiente} />
         </XR>
       </Canvas>
     </main>

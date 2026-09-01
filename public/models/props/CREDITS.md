@@ -24,3 +24,17 @@
   [Lassi Kaukonen](https://sketchfab.com/thesidekick), licença
   [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
   Fonte: https://sketchfab.com/3d-models/philips-radio-46bdaf3fb5cc47b2a7c3f273433dc0dd
+
+## Ambiente Hospital do Duelo (`public/models/hospital/`)
+
+Todos do Sketchfab, licença CC-BY-4.0, com dieta simplify/resize/webp/draco:
+
+- `trolley.glb` — "Hospital Trolley" por creative_beast
+- `monitor-hr.glb` — "Monitor with heart rate" por Sousinho
+- `cortina-monitor.glb` — "Bed Curtain and Vital Signs Monitor" por Ethan Cragun
+- `ultrassom.glb` — "Ultrasound Machine" por Liuuzaki
+- `cadeira-rodas.glb` — "WheelChair" por Loïc
+- `props-medicos.glb` — "Medical Props" por coa white (reserva, ainda não em cena)
+
+Fora do projeto por decisão: "Surgical/Instrument table collection" (CC-BY-NC,
+não-comercial) e "Hospital Stuff" (1,67M triângulos — inviável em VR).
