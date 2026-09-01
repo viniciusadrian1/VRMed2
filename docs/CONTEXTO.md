@@ -12,6 +12,14 @@ flashcards (base curada + geração por IA), hub de modos e livro-tutor.
 procedural); online fica para a fase 2. Detalhes e pendências:
 `docs/PLANO-MULTIMODO.md`.
 
+**Unity como bancada de assets (2026-09-01):** o grupo quer trocar o AMBIENTE do
+Duelo por um cenário que só abre no Unity (.unitypackage). Fluxo: importar no
+projeto Unity ("Tutorial no Editor do Guia de Configuração") → exportar GLB via
+UnityGLTF → dieta (simplify se preciso + webp + draco) → palco do /duelo web.
+O produto continua sendo o site; Unity NÃO vira runtime. Claude opera o Editor
+via MCP (ver memória unity-mcp-setup: servidor HTTP :8080 da janela MCP for
+Unity precisa estar ligado).
+
 ## VRmed Clínica (modo 3) — estado em 2026-08-26
 
 Terceiro modo do app, em `/clinica`: casos 3D gerados de **exames reais anonimizados**
