@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useXR, XROrigin } from "@react-three/xr";
 import * as THREE from "three";
 import { SalaInterativos } from "./SalaInterativos";
@@ -14,6 +14,41 @@ import { SalaInterativos } from "./SalaInterativos";
  * Layout (metros, chão em y=0): sala 5×3×5; mesa encostada na parede -Z;
  * janela na parede -X; jogador sentado/em pé de frente para a mesa.
  */
+
+// Mobília GLB escolhida pelo grupo (Sketchfab, CC-BY-4.0 — créditos em
+// public/models/props/CREDITS.md). Transforms medidos com trimesh e fixados:
+// unidades já em metros, base no y=0.
+const MESA_GLB = "/models/props/mesa.glb";
+const CADEIRA_GLB = "/models/props/cadeira.glb";
+
+/** Mesa 1600×800mm; escala 0.93 põe o tampo exatamente em y=0.765 (a altura
+ *  em que o monitor, o rádio, o livro e os flashcards já estão). */
+function MesaGLB() {
+  const gltf = useGLTF(MESA_GLB, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  return (
+    <group position={[0, 0, -1.9]} scale={0.93}>
+      <group position={[-0.509, 0, -0.392]}>
+        <primitive object={scene} />
+      </group>
+    </group>
+  );
+}
+
+function CadeiraGLB() {
+  const gltf = useGLTF(CADEIRA_GLB, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  return (
+    <group position={[0, 0, -1.15]} rotation={[0, Math.PI, 0]}>
+      <group position={[0.033, 0, 0.036]}>
+        <primitive object={scene} />
+      </group>
+    </group>
+  );
+}
+
+useGLTF.preload(MESA_GLB, "/draco/");
+useGLTF.preload(CADEIRA_GLB, "/draco/");
 
 /** Céu da janela: gradiente + sol + morros, desenhado uma vez em canvas. */
 function useCeuTexture(): THREE.CanvasTexture {
@@ -107,47 +142,9 @@ function Quarto() {
         ))}
       </group>
 
-      {/* Mesa de estudos */}
-      <group position={[0, 0, -1.9]}>
-        <mesh position={[0, 0.74, 0]}>
-          <boxGeometry args={[1.9, 0.05, 0.75]} />
-          <meshStandardMaterial color="#8a6a4a" roughness={0.7} />
-        </mesh>
-        {[
-          [-0.88, -0.31],
-          [0.88, -0.31],
-          [-0.88, 0.31],
-          [0.88, 0.31],
-        ].map(([x, z], i) => (
-          <mesh key={i} position={[x, 0.36, z]}>
-            <boxGeometry args={[0.06, 0.72, 0.06]} />
-            <meshStandardMaterial color="#5e4632" roughness={0.8} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* Cadeira */}
-      <group position={[0, 0, -1.15]}>
-        <mesh position={[0, 0.45, 0]}>
-          <boxGeometry args={[0.45, 0.05, 0.45]} />
-          <meshStandardMaterial color="#3f4b5c" roughness={0.9} />
-        </mesh>
-        <mesh position={[0, 0.75, 0.22]}>
-          <boxGeometry args={[0.45, 0.55, 0.05]} />
-          <meshStandardMaterial color="#3f4b5c" roughness={0.9} />
-        </mesh>
-        {[
-          [-0.19, -0.19],
-          [0.19, -0.19],
-          [-0.19, 0.19],
-          [0.19, 0.19],
-        ].map(([x, z], i) => (
-          <mesh key={i} position={[x, 0.21, z]}>
-            <boxGeometry args={[0.04, 0.42, 0.04]} />
-            <meshStandardMaterial color="#2b323d" roughness={0.8} />
-          </mesh>
-        ))}
-      </group>
+      {/* Mesa e cadeira (GLBs do grupo) */}
+      <MesaGLB />
+      <CadeiraGLB />
 
       {/* Planta no canto */}
       <group position={[2, 0, -2]}>

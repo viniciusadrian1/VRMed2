@@ -4,3 +4,11 @@
   [DatSketch](https://sketchfab.com/DatSketch), licença
   [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
   Fonte: https://sketchfab.com/3d-models/office-monitor-workstation-monitor-6a7b0147890242418a49f6db26657ab4
+- `mesa.glb` — "Office Table 1600x800 mm Nova U dark" por
+  [alex_ko](https://sketchfab.com/alex_ko), licença
+  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
+  Fonte: https://sketchfab.com/3d-models/office-table-1600x800-mm-nova-u-dark-3aa915f97d1c4a5c986f5beedbd64172
+- `cadeira.glb` — "Office Chair Modern" por
+  [thethieme](https://sketchfab.com/thethieme), licença
+  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
+  Fonte: https://sketchfab.com/3d-models/office-chair-modern-675f34f7304e4d92812a41e9750539aa
