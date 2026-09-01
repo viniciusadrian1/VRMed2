@@ -20,6 +20,7 @@ import { SalaInterativos } from "./SalaInterativos";
 // unidades já em metros, base no y=0.
 const MESA_GLB = "/models/props/mesa.glb";
 const CADEIRA_GLB = "/models/props/cadeira.glb";
+const TECLADO_GLB = "/models/props/teclado-mouse.glb";
 
 /** Mesa Nova U ALARGADA a pedido do grupo: escala anisotrópica — X estica
  *  para 2,0m de comprimento (mesa lisa, sem gavetas: o esticão é invisível),
@@ -50,8 +51,23 @@ function CadeiraGLB() {
   );
 }
 
+/** Teclado+mouse (um mesh só, em cm; base em y=-1.212): escala 0.01,
+ *  assentado no tampo em frente ao monitor. Decoração — sem interação. */
+function TecladoMouseGLB() {
+  const gltf = useGLTF(TECLADO_GLB, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  return (
+    <group position={[0, 0.765, -1.75]} scale={0.01}>
+      <group position={[-4.99, 1.212, -0.035]}>
+        <primitive object={scene} />
+      </group>
+    </group>
+  );
+}
+
 useGLTF.preload(MESA_GLB, "/draco/");
 useGLTF.preload(CADEIRA_GLB, "/draco/");
+useGLTF.preload(TECLADO_GLB, "/draco/");
 
 /** Céu da janela: gradiente + sol + morros, desenhado uma vez em canvas. */
 function useCeuTexture(): THREE.CanvasTexture {
@@ -145,9 +161,10 @@ function Quarto() {
         ))}
       </group>
 
-      {/* Mesa e cadeira (GLBs do grupo) */}
+      {/* Mesa, cadeira e teclado (GLBs do grupo) */}
       <MesaGLB />
       <CadeiraGLB />
+      <TecladoMouseGLB />
 
       {/* Planta no canto */}
       <group position={[2, 0, -2]}>

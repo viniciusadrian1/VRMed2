@@ -12,3 +12,7 @@
   [thethieme](https://sketchfab.com/thethieme), licença
   [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
   Fonte: https://sketchfab.com/3d-models/office-chair-modern-675f34f7304e4d92812a41e9750539aa
+- `teclado-mouse.glb` — "Keyboard Mouse" por
+  [arsenif5690](https://sketchfab.com/arsenif5690), licença
+  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
+  Fonte: https://sketchfab.com/3d-models/keyboard-mouse-b6644ed405f8489091be482d34cb7195
