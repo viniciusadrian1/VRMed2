@@ -76,7 +76,7 @@ function Radio() {
   useEffect(() => () => pararRadio(), []);
 
   return (
-    <group position={[0.72, 0.795, -1.95]}>
+    <group position={[0.56, 0.795, -1.95]}>
       <Interativo
         rotulo={nome ? `♪ ${nome}` : "Rádio lo-fi — clique para ligar"}
         posRotulo={[0, 0.24, 0.05]}
