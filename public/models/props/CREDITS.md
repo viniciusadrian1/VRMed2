@@ -20,3 +20,7 @@
   [Maxence Rouillet](https://sketchfab.com/maxencerouillet), licença
   [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
   Fonte: https://sketchfab.com/3d-models/book-encyclopedia-0487cb088c244d02a736cb337e65778c
+- `radio.glb` — "Philips Radio" por
+  [Lassi Kaukonen](https://sketchfab.com/thesidekick), licença
+  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
+  Fonte: https://sketchfab.com/3d-models/philips-radio-46bdaf3fb5cc47b2a7c3f273433dc0dd

@@ -68,59 +68,49 @@ function Interativo({
 
 /* ------------------------------------------------------------------ RÁDIO */
 
+// "Philips Radio" por Lassi Kaukonen (Sketchfab, CC-BY-4.0). Simplificado de
+// 228k para 18k tris (regra "nunca simplificar" vale para ANATOMIA; prop
+// decorativo pode) + texturas 1024/webp: 29MB -> 321KB.
+const RADIO_GLB = "/models/props/radio.glb";
+
 function Radio() {
   const [nome, setNome] = useState<string>("");
-  const tocando = estadoRadio().tocando;
+  const gltf = useGLTF(RADIO_GLB, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
   // Desligar ao sair da página (o áudio não pode vazar para outras rotas).
   useEffect(() => () => pararRadio(), []);
 
   return (
-    <group position={[0.68, 0.765, -1.95]}>
+    <group position={[0.68, 0.765, -2.1]}>
       <Interativo
         rotulo={nome ? `♪ ${nome}` : "Rádio lo-fi — clique para ligar"}
-        posRotulo={[0, 0.24, 0.05]}
+        posRotulo={[0, 0.3, 0.05]}
         onClick={() => {
           void proximaEstacao().then((estado) =>
             setNome(estado.tocando ? estado.nome : ""),
           );
         }}
       >
-        {/* Corpo */}
-        <mesh position={[0, 0.07, 0]}>
-          <boxGeometry args={[0.3, 0.14, 0.12]} />
-          <meshStandardMaterial color="#b3572f" roughness={0.6} />
-        </mesh>
-        {/* Alto-falante */}
-        <mesh position={[-0.07, 0.07, 0.062]}>
-          <circleGeometry args={[0.045, 20]} />
-          <meshStandardMaterial color="#31241c" roughness={1} />
-        </mesh>
-        {/* Botões */}
-        {[0.04, 0.1].map((x) => (
-          <mesh key={x} position={[x, 0.07, 0.062]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.016, 0.016, 0.015, 12]} />
-            <meshStandardMaterial color="#e8d9c3" roughness={0.4} />
+        {/* Rádio Philips vintage (~40cm): arquivo com base em y=0.158 e
+            centro deslocado — offsets internos assentam e centram. */}
+        <group scale={0.0493}>
+          <group position={[0.156, -0.158, -0.3635]}>
+            <primitive object={scene} />
+          </group>
+        </group>
+        {/* Luz de "ligado" flutuando discreta sobre o rádio */}
+        {nome && (
+          <mesh position={[0, 0.26, 0]}>
+            <sphereGeometry args={[0.008, 8, 6]} />
+            <meshBasicMaterial color="#7CFC9B" toneMapped={false} />
           </mesh>
-        ))}
-        {/* Antena */}
-        <mesh position={[0.12, 0.2, -0.03]} rotation={[0, 0, -0.35]}>
-          <cylinderGeometry args={[0.003, 0.003, 0.14, 6]} />
-          <meshStandardMaterial color="#888" metalness={0.6} roughness={0.4} />
-        </mesh>
-        {/* LED de ligado */}
-        <mesh position={[0.07, 0.115, 0.062]}>
-          <circleGeometry args={[0.006, 8]} />
-          <meshStandardMaterial
-            color={tocando || nome ? "#7CFC9B" : "#333"}
-            emissive={tocando || nome ? "#4fae89" : "#000"}
-            emissiveIntensity={2}
-          />
-        </mesh>
+        )}
       </Interativo>
     </group>
   );
 }
+useGLTF.preload(RADIO_GLB, "/draco/");
 
 /* ------------------------------------------------------- COMPUTADOR (HUB) */
 
