@@ -29,12 +29,12 @@ const LARINGE = "/models/organs/larynx.glb";
 // wifi de evento; o nome "Pulmão" ainda aparece como alternativa errada.
 const ORGAOS_DUELO = ORGANS.filter((o) => o.id !== "pulmao");
 
-// Layout "sala de aula" (coordenadas de mundo, medidas do GLB do cenário):
-// lousa em x=0.8 com face em z=-3.85; cadeiras da frente em x=-1.81 (bot) e
-// x=+0.62 (jogador, onde fica o XROrigin — ver DueloApp).
-const LOUSA_X = 0.8;
-const LOUSA_Z = -3.85;
-const MESA_JOGADOR_X = 0.62;
+// Layout "sala de aula" em coordenadas de mundo, derivado das medidas do GLB
+// na escala humana (ESCOLA_S=0.72, ver DueloApp): face da lousa em z=-1.06,
+// centro em x=0.36; o quadro verde ocupa y≈-0.53..0.13 e x≈±0.58 do centro.
+// Cadeiras da frente: x=-0.81 (bot) e x=+0.28 (jogador/XROrigin).
+const LOUSA_X = 0.36;
+const LOUSA_Z = -1.06;
 
 const TOTAL_RODADAS = 8;
 const TEMPO_RODADA = 18;
@@ -433,14 +433,14 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     }
     return (
       <group>
-        <Text3D position={[LOUSA_X, 2.05, LOUSA_Z]} size={0.24} color="#f2f5ec">
+        <Text3D position={[LOUSA_X, 0.03, LOUSA_Z]} size={0.11} color="#f2f5ec">
           Duelo 1×1
         </Text3D>
         <Text3D
-          position={[LOUSA_X, 1.76, LOUSA_Z]}
-          size={0.07}
+          position={[LOUSA_X, -0.1, LOUSA_Z]}
+          size={0.034}
           color="#cfe0cd"
-          maxWidth={2.3}
+          maxWidth={1.05}
         >
           Identifique órgãos (100 pts) e estruturas (200 pts) antes do oponente
         </Text3D>
@@ -448,13 +448,14 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
           <BotaoLousa
             key={nivel}
             texto={BOTS[nivel].nome}
-            position={[LOUSA_X, 1.47 - i * 0.24, LOUSA_Z]}
+            position={[LOUSA_X, -0.23 - i * 0.11, LOUSA_Z]}
             cor={nivel === "especialista" ? "#ffc9bd" : "#f2f5ec"}
-            size={0.13}
+            size={0.06}
+            width={1.1}
             onClick={() => comecar(nivel)}
           />
         ))}
-        <Text3D position={[LOUSA_X, 0.98, LOUSA_Z]} size={0.055} color="#a9c9ad">
+        <Text3D position={[LOUSA_X, -0.5, LOUSA_Z]} size={0.026} color="#a9c9ad">
           Online por partida — em breve; hoje o oponente é um bot
         </Text3D>
       </group>
@@ -467,7 +468,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
         {String(contagem)}
       </Text3D>
     ) : (
-      <Text3D position={[LOUSA_X, 1.6, LOUSA_Z]} size={0.85} color="#f2f5ec">
+      <Text3D position={[LOUSA_X, -0.2, LOUSA_Z]} size={0.4} color="#f2f5ec">
         {String(contagem)}
       </Text3D>
     );
@@ -512,26 +513,28 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     return (
       <group>
         <Text3D
-          position={[LOUSA_X, 2.05, LOUSA_Z]}
-          size={0.22}
+          position={[LOUSA_X, 0.02, LOUSA_Z]}
+          size={0.1}
           color={venceu ? "#bfe8cf" : empate ? "#f2f5ec" : "#ffc9bd"}
         >
           {venceu ? "Você venceu!" : empate ? "Empate!" : "O bot venceu"}
         </Text3D>
-        <Text3D position={[LOUSA_X, 1.7, LOUSA_Z]} size={0.12} color="#f2f5ec">
+        <Text3D position={[LOUSA_X, -0.12, LOUSA_Z]} size={0.055} color="#f2f5ec">
           {`Você ${pontosJogador} × ${pontosBot} ${BOTS[dificuldade].nome.split(" (")[0]}`}
         </Text3D>
         <BotaoLousa
           texto="→ Jogar de novo"
-          position={[LOUSA_X, 1.36, LOUSA_Z]}
+          position={[LOUSA_X, -0.27, LOUSA_Z]}
           cor="#bfe8cf"
-          size={0.14}
+          size={0.065}
+          width={1.1}
           onClick={() => comecar(dificuldade)}
         />
         <BotaoLousa
           texto="→ Trocar dificuldade"
-          position={[LOUSA_X, 1.08, LOUSA_Z]}
-          size={0.12}
+          position={[LOUSA_X, -0.4, LOUSA_Z]}
+          size={0.055}
+          width={1.1}
           onClick={() => setFase("menu")}
         />
       </group>
@@ -546,8 +549,8 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       {/* Escola: órgão ao lado da lousa. Hospital: flutuando no centro,
           entre as duas mesas de instrumentos (referência do grupo). */}
       <group
-        position={hosp ? [0, 0.75, 0] : [-1.75, 1.25, -3.4]}
-        scale={hosp ? 0.72 : 0.62}
+        position={hosp ? [0, 0.75, 0] : [-0.78, -0.15, -0.95]}
+        scale={hosp ? 0.72 : 0.36}
       >
         <Suspense
           fallback={
@@ -573,10 +576,10 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
         </>
       ) : (
         <>
-          <Text3D position={[LOUSA_X - 0.72, 2.28, LOUSA_Z]} size={0.09} color="#bfe8cf">
+          <Text3D position={[LOUSA_X - 0.38, 0.09, LOUSA_Z]} size={0.04} color="#bfe8cf">
             {`Você: ${pontosJogador}`}
           </Text3D>
-          <Text3D position={[LOUSA_X + 0.62, 2.28, LOUSA_Z]} size={0.08} color="#e8e3c8">
+          <Text3D position={[LOUSA_X + 0.28, 0.09, LOUSA_Z]} size={0.036} color="#e8e3c8">
             {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
           </Text3D>
         </>
@@ -597,9 +600,9 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
             </group>
           ) : (
             <Text3D
-              position={[LOUSA_X, 2.0, LOUSA_Z]}
-              size={0.15}
-              maxWidth={2.35}
+              position={[LOUSA_X, -0.03, LOUSA_Z]}
+              size={0.068}
+              maxWidth={1.08}
               color="#f2f5ec"
             >
               {rodada.tipo === "orgao"
@@ -609,8 +612,8 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
           )}
           {/* Cronômetro: telão LED (hospital) ou canto da lousa (escola) */}
           <Text3D
-            position={hosp ? HOSP_LED : [LOUSA_X - 0.85, 2.02, LOUSA_Z]}
-            size={hosp ? 0.34 : 0.13}
+            position={hosp ? HOSP_LED : [LOUSA_X - 0.47, -0.05, LOUSA_Z]}
+            size={hosp ? 0.34 : 0.06}
             color={
               tempoRestante <= 5
                 ? "#ffb0a0"
@@ -641,16 +644,17 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
                 <BotaoLousa
                   key={opcao}
                   texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
-                  position={[LOUSA_X, 1.64 - i * 0.23, LOUSA_Z]}
+                  position={[LOUSA_X, -0.19 - i * 0.1, LOUSA_Z]}
                   cor={erroJogador ? "#8fae94" : "#f8fbef"}
-                  size={0.115}
+                  size={0.052}
+                  width={1.1}
                   onClick={() => responder(opcao)}
                 />
               ))}
           {erroJogador && (
             <Text3D
-              position={hosp ? [-0.85, 1.4, -3.13] : [LOUSA_X - 0.85, 1.82, LOUSA_Z]}
-              size={0.07}
+              position={hosp ? [-0.85, 1.4, -3.13] : [LOUSA_X - 0.47, -0.14, LOUSA_Z]}
+              size={hosp ? 0.07 : 0.035}
               color="#ffb0a0"
             >
               Errado!
@@ -670,9 +674,9 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
           </group>
         ) : (
           <Text3D
-            position={[LOUSA_X, 1.45, LOUSA_Z]}
-            size={0.16}
-            maxWidth={2.35}
+            position={[LOUSA_X, -0.2, LOUSA_Z]}
+            size={0.072}
+            maxWidth={1.08}
             color="#f2f5ec"
           >
             {feedback}
@@ -691,10 +695,9 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
           humor={humorBot}
           nome={BOTS[dificuldade].nome.split(" (")[0]}
           pontos={pontosBot}
-          position={[-1.81, -0.82, 0.85]}
+          position={[-0.81, -1.54, 1.07]}
           rotationY={Math.PI}
           sentado
-          escala={1.35}
         />
       )}
     </group>

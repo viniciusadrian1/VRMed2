@@ -16,17 +16,22 @@ import { AmbienteHospital } from "./AmbienteHospital";
 const FLOOR_Y = -1.3;
 
 // Cenário "Cute Magic Stylized LowPoly" exportado do Unity pelo grupo
-// (29MB de projeto → 142KB: glTFast + webp + draco). Sala em L de ~5×5m,
-// escalada 1.3× para os jogadores caberem dentro com folga.
+// (29MB de projeto → 142KB: glTFast + webp + draco).
+//
+// ESCALA HUMANA (teste no Quest): a mobília do pacote é gigante — mesa a
+// 1,04 un. acima do piso, assento a ~0,5 un., e o piso tem 0,30 un. de
+// espessura. Escala 0,72 põe a mesa em 75cm e o assento em ~38cm; o grupo
+// desce 0,30×0,72 para o TOPO do piso cair exatamente em FLOOR_Y (antes o
+// jogador ficava 48cm abaixo do piso e via a lousa por baixo da mesa).
 const CENARIO_GLB = "/models/props/cenario-duelo.glb";
+export const ESCOLA_S = 0.72;
+export const ESCOLA_OFF_Y = FLOOR_Y - 0.3 * ESCOLA_S;
 
 function CenarioDuelo() {
   const gltf = useGLTF(CENARIO_GLB, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   return (
-    // Deslocada para trás: as carteiras/quadro viram o fundo atrás do
-    // oponente e a área xadrez livre fica sob o jogo.
-    <group position={[0, FLOOR_Y, -1.5]} scale={1.6}>
+    <group position={[0, ESCOLA_OFF_Y, 0]} scale={ESCOLA_S}>
       <primitive object={scene} />
     </group>
   );
@@ -51,9 +56,11 @@ function CenaDuelo({ ambiente }: { ambiente: Ambiente }) {
 
   return (
     <>
-      {/* Escola: sentado na cadeira da direita. Hospital: de pé atrás da
-          sua mesa de instrumentos. */}
-      <XROrigin position={escola ? [0.62, FLOOR_Y, 0.6] : [0, FLOOR_Y, 2.55]} />
+      {/* Escola: origem no piso, exatamente sob o assento da cadeira da
+          direita — quem senta de verdade fica com os olhos ~1,2m acima, na
+          altura da lousa; quem fica de pé vê por cima da mesa. Hospital: de
+          pé atrás da sua mesa de instrumentos. */}
+      <XROrigin position={escola ? [0.28, FLOOR_Y, 0.99] : [0, FLOOR_Y, 2.55]} />
 
       <ambientLight intensity={0.85} />
       <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />
@@ -92,8 +99,8 @@ function CenaDuelo({ ambiente }: { ambiente: Ambiente }) {
           makeDefault
           enableDamping
           dampingFactor={0.08}
-          target={escola ? [0.6, 1.0, -2.6] : [0, 0.9, -0.5]}
-          minDistance={1.5}
+          target={escola ? [0.36, -0.2, -1.06] : [0, 0.9, -0.5]}
+          minDistance={escola ? 0.8 : 1.5}
           maxDistance={9}
           maxPolarAngle={Math.PI * 0.55}
         />
@@ -204,7 +211,7 @@ export function DueloApp() {
         dpr={1}
         frameloop="always"
         camera={{
-          position: ambiente === "escola" ? [0.62, 1.45, 2.2] : [0, 1.5, 4.3],
+          position: ambiente === "escola" ? [0.28, -0.05, 1.0] : [0, 1.5, 4.3],
           fov: 50,
         }}
         gl={{ antialias: true, alpha: false }}
