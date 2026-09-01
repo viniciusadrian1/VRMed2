@@ -16,3 +16,7 @@
   [arsenif5690](https://sketchfab.com/arsenif5690), licença
   [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
   Fonte: https://sketchfab.com/3d-models/keyboard-mouse-b6644ed405f8489091be482d34cb7195
+- `livro.glb` — "Book - Encyclopedia" por
+  [Maxence Rouillet](https://sketchfab.com/maxencerouillet), licença
+  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/).
+  Fonte: https://sketchfab.com/3d-models/book-encyclopedia-0487cb088c244d02a736cb337e65778c

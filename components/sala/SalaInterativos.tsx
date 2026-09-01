@@ -128,6 +128,8 @@ function Radio() {
 // — atribuição em public/models/props/CREDITS.md. Substituiu o monitor
 // procedural a pedido do grupo.
 const MONITOR_GLB = "/models/props/monitor.glb";
+// "Book - Encyclopedia" por Maxence Rouillet (Sketchfab, CC-BY-4.0).
+const LIVRO_GLB = "/models/props/livro.glb";
 
 /** Monitor GLB medido e fixado à mão: tela (815×418 un.) vira para +Z,
  *  base no y=0 do grupo. Escala 0.00076 → ~0,42m de altura na mesa. */
@@ -319,7 +321,7 @@ function Flashcards() {
   return (
     <group>
       {/* Baralho sobre a mesa */}
-      <group position={[-0.42, 0.769, -1.72]}>
+      <group position={[-0.56, 0.769, -1.6]}>
         <Interativo
           rotulo="Flashcards — clique para estudar"
           posRotulo={[0, 0.16, 0]}
@@ -537,6 +539,8 @@ function TutorVR() {
 function Livro({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
   const inSession = useXR((state) => Boolean(state.session));
   const [tutorVR, setTutorVR] = useState(false);
+  const gltf = useGLTF(LIVRO_GLB, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
   return (
     <>
@@ -549,23 +553,20 @@ function Livro({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
             else onAbrirTutorDom();
           }}
         >
-          <mesh position={[0, 0.02, 0]}>
-            <boxGeometry args={[0.22, 0.04, 0.3]} />
-            <meshStandardMaterial color="#7a2e2e" roughness={0.7} />
-          </mesh>
-          <mesh position={[0.005, 0.042, 0]}>
-            <boxGeometry args={[0.2, 0.006, 0.28]} />
-            <meshStandardMaterial color="#efe8da" roughness={0.9} />
-          </mesh>
-          <Text3D position={[0, 0.06, 0.09]} size={0.024} color="#e8d9c3">
-            ANATOMIA
-          </Text3D>
+          {/* Enciclopédia deitada: arquivo centrado na origem, base em
+              y=-0.145 (bruto); escala 0.15 → lombada de 30cm. */}
+          <group scale={0.15}>
+            <group position={[0, 0.145, 0]}>
+              <primitive object={scene} />
+            </group>
+          </group>
         </Interativo>
       </group>
       {inSession && tutorVR && <TutorVR />}
     </>
   );
 }
+useGLTF.preload(LIVRO_GLB, "/draco/");
 
 /* ------------------------------------------------------------------ RAIZ */
 
