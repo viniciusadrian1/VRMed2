@@ -64,30 +64,8 @@ PRESETS: dict[str, list[str] | None] = {
     "completo": None,
 }
 
-# 'commercial': True no map_tasks_config do TotalSegmentator → licença
-# acadêmica gratuita em https://backend.totalsegmentator.com/license-academic/
-TAREFAS_COM_LICENCA = {"heartchambers_highres", "coronary_arteries"}
-
-
 class LicencaAusente(RuntimeError):
-    pass
-
-
-def licenca_configurada() -> bool:
-    config = Path.home() / ".totalsegmentator" / "config.json"
-    try:
-        return bool(json.loads(config.read_text(encoding="utf-8")).get("license_number"))
-    except (OSError, ValueError):
-        return False
-
-
-def validar_estruturas(nomes: list[str]) -> tuple[list[str], list[str]]:
-    """Separa nomes válidos na tarefa `total` instalada dos desconhecidos."""
-    from totalsegmentator.map_to_binary import class_map
-
-    validos = set(class_map["total"].values())
-    ok = [n for n in nomes if n in validos]
-    return ok, [n for n in nomes if n not in validos]
+    """Tarefa comercial do TotalSegmentator sem licença acadêmica configurada."""
 
 
 def rodar_segmentacao(
@@ -96,16 +74,20 @@ def rodar_segmentacao(
     estruturas: list[str] | None = None,
     fast: bool = False,
     task: str = "total",
-    device: str = "gpu",
     log=print,
 ) -> dict:
     """Roda o TotalSegmentator e devolve {tarefa, tempo_s, versão…} (também
     gravado em saida_masks/segmentacao.json)."""
     from importlib.metadata import version
 
+    from totalsegmentator.config import has_valid_license_offline
     from totalsegmentator.python_api import totalsegmentator as segmentar
+    from totalsegmentator.registry import requires_license
 
-    if task in TAREFAS_COM_LICENCA and not licenca_configurada():
+    # A MESMA checagem que a lib faz em get_task_config (18 tarefas comerciais,
+    # config em TOTALSEG_HOME_DIR) — só que lá ela termina em sys.exit(1) no
+    # meio do run; aqui vira exceção que o CLI trata como "tarefa pulada".
+    if requires_license(task) and has_valid_license_offline()[0] != "yes":
         raise LicencaAusente(
             f"a tarefa {task} exige licença acadêmica do TotalSegmentator "
             "(gratuita: https://backend.totalsegmentator.com/license-academic/ → "
@@ -113,10 +95,11 @@ def rodar_segmentacao(
         )
     if task != "total":
         estruturas = None  # roi_subset só existe na tarefa total
-    elif estruturas is not None:
-        estruturas, desconhecidas = validar_estruturas(estruturas)
-        if desconhecidas:
-            log(f"AVISO: estruturas fora da tarefa total, ignoradas: {', '.join(desconhecidas)}")
+        if fast:
+            # Toda tarefa extra do 2.18 (exceto lung_vessels/body) tem
+            # disallow_fast — a API levantaria ValueError depois do run total.
+            log(f"AVISO: --fast só vale para a tarefa total; {task} roda em resolução cheia")
+            fast = False
 
     log(
         f"segmentando {entrada.name} — tarefa {task}, "
@@ -131,14 +114,12 @@ def rodar_segmentacao(
         task=task,
         roi_subset=estruturas,
         fast=fast,
-        device=device,
         quiet=False,
     )
     info = {
         "tarefa": task,
         "estruturas": estruturas,
         "fast": fast,
-        "device": device,
         "tempo_s": round(time.time() - inicio, 1),
         # O pacote não expõe __version__; a metadata da distribuição sim.
         "totalsegmentator_versao": version("TotalSegmentator"),

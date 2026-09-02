@@ -47,7 +47,11 @@ def main() -> int:
         default="",
         help="tarefas extras do TotalSegmentator, separadas por vírgula (ex.: heartchambers_highres)",
     )
-    parser.add_argument("--fast", action="store_true", help="modo rápido 3 mm (só para preview)")
+    parser.add_argument(
+        "--fast",
+        action="store_true",
+        help="modo rápido 3 mm da tarefa total (só para preview; extras rodam em resolução cheia)",
+    )
     parser.add_argument("--dados", default=".clinica-dados", help="raiz dos dados (gitignored)")
     parser.add_argument(
         "--reusar-mascaras",
@@ -74,6 +78,13 @@ def main() -> int:
     # ----- 1. Ingestão -----
     if args.reusar_mascaras and ct.exists():
         log(f"reusando {ct}")
+        # Rastreabilidade: a ingestão registrada na primeira passagem não pode
+        # sumir do relatório só porque o QA/métricas foram refeitos.
+        try:
+            anterior = json.loads((pasta / "relatorio.json").read_text(encoding="utf-8"))
+            relatorio["ingestao"] = anterior.get("ingestao")
+        except (OSError, ValueError):
+            pass
     else:
         if not entrada.exists():
             log(f"ERRO: entrada não existe: {entrada}")
@@ -92,10 +103,14 @@ def main() -> int:
 
     # ----- 2. Segmentação -----
     estruturas = segmentacao.PRESETS[args.preset]
-    if args.reusar_mascaras and any(masks.glob("*.nii.gz")):
+    existentes = {p.name.removesuffix(".nii.gz") for p in masks.glob("*.nii.gz")}
+    faltam = sorted(set(estruturas or []) - existentes)
+    if args.reusar_mascaras and existentes and not faltam:
         log(f"reusando máscaras de {masks}")
         relatorio["segmentacao"] = segmentacao.info_segmentacao(masks)
     else:
+        if args.reusar_mascaras and faltam:
+            log(f"AVISO: masks/ não tem {', '.join(faltam)} (preset {args.preset}) — segmentando de novo")
         seg = segmentacao.rodar_segmentacao(ct, masks, estruturas, fast=args.fast, log=log)
         relatorio["segmentacao"] = seg
         relatorio["etapas_s"]["segmentacao"] = seg["tempo_s"]
@@ -111,7 +126,8 @@ def main() -> int:
             extras[tarefa] = segmentacao.rodar_segmentacao(
                 ct, destino, None, fast=args.fast, task=tarefa, log=log
             )
-        except segmentacao.LicencaAusente as erro:
+        except (segmentacao.LicencaAusente, ValueError) as erro:
+            # ValueError: nome de tarefa desconhecido (python_api.get_task_config)
             log(f"AVISO: {erro} — tarefa {tarefa} pulada")
             extras[tarefa] = {"pulada": str(erro)}
     if extras:
@@ -145,7 +161,7 @@ def main() -> int:
     log(
         "próximo passo (malha): python scripts/tc-para-vrmed.py "
         f"--input {ct} --masks-dir {masks} --structures {args.preset} "
-        f"--output .clinica-dados/{args.slug}/{args.slug}-sem-draco.glb --report .clinica-dados/{args.slug}/malha.json"
+        f"--output {pasta / f'{args.slug}-sem-draco.glb'} --report {pasta / 'malha.json'}"
     )
     return 0
 

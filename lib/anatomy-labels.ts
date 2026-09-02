@@ -191,6 +191,7 @@ const LABEL_MAP: Record<string, string> = {
   "pulmonary vein": "Veia pulmonar",
   "brachiocephalic trunk": "Tronco braquiocefálico",
   "superior vena cava": "Veia cava superior",
+  "atrial appendage left": "Aurícula esquerda",
 };
 
 /** Termos que indicam estruturas externas (pele/gordura). */

@@ -26,7 +26,7 @@ def metricas_mascara(caminho: Path) -> dict:
 
     mm3_voxel = float(np.prod(zooms))
     idx = np.argwhere(mask)
-    lo, hi = idx.min(0), idx.max(0)
+    lo, hi = idx.min(0) - 0.5, idx.max(0) + 0.5  # bordas do voxel, não centros
     cantos = np.array(
         [[x, y, z, 1.0] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])]
     )

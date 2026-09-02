@@ -61,13 +61,19 @@ tomadas em `PROMPT-CLINICA.md` (rotas Next + Neon + R2 + Modal) não foram reabe
 
 - **Ingestão** (`clinica/ingestao.py`, SimpleITK): série DICOM ordenada por
   `ImagePositionPatient`, `RescaleSlope/Intercept` aplicados (HU), spacing real, NIfTI int16
-  gzip. Valida: fatia > 3 mm (aviso), passo irregular entre fatias (aviso), intensidades fora de
-  HU (erro, `--forcar` rebaixa a aviso), orientação oblíqua (aviso). Só metadados não
-  identificáveis vão para o relatório. Regressão: o DICOM do LIDC reconvertido saiu idêntico
-  ao NIfTI aceito em agosto (shape, zooms, affine, HU).
+  gzip. Valida: eixo mais grosso > 3 mm (aviso), passo irregular entre fatias (aviso),
+  intensidades fora de HU (erro, `--forcar` rebaixa a aviso — critério: mínimo ≤ −900 **e** ≥ 1 %
+  dos voxels perto de −1000 HU; a mediana não serve porque mede o enquadramento, não a escala),
+  orientação oblíqua (aviso). Só metadados não identificáveis vão para o relatório (nem o UID da
+  série); origem/direção gravadas em RAS, como o resto do pipeline. Regressão: o DICOM do LIDC
+  reconvertido saiu idêntico ao NIfTI aceito em agosto (shape, zooms, affine, HU).
 - **Segmentação** (`clinica/segmentacao.py`): tarefa `total` com `roi_subset` do preset
-  (`torax`, `cardiaco` novo, `abdomen`, `completo`); tarefas extras em subpasta; versão do
-  TotalSegmentator sempre gravada (`masks/segmentacao.json`), inclusive quando reusada.
+  (`torax`, `cardiaco` novo, `abdomen`, `completo`); tarefas extras em subpasta, com a checagem
+  de licença da própria lib (`registry.requires_license` + `config.has_valid_license_offline`,
+  cobre as 18 tarefas comerciais) virando aviso + "pulada" em vez do `sys.exit(1)` do
+  TotalSegmentator; tarefa desconhecida ou `--fast` em tarefa extra também não derrubam o run;
+  versão do TotalSegmentator sempre gravada (`masks/segmentacao.json`), inclusive quando reusada;
+  `--reusar-mascaras` só reusa se todas as máscaras do preset existirem.
 - **Métricas** (`clinica/metricas.py`): volume (mL), bbox (mm), número de componentes e tamanho
   das ilhas — medida automática, enquadramento educacional.
 - **QA** (`clinica/qa.py`): 9 PNGs + mosaico, convenção radiológica, aspecto pelo spacing.
@@ -87,6 +93,10 @@ ingestão 4 s · TotalSegmentator 63 s · métricas + QA ~85 s · total 153 s.
 | trachea / esophagus | 47,0 / 25,5 | 1 / 1 | |
 
 Fonte: `.clinica-dados/cta-cardio/relatorio.json`; imagens em `.clinica-dados/cta-cardio/qa/`.
+O código passou por revisão adversarial (3 revisores + 2 verificadores por achado; 14 defeitos
+confirmados e corrigidos no mesmo dia — validação de HU sensível ao FOV, bbox por centro de
+voxel, LPS misturado com RAS no relatório, licença hardcoded, UID da série no relatório, cores
+das câmaras, tradução da aurícula, entre outros).
 `fonteDados` ao publicar: "3D Slicer Sample Data (CTACardio) — uso irrestrito declarado pelos
 mantenedores" (mesmo padrão do CTChest já publicado).
 

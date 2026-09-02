@@ -23,6 +23,7 @@ import numpy as np
 import SimpleITK as sitk
 
 ESPESSURA_MAX_MM = 3.0  # acima disso o modelo sai em degraus (plano, etapa 1)
+LPS_PARA_RAS = np.diag([-1.0, -1.0, 1.0])  # SimpleITK é LPS; o resto do pipeline é RAS
 
 
 class EntradaInvalida(ValueError):
@@ -39,7 +40,8 @@ def _serie_dicom(pasta: Path, serie: str | None, log) -> tuple[sitk.Image, dict,
         # A aquisição principal é a série com mais fatias (scouts têm 1–3).
         serie = max(por_serie, key=lambda uid: len(por_serie[uid]))
         if len(ids) > 1:
-            log(f"{len(ids)} séries na pasta; usando a de mais fatias ({len(por_serie[serie])})")
+            # UID só no console (para --serie); no relatório seria dado identificável.
+            log(f"{len(ids)} séries na pasta; usando a de mais fatias ({len(por_serie[serie])}, --serie {serie})")
     if serie not in por_serie:
         raise EntradaInvalida(f"série {serie} não está em {pasta}")
     arquivos = por_serie[serie]  # já ordenados por ImagePositionPatient
@@ -58,7 +60,6 @@ def _serie_dicom(pasta: Path, serie: str | None, log) -> tuple[sitk.Image, dict,
             posicoes.append(np.array([float(v) for v in ipp.split("\\")]))
     passos = [float(np.linalg.norm(b - a)) for a, b in zip(posicoes, posicoes[1:])]
     meta = {
-        "serie": serie,
         "fatias": len(arquivos),
         "modalidade": tag(0, "0008|0060"),
         "fabricante": tag(0, "0008|0070"),
@@ -76,13 +77,19 @@ def _serie_dicom(pasta: Path, serie: str | None, log) -> tuple[sitk.Image, dict,
 def validar(img: sitk.Image, passos: list[float], forcar: bool) -> tuple[list[str], dict]:
     """Avisos (lista) + estatísticas; levanta EntradaInvalida se não for HU."""
     avisos: list[str] = []
-    _sx, _sy, sz = img.GetSpacing()
+    sz = max(img.GetSpacing())  # eixo mais grosso = direção de fatia (NIfTI/NRRD: qualquer índice)
     arr = sitk.GetArrayViewFromImage(img)
+    sub = arr[::4, ::4, ::4]
     stats = {
         "hu_min": float(arr.min()),
-        "hu_mediana": float(np.median(arr[::4, ::4, ::4])),
+        "hu_mediana": float(np.median(sub)),
         "hu_max": float(arr.max()),
     }
+    # HU de verdade tem ar/pulmão/gás ≈ -1000. Bruto sem rescale fica em 0..4095
+    # (min ≥ 0) ou, com padding negativo (GE: -2000 fora do FOV), tem o ar em
+    # ~+24 — nenhum dos dois cai nesta banda. A mediana NÃO serve de critério:
+    # mede o enquadramento (CTA recortada ao coração tem mediana +40 e é HU).
+    fracao_ar = float(((sub > -1100) & (sub < -900)).mean())
     if sz > ESPESSURA_MAX_MM:
         avisos.append(
             f"fatias de {sz:.2f} mm (> {ESPESSURA_MAX_MM:.0f} mm): o modelo sai em degraus — "
@@ -94,9 +101,10 @@ def validar(img: sitk.Image, passos: list[float], forcar: bool) -> tuple[list[st
             avisos.append(
                 f"passo entre fatias irregular ({pmin:.2f}–{pmax:.2f} mm): fatias faltando ou série mista"
             )
-    if not (stats["hu_min"] <= -900 and stats["hu_mediana"] < 0):
+    if not (stats["hu_min"] <= -900 and fracao_ar >= 0.01):
         msg = (
-            f"intensidades não parecem HU (min {stats['hu_min']:.0f}, mediana {stats['hu_mediana']:.0f}): "
+            f"intensidades não parecem HU (min {stats['hu_min']:.0f}, esperado ≤ -900; "
+            f"{fracao_ar:.1%} dos voxels perto de -1000 HU, esperado ≥ 1%): "
             "RescaleSlope/Intercept não aplicados?"
         )
         if not forcar:
@@ -153,8 +161,12 @@ def ingerir(
         "saida": str(destino),
         "shape_xyz": list(img.GetSize()),
         "spacing_mm": [round(v, 4) for v in img.GetSpacing()],
-        "origem_mm": [round(v, 2) for v in img.GetOrigin()],
-        "direcao": [round(v, 4) for v in img.GetDirection()],
+        # Em RAS (SimpleITK devolve LPS): mesma convenção de ct.nii.gz e bbox_mm.
+        "origem_mm_ras": [round(float(v), 2) for v in LPS_PARA_RAS @ np.array(img.GetOrigin())],
+        "direcao_ras": [
+            round(float(v), 4)
+            for v in (LPS_PARA_RAS @ np.array(img.GetDirection()).reshape(3, 3)).ravel()
+        ],
         **stats,
         "meta": meta,
         "avisos": avisos,
@@ -167,11 +179,13 @@ def _checagem(argv: list[str]) -> int:
     um NIfTI já aceito (regressão: o LIDC convertido ad hoc em agosto)."""
     import nibabel as nib
 
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")  # stdout em pipe no Windows é cp1252
     if len(argv) < 2:
         print(__doc__)
         return 2
     info = ingerir(Path(argv[0]), Path(argv[1]))
-    print({k: v for k, v in info.items() if k != "direcao"})
+    print({k: v for k, v in info.items() if k != "direcao_ras"})
     if len(argv) < 3:
         return 0
     novo, ref = nib.load(argv[1]), nib.load(argv[2])
