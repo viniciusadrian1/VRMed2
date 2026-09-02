@@ -116,6 +116,11 @@ substitui laudo"**, com selo "experimental" enquanto não houver Dice/HD95 (§5 
 
 ## 5. Próximas etapas
 
+Antes de tocar na 3a, ler **`CLINICA-FIDELIDADE.md`**: lista priorizada (14 itens, com fontes)
+do que separa o modelo cardíaco da realidade e o plano em três passos (malha + viewer sem
+licença; câmaras com `heartchambers_highres`; camada de volume). Correção de fato: a tarefa
+`heartchambers_highres` roda na resolução nativa do exame (sem `resample` na config), não a 1,5 mm.
+
 - **3a — malha** (`clinica/malha.py`, a partir de `tc-para-vrmed.py`): maior componente conexo
   + `binary_fill_holes` ANTES do marching cubes; sigma mínimo de 1 voxel em z; `.stl` (1 linha);
   volume/bbox no relatório (já em `metricas.py`); orçamento continua ≤150k tris **por paciente**
