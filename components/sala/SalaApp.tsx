@@ -233,7 +233,7 @@ export function SalaApp() {
         frameloop="always"
         // No ponto de vista do VR sentado (olhos ~1,2m sobre o XROrigin):
         // a câmera antiga, 1m atrás e 40cm acima, escondia painéis altos.
-        camera={{ position: [0, 1.2, -0.55], fov: 55 }}
+        camera={{ position: [0, 1.2, -1.15], fov: 55 }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => gl.setClearColor("#1a140d")}
       >

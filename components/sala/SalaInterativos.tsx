@@ -16,6 +16,19 @@ import { streamChatResponse } from "@/lib/chat-client";
  * mouse (desktop) e laser (VR), seguindo o padrão da Arena.
  */
 
+/** Qual pop-up está aberto — só um por vez (abrir outro fecha o anterior). */
+type PainelAberto = "hub" | "flashcards" | "tutor" | null;
+interface PropsPainel {
+  aberto: boolean;
+  onAbrir: () => void;
+  onFechar: () => void;
+}
+
+/** "×" no canto do painel: segundo jeito de fechar, além de clicar no item. */
+function BotaoFechar({ position, onClick }: { position: [number, number, number]; onClick: () => void }) {
+  return <Button3D label="×" width={0.11} height={0.1} position={position} color="#5c6b7a" onClick={onClick} />;
+}
+
 /** Wrapper de item clicável: cresce um pouco sob o ponteiro + rótulo. */
 function Interativo({
   rotulo,
@@ -250,8 +263,7 @@ const MODOS_HUB = [
   { rotulo: "Quiz", href: "/quiz" },
 ];
 
-function Computador() {
-  const [aberto, setAberto] = useState(false);
+function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
   const inSession = useXR((state) => Boolean(state.session));
 
   return (
@@ -259,7 +271,7 @@ function Computador() {
       <Interativo
         rotulo={aberto ? "Fechar hub" : "Computador — hub do VRmed"}
         posRotulo={[0, 0.5, 0.08]}
-        onClick={() => setAberto((v) => !v)}
+        onClick={() => (aberto ? onFechar() : onAbrir())}
       >
         <MonitorGLB />
         {/* Tela ligada por cima do vidro preto do GLB (a tela fica em z≈0.058) */}
@@ -286,13 +298,16 @@ function Computador() {
         ))}
       </Interativo>
 
-      {/* Painel-hub flutuante acima do monitor */}
+      {/* Painel-hub flutuante acima do monitor, a ~1 m dos olhos (origem no
+          assento em z −1,15; com o painel a 0,3 m do monitor ele ficava colado
+          no rosto). */}
       {aberto && (
-        <group position={[0, 0.6, 0.3]}>
+        <group position={[0, 0.62, -0.35]} scale={0.8}>
           <Panel width={1.15} height={0.78}>
             <Text3D position={[0, 0.28, 0.01]} size={0.06}>
               Portal de estudo
             </Text3D>
+            <BotaoFechar position={[0.5, 0.31, 0.01]} onClick={onFechar} />
             {MODOS_HUB.map((modo, i) => (
               <Button3D
                 key={modo.href}
@@ -372,13 +387,12 @@ async function gerarCartasIA(tema: Tema): Promise<Carta[]> {
     .slice(0, 6);
 }
 
-function Flashcards() {
+function Flashcards({ aberto: painel, onAbrir, onFechar }: PropsPainel) {
   const [temas, setTemas] = useState<Tema[]>([]);
   const [tema, setTema] = useState<Tema | null>(null);
   const [fila, setFila] = useState<Carta[]>([]);
   const [indice, setIndice] = useState(0);
   const [virada, setVirada] = useState(false);
-  const [painel, setPainel] = useState(false);
   const [statusIA, setStatusIA] = useState<string | null>(null);
   // Id do tema vigente, lido na RESOLUÇÃO da geração por IA: se o usuário
   // trocou de tema durante o streaming, as cartas antigas são descartadas
@@ -422,7 +436,7 @@ function Flashcards() {
         <Interativo
           rotulo="Flashcards — clique para estudar"
           posRotulo={[0, 0.16, 0]}
-          onClick={() => setPainel((v) => !v)}
+          onClick={() => (painel ? onFechar() : onAbrir())}
         >
           {[0, 1, 2].map((i) => (
             <mesh key={i} position={[i * 0.004, i * 0.008, -i * 0.003]} rotation={[0, i * 0.08, 0]}>
@@ -437,13 +451,15 @@ function Flashcards() {
         </Interativo>
       </group>
 
-      {/* Painel de temas */}
+      {/* Painel de temas: à esquerda, sobre a mesa, ~1,1 m dos olhos e virado
+          para quem está sentado no assento (z −1,15). */}
       {painel && !tema && (
-        <group position={[-0.55, 1.3, -1.45]} rotation={[0, 0.18, 0]}>
+        <group position={[-0.8, 1.35, -2.0]} rotation={[0, 0.55, 0]}>
           <Panel width={1.0} height={1.15}>
             <Text3D position={[0, 0.47, 0.01]} size={0.055}>
               Escolha o tema
             </Text3D>
+            <BotaoFechar position={[0.43, 0.5, 0.01]} onClick={onFechar} />
             {temas.map((t, i) => (
               <Button3D
                 key={t.id}
@@ -458,9 +474,10 @@ function Flashcards() {
         </group>
       )}
 
-      {/* Carta flutuante */}
+      {/* Carta flutuante (mesmo lugar do painel de temas) */}
       {painel && tema && atual && (
-        <group position={[-0.45, 1.28, -1.3]} rotation={[0, 0.15, 0]}>
+        <group position={[-0.8, 1.35, -2.0]} rotation={[0, 0.55, 0]}>
+          <BotaoFechar position={[0.42, 0.36, 0.02]} onClick={onFechar} />
           <group
             ref={carta}
             onClick={(event) => {
@@ -558,8 +575,7 @@ const PERGUNTAS_RAPIDAS = [
 ];
 
 /** Painel de tutor DENTRO do VR: perguntas prontas + resposta em texto 3D. */
-function TutorVR() {
-  const [aberto, setAberto] = useState(false);
+function TutorVR({ onFechar }: { onFechar: () => void }) {
   const [resposta, setResposta] = useState("");
   const [ocupado, setOcupado] = useState(false);
   const buffer = useRef("");
@@ -596,55 +612,47 @@ function TutorVR() {
   };
 
   return (
-    <group position={[0.62, 1.3, -1.45]} rotation={[0, -0.2, 0]}>
-      {!aberto ? (
-        <Button3D label="Abrir tutor" width={0.6} height={0.14} onClick={() => setAberto(true)} />
-      ) : (
-        <>
-          <Panel width={1.25} height={1.15}>
-            <Text3D position={[0, 0.48, 0.01]} size={0.05}>
-              Tutor de IA
-            </Text3D>
-            {PERGUNTAS_RAPIDAS.map((p, i) => (
-              <Button3D
-                key={p}
-                label={p.length > 34 ? `${p.slice(0, 33)}…` : p}
-                width={1.05}
-                height={0.11}
-                position={[0, 0.31 - i * 0.14, 0.01]}
-                onClick={() => perguntar(p)}
-              />
-            ))}
-            {/* Ancorado no topo, abaixo do último chip; teto de 572
-                caracteres (~11 linhas) para não invadir o "Fechar". */}
-            <Text3D
-              position={[0, -0.065, 0.01]}
-              size={0.036}
-              maxWidth={1.1}
-              anchorY="top"
-            >
-              {resposta.length > 572
-                ? `${resposta.slice(0, 572)}…`
-                : resposta || "Escolha uma pergunta — ou use o teclado no desktop."}
-            </Text3D>
-          </Panel>
+    // À direita, sobre a mesa, ~1,1 m dos olhos de quem está no assento.
+    <group position={[0.85, 1.35, -2.0]} rotation={[0, -0.55, 0]}>
+      <Panel width={1.25} height={1.15}>
+        <Text3D position={[0, 0.48, 0.01]} size={0.05}>
+          Tutor de IA
+        </Text3D>
+        <BotaoFechar position={[0.55, 0.5, 0.01]} onClick={onFechar} />
+        {PERGUNTAS_RAPIDAS.map((p, i) => (
           <Button3D
-            label="Fechar"
-            width={0.34}
-            height={0.1}
-            position={[0, -0.68, 0]}
-            color="#5c6b7a"
-            onClick={() => setAberto(false)}
+            key={p}
+            label={p.length > 34 ? `${p.slice(0, 33)}…` : p}
+            width={1.05}
+            height={0.11}
+            position={[0, 0.31 - i * 0.14, 0.01]}
+            onClick={() => perguntar(p)}
           />
-        </>
-      )}
+        ))}
+        {/* Ancorado no topo, abaixo do último chip; teto de 572
+            caracteres (~11 linhas) para caber no painel. */}
+        <Text3D
+          position={[0, -0.065, 0.01]}
+          size={0.036}
+          maxWidth={1.1}
+          anchorY="top"
+        >
+          {resposta.length > 572
+            ? `${resposta.slice(0, 572)}…`
+            : resposta || "Escolha uma pergunta — ou use o teclado no desktop."}
+        </Text3D>
+      </Panel>
     </group>
   );
 }
 
-function Livro({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
+function Livro({
+  onAbrirTutorDom,
+  aberto,
+  onAbrir,
+  onFechar,
+}: PropsPainel & { onAbrirTutorDom: () => void }) {
   const inSession = useXR((state) => Boolean(state.session));
-  const [tutorVR, setTutorVR] = useState(false);
   const gltf = useGLTF(LIVRO_GLB, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
@@ -655,8 +663,9 @@ function Livro({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
           rotulo="Livro — pergunte ao tutor de IA"
           posRotulo={[0, 0.16, 0]}
           onClick={() => {
-            if (inSession) setTutorVR((v) => !v);
-            else onAbrirTutorDom();
+            if (!inSession) onAbrirTutorDom();
+            else if (aberto) onFechar();
+            else onAbrir();
           }}
         >
           {/* Enciclopédia deitada: arquivo centrado na origem, base em
@@ -668,7 +677,7 @@ function Livro({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
           </group>
         </Interativo>
       </group>
-      {inSession && tutorVR && <TutorVR />}
+      {inSession && aberto && <TutorVR onFechar={onFechar} />}
     </>
   );
 }
@@ -681,12 +690,19 @@ export function SalaInterativos({
 }: {
   onAbrirTutorDom: () => void;
 }) {
+  // Um pop-up por vez: abrir um fecha o outro (pedido do teste no Quest).
+  const [aberto, setAberto] = useState<PainelAberto>(null);
+  const props = (nome: Exclude<PainelAberto, null>): PropsPainel => ({
+    aberto: aberto === nome,
+    onAbrir: () => setAberto(nome),
+    onFechar: () => setAberto((atual) => (atual === nome ? null : atual)),
+  });
   return (
     <group>
       <Radio />
-      <Computador />
-      <Flashcards />
-      <Livro onAbrirTutorDom={onAbrirTutorDom} />
+      <Computador {...props("hub")} />
+      <Flashcards {...props("flashcards")} />
+      <Livro onAbrirTutorDom={onAbrirTutorDom} {...props("tutor")} />
     </group>
   );
 }

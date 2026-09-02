@@ -20,6 +20,12 @@ O produto continua sendo o site; Unity NÃO vira runtime. Claude opera o Editor
 via MCP (ver memória unity-mcp-setup: servidor HTTP :8080 da janela MCP for
 Unity precisa estar ligado).
 
+**Sala no Quest (teste do grupo, 2026-09-02):** origem do VR movida para o CENTRO DO ASSENTO
+(`XROrigin [0,0,-1.15]`; antes ficava em z −0,55, atrás do encosto, e a cabeça entrava nele).
+Painéis reposicionados a ~1,1 m dos olhos (flashcards à esquerda, tutor à direita, hub atrás do
+monitor), estado único "um pop-up por vez" em `SalaInterativos` e botão × em cada painel.
+Câmera de desktop = olho sentado no assento.
+
 **Sair do VR (2026-09-02):** `components/xr/SairDoVR.tsx` — botão 3D filho do `<XROrigin>` em
 todos os modos com sessão (Sala, Duelo, Clínica, Arena, Estudo 3D): encerra a sessão e faz
 `history.back()`. Dentro da sessão o DOM some, então antes não havia como voltar. Posição

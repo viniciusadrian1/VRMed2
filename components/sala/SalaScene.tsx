@@ -223,9 +223,13 @@ export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
 
   return (
     <>
-      {/* Sentado à mesa: origem um pouco atrás da cadeira. */}
-      <XROrigin position={[0, 0, -0.55]}>
-        <SairDoVR position={[-0.45, 0.95, -0.5]} />
+      {/* Origem (pés) no CENTRO DO ASSENTO da cadeira (cadeira ocupa z −1,55..−0,75,
+          encosto do lado +z; mesa começa em z ≈ −1,5). Antes ficava em z −0,55,
+          atrás do encosto: qualquer passo à frente punha a cabeça dentro dele.
+          Quem senta de verdade fica sentado na cadeira; quem fica de pé fica
+          "no lugar" dela, olhando a mesa de cima. */}
+      <XROrigin position={[0, 0, -1.15]}>
+        <SairDoVR position={[-0.8, 1.05, -0.2]} />
       </XROrigin>
 
       {/* Luz: quente da luminária + fria fraca da janela + ambiente baixa. */}
