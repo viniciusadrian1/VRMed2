@@ -48,3 +48,7 @@ next-env.d.ts
 /feedback.jsonl
 .venv-pipeline/
 .clinica-dados/
+
+# Python (pipeline clínico)
+__pycache__/
+*.pyc

@@ -29,7 +29,14 @@ educacional — não substitui laudo" (nunca "diagnóstico/assistência", territ
 
 **Pipeline (Python, roda SÓ no PC Windows com RTX 4060 Ti — TotalSegmentator usa CUDA):**
 
-- `scripts/tc-para-vrmed.py` — TC (DICOM/NIfTI) → GLB nomeado. Flags novas:
+- **2026-09-01 — plano DICOM→3D do grupo reconciliado:** `docs/PLANO-CLINICA-DICOM.md`. O
+  pipeline JÁ era segmentação anatômica (TotalSegmentator) → marching cubes; o plano evolui
+  ele, não substitui. Código novo em `scripts/clinica/` (ingestao, segmentacao, metricas, qa,
+  cores) + `scripts/preparar-caso.py` (etapas 1+2 + QA, sem malha). Caso cardíaco com contraste
+  `cta-cardio` (3D Slicer) preparado em 153 s; câmaras cardíacas exigem licença acadêmica
+  gratuita do TotalSegmentator (`totalseg_set_license`) — ainda não configurada.
+- `scripts/tc-para-vrmed.py` — TC (DICOM/NIfTI) → GLB nomeado (importa presets/cores/segmentação
+  de `scripts/clinica/`; preset novo `cardiaco`). Flags:
   `--pulmoes-inteiros` (une lobos → pulmão esq/dir sem linhas de fissura) e
   `--cores-tc exame.nii.gz` (cor por vértice pela densidade HU real + oclusão de cavidade —
   a "textura" vem do próprio exame). Depois SEMPRE `npx gltf-transform draco` (nunca --simplify).
@@ -47,9 +54,13 @@ pulmões inteiros, cores da TC); alternativa = "Mapa de achados". Lição aprend
 exporta normais para DENTRO — `fix_normals(multibody=True)` no pipeline é obrigatório (sem isso
 a iluminação inverte e a amostragem de HU cai na parede torácica).
 
-**Pendências Clínica:** validação de acurácia (§5 do prompt: Dice/HD95 vs ground truth, script
-`validar-segmentacao.py` ainda não existe); caso de enfisema grave (DPOC) para o contraste
-saudável×fumante; teste em Quest; Fase 3 (upload → processamento na nuvem: R2 + Modal + Neon).
+**Pendências Clínica:** etapa 3a da malha (maior componente + fill-holes antes do marching
+cubes — o QA do cta-cardio mostra ilhas de 1–11 mm³; STL; métricas no report); etapa 3b
+(volume HU recortado + função de transferência) e viewer com escala real/ray marching; licença
+acadêmica do TotalSegmentator para câmaras; validação de acurácia (§5 do prompt: Dice/HD95 vs
+ground truth, script `validar-segmentacao.py` ainda não existe); caso de enfisema grave (DPOC)
+para o contraste saudável×fumante; teste em Quest; Fase 3 (upload → processamento na nuvem:
+R2 + Modal + Neon).
 
 **Multi-máquina:** no Mac dá para editar frontend, rodar `npm run dev`, commitar e push
 (Render faz deploy automático do GitHub). Processamento de exames novos: só no PC (CUDA).

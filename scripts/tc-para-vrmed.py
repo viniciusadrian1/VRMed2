@@ -30,37 +30,12 @@ import numpy as np
 import trimesh
 from skimage import measure
 
-# ---------------------------------------------------------------------------
-# Presets de estruturas (nomes do TotalSegmentator, tarefa "total").
-# Uma malha POR estrutura, com o nome preservado — é o contrato do VRmed
-# (detectStructures/identifyStructure identificam pelo nome do nó).
-# ---------------------------------------------------------------------------
-PRESETS: dict[str, list[str] | None] = {
-    "torax": [
-        "lung_upper_lobe_left",
-        "lung_lower_lobe_left",
-        "lung_upper_lobe_right",
-        "lung_middle_lobe_right",
-        "lung_lower_lobe_right",
-        "heart",
-        "aorta",
-        "trachea",
-        "esophagus",
-    ],
-    "abdomen": [
-        "liver",
-        "spleen",
-        "kidney_left",
-        "kidney_right",
-        "gallbladder",
-        "pancreas",
-        "stomach",
-        "aorta",
-        "inferior_vena_cava",
-    ],
-    # None = todas as estruturas da tarefa "total" (pesado; use com cuidado)
-    "completo": None,
-}
+# Etapas 1–2 e cores vivem no pacote scripts/clinica (também usado por
+# preparar-caso.py e, na Fase 3, pelo worker). O hífen no nome deste
+# arquivo impede importá-lo, por isso o pacote.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from clinica.cores import cor_para  # noqa: E402
+from clinica.segmentacao import PRESETS, info_segmentacao, rodar_segmentacao  # noqa: E402
 
 # Rotação RAS→glTF: (x, y, z) → (x, z, -y). Determinante +1 (rotação pura,
 # sem espelhar) — anterior do paciente aponta para -Z, superior para +Y.
@@ -73,64 +48,8 @@ RAS_PARA_GLTF = np.array(
 )
 MM_PARA_M = 0.001
 
-# Cores anatômicas (RGB 0–1) por prefixo de estrutura — aproximação didática,
-# não convenção clínica. Sem isso o GLB sai cinza uniforme.
-# Os lobos pulmonares têm tons DISTINTOS de propósito: as fissuras entre eles
-# são anatomia real, e com uma cor só pareciam rachadura de defeito.
-CORES: list[tuple[str, tuple[float, float, float]]] = [
-    ("lung_upper_lobe_left", (0.89, 0.58, 0.58)),
-    ("lung_lower_lobe_left", (0.78, 0.47, 0.50)),
-    ("lung_upper_lobe_right", (0.91, 0.64, 0.55)),
-    ("lung_middle_lobe_right", (0.83, 0.52, 0.44)),
-    ("lung_lower_lobe_right", (0.74, 0.42, 0.44)),
-    ("lung", (0.85, 0.55, 0.55)),
-    ("heart", (0.72, 0.25, 0.22)),
-    ("aorta", (0.80, 0.20, 0.20)),
-    ("pulmonary", (0.55, 0.30, 0.55)),
-    ("trachea", (0.85, 0.83, 0.75)),
-    ("esophagus", (0.76, 0.60, 0.48)),
-    ("liver", (0.55, 0.27, 0.17)),
-    ("spleen", (0.45, 0.18, 0.25)),
-    ("kidney", (0.58, 0.32, 0.28)),
-    ("gallbladder", (0.35, 0.52, 0.30)),
-    ("pancreas", (0.85, 0.72, 0.50)),
-    ("stomach", (0.83, 0.65, 0.58)),
-    ("inferior_vena_cava", (0.25, 0.35, 0.65)),
-]
-COR_PADRAO = (0.75, 0.72, 0.68)
-
-
-def cor_para(nome: str) -> tuple[float, float, float]:
-    for prefixo, cor in CORES:
-        if nome.startswith(prefixo):
-            return cor
-    return COR_PADRAO
-
-
 def log(msg: str) -> None:
     print(f"[tc-para-vrmed] {msg}", flush=True)
-
-
-def rodar_segmentacao(
-    entrada: Path, saida_masks: Path, estruturas: list[str] | None, fast: bool
-) -> float:
-    """Roda o TotalSegmentator (inferência) e devolve o tempo gasto."""
-    from totalsegmentator.python_api import totalsegmentator
-
-    inicio = time.time()
-    log(
-        f"segmentando {entrada.name} "
-        f"({'todas as estruturas' if estruturas is None else f'{len(estruturas)} estruturas'}"
-        f"{', modo rápido' if fast else ''})…"
-    )
-    totalsegmentator(
-        str(entrada),
-        str(saida_masks),
-        roi_subset=estruturas,
-        fast=fast,
-        quiet=False,
-    )
-    return time.time() - inicio
 
 
 def malha_de_volume(
@@ -300,20 +219,19 @@ def main() -> int:
     if args.masks_dir:
         masks_dir = Path(args.masks_dir)
         log(f"reusando máscaras de {masks_dir}")
+        # Rastreabilidade: a versão do TotalSegmentator não pode sumir do
+        # relatório só porque as máscaras foram reusadas.
+        seg = info_segmentacao(masks_dir)
+        if seg:
+            relatorio["totalsegmentator_versao"] = seg.get("totalsegmentator_versao")
     else:
         # Máscaras são intermediário volumoso: ficam FORA de public/ (nunca
         # devem ir para o site nem para o git).
         masks_dir = Path(".clinica-dados") / (saida.stem + "_masks")
         masks_dir.mkdir(parents=True, exist_ok=True)
-        relatorio["etapas_s"]["segmentacao"] = round(
-            rodar_segmentacao(entrada, masks_dir, estruturas, args.fast), 1
-        )
-        try:
-            import totalsegmentator
-
-            relatorio["totalsegmentator_versao"] = totalsegmentator.__version__
-        except Exception:
-            pass
+        seg = rodar_segmentacao(entrada, masks_dir, estruturas, args.fast, log=log)
+        relatorio["etapas_s"]["segmentacao"] = seg["tempo_s"]
+        relatorio["totalsegmentator_versao"] = seg["totalsegmentator_versao"]
 
     mascaras = sorted(masks_dir.glob("*.nii.gz"))
     if estruturas is not None:
