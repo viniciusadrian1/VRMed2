@@ -16,6 +16,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
 import { streamChatResponse } from "@/lib/chat-client";
+import * as spotify from "@/lib/spotify";
 import { CenaSala } from "./SalaScene";
 
 interface Mensagem {
@@ -39,6 +40,21 @@ export function SalaApp() {
   const [pergunta, setPergunta] = useState("");
   const [ocupado, setOcupado] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  // Spotify (opcional; docs/SALA-SPOTIFY.md). O login é um redirect, então
+  // acontece aqui, na tela 2D, nunca dentro da sessão XR.
+  const [spotifyEstado, setSpotifyEstado] = useState<"desconectado" | "conectado" | "erro">(
+    "desconectado",
+  );
+  useEffect(() => {
+    if (!spotify.spotifyConfigurado()) return;
+    const sincronizar = () => setSpotifyEstado(spotify.conectado() ? "conectado" : "desconectado");
+    void spotify.concluirLogin().then((resultado) => {
+      if (resultado === "erro") setSpotifyEstado("erro");
+      else sincronizar();
+    });
+    window.addEventListener(spotify.EVENTO_SPOTIFY, sincronizar);
+    return () => window.removeEventListener(spotify.EVENTO_SPOTIFY, sincronizar);
+  }, []);
 
   const store = obterXRStore();
 
@@ -123,6 +139,28 @@ export function SalaApp() {
               <p className="pointer-events-auto max-w-md rounded-lg border border-red-400/40 bg-red-950/70 px-4 py-2 text-xs text-red-200">
                 Não foi possível iniciar o VR: {xrError}
               </p>
+            )}
+            {spotify.spotifyConfigurado() && (
+              <div className="pointer-events-auto flex flex-col items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() =>
+                    spotifyEstado === "conectado"
+                      ? spotify.desconectar()
+                      : void spotify.iniciarLogin()
+                  }
+                  className="rounded-full border border-[#1DB954]/60 bg-black/50 px-5 py-2 text-sm font-medium text-[#1DB954] backdrop-blur hover:bg-black/70"
+                >
+                  {spotifyEstado === "conectado" ? "Desconectar Spotify" : "Conectar Spotify"}
+                </button>
+                <p className="max-w-md px-4 text-center text-[10px] leading-snug text-white/40">
+                  {spotifyEstado === "erro"
+                    ? "O login não terminou — tente de novo."
+                    : spotifyEstado === "conectado"
+                      ? "O rádio da sala controla o que toca no seu celular, computador ou no Spotify do Quest (Premium para controlar)."
+                      : "Usa só o estado de reprodução e suas playlists, guardados neste navegador; nada vai para o servidor do VRmed. Conecte antes de entrar em VR."}
+                </p>
+              </div>
             )}
             <p className="max-w-lg px-4 text-center text-[11px] text-white/45">
               Sala de estudos — clique no rádio, no computador, nos flashcards

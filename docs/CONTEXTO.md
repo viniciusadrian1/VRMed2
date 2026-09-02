@@ -20,6 +20,13 @@ O produto continua sendo o site; Unity NÃO vira runtime. Claude opera o Editor
 via MCP (ver memória unity-mcp-setup: servidor HTTP :8080 da janela MCP for
 Unity precisa estar ligado).
 
+**Spotify no rádio da Sala (2026-09-02):** modo "controle remoto" (Spotify Connect pela Web
+API, login PKCE no navegador, `lib/spotify.ts`, `docs/SALA-SPOTIFY.md`). Regras de 2026 que
+limitam: app em modo dev aceita só 5 usuários cadastrados, dono precisa de Premium, controle
+exige Premium do usuário, redirect `http://127.0.0.1:3000/sala` (não localhost). Sem
+`NEXT_PUBLIC_SPOTIFY_CLIENT_ID` o botão nem aparece; o lo-fi local continua o padrão. Web
+Playback SDK (som na própria página) ficou fora até um teste-piloto no Quest.
+
 ## VRmed Clínica (modo 3) — estado em 2026-08-26
 
 Terceiro modo do app, em `/clinica`: casos 3D gerados de **exames reais anonimizados**

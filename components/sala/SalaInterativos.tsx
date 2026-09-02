@@ -7,6 +7,7 @@ import { useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { Text3D, Panel, Button3D, ARENA_COLORS } from "@/components/arena/ui3d";
 import { proximaEstacao, pararRadio } from "@/lib/lofi";
+import * as spotify from "@/lib/spotify";
 import { streamChatResponse } from "@/lib/chat-client";
 
 /**
@@ -75,18 +76,124 @@ const RADIO_GLB = "/models/props/radio.glb";
 
 function Radio() {
   const [nome, setNome] = useState<string>("");
+  // Spotify como controle remoto (docs/SALA-SPOTIFY.md): conectado = o rádio
+  // mostra e controla o que toca no dispositivo do usuário; o lo-fi desliga
+  // (Policy III.7 do Spotify: nada de mixar com outro áudio).
+  const [viaSpotify, setViaSpotify] = useState(false);
+  const [reproducao, setReproducao] = useState<spotify.Reproducao | null>(null);
+  const [aviso, setAviso] = useState<string>("");
   const gltf = useGLTF(RADIO_GLB, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
   // Desligar ao sair da página (o áudio não pode vazar para outras rotas).
   useEffect(() => () => pararRadio(), []);
 
+  // Conectado? (o login acontece no DOM, antes de entrar em VR; o evento
+  // cobre conectar/desconectar sem recarregar a cena)
+  useEffect(() => {
+    const sincronizar = () => {
+      const ativo = spotify.conectado();
+      setViaSpotify(ativo);
+      if (ativo) {
+        pararRadio();
+        setNome("");
+      } else {
+        setReproducao(null);
+      }
+    };
+    sincronizar();
+    window.addEventListener(spotify.EVENTO_SPOTIFY, sincronizar);
+    return () => window.removeEventListener(spotify.EVENTO_SPOTIFY, sincronizar);
+  }, []);
+
+  // Sonda o estado a cada 5 s (a janela de rate limit do Spotify é de 30 s;
+  // 6 chamadas por janela é conservador).
+  useEffect(() => {
+    if (!viaSpotify) return;
+    let cancelado = false;
+    const ler = () =>
+      spotify
+        .estadoReproducao()
+        .then((estado) => {
+          if (!cancelado) setReproducao(estado);
+        })
+        .catch((erro: unknown) => {
+          if (!cancelado && erro instanceof spotify.ErroSpotify) setAviso(erro.message);
+        });
+    void ler();
+    const timer = setInterval(ler, 5000);
+    return () => {
+      cancelado = true;
+      clearInterval(timer);
+    };
+  }, [viaSpotify]);
+
+  // Avisos somem sozinhos
+  useEffect(() => {
+    if (!aviso) return;
+    const timer = setTimeout(() => setAviso(""), 5000);
+    return () => clearTimeout(timer);
+  }, [aviso]);
+
+  const comando = (acao: () => Promise<void>) => {
+    acao()
+      .then(() => spotify.estadoReproducao())
+      .then((estado) => setReproducao(estado))
+      .catch((erro: unknown) => {
+        setAviso(erro instanceof spotify.ErroSpotify ? erro.message : "Spotify não respondeu");
+      });
+  };
+
+  const rotulo = aviso
+    ? aviso
+    : viaSpotify
+      ? reproducao
+        ? `${reproducao.tocando ? "♪" : "II"} ${reproducao.faixa} — ${reproducao.artista}`
+        : "Spotify conectado — dê play no celular ou no Quest"
+      : nome
+        ? `♪ ${nome}`
+        : "Rádio lo-fi — clique para ligar";
+
   return (
     <group position={[0.68, 0.765, -2.1]}>
+      {viaSpotify && (
+        <group position={[0, 0.46, 0.05]}>
+          {/* Atribuição exigida pelo Spotify (Design Guidelines); o logo
+              oficial como textura é pendência em docs/SALA-SPOTIFY.md */}
+          <Text3D position={[0, 0.1, 0]} size={0.03} color="#1DB954">
+            Spotify
+          </Text3D>
+          <Button3D
+            label="<<"
+            width={0.13}
+            height={0.06}
+            position={[-0.17, 0, 0]}
+            onClick={() => comando(spotify.faixaAnterior)}
+          />
+          <Button3D
+            label={reproducao?.tocando ? "II" : ">"}
+            width={0.13}
+            height={0.06}
+            position={[0, 0, 0]}
+            onClick={() => comando(() => spotify.alternar(Boolean(reproducao?.tocando)))}
+          />
+          <Button3D
+            label=">>"
+            width={0.13}
+            height={0.06}
+            position={[0.17, 0, 0]}
+            onClick={() => comando(spotify.proximaFaixa)}
+          />
+        </group>
+      )}
       <Interativo
-        rotulo={nome ? `♪ ${nome}` : "Rádio lo-fi — clique para ligar"}
+        rotulo={rotulo}
         posRotulo={[0, 0.3, 0.05]}
         onClick={() => {
+          if (viaSpotify) {
+            comando(() => spotify.alternar(Boolean(reproducao?.tocando)));
+            return;
+          }
           void proximaEstacao().then((estado) =>
             setNome(estado.tocando ? estado.nome : ""),
           );
@@ -100,7 +207,7 @@ function Radio() {
           </group>
         </group>
         {/* Luz de "ligado" flutuando discreta sobre o rádio */}
-        {nome && (
+        {(nome || reproducao?.tocando) && (
           <mesh position={[0, 0.26, 0]}>
             <sphereGeometry args={[0.008, 8, 6]} />
             <meshBasicMaterial color="#7CFC9B" toneMapped={false} />
