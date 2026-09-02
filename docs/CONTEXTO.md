@@ -33,8 +33,12 @@ educacional — não substitui laudo" (nunca "diagnóstico/assistência", territ
   pipeline JÁ era segmentação anatômica (TotalSegmentator) → marching cubes; o plano evolui
   ele, não substitui. Código novo em `scripts/clinica/` (ingestao, segmentacao, metricas, qa,
   cores) + `scripts/preparar-caso.py` (etapas 1+2 + QA, sem malha). Caso cardíaco com contraste
-  `cta-cardio` (3D Slicer) preparado em 153 s; câmaras cardíacas exigem licença acadêmica
-  gratuita do TotalSegmentator (`totalseg_set_license`) — ainda não configurada.
+  `cta-cardio` (3D Slicer) preparado em 153 s e PUBLICADO em `public/pacientes/` como
+  "Coração e grandes vasos" **sem pulmões** (o viewer ainda não tem toggle e eles escondiam o
+  coração; a versão completa fica em `.clinica-dados/cta-cardio/`). No GLB completo o pulmão
+  direito saiu escuro (aviso "normais invertidas" — `fix_normals(multibody)` não corrige todos
+  os corpos; item da etapa 3a). Câmaras cardíacas exigem licença acadêmica gratuita do
+  TotalSegmentator (`totalseg_set_license`) — ainda não configurada.
 - `scripts/tc-para-vrmed.py` — TC (DICOM/NIfTI) → GLB nomeado (importa presets/cores/segmentação
   de `scripts/clinica/`; preset novo `cardiaco`). Flags:
   `--pulmoes-inteiros` (une lobos → pulmão esq/dir sem linhas de fissura) e
