@@ -68,13 +68,15 @@ pulmões inteiros, cores da TC); alternativa = "Mapa de achados". Lição aprend
 exporta normais para DENTRO — `fix_normals(multibody=True)` no pipeline é obrigatório (sem isso
 a iluminação inverte e a amostragem de HU cai na parede torácica).
 
-**Pendências Clínica:** etapa 3a da malha (maior componente + fill-holes antes do marching
-cubes — o QA do cta-cardio mostra ilhas de 1–11 mm³; STL; métricas no report); etapa 3b
-(volume HU recortado + função de transferência) e viewer com escala real/ray marching; licença
-acadêmica do TotalSegmentator para câmaras; validação de acurácia (§5 do prompt: Dice/HD95 vs
-ground truth, script `validar-segmentacao.py` ainda não existe); caso de enfisema grave (DPOC)
-para o contraste saudável×fumante; teste em Quest; Fase 3 (upload → processamento na nuvem:
-R2 + Modal + Neon).
+**Pendências Clínica:** etapa 3b (volume HU recortado + função de transferência + ray marching
+no viewer — a resposta definitiva à "textura"); viewer com escala real e régua; `.stl` e normais
+guiadas pelo gradiente do HU na 3a; esqueleto/pericárdio como contexto opcional; validação de
+acurácia (§5 do prompt: Dice/HD95 vs ground truth, script `validar-segmentacao.py` ainda não
+existe — sem ela tudo é "experimental"); reprocessar os dois casos de tórax com a malha nova;
+caso de enfisema grave (DPOC) para o contraste saudável×fumante; teste em Quest; Fase 3
+(upload → processamento na nuvem: R2 + Modal + Neon; tarefa licenciada exige consulta ao autor).
+Licença acadêmica do TotalSegmentator: configurada em 2026-09-02 (regras em
+`docs/PLANO-CLINICA-DICOM.md` §4).
 
 **Multi-máquina:** no Mac dá para editar frontend, rodar `npm run dev`, commitar e push
 (Render faz deploy automático do GitHub). Processamento de exames novos: só no PC (CUDA).

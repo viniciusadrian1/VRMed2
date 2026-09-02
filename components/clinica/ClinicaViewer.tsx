@@ -39,7 +39,7 @@ const FLOOR_Y = -1.3;
 const CORTES = {
   axial: { normal: [0, -1, 0] as const, rotulo: "Axial" }, // tira o que está acima
   coronal: { normal: [0, 0, -1] as const, rotulo: "Coronal" }, // tira a frente (+Z)
-  sagital: { normal: [-1, 0, 0] as const, rotulo: "Sagital" }, // tira o lado direito (−X)
+  sagital: { normal: [-1, 0, 0] as const, rotulo: "Sagital" }, // tira o lado esquerdo (+X)
 } as const;
 type Corte = keyof typeof CORTES | "nenhum";
 // normalizeContent deixa o modelo em ±1 e o pivô escala 1,4 → cabe em ±1,5.
@@ -123,8 +123,16 @@ function ModeloPaciente({
   }, [mostrarEnvelope, scene]);
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
+    // O raycast do three não filtra `visible` nem `clippingPlanes`: pula o
+    // envelope oculto e as faces do lado removido pelo corte. Em VR o
+    // pointer-events entrega `intersections` vazio → usa o próprio hit.
+    const hits = event.intersections.length ? event.intersections : [event];
+    const hit = hits.find(
+      (h) => h.object.visible && plano.current.distanceToPoint(h.point) >= 0,
+    );
+    if (!hit) return;
     event.stopPropagation();
-    onIdentify(identifyStructure(event.object));
+    onIdentify(identifyStructure(hit.object));
   };
 
   return (

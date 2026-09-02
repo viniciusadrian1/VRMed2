@@ -134,6 +134,9 @@ def main() -> int:
                 mascaras[nome], _ = carregar(caminho)
                 com_camaras = True
         log(f"câmaras: {sum(n in mascaras for n in M.CAMARAS)} de {len(M.CAMARAS)} máscaras")
+        if not com_camaras:
+            log(f"ERRO: nenhuma máscara de câmaras em {pasta} (tarefa heartchambers_highres não rodou?)")
+            return 1
 
     assert affine is not None
     zooms = M.zooms_de(affine)
@@ -154,7 +157,7 @@ def main() -> int:
         internos = [n for n in mascaras if n.startswith("heart_")]
         externos = [n for n in mascaras if n not in internos]
         uniao = lambda nomes: np.logical_or.reduce([mascaras[n] for n in nomes]) if nomes else None  # noqa: E731
-        ct = M.preparar_ct(caminho_ct, uniao(externos), uniao(internos))
+        ct = M.preparar_ct(caminho_ct, uniao(externos), uniao(internos), affine_mascaras=affine)
         log(f"pintando pelo HU de {caminho_ct.name}")
 
     # ----- 4. Malhas brutas (para conhecer os tamanhos) -----
@@ -166,7 +169,7 @@ def main() -> int:
             relatorio["estruturas"][nome] = {"presente": False}
             continue
         vol_mascara = float(mask.sum()) * float(np.prod(zooms)) / 1000.0
-        brutas.append((nome, *resultado, vol_mascara, M.toca_borda(mask)))
+        brutas.append((nome, *resultado, vol_mascara, M.toca_borda(mask, affine)))
 
     # ----- 5. Orçamento proporcional + decimação + pintura -----
     orcamento_por = orcamentos({n: t for n, _, t, _, _ in brutas}, args.max_tris, PISO_TRIS)
@@ -189,6 +192,7 @@ def main() -> int:
             "volume_malha_ml": round(vol_malha, 1),
             "perda_volume_pct": round(100 * perda, 1),
             "toca_borda": bordas,
+            "watertight": bool(malha.is_watertight),
         }
         relatorio["estruturas"][nome] = info
         total_tris += info["triangulos_finais"]

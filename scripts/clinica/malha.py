@@ -105,12 +105,14 @@ def encostar(mask: np.ndarray, alvo: np.ndarray) -> np.ndarray:
     return mask | (ndimage.binary_dilation(mask) & alvo)
 
 
-def toca_borda(mask: np.ndarray) -> list[str]:
+def toca_borda(mask: np.ndarray, affine: np.ndarray) -> list[str]:
+    # k cresce para superior só se affine[2,2] > 0 (o nibabel não reorienta).
+    topo, base = ("topo", "base") if affine[2, 2] > 0 else ("base", "topo")
     faces = []
     if mask[:, :, -1].any():
-        faces.append("topo")
+        faces.append(topo)
     if mask[:, :, 0].any():
-        faces.append("base")
+        faces.append(base)
     if mask[0].any() or mask[-1].any() or mask[:, 0].any() or mask[:, -1].any():
         faces.append("lateral")
     return faces
@@ -122,7 +124,7 @@ def malha_de_volume(
     sigma_mm: float | None = None,
     level: float = 0.5,
     afastamento_mm: float = 0.15,
-    taubin: int = 3,
+    taubin: int = 4,
 ) -> tuple[trimesh.Trimesh, int] | None:
     """Máscara binária → malha em metros (eixos glTF), ainda sem decimação."""
     from scipy import ndimage
@@ -134,13 +136,18 @@ def malha_de_volume(
     if sigma_mm is None:
         sigma_mm = max(0.6, 0.5 * float(zooms.max()))
     # Pad: a superfície fecha com uma tampa plana onde o exame termina.
-    campo = ndimage.gaussian_filter(np.pad(mask.astype(np.float32), 1), sigma=sigma_mm / zooms)
+    campo = ndimage.gaussian_filter(
+        np.pad(mask.astype(np.float32), 1), sigma=sigma_mm / zooms, mode="constant"
+    )  # fora do exame é 0 (o 'reflect' padrão abria a tampa em fatias grossas)
     verts, faces, _normais, _valores = measure.marching_cubes(campo, level=level)
     verts -= 1.0  # desfaz o pad
     verts_mm = verts @ affine[:3, :3].T + affine[:3, 3]
     malha = trimesh.Trimesh(vertices=(verts_mm @ RAS_PARA_GLTF.T) * MM_PARA_M, faces=faces, process=True)
     tris_brutos = len(malha.faces)
-    trimesh.smoothing.filter_taubin(malha, lamb=0.5, nu=-0.53, iterations=taubin)
+    # No trimesh o passo ímpar faz `vertices -= nu*dot`: nu POSITIVO é o
+    # unshrink (a convenção do artigo, μ<0, aqui viraria 3 encolhimentos
+    # seguidos). Iterações pares: cada shrink com o seu inflate.
+    trimesh.smoothing.filter_taubin(malha, lamb=0.5, nu=0.53, iterations=taubin)
     # O marching cubes sai com normais para DENTRO; corrige por corpo antes de
     # usar as normais para o afastamento e para a amostragem de HU.
     malha.fix_normals(multibody=True)
@@ -168,9 +175,10 @@ class ContextoCT:
     """CT levemente suavizada + campos de ocupação para pintar as malhas."""
 
     vol: np.ndarray
-    inv_affine: np.ndarray
+    inv_affine: np.ndarray  # grade da CT
     ocupacao_fora: np.ndarray | None  # estruturas externas (envelope, vasos, vias aéreas…)
     ocupacao_dentro: np.ndarray | None  # câmaras + miocárdio (dentro do envelope)
+    inv_affine_mascaras: np.ndarray | None = None  # grade das máscaras (ocupação)
 
 
 def preparar_ct(
@@ -178,6 +186,7 @@ def preparar_ct(
     uniao_fora: np.ndarray | None = None,
     uniao_dentro: np.ndarray | None = None,
     raio_oclusao_mm: float = 8.0,
+    affine_mascaras: np.ndarray | None = None,
 ) -> ContextoCT:
     import nibabel as nib
     from scipy import ndimage
@@ -192,7 +201,8 @@ def preparar_ct(
         tamanho = (np.maximum(1, np.round(raio_oclusao_mm / zooms)).astype(int) * 2 + 1).tolist()
         return ndimage.uniform_filter(uniao.astype(np.float32), size=tamanho)
 
-    return ContextoCT(vol, np.linalg.inv(img.affine), ocupacao(uniao_fora), ocupacao(uniao_dentro))
+    inv_masc = np.linalg.inv(affine_mascaras) if affine_mascaras is not None else np.linalg.inv(img.affine)
+    return ContextoCT(vol, np.linalg.inv(img.affine), ocupacao(uniao_fora), ocupacao(uniao_dentro), inv_masc)
 
 
 def _amostrar(campo: np.ndarray, inv_affine: np.ndarray, pontos_gltf: np.ndarray) -> np.ndarray:
@@ -251,7 +261,8 @@ def pintar(malha: trimesh.Trimesh, nome: str, papel: str, ct: ContextoCT | None)
         if ocupacao is not None:
             # Fora da superfície: quanto mais vizinhança ocupada (fenda entre
             # estruturas), menos luz — oclusão cozida no vértice, custo zero no Quest.
-            oc = _amostrar(ocupacao, ct.inv_affine, malha.vertices + malha.vertex_normals * (1.0 * MM_PARA_M))
+            inv = ct.inv_affine_mascaras if ct.inv_affine_mascaras is not None else ct.inv_affine
+            oc = _amostrar(ocupacao, inv, malha.vertices + malha.vertex_normals * (1.0 * MM_PARA_M))
             ao = 1.0 - np.clip((oc - 0.5) / 0.4, 0.0, 1.0)
             cor = cor * (0.55 + 0.45 * ao)[:, None]
 

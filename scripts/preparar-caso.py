@@ -158,10 +158,15 @@ def main() -> int:
         json.dumps(relatorio, indent=2, ensure_ascii=False), encoding="utf-8"
     )
     log(f"relatório: {pasta / 'relatorio.json'} ({relatorio['tempo_total_s']} s no total)")
+    extra = ""
+    if any((masks / "heartchambers_highres").glob("*.nii.gz")):
+        extra += f" --camaras {masks / 'heartchambers_highres'}"
+    if args.preset == "cardiaco":
+        extra += " --sem-pulmoes"  # pulmões escondem o coração no viewer
     log(
         "próximo passo (malha): python scripts/tc-para-vrmed.py "
         f"--input {ct} --masks-dir {masks} --structures {args.preset} "
-        f"--output {pasta / f'{args.slug}-sem-draco.glb'} --report {pasta / 'malha.json'}"
+        f"--output {pasta / f'{args.slug}-sem-draco.glb'} --report {pasta / 'malha.json'}{extra}"
     )
     return 0
 
