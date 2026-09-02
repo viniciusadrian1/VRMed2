@@ -1,5 +1,13 @@
 [
   {
+    "slug": "cta-cardio",
+    "titulo": "Coração e grandes vasos (angio-TC 1,25mm)",
+    "descricao": "Angiotomografia cardíaca com contraste: coração inteiro, aorta, cavas, veias pulmonares e aurícula esquerda segmentados pelo TotalSegmentator, com pulmões, traqueia e esôfago como contexto. Reconstrução experimental: câmaras cardíacas e a limpeza de malha (etapa 3a) ainda não entraram.",
+    "glb": "/pacientes/cta-cardio.glb",
+    "dataProcessamento": "2026-09-01",
+    "fonteDados": "3D Slicer Sample Data (CTACardio) — exame público e anonimizado, uso irrestrito declarado pelos mantenedores"
+  },
+  {
     "slug": "torax-alta",
     "titulo": "Tórax em alta resolução (TC 1,25mm)",
     "descricao": "Tomografia moderna de fatias finas: o modelo ilustrativo recebe uma textura gerada a partir do exame — manchas onde a TC encontrou opacidades e escurecimento proporcional ao enfisema medido.",
