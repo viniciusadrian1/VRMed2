@@ -20,6 +20,12 @@ O produto continua sendo o site; Unity NÃO vira runtime. Claude opera o Editor
 via MCP (ver memória unity-mcp-setup: servidor HTTP :8080 da janela MCP for
 Unity precisa estar ligado).
 
+**Sair do VR (2026-09-02):** `components/xr/SairDoVR.tsx` — botão 3D filho do `<XROrigin>` em
+todos os modos com sessão (Sala, Duelo, Clínica, Arena, Estudo 3D): encerra a sessão e faz
+`history.back()`. Dentro da sessão o DOM some, então antes não havia como voltar. Posição
+relativa aos pés: `[-0.45, 0.95, -0.5]` sentado, `1.25` de pé. O emulador iwer do modo dev
+quebra com three 0.184 (`material.onBuild is not a function`) — testar só no headset.
+
 **Spotify no rádio da Sala (2026-09-02):** modo "controle remoto" (Spotify Connect pela Web
 API, login PKCE no navegador, `lib/spotify.ts`, `docs/SALA-SPOTIFY.md`). Regras de 2026 que
 limitam: app em modo dev aceita só 5 usuários cadastrados, dono precisa de Premium, controle

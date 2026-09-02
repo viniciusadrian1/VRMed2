@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
+import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
 import { track } from "@/lib/analytics";
 import { clamp } from "@/lib/format";
@@ -148,7 +149,9 @@ function SceneContents() {
   return (
     <>
       {/* Posiciona o usuário à frente do modelo ao entrar em VR. */}
-      <XROrigin position={[0, FLOOR_Y, 3]} />
+      <XROrigin position={[0, FLOOR_Y, 3]}>
+        <SairDoVR position={[-0.45, 1.25, -0.5]} />
+      </XROrigin>
 
       <ambientLight intensity={inSession ? 0.85 : 0.5} />
       <directionalLight

@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { XR, XROrigin, useXR } from "@react-three/xr";
+import { SairDoVR } from "@/components/xr/SairDoVR";
 import { obterXRStore } from "@/lib/xr-store";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
@@ -61,7 +62,9 @@ function CenaDuelo({ ambiente }: { ambiente: Ambiente }) {
           direita — quem senta de verdade fica com os olhos ~1,2m acima, na
           altura da lousa; quem fica de pé vê por cima da mesa. Hospital: de
           pé atrás da sua mesa de instrumentos. */}
-      <XROrigin position={escola ? [0.28, FLOOR_Y, 0.99] : [0, FLOOR_Y, 2.55]} />
+      <XROrigin position={escola ? [0.28, FLOOR_Y, 0.99] : [0, FLOOR_Y, 2.55]}>
+        <SairDoVR position={[-0.45, escola ? 0.95 : 1.25, -0.5]} />
+      </XROrigin>
 
       <ambientLight intensity={0.85} />
       <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />

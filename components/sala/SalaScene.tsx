@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useXR, XROrigin } from "@react-three/xr";
+import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
 import { SalaInterativos } from "./SalaInterativos";
 
@@ -223,7 +224,9 @@ export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
   return (
     <>
       {/* Sentado à mesa: origem um pouco atrás da cadeira. */}
-      <XROrigin position={[0, 0, -0.55]} />
+      <XROrigin position={[0, 0, -0.55]}>
+        <SairDoVR position={[-0.45, 0.95, -0.5]} />
+      </XROrigin>
 
       {/* Luz: quente da luminária + fria fraca da janela + ambiente baixa. */}
       <ambientLight intensity={0.45} color="#f5ead8" />

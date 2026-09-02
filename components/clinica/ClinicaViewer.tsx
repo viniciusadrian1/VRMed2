@@ -12,6 +12,7 @@ import {
 import { Canvas, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { XR, XROrigin, useXR } from "@react-three/xr";
+import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import {
@@ -171,7 +172,9 @@ function CenaClinica({
 
   return (
     <>
-      <XROrigin position={[0, FLOOR_Y, 2.4]} />
+      <XROrigin position={[0, FLOOR_Y, 2.4]}>
+        <SairDoVR position={[-0.45, 1.25, -0.5]} />
+      </XROrigin>
 
       {/* Uma luz direcional + ambiente por mapa: luz ambiente dupla achatava
           o relevo (Meta: 1 luz com PBR é o orçamento do Quest 2). */}

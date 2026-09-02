@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin, createXRStore } from "@react-three/xr";
+import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ArenaGame } from "./ArenaGame";
@@ -238,7 +239,9 @@ export function ArenaScene() {
       >
         <XR store={store}>
           {/* Jogador de pé, a 2,6 m do modelo. */}
-          <XROrigin position={[0, FLOOR_Y, 2.6]} />
+          <XROrigin position={[0, FLOOR_Y, 2.6]}>
+        <SairDoVR position={[-0.45, 1.25, -0.5]} />
+      </XROrigin>
 
           <ambientLight intensity={0.85} />
           {/* Luz principal levemente quente + contraluz fria: dá volume ao
