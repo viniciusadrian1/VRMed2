@@ -150,10 +150,12 @@ do que separa o modelo cardíaco da realidade e o plano em três passos (malha +
 licença; câmaras com `heartchambers_highres`; camada de volume). Correção de fato: a tarefa
 `heartchambers_highres` roda na resolução nativa do exame (sem `resample` na config), não a 1,5 mm.
 
-- **3a — malha** (`clinica/malha.py`, a partir de `tc-para-vrmed.py`): maior componente conexo
-  + `binary_fill_holes` ANTES do marching cubes; sigma mínimo de 1 voxel em z; `.stl` (1 linha);
-  volume/bbox no relatório (já em `metricas.py`); orçamento continua ≤150k tris **por paciente**
-  (o "~100k por estrutura" do plano estoura o Quest 2).
+- **3a — malha** (`clinica/malha.py`): **feita em 2026-09-02** — ilhas < 30 mm³ + `binary_fill_holes`
+  na máscara, σ = max(0,6 mm, 0,5·voxel), pad/tampa no limite do exame, nível 0,5 (afastamento de
+  0,15 mm só em câmaras/miocárdio), vasos dilatados 1 voxel para dentro do coração, cor pelo HU
+  (sangue/músculo/envelope/pulmão) com sRGB linearizado e oclusão pela ocupação, relatório com
+  perda de volume e `toca_borda`, orçamento ≤150k respeitado (pisos primeiro, resto proporcional).
+  Faltam: `.stl`, normais guiadas pelo gradiente do HU, esqueleto/pericárdio como contexto opcional.
 - **3b — volume** (`clinica/volume.py`): recorte HU pelo bbox das máscaras (+ margem), ≤384³,
   export para textura 3D; presets de função de transferência (cardíaco com contraste, tórax sem
   contraste, abdome). Decidir antes: retenção do volume HU derivado (LGPD — ok com dados

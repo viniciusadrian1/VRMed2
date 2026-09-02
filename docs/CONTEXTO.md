@@ -39,8 +39,18 @@ educacional — não substitui laudo" (nunca "diagnóstico/assistência", territ
   direito saiu escuro (aviso "normais invertidas" — `fix_normals(multibody)` não corrige todos
   os corpos; item da etapa 3a). Câmaras cardíacas exigem licença acadêmica gratuita do
   TotalSegmentator (`totalseg_set_license`) — ainda não configurada.
-- `scripts/tc-para-vrmed.py` — TC (DICOM/NIfTI) → GLB nomeado (importa presets/cores/segmentação
-  de `scripts/clinica/`; preset novo `cardiaco`). Flags:
+- **2026-09-02 — etapa 3a + viewer (resposta à crítica "parece massinha"):** `scripts/clinica/malha.py`
+  (σ proporcional ao spacing, pad/tampa no limite do exame, nível 0,5 com afastamento só nas
+  câmaras, ilhas < 30 mm³ e buracos tratados na máscara, vasos encostados no coração, cor por HU
+  em duas profundidades com sRGB linearizado, oclusão pela ocupação da vizinhança);
+  `tc-para-vrmed.py` virou CLI fino com `--camaras`, `--sem-pulmoes` e orçamento que respeita o
+  teto de 150k. Viewer: RoomEnvironment local + NeutralToneMapping + 1 luz, envelope translúcido
+  do coração com toggle, corte por plano (axial/coronal/sagital) e **vista inicial de frente**
+  (o pipeline exporta a frente em −Z; o modelo gira 180° no viewer — antes a primeira vista era
+  das costas, em todos os casos). Caso `cta-cardio` republicado com câmaras (149.674 tris).
+  Diagnóstico completo com fontes: `docs/CLINICA-FIDELIDADE.md`.
+- `scripts/tc-para-vrmed.py` — máscaras → GLB nomeado (etapa 3a; importa `scripts/clinica/malha.py`,
+  presets/cores/segmentação do pacote; preset `cardiaco`). Flags:
   `--pulmoes-inteiros` (une lobos → pulmão esq/dir sem linhas de fissura) e
   `--cores-tc exame.nii.gz` (cor por vértice pela densidade HU real + oclusão de cavidade —
   a "textura" vem do próprio exame). Depois SEMPRE `npx gltf-transform draco` (nunca --simplify).

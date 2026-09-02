@@ -192,6 +192,18 @@ const LABEL_MAP: Record<string, string> = {
   "brachiocephalic trunk": "Tronco braquiocefálico",
   "superior vena cava": "Veia cava superior",
   "atrial appendage left": "Aurícula esquerda",
+  "heart ventricle left": "Ventrículo esquerdo",
+  "heart ventricle right": "Ventrículo direito",
+  "heart atrium left": "Átrio esquerdo",
+  "heart atrium right": "Átrio direito",
+  "heart myocardium": "Miocárdio (ventrículo esquerdo)",
+  "pulmonary artery": "Artéria pulmonar",
+  "subclavian artery left": "Artéria subclávia esquerda",
+  "subclavian artery right": "Artéria subclávia direita",
+  "common carotid artery left": "Artéria carótida comum esquerda",
+  "common carotid artery right": "Artéria carótida comum direita",
+  "brachiocephalic vein left": "Veia braquiocefálica esquerda",
+  "brachiocephalic vein right": "Veia braquiocefálica direita",
 };
 
 /** Termos que indicam estruturas externas (pele/gordura). */

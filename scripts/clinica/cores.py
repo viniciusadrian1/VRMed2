@@ -20,12 +20,15 @@ CORES: list[tuple[str, tuple[float, float, float]]] = [
     ("heart_atrium_right", (0.55, 0.40, 0.72)),
     ("heart_ventricle_right", (0.40, 0.35, 0.68)),
     ("heart", (0.72, 0.25, 0.22)),
-    ("atrial_appendage", (0.85, 0.35, 0.30)),
+    ("atrial_appendage", (0.90, 0.45, 0.40)),  # = átrio esquerdo
     ("aorta", (0.80, 0.20, 0.20)),
-    ("pulmonary_vein", (0.45, 0.35, 0.70)),
+    ("pulmonary_vein", (0.85, 0.25, 0.25)),  # sangue oxigenado é vermelho nos atlas
     ("pulmonary_artery", (0.35, 0.40, 0.75)),
     ("pulmonary", (0.55, 0.30, 0.55)),
-    ("brachiocephalic", (0.75, 0.45, 0.30)),
+    ("brachiocephalic_vein", (0.30, 0.40, 0.70)),
+    ("brachiocephalic", (0.80, 0.20, 0.20)),  # ramos do arco = tom da aorta
+    ("subclavian", (0.80, 0.20, 0.20)),
+    ("common_carotid", (0.80, 0.20, 0.20)),
     ("superior_vena_cava", (0.30, 0.40, 0.70)),
     ("trachea", (0.85, 0.83, 0.75)),
     ("esophagus", (0.76, 0.60, 0.48)),

@@ -7,16 +7,19 @@ import {
   useMemo,
   useRef,
   useState,
+  type RefObject,
 } from "react";
-import { Canvas, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
-import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
+import { XR, XROrigin, useXR } from "@react-three/xr";
 import * as THREE from "three";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import {
   identifyStructure,
   normalizeContent,
   prepareModel,
 } from "@/lib/model-utils";
+import { obterXRStore } from "@/lib/xr-store";
 import { XRManipulation } from "@/components/viewer/XRManipulation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
@@ -26,13 +29,49 @@ import type { CasoClinico } from "./ClinicaApp";
 
 const FLOOR_Y = -1.3;
 
-/** Modelo do paciente: carrega, prepara e responde ao clique. */
+/**
+ * Planos de corte em coordenadas de MUNDO. O pipeline exporta o paciente com
+ * a frente em −Z e a direita em +X (RAS); o ModeloPaciente gira 180° em Y para
+ * a vista inicial ser de frente, como um atlas: no mundo a frente fica em +Z
+ * e a direita do paciente em −X (à esquerda de quem olha). O three.js
+ * descarta o lado negativo do plano, então cada normal aponta para o que FICA.
+ */
+const CORTES = {
+  axial: { normal: [0, -1, 0] as const, rotulo: "Axial" }, // tira o que está acima
+  coronal: { normal: [0, 0, -1] as const, rotulo: "Coronal" }, // tira a frente (+Z)
+  sagital: { normal: [-1, 0, 0] as const, rotulo: "Sagital" }, // tira o lado direito (−X)
+} as const;
+type Corte = keyof typeof CORTES | "nenhum";
+// normalizeContent deixa o modelo em ±1 e o pivô escala 1,4 → cabe em ±1,5.
+const ALCANCE = 1.5;
+
+/** Mapa de ambiente local (sem CDN): brilho úmido e sombra suave nos órgãos.
+ *  Declarativo (attach) porque o React Compiler proíbe mutar `scene`. */
+function AmbienteLuz() {
+  const gl = useThree((state) => state.gl);
+  const ambiente = useMemo(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const textura = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+    return textura;
+  }, [gl]);
+  useEffect(() => () => ambiente.dispose(), [ambiente]);
+  return <primitive object={ambiente} attach="environment" />;
+}
+
+/** Modelo do paciente: carrega, prepara materiais, corte e envelope. */
 function ModeloPaciente({
   glb,
+  plano,
+  mostrarEnvelope,
   onIdentify,
+  onCarregado,
 }: {
   glb: string;
+  plano: RefObject<THREE.Plane>;
+  mostrarEnvelope: boolean;
   onIdentify: (label: string) => void;
+  onCarregado: (info: { temCamaras: boolean }) => void;
 }) {
   const gltf = useGLTF(glb, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
@@ -43,22 +82,45 @@ function ModeloPaciente({
     const group = content.current;
     if (!group) return;
     normalizeContent(group);
-    // prepareModel clona os materiais — obrigatório para não contaminar o
-    // cache do useGLTF (compartilhado com o resto do app) — e marca cada
-    // malha com sua camada. O retorno (lista de camadas) fica para a fase 2.
+    // prepareModel clona os materiais (não contamina o cache do useGLTF) e
+    // marca cada malha com sua camada.
     prepareModel(group, "mesh");
-    // Órgão vivo é úmido: especular baixo-rugoso por cima das cores por
-    // vértice (densidade da TC) tira o aspecto de plástico fosco.
+    let temCamaras = false;
     group.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        const mat = obj.material as THREE.MeshStandardMaterial;
-        if ("roughness" in mat) {
-          mat.roughness = 0.34;
-          mat.metalness = 0.02;
-        }
-      }
+      if (obj.name.startsWith("heart_")) temCamaras = true;
     });
-  }, [scene]);
+    group.traverse((obj) => {
+      if (!(obj instanceof THREE.Mesh)) return;
+      const mat = obj.material as THREE.MeshStandardMaterial;
+      if (!("roughness" in mat)) return;
+      // Com câmaras no GLB, o rótulo `heart` é o envelope epicárdico: fica
+      // translúcido por cima das câmaras (e pode ser escondido).
+      const envelope = temCamaras && obj.name === "heart";
+      obj.userData.envelope = envelope;
+      // Órgão vivo é úmido, não plástico: rugosidade média + mapa de ambiente.
+      mat.roughness = 0.5;
+      mat.metalness = 0;
+      mat.envMapIntensity = 0.7;
+      // Corte: a parede interna precisa aparecer (DoubleSide), menos no
+      // envelope translúcido, onde as duas faces se somam e turvam a vista.
+      mat.side = envelope ? THREE.FrontSide : THREE.DoubleSide;
+      mat.clippingPlanes = [plano.current];
+      if (envelope) {
+        mat.transparent = true;
+        mat.opacity = 0.22;
+        mat.depthWrite = false;
+        obj.renderOrder = 2;
+      }
+      mat.needsUpdate = true;
+    });
+    onCarregado({ temCamaras });
+  }, [scene, plano, onCarregado]);
+
+  useEffect(() => {
+    content.current?.traverse((obj) => {
+      if (obj.userData.envelope) obj.visible = mostrarEnvelope;
+    });
+  }, [mostrarEnvelope, scene]);
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
@@ -66,7 +128,9 @@ function ModeloPaciente({
   };
 
   return (
-    <group ref={pivot} scale={1.4}>
+    // Meia-volta: o pipeline exporta a frente do paciente em −Z; a câmera e
+    // o XROrigin ficam em +Z, então sem isto a primeira vista era das costas.
+    <group ref={pivot} scale={1.4} rotation={[0, Math.PI, 0]}>
       <group ref={content} onClick={handleClick}>
         <primitive object={scene} />
       </group>
@@ -80,13 +144,19 @@ function CenaClinica({
   glb,
   mapaGlb,
   achados,
+  plano,
+  mostrarEnvelope,
   onIdentify,
+  onCarregado,
   labelVR,
 }: {
   glb: string;
   mapaGlb: string | null;
   achados: AchadosPulmao | null;
+  plano: RefObject<THREE.Plane>;
+  mostrarEnvelope: boolean;
   onIdentify: (label: string) => void;
+  onCarregado: (info: { temCamaras: boolean }) => void;
   labelVR: string | null;
 }) {
   const inSession = useXR((state) => Boolean(state.session));
@@ -95,10 +165,11 @@ function CenaClinica({
     <>
       <XROrigin position={[0, FLOOR_Y, 2.4]} />
 
-      <ambientLight intensity={0.85} />
-      <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />
-      <directionalLight position={[-5, 3, -4]} intensity={0.7} color="#9fc3dd" />
-      <hemisphereLight args={["#dfe9f2", "#141a22", 1]} />
+      {/* Uma luz direcional + ambiente por mapa: luz ambiente dupla achatava
+          o relevo (Meta: 1 luz com PBR é o orçamento do Quest 2). */}
+      <AmbienteLuz />
+      <directionalLight position={[4, 6, 4]} intensity={2.2} color="#ffeedd" />
+      <hemisphereLight args={["#dfe9f2", "#141a22", 0.25]} />
 
       {/* Palco: chão + anel, referência espacial (mesma linguagem da Arena). */}
       <mesh position={[0, FLOOR_Y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -135,7 +206,13 @@ function CenaClinica({
               onIdentify={onIdentify}
             />
           ) : (
-            <ModeloPaciente glb={glb} onIdentify={onIdentify} />
+            <ModeloPaciente
+              glb={glb}
+              plano={plano}
+              mostrarEnvelope={mostrarEnvelope}
+              onIdentify={onIdentify}
+              onCarregado={onCarregado}
+            />
           )}
         </Suspense>
       </ErrorBoundary>
@@ -171,6 +248,29 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
   // "malha" = superfície medida na TC (padrão); "mapa" = achados sobre o
   // modelo ilustrativo (alternativa, enquanto não há modelo de artista melhor).
   const [modo, setModo] = useState<"mapa" | "malha">("malha");
+  const [corte, setCorte] = useState<Corte>("nenhum");
+  const [posicao, setPosicao] = useState(0.5);
+  const [temCamaras, setTemCamaras] = useState(false);
+  const [mostrarEnvelope, setMostrarEnvelope] = useState(true);
+
+  // Um plano só, compartilhado pelos materiais (ref: o React Compiler proíbe
+  // mutar valores de useMemo); os estados o reposicionam no efeito.
+  const plano = useRef(new THREE.Plane(new THREE.Vector3(0, -1, 0), 100));
+  useEffect(() => {
+    const p = plano.current;
+    if (corte === "nenhum") {
+      p.constant = 100; // fora do modelo: nada é cortado
+      return;
+    }
+    const [x, y, z] = CORTES[corte].normal;
+    p.normal.set(x, y, z);
+    // posicao 0 = plano na borda (sem corte) … 1 = atravessou o modelo inteiro
+    p.constant = ALCANCE - posicao * 2 * ALCANCE;
+  }, [corte, posicao]);
+
+  const aoCarregar = useCallback((info: { temCamaras: boolean }) => {
+    setTemCamaras(info.temCamaras);
+  }, []);
 
   useEffect(() => {
     if (!caso.achados || !caso.mapaGlb) return;
@@ -186,30 +286,9 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
     return () => {
       cancelado = true;
     };
-  }, [caso.achados]);
+  }, [caso.achados, caso.mapaGlb]);
 
-  const store = useMemo(
-    () =>
-      createXRStore({
-        // Mesmo endurecimento da Arena (lições dos testes no Quest 2):
-        // perfis locais em URL absoluta, só o ponteiro de raio, recursos de
-        // realidade mista desligados e taxa de quadros intocada.
-        baseAssetPath:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/webxr-profiles/`
-            : "https://localhost/webxr-profiles/",
-        controller: { grabPointer: false, teleportPointer: false },
-        hand: { model: false, grabPointer: false, touchPointer: false },
-        anchors: false,
-        meshDetection: false,
-        planeDetection: false,
-        hitTest: false,
-        depthSensing: false,
-        frameRate: false,
-        foveation: 0.5,
-      }),
-    [],
-  );
+  const store = obterXRStore();
 
   useEffect(
     () => store.subscribe((state) => setInSession(Boolean(state.session))),
@@ -227,7 +306,6 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
 
   return (
     <>
-      {/* Barra de identificação (DOM, fora do VR) */}
       {/* Resumo dos achados medidos (só no modo mapa) */}
       {!inSession && modo === "mapa" && achados && (
         <div className="absolute right-4 top-16 z-10 w-64 rounded-xl border border-white/10 bg-black/60 p-4 text-white backdrop-blur">
@@ -250,6 +328,55 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
             Textura gerada a partir das medidas da TC sobre um modelo
             ilustrativo — a posição das manchas é aproximada. Clique numa
             mancha escura para detalhes.
+          </p>
+        </div>
+      )}
+
+      {/* Corte por plano + envelope (só na reconstrução real, fora do VR) */}
+      {!inSession && modo === "malha" && (
+        <div className="absolute right-4 top-16 z-10 w-60 rounded-xl border border-white/10 bg-black/60 p-3 text-white backdrop-blur">
+          <p className="text-xs font-semibold">Corte</p>
+          <div className="mt-2 grid grid-cols-4 gap-1 text-[11px]">
+            {(["nenhum", "axial", "coronal", "sagital"] as const).map((valor) => (
+              <button
+                key={valor}
+                type="button"
+                onClick={() => setCorte(valor)}
+                className={
+                  corte === valor
+                    ? "rounded-md bg-[#5896c8] px-1 py-1 text-[#0b1220]"
+                    : "rounded-md border border-white/15 px-1 py-1 text-white/70 hover:text-white"
+                }
+              >
+                {valor === "nenhum" ? "Sem" : CORTES[valor].rotulo}
+              </button>
+            ))}
+          </div>
+          {corte !== "nenhum" && (
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={posicao}
+              onChange={(event) => setPosicao(Number(event.target.value))}
+              aria-label="Posição do corte"
+              className="mt-3 w-full accent-[#5896c8]"
+            />
+          )}
+          {temCamaras && (
+            <button
+              type="button"
+              onClick={() => setMostrarEnvelope((v) => !v)}
+              className="mt-3 w-full rounded-md border border-white/15 px-2 py-1 text-[11px] text-white/80 hover:text-white"
+            >
+              Envelope do coração: {mostrarEnvelope ? "visível" : "oculto"}
+            </button>
+          )}
+          <p className="mt-2 text-[10px] leading-snug text-white/50">
+            {temCamaras
+              ? "Câmaras e artéria pulmonar são malhas próprias; o miocárdio rotulado é só o do ventrículo esquerdo."
+              : "Superfície medida na TC; detalhes menores que 3 mm não são representados."}
           </p>
         </div>
       )}
@@ -315,7 +442,15 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
         dpr={1}
         frameloop="always"
         camera={{ position: [0, 0.4, 3.0], fov: 50 }}
-        gl={{ antialias: true, alpha: false }}
+        // NeutralToneMapping preserva o matiz do vermelho (ACES dessatura);
+        // localClippingEnabled liga os planos de corte por material.
+        gl={{
+          antialias: true,
+          alpha: false,
+          toneMapping: THREE.NeutralToneMapping,
+          localClippingEnabled: true,
+        }}
+        scene={{ environmentIntensity: 0.7 }}
         onCreated={({ gl }) => gl.setClearColor("#101820")}
       >
         <XR store={store}>
@@ -323,7 +458,10 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
             glb={caso.glb}
             mapaGlb={caso.mapaGlb ?? null}
             achados={modo === "mapa" ? achados : null}
+            plano={plano}
+            mostrarEnvelope={mostrarEnvelope}
             onIdentify={setLabel}
+            onCarregado={aoCarregar}
             labelVR={label}
           />
         </XR>

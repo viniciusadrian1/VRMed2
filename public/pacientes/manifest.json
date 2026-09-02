@@ -1,10 +1,10 @@
 [
   {
     "slug": "cta-cardio",
-    "titulo": "Coração e grandes vasos (angio-TC 1,25mm)",
-    "descricao": "Angiotomografia cardíaca com contraste: coração inteiro, aorta, cavas, veias pulmonares e aurícula esquerda segmentados pelo TotalSegmentator, com pulmões, traqueia e esôfago como contexto. Reconstrução experimental: câmaras cardíacas e a limpeza de malha (etapa 3a) ainda não entraram.",
+    "titulo": "Coração com câmaras (angio-TC 1,25mm)",
+    "descricao": "Angiotomografia cardíaca com contraste: átrios, ventrículos, miocárdio do ventrículo esquerdo e artéria pulmonar como malhas próprias (TotalSegmentator, tarefa de câmaras sob licença acadêmica), dentro do envelope translúcido do coração; aorta com os ramos do arco, cavas, veias pulmonares, traqueia e esôfago. Cor tirada da densidade real do exame. Use o corte por plano para ver as cavidades. Reconstrução experimental, sem validação Dice/HD95.",
     "glb": "/pacientes/cta-cardio.glb",
-    "dataProcessamento": "2026-09-01",
+    "dataProcessamento": "2026-09-02",
     "fonteDados": "3D Slicer Sample Data (CTACardio) — exame público e anonimizado, uso irrestrito declarado pelos mantenedores"
   },
   {

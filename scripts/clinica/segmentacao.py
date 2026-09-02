@@ -39,6 +39,12 @@ PRESETS: dict[str, list[str] | None] = {
         "aorta",
         "pulmonary_vein",
         "brachiocephalic_trunk",
+        "subclavian_artery_left",
+        "subclavian_artery_right",
+        "common_carotid_artery_left",
+        "common_carotid_artery_right",
+        "brachiocephalic_vein_left",
+        "brachiocephalic_vein_right",
         "superior_vena_cava",
         "inferior_vena_cava",
         "lung_upper_lobe_left",
@@ -114,12 +120,18 @@ def rodar_segmentacao(
         task=task,
         roi_subset=estruturas,
         fast=fast,
+        # Reamostragem de 1,5 mm → nativo com ordem alta (o padrão é vizinho
+        # mais próximo: 38 de 123 fatias saíam repetidas) e recorte robusto.
+        higher_order_resampling_LEGACY=True,
+        robust_crop=True,
         quiet=False,
     )
     info = {
         "tarefa": task,
         "estruturas": estruturas,
         "fast": fast,
+        "higher_order_resampling_LEGACY": True,
+        "robust_crop": True,
         "tempo_s": round(time.time() - inicio, 1),
         # O pacote não expõe __version__; a metadata da distribuição sim.
         "totalsegmentator_versao": version("TotalSegmentator"),
