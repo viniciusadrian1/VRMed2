@@ -93,6 +93,20 @@ ingestão 4 s · TotalSegmentator 63 s · métricas + QA ~85 s · total 153 s.
 | trachea / esophagus | 47,0 / 25,5 | 1 / 1 | |
 
 Fonte: `.clinica-dados/cta-cardio/relatorio.json`; imagens em `.clinica-dados/cta-cardio/qa/`.
+
+**Câmaras (2026-09-02, `heartchambers_highres` com licença):** 82 s na RTX 4060 Ti, resolução
+nativa (0,93×0,93×1,25 mm), sete máscaras, todas com um componente só; 95 % das câmaras +
+miocárdio caem dentro do rótulo `heart` da tarefa `total`, que por sua vez é 89 % coberto por
+elas (o resto é parede do VD/átrios e gordura). QA em `qa/heartchambers_highres/`.
+
+| estrutura | volume (mL) | observação |
+|---|---:|---|
+| heart_ventricle_left / right | 94,7 / 123,9 | cavidades (sangue) |
+| heart_atrium_left / right | 37,3 / 88,0 | AE sem a confluência das veias pulmonares |
+| heart_myocardium | 123,7 | só o miocárdio do VE (limite da tarefa) |
+| pulmonary_artery | 45,8 | tronco + ramos proximais, ausente na tarefa `total` |
+| aorta | 99,0 | só o trecho dentro do recorte do coração; manter a aorta da `total` |
+
 O código passou por revisão adversarial (3 revisores + 2 verificadores por achado; 14 defeitos
 confirmados e corrigidos no mesmo dia — validação de HU sensível ao FOV, bbox por centro de
 voxel, LPS misturado com RAS no relatório, licença hardcoded, UID da série no relatório, cores
@@ -113,6 +127,21 @@ mantenedores" (mesmo padrão do CTChest já publicado).
 Registrar a licença em `docs/` (uso não comercial, compatível com a IC). Volume de câmara e
 espessura de parede só aparecem como **"medida automática — visualização educacional, não
 substitui laudo"**, com selo "experimental" enquanto não houver Dice/HD95 (§5 do PROMPT).
+
+**Licença configurada em 2026-09-02** (licenciado: Vinícius, e-mail institucional), com as
+quatro cláusulas aceitas: uso acadêmico não comercial; uso interno; sem aprovação regulatória
+para diagnóstico; sem garantia. Regras derivadas:
+
+- A chave (`aca_…`) fica só em `C:\Users\vinic\.totalsegmentator\config.json` deste PC. Nunca
+  no git, no `.env`, em prints ou no chat.
+- Os pesos das tarefas licenciadas (`heartchambers_highres`, `coronary_arteries`, Dataset301/509)
+  não são copiados para o Mac nem para máquinas de outros membros; quem precisar rodar pede a
+  própria licença (gratuita).
+- Máscaras e GLBs gerados são resultado do projeto e podem ir para o site com a atribuição ao
+  TotalSegmentator; o **software** não.
+- Fase 3: antes de expor a tarefa licenciada num worker que processa exames enviados por
+  terceiros, perguntar ao autor (contato no próprio pacote) — pode contar como "disponibilizar a
+  terceiros". A tarefa `total` não tem essa restrição.
 
 ## 5. Próximas etapas
 
