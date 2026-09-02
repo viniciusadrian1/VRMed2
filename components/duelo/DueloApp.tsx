@@ -5,7 +5,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
-import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
+import { XR, XROrigin, useXR } from "@react-three/xr";
+import { obterXRStore } from "@/lib/xr-store";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -99,7 +100,7 @@ function CenaDuelo({ ambiente }: { ambiente: Ambiente }) {
           makeDefault
           enableDamping
           dampingFactor={0.08}
-          target={escola ? [0.36, -0.2, -1.06] : [0, 0.9, -0.5]}
+          target={escola ? [0.36, -0.2, -1.06] : [0.35, 0.1, -0.5]}
           minDistance={escola ? 0.8 : 1.5}
           maxDistance={9}
           maxPolarAngle={Math.PI * 0.55}
@@ -116,26 +117,7 @@ export function DueloApp() {
   const [xrError, setXrError] = useState<string | null>(null);
   const [ambiente, setAmbiente] = useState<Ambiente>("escola");
 
-  const store = useMemo(
-    () =>
-      createXRStore({
-        // Mesmo endurecimento da Arena (lições do Quest 2).
-        baseAssetPath:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/webxr-profiles/`
-            : "https://localhost/webxr-profiles/",
-        controller: { grabPointer: false, teleportPointer: false },
-        hand: { model: false, grabPointer: false, touchPointer: false },
-        anchors: false,
-        meshDetection: false,
-        planeDetection: false,
-        hitTest: false,
-        depthSensing: false,
-        frameRate: false,
-        foveation: 0.5,
-      }),
-    [],
-  );
+  const store = obterXRStore();
 
   useEffect(
     () => store.subscribe((state) => setInSession(Boolean(state.session))),
@@ -211,7 +193,9 @@ export function DueloApp() {
         dpr={1}
         frameloop="always"
         camera={{
-          position: ambiente === "escola" ? [0.28, -0.05, 1.0] : [0, 1.5, 4.3],
+          // Ambas no ponto de vista do VR (sentado na escola, de pé no
+          // hospital): o desktop não pode esconder o que o headset vê.
+          position: ambiente === "escola" ? [0.28, -0.05, 1.0] : [0, 0.3, 2.55],
           fov: 50,
         }}
         gl={{ antialias: true, alpha: false }}

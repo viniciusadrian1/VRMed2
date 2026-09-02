@@ -10,6 +10,7 @@ import {
   normalizeContent,
   prepareModel,
 } from "@/lib/model-utils";
+import type { StructurePoint } from "@/types";
 import { ORGANS } from "@/lib/organs";
 import { playEnd, playHit, playMiss, playStart, playTick } from "@/lib/arena-audio";
 import { Oponente, type HumorOponente } from "./Oponente";
@@ -43,9 +44,14 @@ const TEMPO_RODADA = 18;
 export type Dificuldade = "iniciante" | "residente" | "especialista";
 export type Ambiente = "escola" | "hospital";
 
-// Layout do HOSPITAL: pergunta em painel flutuante à esquerda (referência do
-// grupo), cronômetro no telão LED, órgão no centro entre as mesas.
-const HOSP_PAINEL: [number, number, number] = [-1.75, 1.35, 0.75];
+// Layout do HOSPITAL em coordenadas de mundo (piso em -1.3; jogador de pé no
+// XROrigin [0,-1.3,2.55], olhos ≈ +0.3, olhando para -z). Toda a UI vive num
+// painel só, 14° à direita e na altura dos olhos; órgão ~18° à esquerda; bot
+// entre os dois, ao lado da mesa dele (não pode ficar atrás do painel). O layout antigo foi desenhado para a câmera
+// de desktop vista de cima: a pergunta ficava a 3m do chão e 44° à esquerda —
+// no Quest ela "não aparecia".
+const HOSP_UI: [number, number, number] = [0.75, 0.15, -0.55];
+const HOSP_ROT: [number, number, number] = [0, -0.25, 0];
 const HOSP_LED: [number, number, number] = [0, 1.27, -3.13];
 
 const BOTS: Record<
@@ -67,6 +73,18 @@ interface Rodada {
   opcoes: string[];
   /** Só para tipo "orgao": caminho do GLB. */
   modelo?: string;
+  /** Só para tipo "estrutura": marcador no espaço local do spinner. */
+  marcador?: [number, number, number];
+}
+
+/** Sorteia quando e se o bot acerta a rodada (fora do componente: o lint de
+ *  pureza do React não aceita Math.random no escopo de render). */
+function planejarBot(bot: (typeof BOTS)[Dificuldade]) {
+  return {
+    em: bot.atrasoMin + Math.random() * (bot.atrasoMax - bot.atrasoMin),
+    acerta: Math.random() < bot.acerto,
+    respondeu: false,
+  };
 }
 
 function embaralhar<T>(lista: T[]): T[] {
@@ -78,9 +96,10 @@ function embaralhar<T>(lista: T[]): T[] {
   return r;
 }
 
-function montarRodadas(estruturas: string[]): Rodada[] {
+function montarRodadas(estruturas: StructurePoint[]): Rodada[] {
   const orgaos = embaralhar(ORGAOS_DUELO).slice(0, TOTAL_RODADAS / 2);
   const nomesOrgaos = ORGANS.map((o) => o.name);
+  const nomesEstruturas = estruturas.map((p) => p.label);
   const alvosEstrutura = embaralhar(estruturas).slice(0, TOTAL_RODADAS / 2);
 
   const rodadasOrgao: Rodada[] = orgaos.map((organ) => ({
@@ -93,13 +112,14 @@ function montarRodadas(estruturas: string[]): Rodada[] {
       ...embaralhar(nomesOrgaos.filter((n) => n !== organ.name)).slice(0, 3),
     ]),
   }));
-  const rodadasEstrutura: Rodada[] = alvosEstrutura.map((alvo) => ({
+  const rodadasEstrutura: Rodada[] = alvosEstrutura.map((ponto) => ({
     tipo: "estrutura",
     pontos: 200,
-    alvo,
+    alvo: ponto.label,
+    marcador: ponto.position,
     opcoes: embaralhar([
-      alvo,
-      ...embaralhar(estruturas.filter((e) => e !== alvo)).slice(0, 3),
+      ponto.label,
+      ...embaralhar(nomesEstruturas.filter((e) => e !== ponto.label)).slice(0, 3),
     ]),
   }));
 
@@ -178,7 +198,6 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
   const spinner = useRef<THREE.Group>(null);
   const content = useRef<THREE.Group>(null);
   const marcador = useRef<THREE.Mesh>(null);
-  const [posMarcador, setPosMarcador] = useState<[number, number, number] | null>(null);
 
   // Normalização calculada no espaço PRÓPRIO do clone, ainda solto da cena
   // (useMemo roda antes de montar). O normalizeContent media em coordenadas
@@ -215,24 +234,11 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
     g.traverse((obj) => {
       if (obj instanceof THREE.Mesh) obj.raycast = () => null;
     });
-    if (rodada.tipo === "estrutura" && spinner.current) {
-      // Posições vêm em coordenadas de mundo com os grupos ainda sem rotação.
-      // O marcador vive no SPINNER (fora do content): dentro do content ele
-      // contaminava a medição da rodada seguinte — o normalizeContent media
-      // "órgão novo + marcador velho" e o órgão saía minúsculo/deslocado
-      // (era o cérebro invisível e o coração miniatura do teste do grupo).
-      const ponto = detectStructures(g).find((p) => p.label === rodada.alvo);
-      if (ponto) {
-        const local = spinner.current.worldToLocal(
-          new THREE.Vector3(...ponto.position),
-        );
-        setPosMarcador([local.x, local.y, local.z]);
-      } else {
-        setPosMarcador(null);
-      }
-    } else {
-      setPosMarcador(null);
-    }
+    // O marcador vive no SPINNER (fora do content) com posição pré-calculada
+    // no clone normalizado da laringe (montarRodadas). Calculá-lo aqui, com o
+    // grupo-pai deslocado, puxava o ponto para a origem do MUNDO: o
+    // detectStructures escolhe o vértice mais distante da origem e o afasta
+    // 3% dela — na sala, o marcador caía sobre a cartilagem vizinha.
   }, [scene, rodada]);
 
   useFrame((state, delta) => {
@@ -249,9 +255,9 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
         <group ref={content} position={ajuste.pos} scale={ajuste.escala}>
           <primitive object={scene} />
         </group>
-        {posMarcador && (
-          <mesh ref={marcador} position={posMarcador} raycast={() => null}>
-            <sphereGeometry args={[0.055, 16, 12]} />
+        {rodada.marcador && (
+          <mesh ref={marcador} position={rodada.marcador} raycast={() => null}>
+            <sphereGeometry args={[0.09, 16, 12]} />
             <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
           </mesh>
         )}
@@ -265,15 +271,23 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   // A laringe carrega já no menu (Suspense) — as rodadas de 200 pts saem
   // das estruturas nomeadas reais dela.
   const laringe = useGLTF(LARINGE, "/draco/");
+  // Pontos medidos no clone normalizado e solto da cena — mesma normalização
+  // do ModeloRodada, então a posição já é a do espaço local do spinner.
   const estruturas = useMemo(() => {
     const clone = laringe.scene.clone(true);
     normalizeContent(clone);
-    return detectStructures(clone)
-      .map((p) => p.label)
-      .filter((nome) => nome.length <= 34);
+    return detectStructures(clone).filter((p) => p.label.length <= 34);
   }, [laringe.scene]);
 
-  const [fase, setFase] = useState<Fase>("menu");
+  const [fase, setFaseState] = useState<Fase>("menu");
+  // Espelho síncrono da fase: o useFrame pode rodar entre o setState e o
+  // commit (o React cede tempo no re-layout do troika) e ler a fase velha —
+  // a contagem disparava um tick fantasma e voltava a "3" já na rodada.
+  const faseRef = useRef<Fase>("menu");
+  const setFase = (nova: Fase) => {
+    faseRef.current = nova;
+    setFaseState(nova);
+  };
   const [dificuldade, setDificuldade] = useState<Dificuldade>("residente");
   const [rodadas, setRodadas] = useState<Rodada[]>([]);
   const [indice, setIndice] = useState(0);
@@ -313,12 +327,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     rodadaEncerrada.current = false;
     setTempoRestante(TEMPO_RODADA);
     setErroJogador(false);
-    const bot = BOTS[dificuldade];
-    botPlano.current = {
-      em: bot.atrasoMin + Math.random() * (bot.atrasoMax - bot.atrasoMin),
-      acerta: Math.random() < bot.acerto,
-      respondeu: false,
-    };
+    botPlano.current = planejarBot(BOTS[dificuldade]);
     setFase("rodada");
   };
 
@@ -331,7 +340,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   };
 
   const responder = (opcao: string) => {
-    if (fase !== "rodada" || rodadaEncerrada.current) return;
+    if (faseRef.current !== "rodada" || rodadaEncerrada.current) return;
     if (relogio.current < travadoAte.current) return;
     if (opcao === rodada.alvo) {
       playHit();
@@ -348,8 +357,9 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   // useFrame, empurrando para o React só quando um valor visível muda.
   useFrame((_, delta) => {
     relogio.current += delta;
+    const faseAgora = faseRef.current;
 
-    if (fase === "contagem") {
+    if (faseAgora === "contagem") {
       const restante = 3 - Math.floor(relogio.current);
       if (restante !== contagem && restante > 0) {
         setContagem(restante);
@@ -362,7 +372,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       return;
     }
 
-    if (fase === "rodada") {
+    if (faseAgora === "rodada") {
       if (rodadaEncerrada.current) return;
       const restante = Math.max(0, Math.ceil(TEMPO_RODADA - relogio.current));
       if (restante !== tempoRestante) setTempoRestante(restante);
@@ -392,7 +402,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       return;
     }
 
-    if (fase === "feedback" && relogio.current >= 2.4) {
+    if (faseAgora === "feedback" && relogio.current >= 2.4) {
       setHumorBot("idle");
       if (indice + 1 >= TOTAL_RODADAS) {
         playEnd();
@@ -409,19 +419,19 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   if (fase === "menu") {
     if (hosp) {
       return (
-        <group position={[0, 1.3, 0.4]}>
-          <Panel width={2.2} height={1.4}>
+        <group position={HOSP_UI} rotation={HOSP_ROT}>
+          <Panel width={1.7} height={1.4}>
             <Text3D position={[0, 0.5, 0.01]} size={0.14}>
               Duelo 1×1
             </Text3D>
-            <Text3D position={[0, 0.28, 0.01]} size={0.055} color={ARENA_COLORS.muted} maxWidth={1.9}>
+            <Text3D position={[0, 0.28, 0.01]} size={0.055} color={ARENA_COLORS.muted} maxWidth={1.5}>
               Identifique órgãos (100 pts) e estruturas (200 pts) antes do oponente
             </Text3D>
             {(Object.keys(BOTS) as Dificuldade[]).map((nivel, i) => (
               <Button3D
                 key={nivel}
                 label={BOTS[nivel].nome}
-                width={1.6}
+                width={1.4}
                 height={0.22}
                 position={[0, -0.02 - i * 0.28, 0.01]}
                 color={nivel === "especialista" ? ARENA_COLORS.danger : ARENA_COLORS.primary}
@@ -465,9 +475,16 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
 
   if (fase === "contagem") {
     return hosp ? (
-      <Text3D position={HOSP_LED} size={0.42} color="#7de8ff">
-        {String(contagem)}
-      </Text3D>
+      <>
+        <group position={HOSP_UI} rotation={HOSP_ROT}>
+          <Text3D size={0.5} color="#7de8ff">
+            {String(contagem)}
+          </Text3D>
+        </group>
+        <Text3D position={HOSP_LED} size={0.42} color="#7de8ff">
+          {String(contagem)}
+        </Text3D>
+      </>
     ) : (
       <Text3D position={[LOUSA_X, -0.12, LOUSA_Z]} size={0.4} color="#f2f5ec">
         {String(contagem)}
@@ -480,8 +497,8 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     const empate = pontosJogador === pontosBot;
     if (hosp) {
       return (
-        <group position={[0, 1.3, 0.4]}>
-          <Panel width={2.1} height={1.2}>
+        <group position={HOSP_UI} rotation={HOSP_ROT}>
+          <Panel width={1.7} height={1.2}>
             <Text3D
               position={[0, 0.38, 0.01]}
               size={0.15}
@@ -547,11 +564,11 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     <group>
       {/* Suspense LOCAL: em wifi lento, um GLB de rodada ainda em voo não pode
           apagar placar, cronômetro e botões — só o modelo espera. */}
-      {/* Escola: órgão ao lado da lousa. Hospital: flutuando no centro,
-          entre as duas mesas de instrumentos (referência do grupo). */}
+      {/* Escola: órgão ao lado da lousa. Hospital: flutuando à esquerda do
+          painel, na altura do peito (1,5m do chão). */}
       <group
-        position={hosp ? [0, 0.75, 0] : [-0.78, -0.15, -0.95]}
-        scale={hosp ? 0.72 : 0.36}
+        position={hosp ? [-1.05, 0.2, -0.5] : [-0.78, -0.15, -0.95]}
+        scale={hosp ? 0.6 : 0.36}
       >
         <Suspense
           fallback={
@@ -564,17 +581,56 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
         </Suspense>
       </group>
 
-      {/* Placar e cabeçalho */}
-      {/* Placar e info da rodada */}
+      {/* Placar, cronômetro, pergunta, alternativas e feedback */}
       {hosp ? (
-        <>
-          <Text3D position={[-0.85, 1.62, -3.13]} size={0.1} color="#bfe8cf">
-            {`Você: ${pontosJogador}`}
-          </Text3D>
-          <Text3D position={[0.95, 1.62, -3.13]} size={0.09} color="#e8e3c8">
-            {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
-          </Text3D>
-        </>
+        <group position={HOSP_UI} rotation={HOSP_ROT}>
+          <Panel width={1.7} height={1.45} position={[0, -0.05, 0]}>
+            <Text3D position={[-0.55, 0.55, 0.01]} size={0.06} color="#bfe8cf">
+              {`Você: ${pontosJogador}`}
+            </Text3D>
+            {fase === "rodada" && (
+              <Text3D
+                position={[0, 0.55, 0.01]}
+                size={0.075}
+                color={tempoRestante <= 5 ? "#ffb0a0" : "#7de8ff"}
+              >
+                {String(tempoRestante)}
+              </Text3D>
+            )}
+            <Text3D position={[0.5, 0.55, 0.01]} size={0.05} color="#e8e3c8">
+              {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
+            </Text3D>
+            {fase === "rodada" ? (
+              <>
+                <Text3D position={[0, 0.34, 0.01]} size={0.085} maxWidth={1.5}>
+                  {rodada.tipo === "orgao"
+                    ? "Qual órgão é este?"
+                    : "Qual estrutura está marcada em amarelo?"}
+                </Text3D>
+                {rodada.opcoes.map((opcao, i) => (
+                  <Button3D
+                    key={opcao}
+                    label={opcao}
+                    width={1.55}
+                    height={0.18}
+                    position={[0, 0.1 - i * 0.22, 0.01]}
+                    color={erroJogador ? "#5c6b7a" : ARENA_COLORS.primary}
+                    onClick={() => responder(opcao)}
+                  />
+                ))}
+                {erroJogador && (
+                  <Text3D position={[0, -0.7, 0.01]} size={0.05} color="#ffb0a0">
+                    Errado!
+                  </Text3D>
+                )}
+              </>
+            ) : (
+              <Text3D position={[0, -0.1, 0.01]} size={0.09} maxWidth={1.5}>
+                {feedback}
+              </Text3D>
+            )}
+          </Panel>
+        </group>
       ) : (
         <>
           <Text3D position={[LOUSA_X - 0.38, 0.2, LOUSA_Z]} size={0.04} color="#bfe8cf">
@@ -583,65 +639,29 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
           <Text3D position={[LOUSA_X + 0.28, 0.2, LOUSA_Z]} size={0.036} color="#e8e3c8">
             {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
           </Text3D>
-        </>
-      )}
-
-      {fase === "rodada" && (
-        <>
-          {/* Pergunta: giz na lousa (escola) ou painel flutuante (hospital) */}
-          {hosp ? (
-            <group position={HOSP_PAINEL} rotation={[0, 0.42, 0]}>
-              <Panel width={1.7} height={0.52} position={[0, 0.42, 0]}>
-                <Text3D position={[0, 0, 0.01]} size={0.09} maxWidth={1.5}>
-                  {rodada.tipo === "orgao"
-                    ? "Qual órgão é este?"
-                    : "Qual estrutura está marcada em amarelo?"}
-                </Text3D>
-              </Panel>
-            </group>
-          ) : (
-            <Text3D
-              position={[LOUSA_X, 0.08, LOUSA_Z]}
-              size={0.068}
-              maxWidth={1.08}
-              color="#f2f5ec"
-            >
-              {rodada.tipo === "orgao"
-                ? "Qual órgão é este?"
-                : "Qual estrutura está marcada em amarelo?"}
-            </Text3D>
-          )}
-          {/* Cronômetro: telão LED (hospital) ou canto da lousa (escola) */}
-          <Text3D
-            position={hosp ? HOSP_LED : [LOUSA_X - 0.47, 0.06, LOUSA_Z]}
-            size={hosp ? 0.34 : 0.06}
-            color={
-              tempoRestante <= 5
-                ? "#ffb0a0"
-                : hosp
-                  ? "#7de8ff"
-                  : "#dfe8db"
-            }
-          >
-            {String(tempoRestante)}
-          </Text3D>
-
-          {/* Opções em grade 2×2, perto do jogador */}
-          {/* Alternativas: giz (escola) ou botões sob o painel (hospital) */}
-          {hosp
-            ? rodada.opcoes.map((opcao, i) => (
-                <group key={opcao} position={HOSP_PAINEL} rotation={[0, 0.42, 0]}>
-                  <Button3D
-                    label={opcao}
-                    width={1.55}
-                    height={0.2}
-                    position={[0, 0.05 - i * 0.26, 0]}
-                    color={erroJogador ? "#5c6b7a" : ARENA_COLORS.primary}
-                    onClick={() => responder(opcao)}
-                  />
-                </group>
-              ))
-            : rodada.opcoes.map((opcao, i) => (
+          {fase === "rodada" && (
+            <>
+              {/* Pergunta em giz na lousa */}
+              <Text3D
+                position={[LOUSA_X, 0.08, LOUSA_Z]}
+                size={0.068}
+                maxWidth={1.08}
+                color="#f2f5ec"
+              >
+                {rodada.tipo === "orgao"
+                  ? "Qual órgão é este?"
+                  : "Qual estrutura está marcada em amarelo?"}
+              </Text3D>
+              {/* Cronômetro no canto da lousa */}
+              <Text3D
+                position={[LOUSA_X - 0.47, 0.06, LOUSA_Z]}
+                size={0.06}
+                color={tempoRestante <= 5 ? "#ffb0a0" : "#dfe8db"}
+              >
+                {String(tempoRestante)}
+              </Text3D>
+              {/* Alternativas em giz */}
+              {rodada.opcoes.map((opcao, i) => (
                 <BotaoLousa
                   key={opcao}
                   texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
@@ -652,44 +672,49 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
                   onClick={() => responder(opcao)}
                 />
               ))}
-          {erroJogador && (
+              {erroJogador && (
+                <Text3D
+                  position={[LOUSA_X - 0.47, -0.03, LOUSA_Z]}
+                  size={0.035}
+                  color="#ffb0a0"
+                >
+                  Errado!
+                </Text3D>
+              )}
+            </>
+          )}
+          {fase === "feedback" && (
             <Text3D
-              position={hosp ? [-0.85, 1.4, -3.13] : [LOUSA_X - 0.47, -0.03, LOUSA_Z]}
-              size={hosp ? 0.07 : 0.035}
-              color="#ffb0a0"
+              position={[LOUSA_X, -0.1, LOUSA_Z]}
+              size={0.072}
+              maxWidth={1.08}
+              color="#f2f5ec"
             >
-              Errado!
+              {feedback}
             </Text3D>
           )}
         </>
       )}
 
-      {fase === "feedback" &&
-        (hosp ? (
-          <group position={[0, 1.75, 0.3]}>
-            <Panel width={2.1} height={0.42}>
-              <Text3D position={[0, 0, 0.01]} size={0.085} maxWidth={1.9}>
-                {feedback}
-              </Text3D>
-            </Panel>
-          </group>
-        ) : (
-          <Text3D
-            position={[LOUSA_X, -0.1, LOUSA_Z]}
-            size={0.072}
-            maxWidth={1.08}
-            color="#f2f5ec"
-          >
-            {feedback}
-          </Text3D>
-        ))}
+      {/* Telão LED do hospital espelha o cronômetro (ambiente) */}
+      {hosp && fase === "rodada" && (
+        <Text3D
+          position={HOSP_LED}
+          size={0.34}
+          color={tempoRestante <= 5 ? "#ffb0a0" : "#7de8ff"}
+        >
+          {String(tempoRestante)}
+        </Text3D>
+      )}
 
       {hosp ? (
         <Oponente
           humor={humorBot}
           nome={BOTS[dificuldade].nome.split(" (")[0]}
           pontos={pontosBot}
-          position={[0, -1.3, -2.4]}
+          position={[-0.45, -1.3, -1.9]}
+          // O corpo é modelado de frente para +z; o jogador está em +z.
+          rotationY={0}
         />
       ) : (
         <Oponente

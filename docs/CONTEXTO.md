@@ -148,6 +148,17 @@ Auditoria completa de 7 dimensões (2026-06-12) + correções aplicadas:
   com `adb reverse`.
 - **Screenshot de página com WebGL contínuo trava** as ferramentas de preview. Alternativa:
   ler pixels via `drawImage` num canvas 2D + `getImageData`.
+- **`material-*` no `<Text>` do drei não funciona com `outlineWidth`:** o troika expõe `material`
+  como ARRAY `[contorno, texto]`, então `material-depthTest={false}` caía no array e o texto era
+  depth-testado — qualquer transparência à frente (vidro da divisória do hospital) apagava o
+  texto atrás. `Text3D` agora passa um material-base próprio (`TEXT_MATERIAL` em `ui3d.tsx`).
+- **A câmera de desktop tem de ser o olho do VR.** O layout do hospital foi desenhado numa câmera
+  a 2,8m do chão vista de cima e "funcionava"; no Quest a pergunta ficava a 3m de altura e 44° à
+  esquerda. Regra: `camera.position` = XROrigin + altura dos olhos (1,2m sentado / 1,6m de pé),
+  olhando para −z, antes de posicionar qualquer painel.
+- **Uma store XR por app, não por montagem:** `createXRStore` pendura overlay + listeners e nunca é
+  destruída (e `destroy()` no cleanup quebra a religada sob StrictMode). Usar `obterXRStore()` de
+  `lib/xr-store.ts` (Sala e Duelo já usam; Arena/Clínica/Viewer ainda criam a própria).
 
 ---
 

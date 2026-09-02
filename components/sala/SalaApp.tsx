@@ -3,7 +3,6 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -11,7 +10,8 @@ import {
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Send, X } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
-import { XR, createXRStore } from "@react-three/xr";
+import { XR } from "@react-three/xr";
+import { obterXRStore } from "@/lib/xr-store";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
@@ -40,26 +40,7 @@ export function SalaApp() {
   const [ocupado, setOcupado] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const store = useMemo(
-    () =>
-      createXRStore({
-        // Mesmo endurecimento da Arena/Clínica (lições dos testes no Quest 2).
-        baseAssetPath:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/webxr-profiles/`
-            : "https://localhost/webxr-profiles/",
-        controller: { grabPointer: false, teleportPointer: false },
-        hand: { model: false, grabPointer: false, touchPointer: false },
-        anchors: false,
-        meshDetection: false,
-        planeDetection: false,
-        hitTest: false,
-        depthSensing: false,
-        frameRate: false,
-        foveation: 0.5,
-      }),
-    [],
-  );
+  const store = obterXRStore();
 
   useEffect(
     () => store.subscribe((state) => setInSession(Boolean(state.session))),
@@ -84,8 +65,11 @@ export function SalaApp() {
     setMensagens([...historico, { role: "assistant", content: "" }]);
 
     abortRef.current = new AbortController();
+    // O servidor aceita até 40 mensagens não vazias: uma sessão longa ou
+    // uma resposta vazia (recusa do modelo) deixavam o tutor em 400 para
+    // sempre.
     streamChatResponse(
-      { messages: historico },
+      { messages: historico.filter((m) => m.content.trim()).slice(-20) },
       (chunk) => {
         setMensagens((atual) => {
           const copia = [...atual];
@@ -209,7 +193,9 @@ export function SalaApp() {
         shadows={false}
         dpr={1}
         frameloop="always"
-        camera={{ position: [0, 1.62, 0.5], fov: 55 }}
+        // No ponto de vista do VR sentado (olhos ~1,2m sobre o XROrigin):
+        // a câmera antiga, 1m atrás e 40cm acima, escondia painéis altos.
+        camera={{ position: [0, 1.2, -0.55], fov: 55 }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => gl.setClearColor("#1a140d")}
       >

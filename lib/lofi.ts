@@ -73,6 +73,8 @@ let audioEl: HTMLAudioElement | null = null;
 // Reentrância: dois cliques rápidos durante o fetch do manifest criavam dois
 // geradores, e o primeiro ficava órfão (impossível de parar sem reload).
 let emVoo = false;
+// Sobe a cada pararRadio(): uma religada pendente (await) de geração velha desiste.
+let geracao = 0;
 let faixasLocais: { title: string; file: string }[] | null = null;
 let estadoAtual: EstadoRadio = { tocando: false, nome: "", indice: -1 };
 
@@ -197,6 +199,7 @@ async function carregarManifest(): Promise<typeof faixasLocais> {
 
 /** Para tudo (procedural e arquivo). */
 export function pararRadio(): void {
+  geracao += 1;
   if (timer) clearInterval(timer);
   timer = null;
   vinil?.stop();
@@ -222,24 +225,31 @@ export async function proximaEstacao(): Promise<EstadoRadio> {
   try {
     const indice = estadoAtual.indice + 1;
     pararRadio();
+    const minhaGeracao = geracao;
 
     const faixas = await carregarManifest();
+    // pararRadio() rodou durante o await (jogador saiu da Sala): não religar
+    // — senão o rádio seguia tocando na Home sem botão para desligar.
+    if (minhaGeracao !== geracao) return estadoAtual;
     if (faixas && faixas.length > 0) {
       if (indice >= faixas.length) {
         estadoAtual = { tocando: false, nome: "Desligado", indice: -1 };
         return estadoAtual;
       }
       const faixa = faixas[indice];
-      audioEl = new Audio(`/audio/lofi/${faixa.file}`);
-      audioEl.loop = true;
+      const el = new Audio(`/audio/lofi/${faixa.file}`);
+      el.loop = true;
       // Arquivo quebrado/ausente não pode deixar o rádio "ligado" e mudo:
       // cai no gerador procedural, que existe justamente como reserva.
-      audioEl.onerror = () => {
+      el.onerror = () => {
+        // Evento atrasado de uma faixa já trocada não derruba a atual.
+        if (audioEl !== el) return;
         pararRadio();
         tocarProcedural(indice % ESTACOES.length);
         estadoAtual = { tocando: true, nome: ESTACOES[indice % ESTACOES.length].nome, indice };
       };
-      audioEl.play().catch(() => audioEl?.onerror?.(new Event("error")));
+      audioEl = el;
+      el.play().catch(() => el.onerror?.(new Event("error")));
       estadoAtual = { tocando: true, nome: faixa.title, indice };
       return estadoAtual;
     }

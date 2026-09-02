@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { Billboard } from "@react-three/drei";
 import * as THREE from "three";
 import { Text3D, ARENA_COLORS } from "@/components/arena/ui3d";
 
@@ -122,15 +123,16 @@ export function Oponente({
         </mesh>
       </group>
 
-      {/* Placa: nome + pontos (vira para o jogador, que está do outro lado) */}
-      <group rotation={[0, Math.PI - rotationY, 0]} position={[0, sentado ? 1.85 : 2.05, 0]}>
+      {/* Placa: nome + pontos. Billboard: sempre de frente para a câmera (no
+          hospital a rotação fixa deixava a placa de costas — nome espelhado). */}
+      <Billboard position={[0, sentado ? 1.85 : 2.05, 0]} lockX lockZ>
         <Text3D size={0.09} color={ARENA_COLORS.danger}>
           {nome}
         </Text3D>
         <Text3D position={[0, -0.14, 0]} size={0.11}>
           {String(pontos)}
         </Text3D>
-      </group>
+      </Billboard>
     </group>
   );
 }

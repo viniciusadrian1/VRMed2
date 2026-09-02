@@ -259,5 +259,8 @@ export function AmbienteHospital() {
   );
 }
 
-useGLTF.preload(`${HOSPITAL_DIR}/trolley.glb`, "/draco/");
-useGLTF.preload(`${HOSPITAL_DIR}/monitor-hr.glb`, "/draco/");
+// Todos: o Suspense é um só, então as mesas (à frente do jogador) só
+// aparecem quando o último prop chega.
+for (const nome of ["trolley", "monitor-hr", "ultrassom", "cortina-monitor", "cadeira-rodas"]) {
+  useGLTF.preload(`${HOSPITAL_DIR}/${nome}.glb`, "/draco/");
+}

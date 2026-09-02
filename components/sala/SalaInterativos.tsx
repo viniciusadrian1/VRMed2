@@ -6,7 +6,7 @@ import { useGLTF } from "@react-three/drei";
 import { useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { Text3D, Panel, Button3D, ARENA_COLORS } from "@/components/arena/ui3d";
-import { proximaEstacao, pararRadio, estadoRadio } from "@/lib/lofi";
+import { proximaEstacao, pararRadio } from "@/lib/lofi";
 import { streamChatResponse } from "@/lib/chat-client";
 
 /**
@@ -181,7 +181,7 @@ function Computador() {
 
       {/* Painel-hub flutuante acima do monitor */}
       {aberto && (
-        <group position={[0, 0.85, 0.3]}>
+        <group position={[0, 0.6, 0.3]}>
           <Panel width={1.15} height={0.78}>
             <Text3D position={[0, 0.28, 0.01]} size={0.06}>
               Portal de estudo
@@ -332,7 +332,7 @@ function Flashcards() {
 
       {/* Painel de temas */}
       {painel && !tema && (
-        <group position={[-0.55, 1.5, -1.45]} rotation={[0, 0.18, 0]}>
+        <group position={[-0.55, 1.3, -1.45]} rotation={[0, 0.18, 0]}>
           <Panel width={1.0} height={1.15}>
             <Text3D position={[0, 0.47, 0.01]} size={0.055}>
               Escolha o tema
@@ -353,7 +353,7 @@ function Flashcards() {
 
       {/* Carta flutuante */}
       {painel && tema && atual && (
-        <group position={[-0.45, 1.48, -1.3]} rotation={[0, 0.15, 0]}>
+        <group position={[-0.45, 1.28, -1.3]} rotation={[0, 0.15, 0]}>
           <group
             ref={carta}
             onClick={(event) => {
@@ -489,7 +489,7 @@ function TutorVR() {
   };
 
   return (
-    <group position={[0.62, 1.5, -1.45]} rotation={[0, -0.2, 0]}>
+    <group position={[0.62, 1.3, -1.45]} rotation={[0, -0.2, 0]}>
       {!aberto ? (
         <Button3D label="Abrir tutor" width={0.6} height={0.14} onClick={() => setAberto(true)} />
       ) : (
@@ -508,8 +508,17 @@ function TutorVR() {
                 onClick={() => perguntar(p)}
               />
             ))}
-            <Text3D position={[0, -0.28, 0.01]} size={0.036} maxWidth={1.1}>
-              {resposta || "Escolha uma pergunta — ou use o teclado no desktop."}
+            {/* Ancorado no topo, abaixo do último chip; teto de 572
+                caracteres (~11 linhas) para não invadir o "Fechar". */}
+            <Text3D
+              position={[0, -0.065, 0.01]}
+              size={0.036}
+              maxWidth={1.1}
+              anchorY="top"
+            >
+              {resposta.length > 572
+                ? `${resposta.slice(0, 572)}…`
+                : resposta || "Escolha uma pergunta — ou use o teclado no desktop."}
             </Text3D>
           </Panel>
           <Button3D

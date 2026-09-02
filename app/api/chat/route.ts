@@ -68,7 +68,9 @@ export async function POST(request: Request) {
       max_completion_tokens: 1500,
       stream: true,
       messages: [{ role: "system", content: systemPrompt }, ...messages],
-    })
+    },
+    // Cliente abortou (fechou a gaveta/saiu da Sala): não pagar o resto.
+    { signal: request.signal })
     .catch(() => null);
 
   if (!completion) {
@@ -91,6 +93,9 @@ export async function POST(request: Request) {
       } catch (error) {
         controller.error(error);
       }
+    },
+    cancel() {
+      completion.controller.abort();
     },
   });
 

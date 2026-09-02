@@ -49,6 +49,24 @@ export const ARENA_COLORS = {
   danger: "#e06a5c",
 } as const;
 
+/**
+ * Material-base do texto. Com `outlineWidth`, o troika expõe `material` como
+ * ARRAY [contorno, texto] — então `material-depthTest={false}` caía no array e
+ * nunca chegava ao shader: o texto era depth-testado e sumia atrás de qualquer
+ * transparência à frente (a divisória de vidro do hospital apagava metade do
+ * painel do Duelo). Os derivados herdam depthTest/toneMapped por protótipo; a
+ * cor vira propriedade própria de cada texto (o troika cuida disso).
+ */
+const TEXT_MATERIAL = new THREE.MeshBasicMaterial({
+  transparent: true,
+  side: THREE.DoubleSide,
+  // A interface nunca pode ser engolida pelo modelo — o jogador pode
+  // escalá-lo até 6× e cobrir o painel que ele precisa clicar.
+  depthTest: false,
+  // Sem tonemapping o texto mantém o contraste dentro do headset.
+  toneMapped: false,
+});
+
 interface Text3DProps {
   children: ReactNode;
   position?: [number, number, number];
@@ -81,11 +99,7 @@ export function Text3D({
       // Contorno escuro: o texto passa por cima de um modelo claro.
       outlineWidth={size * 0.05}
       outlineColor="#04070c"
-      // Sem tonemapping o texto mantém o contraste dentro do headset.
-      material-toneMapped={false}
-      // A interface nunca pode ser engolida pelo modelo — o jogador pode
-      // escalá-lo até 6× e cobrir o painel que ele precisa clicar.
-      material-depthTest={false}
+      material={TEXT_MATERIAL}
       renderOrder={999}
       // Texto não intercepta o laser: o clique atravessa até o modelo.
       raycast={() => null}
