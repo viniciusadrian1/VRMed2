@@ -9,12 +9,11 @@ import {
   useState,
   type RefObject,
 } from "react";
-import { Canvas, useThree, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { XR, XROrigin, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import {
   identifyStructure,
   normalizeContent,
@@ -22,6 +21,7 @@ import {
 } from "@/lib/model-utils";
 import { obterXRStore } from "@/lib/xr-store";
 import { XRManipulation } from "@/components/viewer/XRManipulation";
+import { SafeEnvironment } from "@/components/viewer/SafeEnvironment";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
 import { useMounted } from "@/hooks/use-mounted";
@@ -45,20 +45,6 @@ const CORTES = {
 type Corte = keyof typeof CORTES | "nenhum";
 // normalizeContent deixa o modelo em ±1 e o pivô escala 1,4 → cabe em ±1,5.
 const ALCANCE = 1.5;
-
-/** Mapa de ambiente local (sem CDN): brilho úmido e sombra suave nos órgãos.
- *  Declarativo (attach) porque o React Compiler proíbe mutar `scene`. */
-function AmbienteLuz() {
-  const gl = useThree((state) => state.gl);
-  const ambiente = useMemo(() => {
-    const pmrem = new THREE.PMREMGenerator(gl);
-    const textura = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    pmrem.dispose();
-    return textura;
-  }, [gl]);
-  useEffect(() => () => ambiente.dispose(), [ambiente]);
-  return <primitive object={ambiente} attach="environment" />;
-}
 
 /** Modelo do paciente: carrega, prepara materiais, corte e envelope. */
 function ModeloPaciente({
@@ -178,7 +164,7 @@ function CenaClinica({
 
       {/* Uma luz direcional + ambiente por mapa: luz ambiente dupla achatava
           o relevo (Meta: 1 luz com PBR é o orçamento do Quest 2). */}
-      <AmbienteLuz />
+      <SafeEnvironment />
       <directionalLight position={[4, 6, 4]} intensity={2.2} color="#ffeedd" />
       <hemisphereLight args={["#dfe9f2", "#141a22", 0.25]} />
 

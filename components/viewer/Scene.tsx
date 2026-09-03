@@ -140,7 +140,8 @@ function XRStage() {
  *  - OrbitControls e CameraRig escrevem em `camera.position` a cada quadro
  *    (o OrbitControls do drei não tem consciência de XR) e, numa sessão, essa
  *    câmera é a do headset — brigando com o rastreamento da cabeça.
- *  - Environment busca um HDR na rede (falha em wifi ruim/offline).
+ *  - SafeEnvironment agora é local (RoomEnvironment + PMREM), sem rede; fica
+ *    fora da sessão VR pelo custo de PMREM no Quest.
  *  - Html (hotspots) é DOM: invisível em VR e ainda faz raycast por quadro.
  */
 function SceneContents() {

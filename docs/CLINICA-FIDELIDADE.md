@@ -107,7 +107,7 @@ Legenda: **[MALHA NÃO RESOLVE]** = precisa de volume 3b ou de outra segmentaç�
 - **Mais decimação ou `simplify` em anatomia** — a decimação não é o gargalo (aresta 1,64 mm ≈ resolução da máscara); o problema é a suavização a montante.
 - **"Maior componente" cego** — apagaria 50% da veia pulmonar (3 componentes é anatomia) e não conserta o FOV truncado.
 - **Treinar ou fine-tunar** (PROMPT §7); MM-WHS não pode ser redistribuído e não tem pesos; MONAI wholeBody exige 28,7 GB de VRAM.
-- **HDR remoto** (`drei` preset `studio` baixa de CDN — o `SafeEnvironment` do modo Estudo já fere a regra); usar `RoomEnvironment` local.
+- ~~**HDR remoto**~~ **RESOLVIDO** — o `SafeEnvironment` (Estudo/Comparar/Quiz) agora usa `RoomEnvironment` local via PMREM, sem CDN nem `DefaultLoadingManager`.
 - **Prometer coronárias no CTACardio** — 1,25 mm sem gating confirmável; a tarefa `coronary_arteries` sairia fragmentada. Não rotular a protuberância superior do `heart` como coração na UI.
 - **Remover traqueia/esôfago/aorta cortadas** — são contexto; tampar e etiquetar "limite do exame".
 - **Chamar 497 mL de "volume do coração"** — é o rótulo `heart` (sangue + parede).
