@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useXR, XROrigin } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
@@ -162,10 +162,14 @@ function Quarto() {
         ))}
       </group>
 
-      {/* Mesa, cadeira e teclado (GLBs do grupo) */}
-      <MesaGLB />
-      <CadeiraGLB />
-      <TecladoMouseGLB />
+      {/* Mesa, cadeira e teclado (GLBs do grupo). O Canvas do R3F 9 suspende a
+          página inteira quando um useGLTF suspende sem boundary local; com este
+          Suspense o quarto procedural, as luzes e a UI DOM aparecem na hora. */}
+      <Suspense fallback={null}>
+        <MesaGLB />
+        <CadeiraGLB />
+        <TecladoMouseGLB />
+      </Suspense>
 
       {/* Planta no canto */}
       <group position={[2, 0, -2]}>

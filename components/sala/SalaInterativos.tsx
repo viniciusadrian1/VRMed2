@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import { useXR } from "@react-three/xr";
@@ -725,10 +725,20 @@ export function SalaInterativos({
   });
   return (
     <group>
-      <Radio />
-      <Computador {...props("hub")} />
+      {/* Suspense por item que usa useGLTF: sem boundary local, o Canvas do
+          R3F 9 suspende a página inteira até o GLB baixar. Flashcards não usa
+          GLB. O estado `aberto` vive aqui, então envolver o item inteiro não
+          perde estado. */}
+      <Suspense fallback={null}>
+        <Radio />
+      </Suspense>
+      <Suspense fallback={null}>
+        <Computador {...props("hub")} />
+      </Suspense>
       <Flashcards {...props("flashcards")} />
-      <Livro onAbrirTutorDom={onAbrirTutorDom} {...props("tutor")} />
+      <Suspense fallback={null}>
+        <Livro onAbrirTutorDom={onAbrirTutorDom} {...props("tutor")} />
+      </Suspense>
     </group>
   );
 }
