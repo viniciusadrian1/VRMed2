@@ -256,11 +256,17 @@ function MonitorGLB() {
 }
 useGLTF.preload(MONITOR_GLB, "/draco/");
 
+// Modos do hub da Sala. Segue a ordem do NAV_ITEMS de
+// components/layout/Sidebar.tsx, mas não é cópia literal: aqui o rótulo é
+// "Estudo 3D" (lá "Visualizador") e há "Arena VR" (ausente na Sidebar).
+// Manter em sincronia com as rotas de app/ ao adicionar/remover um modo.
 const MODOS_HUB = [
   { rotulo: "Estudo 3D", href: "/viewer" },
-  { rotulo: "Arena VR", href: "/arena" },
-  { rotulo: "Clínica", href: "/clinica" },
+  { rotulo: "Comparar", href: "/compare" },
   { rotulo: "Quiz", href: "/quiz" },
+  { rotulo: "Clínica", href: "/clinica" },
+  { rotulo: "Arena VR", href: "/arena" },
+  { rotulo: "Duelo 1×1", href: "/duelo" },
 ];
 
 function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
@@ -305,16 +311,18 @@ function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
         <group position={[0, 0.62, -0.35]} scale={0.8}>
           <Panel width={1.15} height={0.78}>
             <Text3D position={[0, 0.28, 0.01]} size={0.06}>
-              Portal de estudo
+              Modos do VRmed
             </Text3D>
             <BotaoFechar position={[0.5, 0.31, 0.01]} onClick={onFechar} />
+            {/* Duas colunas para os 6 modos caberem no painel (0.78 de altura):
+                colunas em x ±0.28, linhas a cada 0.16 em y. */}
             {MODOS_HUB.map((modo, i) => (
               <Button3D
                 key={modo.href}
                 label={modo.rotulo}
-                width={0.9}
+                width={0.52}
                 height={0.13}
-                position={[0, 0.12 - i * 0.16, 0.01]}
+                position={[i % 2 === 0 ? -0.28 : 0.28, 0.12 - Math.floor(i / 2) * 0.16, 0.01]}
                 onClick={() => {
                   // Navegar derruba a sessão VR (comportamento do navegador);
                   // no headset o aviso abaixo explica isso antes do clique.
