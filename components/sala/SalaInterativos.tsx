@@ -347,6 +347,8 @@ function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
 interface Carta {
   pergunta: string;
   resposta: string;
+  /** true quando veio do /api/chat, não da base curada */
+  ia?: true;
 }
 interface Tema {
   id: string;
@@ -392,7 +394,11 @@ async function gerarCartasIA(tema: Tema): Promise<Carta[]> {
     .filter(
       (c) => typeof c.pergunta === "string" && typeof c.resposta === "string",
     )
-    .slice(0, 6);
+    // Teto de tamanho: a carta (0.95×0.6, maxWidth 0.8) comporta ~7 linhas de
+    // ~35 chars; texto maior invade o rodapé.
+    .filter((c) => c.pergunta.length <= 140 && c.resposta.length <= 220)
+    .slice(0, 6)
+    .map((c) => ({ pergunta: c.pergunta, resposta: c.resposta, ia: true as const }));
 }
 
 function Flashcards({ aberto: painel, onAbrir, onFechar }: PropsPainel) {
@@ -515,7 +521,13 @@ function Flashcards({ aberto: painel, onAbrir, onFechar }: PropsPainel) {
                 {virada ? atual.resposta : atual.pergunta}
               </Text3D>
               <Text3D position={[0, -0.24, 0.01]} size={0.026} color={ARENA_COLORS.muted}>
-                {virada ? "clique para voltar à pergunta" : "clique na carta para virar"}
+                {virada
+                  ? atual.ia
+                    ? "gerada por IA — confira no tratado"
+                    : "clique para voltar à pergunta"
+                  : atual.ia
+                    ? "gerada por IA — clique para virar"
+                    : "clique na carta para virar"}
               </Text3D>
             </Panel>
           </group>
