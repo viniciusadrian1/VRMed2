@@ -39,9 +39,11 @@ function CompareGLB({ path }: { path: string }) {
 function CompareModel({
   path,
   variant,
+  onResolved,
 }: {
   path: string;
   variant: "healthy" | "pathological";
+  onResolved?: (kind: "real" | "placeholder") => void;
 }) {
   const [state, setState] = useState<"checking" | "real" | "missing">(
     "checking",
@@ -51,12 +53,20 @@ function CompareModel({
     let cancelled = false;
     setState("checking");
     fetch(path, { method: "HEAD" })
-      .then((res) => !cancelled && setState(res.ok ? "real" : "missing"))
-      .catch(() => !cancelled && setState("missing"));
+      .then((res) => {
+        if (cancelled) return;
+        setState(res.ok ? "real" : "missing");
+        onResolved?.(res.ok ? "real" : "placeholder");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setState("missing");
+        onResolved?.("placeholder");
+      });
     return () => {
       cancelled = true;
     };
-  }, [path]);
+  }, [path, onResolved]);
 
   if (state === "real") {
     return (
@@ -73,6 +83,7 @@ interface CompareCanvasProps {
   variant: "healthy" | "pathological";
   synced: boolean;
   syncRef: RefObject<CameraSyncState>;
+  onResolved?: (kind: "real" | "placeholder") => void;
 }
 
 /** Um dos dois canvas 3D do modo de comparação. */
@@ -81,6 +92,7 @@ export function CompareCanvas({
   variant,
   synced,
   syncRef,
+  onResolved,
 }: CompareCanvasProps) {
   const mounted = useMounted();
 
@@ -106,7 +118,7 @@ export function CompareCanvas({
       <directionalLight position={[-5, 2, -4]} intensity={0.5} color="#9fc3dd" />
 
       <SafeEnvironment />
-      <CompareModel path={path} variant={variant} />
+      <CompareModel path={path} variant={variant} onResolved={onResolved} />
 
       <ContactShadows
         position={[0, -1.2, 0]}

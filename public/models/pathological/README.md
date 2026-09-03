@@ -7,5 +7,6 @@ modo de comparação (`/compare`).
   em `../healthy/`. Exemplo: `coracao.glb` (coração hipertrofiado),
   `pulmao.glb` (enfisema), `figado.glb` (cirrose).
 - O órgão precisa ter `pathologicalPath` definido em `lib/organs.ts`.
-- Sem o arquivo, o modo de comparação exibe um modelo de demonstração e um
-  aviso de "modelo em breve" — sem quebrar a interface.
+- Sem o arquivo, o modo de comparação exibe um modelo de demonstração com o
+  selo "Modelo de demonstração" e o aviso "Modelo patológico real em preparação"
+  — sem quebrar a interface nem passar o placeholder por modelo real.

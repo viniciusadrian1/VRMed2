@@ -17,7 +17,7 @@ import { SectionHeading } from "@/components/landing/SectionHeading";
 import { Logo } from "@/components/layout/Logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ORGANS, REGIONS, SYSTEMS } from "@/lib/organs";
+import { getComparableOrgans, ORGANS, REGIONS, SYSTEMS } from "@/lib/organs";
 
 /* -------------------------------------------------------------------------- */
 /* Dados estáticos da página                                                   */
@@ -83,7 +83,7 @@ const CATALOG_TIERS = [
   },
   {
     label: "Órgãos",
-    caption: "Modelos individuais, com par patológico",
+    caption: `Modelos individuais; ${getComparableOrgans().length} com par patológico`,
     items: ORGANS.map((o) => o.name),
   },
 ];

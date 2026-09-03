@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, type RefObject } from "react";
-import { Clock } from "lucide-react";
+import { useCallback, useRef, useState, type RefObject } from "react";
+import { Clock, Sparkles } from "lucide-react";
 import { clamp } from "@/lib/format";
+import { Badge } from "@/components/ui/badge";
 import type { OrganDefinition } from "@/types";
 import { CompareCanvas } from "./CompareCanvas";
 import type { CameraSyncState } from "./SyncedCameras";
@@ -18,6 +19,13 @@ export function SplitView({ organ, synced, syncRef }: SplitViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const [ratio, setRatio] = useState(0.5);
+  // Sinaliza quando o lado patológico caiu no modelo de demonstração
+  // (o .glb real ainda não existe), para exibir o aviso honesto.
+  const [placeholder, setPlaceholder] = useState(false);
+  const handleResolved = useCallback(
+    (kind: "real" | "placeholder") => setPlaceholder(kind === "placeholder"),
+    [],
+  );
 
   return (
     <div
@@ -73,10 +81,27 @@ export function SplitView({ organ, synced, syncRef }: SplitViewProps) {
               variant="pathological"
               synced={synced}
               syncRef={syncRef}
+              onResolved={handleResolved}
             />
-            <span className="absolute right-3 top-3 rounded-md bg-card/90 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm">
-              {organ.pathologyName ?? "Patológico"}
-            </span>
+            <div className="absolute right-3 top-3 flex flex-col items-end gap-1">
+              <span className="rounded-md bg-card/90 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm">
+                {organ.pathologyName ?? "Patológico"}
+              </span>
+              {placeholder && (
+                <>
+                  <Badge
+                    variant="outline"
+                    className="bg-card/90 shadow-sm backdrop-blur-sm"
+                  >
+                    <Sparkles className="size-3" />
+                    Modelo de demonstração
+                  </Badge>
+                  <span className="text-[11px] text-muted-foreground">
+                    Modelo patológico real em preparação
+                  </span>
+                </>
+              )}
+            </div>
           </>
         ) : (
           <div className="grid size-full place-items-center p-6 text-center">

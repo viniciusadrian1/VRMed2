@@ -54,11 +54,11 @@ const ITEMS: ShowcaseItem[] = [
     eyebrow: "Saudável × patológico",
     title: "Veja a doença, lado a lado.",
     description:
-      "Compare a anatomia normal e a alterada com câmeras sincronizadas. Entenda visualmente o que a patologia transforma — do coração hipertrofiado ao fígado cirrótico.",
+      "Compare a anatomia normal e a alterada com câmeras sincronizadas. Entenda visualmente o que a patologia transforma — como o fígado cirrótico ao lado do fígado saudável.",
     bullets: [
       "Câmeras espelhadas para comparação precisa",
       "Legendas com as diferenças anatômicas chave",
-      "Coração, pulmão e fígado com par patológico",
+      "Fígado com par patológico real; coração e pulmão em preparação",
     ],
     cta: { href: "/compare", label: "Comparar modelos" },
     mockup: <CompareMockup />,
