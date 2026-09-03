@@ -164,8 +164,8 @@ export function SalaApp() {
             )}
             <p className="max-w-lg px-4 text-center text-[11px] text-white/45">
               Sala de estudos — clique no rádio, no computador, nos flashcards
-              ou no livro. Conteúdo educacional; o tutor de IA cita fontes
-              médicas reconhecidas.
+              ou no livro. Conteúdo educacional; o tutor de IA responde com base
+              nos tratados de anatomia da graduação.
             </p>
           </div>
 
@@ -190,7 +190,8 @@ export function SalaApp() {
                 {mensagens.length === 0 && (
                   <p className="text-sm text-white/50">
                     Pergunte qualquer coisa de anatomia, fisiologia ou
-                    patologia — as respostas citam apenas fontes reconhecidas.
+                    patologia. Respostas curtas, com base nos tratados da
+                    graduação (Moore, Gray, Netter, Guyton).
                   </p>
                 )}
                 {mensagens.map((m, i) => (

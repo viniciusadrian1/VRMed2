@@ -26,6 +26,13 @@ Painéis reposicionados a ~1,1 m dos olhos (flashcards à esquerda, tutor à dir
 monitor), estado único "um pop-up por vez" em `SalaInterativos` e botão × em cada painel.
 Câmera de desktop = olho sentado no assento.
 
+**Tutor de IA reescrito (2026-09-02):** `lib/medical-system-prompt.ts` agora pede texto corrido
+curto (2 a 5 frases; até 3 parágrafos se pedirem detalhe), SEM Markdown e sem travessão, porque a
+gaveta da Sala e o painel VR mostram texto puro (os asteriscos apareciam literalmente). Caiu a
+exigência de `[Fonte: X]` atrás de cada frase (só forçava citação inventada): fontes = tratados da
+graduação (Moore, Gray, Netter, Sobotta, Guyton, Robbins), uma referência natural no fim e só com
+certeza. Teto de 700 tokens. O chip de citação do `MarkdownContent` (Estudo 3D) ficou sem uso.
+
 **Sair do VR (2026-09-02):** `components/xr/SairDoVR.tsx` — botão 3D filho do `<XROrigin>` em
 todos os modos com sessão (Sala, Duelo, Clínica, Arena, Estudo 3D): encerra a sessão e faz
 `history.back()`. Dentro da sessão o DOM some, então antes não havia como voltar. Posição

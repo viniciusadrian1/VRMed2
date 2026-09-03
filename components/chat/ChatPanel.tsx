@@ -125,7 +125,7 @@ function ChatPanelContent() {
         <div className="flex-1">
           <h2 className="text-sm font-semibold leading-tight">Tutor de IA</h2>
           <p className="text-[11px] text-muted-foreground">
-            Respostas com fontes médicas
+            Respostas curtas, com base nos tratados de anatomia
           </p>
         </div>
         <Button
@@ -159,8 +159,8 @@ function ChatPanelContent() {
                 Pergunte ao tutor
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Tire dúvidas de anatomia e fisiologia. As respostas citam apenas
-                fontes médicas reconhecidas.
+                Tire dúvidas de anatomia e fisiologia. Respostas curtas, com base
+                nos tratados da graduação (Moore, Gray, Netter, Guyton).
               </p>
             </div>
             <div className="flex w-full flex-col gap-2">

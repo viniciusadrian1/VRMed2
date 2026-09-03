@@ -65,7 +65,7 @@ export async function POST(request: Request) {
   const completion = await client.chat.completions
     .create({
       model: CHAT_MODEL,
-      max_completion_tokens: 1500,
+      max_completion_tokens: 700,
       stream: true,
       messages: [{ role: "system", content: systemPrompt }, ...messages],
     },
