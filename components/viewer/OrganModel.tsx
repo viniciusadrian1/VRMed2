@@ -24,6 +24,7 @@ import {
   normalizeContent,
   prepareModel,
 } from "@/lib/model-utils";
+import { TEXTO_PADRAO_ANOTACAO } from "@/lib/quiz";
 import { useVRMedStore } from "@/lib/store";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GLBModel } from "./GLBModel";
@@ -167,7 +168,7 @@ export function OrganModel() {
       addAnnotation(organId, {
         id: genId(),
         position: [event.point.x, event.point.y, event.point.z],
-        text: "Nova anotação",
+        text: TEXTO_PADRAO_ANOTACAO,
         color: "#0f4c81",
         hideLabel: false,
       });

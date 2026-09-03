@@ -7,7 +7,7 @@ import { track } from "@/lib/analytics";
 import { formatDate } from "@/lib/format";
 import { genId } from "@/lib/format";
 import { ALL_MODELS, getOrganById } from "@/lib/organs";
-import { QUIZ_TIME_PER_QUESTION, buildQuiz } from "@/lib/quiz";
+import { QUIZ_TIME_PER_QUESTION, anotacoesQuizaveis, buildQuiz } from "@/lib/quiz";
 import { useVRMedStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -50,9 +50,7 @@ export function QuizMode() {
   // Modelos (órgãos ou sistemas) com anotações suficientes para um quiz.
   const quizableOrgans = ALL_MODELS.filter(
     (model) =>
-      (annotationsByOrgan[model.id] ?? []).filter(
-        (a) => a.text.trim().length > 0,
-      ).length > 0,
+      anotacoesQuizaveis(annotationsByOrgan[model.id] ?? []).length > 0,
   );
 
   // Contagem regressiva do modo cronometrado.
@@ -90,8 +88,8 @@ export function QuizMode() {
   const beginQuiz = (targetOrganId: string) => {
     const organ = getOrganById(targetOrganId);
     if (!organ) return;
-    const annotations = (annotationsByOrgan[targetOrganId] ?? []).filter(
-      (a) => a.text.trim().length > 0,
+    const annotations = anotacoesQuizaveis(
+      annotationsByOrgan[targetOrganId] ?? [],
     );
     const built = buildQuiz(annotations, count);
     if (built.length === 0) return;
@@ -190,7 +188,8 @@ export function QuizMode() {
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               O quiz usa as anotações que você cria nos modelos. Marque
-              estruturas no visualizador para montar um quiz.
+              estruturas no visualizador e dê um nome a cada ponto para montar
+              um quiz.
             </p>
             <Button asChild className="mt-5">
               <Link href="/viewer">Abrir o visualizador</Link>

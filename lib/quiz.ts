@@ -4,6 +4,21 @@ import type { Annotation, QuizQuestion } from "@/types";
 /** Tempo por questão no modo cronometrado (segundos). */
 export const QUIZ_TIME_PER_QUESTION = 25;
 
+/** Texto atribuído a uma anotação recém-criada, antes de ser renomeada. */
+export const TEXTO_PADRAO_ANOTACAO = "Nova anotação";
+
+/**
+ * Filtra as anotações que podem virar questão de quiz: precisam ter texto e
+ * não podem estar com o rótulo padrão ("Nova anotação"), que não identifica
+ * nenhuma estrutura.
+ */
+export function anotacoesQuizaveis(list: Annotation[]): Annotation[] {
+  return list.filter((a) => {
+    const t = a.text.trim();
+    return t.length > 0 && t !== TEXTO_PADRAO_ANOTACAO;
+  });
+}
+
 /**
  * Termos anatômicos genéricos usados como distratores quando o órgão não
  * tem anotações suficientes para gerar alternativas erradas plausíveis.
@@ -44,7 +59,7 @@ export function buildQuiz(
   annotations: Annotation[],
   count: number,
 ): QuizQuestion[] {
-  const labelled = annotations.filter((a) => a.text.trim().length > 0);
+  const labelled = anotacoesQuizaveis(annotations);
   const selected = shuffle(labelled).slice(0, Math.min(count, labelled.length));
 
   return selected.map((annotation) => {
