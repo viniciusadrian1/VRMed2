@@ -1,100 +1,29 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Float } from "@react-three/drei";
-import * as THREE from "three";
-import { useMounted } from "@/hooks/use-mounted";
+import { useRef } from "react";
+import dynamic from "next/dynamic";
+import { useInView, useReducedMotion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 
-/** Camadas concêntricas que, ao serem cortadas, revelam a seção transversal. */
-const LAYERS = [
-  { radius: 1.0, color: "#d8c4b4" },
-  { radius: 0.74, color: "#bf564a" },
-  { radius: 0.5, color: "#e6e2d9" },
-  { radius: 0.27, color: "#0f4c81" },
-];
+// Carrega o three.js/R3F sob demanda: mantém a landing leve no primeiro carregamento.
+const HeroCanvas = dynamic(
+  () => import("./HeroCanvas").then((m) => m.HeroCanvas),
+  { ssr: false, loading: () => <Skeleton className="size-full rounded-2xl" /> },
+);
 
-/** Esfera anatômica seccionada que gira lentamente — espelha a marca do VRmed. */
-function CrossSectionModel() {
-  const group = useRef<THREE.Group>(null);
-  // Plano de corte fixo que expõe o interior das camadas.
-  const clipPlane = useMemo(
-    () => new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.08),
-    [],
-  );
-
-  useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.3;
-  });
-
-  return (
-    <Float speed={1.3} rotationIntensity={0.25} floatIntensity={0.45}>
-      <group ref={group} rotation={[0.32, 0, 0.08]}>
-        {LAYERS.map((layer) => (
-          <mesh key={layer.radius} castShadow receiveShadow>
-            <sphereGeometry args={[layer.radius, 64, 64]} />
-            <meshStandardMaterial
-              color={layer.color}
-              roughness={0.5}
-              metalness={0.04}
-              clippingPlanes={[clipPlane]}
-              clipShadows
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-        ))}
-        {/* Malha externa em arame — dá profundidade e leitura de "modelo 3D". */}
-        <mesh>
-          <sphereGeometry args={[1.16, 28, 28]} />
-          <meshBasicMaterial
-            color="#0f4c81"
-            wireframe
-            transparent
-            opacity={0.12}
-          />
-        </mesh>
-      </group>
-    </Float>
-  );
-}
-
-/** Demonstração 3D exibida na seção hero da landing page. */
+/**
+ * Demonstração 3D exibida na seção hero da landing page. Só anima quando está
+ * na viewport e respeita prefers-reduced-motion — fora disso a cena fica
+ * estática (frameloop "demand"), sem queimar GPU ociosa.
+ */
 export function HeroScene() {
-  const mounted = useMounted();
-
-  if (!mounted) {
-    return <Skeleton className="size-full rounded-2xl" />;
-  }
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.2 });
+  const reduce = useReducedMotion();
 
   return (
-    <Canvas
-      shadows="percentage"
-      dpr={[1, 2]}
-      camera={{ position: [0, 0.35, 3.5], fov: 42 }}
-      gl={{ antialias: true, alpha: true }}
-      onCreated={({ gl }) => {
-        // Necessário para que os clipping planes sejam aplicados por material.
-        gl.localClippingEnabled = true;
-      }}
-    >
-      <ambientLight intensity={0.7} />
-      <directionalLight
-        position={[3, 5, 4]}
-        intensity={2.4}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-      />
-      <directionalLight position={[-4, 2, -3]} intensity={0.6} color="#9fc3dd" />
-      <CrossSectionModel />
-      <ContactShadows
-        position={[0, -1.3, 0]}
-        opacity={0.35}
-        scale={6}
-        blur={2.6}
-        far={3}
-        frames={1}
-      />
-    </Canvas>
+    <div ref={ref} className="size-full">
+      <HeroCanvas active={inView && !reduce} />
+    </div>
   );
 }
