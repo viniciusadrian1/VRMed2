@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConsentBanner } from "@/components/analytics/ConsentBanner";
 import { AnalyticsScript } from "@/components/analytics/AnalyticsScript";
+import { SITE_URL } from "@/lib/site-url";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,12 +17,6 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   display: "swap",
 });
-
-/**
- * URL base do site. Resolve todas as URLs absolutas (Open Graph, ícones,
- * manifesto). Defina NEXT_PUBLIC_SITE_URL no ambiente de produção.
- */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vrmed.vercel.app";
 
 const SITE_DESCRIPTION =
   "Plataforma de estudo de anatomia com visualização 3D interativa, cortes anatômicos, comparação saudável × patológico, realidade virtual e um tutor de IA fundamentado em fontes médicas confiáveis.";

@@ -107,6 +107,8 @@ Licença acadêmica do TotalSegmentator: configurada em 2026-09-02 (regras em
 **Multi-máquina:** no Mac dá para editar frontend, rodar `npm run dev`, commitar e push
 (Render faz deploy automático do GitHub). Processamento de exames novos: só no PC (CUDA).
 `.env` (OPENAI_API_KEY) não está no git — copiar manualmente se precisar do tutor local.
+O domínio público (canonical/Open Graph/sitemap/robots) vem de `NEXT_PUBLIC_SITE_URL` ou, sem
+ela, de `RENDER_EXTERNAL_URL` (injetada pelo Render); em dev cai em `http://localhost:3000`.
 
 ## O que é
 

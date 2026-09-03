@@ -89,6 +89,7 @@ npm run lint        # ESLint
 | `ADMIN_PASSWORD`            | Para /admin | Senha de acesso às páginas administrativas (HTTP Basic Auth).   |
 | `NEXT_PUBLIC_ANALYTICS_URL` | Opcional    | URL da instância de analytics (Umami self-hosted recomendado).  |
 | `NEXT_PUBLIC_ANALYTICS_ID`  | Opcional    | ID do site/projeto no analytics.                                |
+| `NEXT_PUBLIC_SITE_URL`      | Opcional    | URL pública do site (canonical/OG/sitemap). No Render cai em `RENDER_EXTERNAL_URL` automaticamente. |
 
 Sem `OPENAI_API_KEY`, todo o restante da aplicação funciona — apenas o chat
 tutor fica indisponível. Sem as variáveis de analytics, nenhuma telemetria é

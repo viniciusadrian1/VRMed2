@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vrmed.vercel.app";
+import { SITE_URL } from "@/lib/site-url";
 
 /** Mapa do site com as rotas públicas (exclui as páginas administrativas). */
 export default function sitemap(): MetadataRoute.Sitemap {
