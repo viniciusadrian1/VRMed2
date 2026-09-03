@@ -47,7 +47,7 @@ export function QuestionCard({
               <button
                 key={option}
                 type="button"
-                disabled={answered}
+                aria-disabled={answered}
                 onClick={() => onSelect(option)}
                 aria-label={
                   answered
@@ -59,7 +59,7 @@ export function QuestionCard({
                     : option
                 }
                 className={cn(
-                  "flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
+                  "flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors aria-disabled:cursor-default",
                   !answered && "border-border hover:bg-muted",
                   answered &&
                     isCorrectOption &&
@@ -102,7 +102,7 @@ export function QuestionCard({
                 </span>
               )}
             </p>
-            <Button onClick={onNext}>
+            <Button autoFocus onClick={onNext}>
               {isLast ? "Ver resultado" : "Próxima questão"}
             </Button>
           </div>
