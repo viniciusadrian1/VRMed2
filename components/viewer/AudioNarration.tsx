@@ -191,8 +191,7 @@ export function AudioNarration() {
   if (!description) {
     return (
       <p className="px-4 py-10 text-center text-sm text-muted-foreground">
-        Descrição indisponível. Adicione o arquivo{" "}
-        <code className="text-xs">/descriptions/{organId}.json</code>.
+        Este modelo ainda não tem descrição narrada.
       </p>
     );
   }
@@ -242,7 +241,7 @@ export function AudioNarration() {
                 ? "Pausado"
                 : useSpeech
                   ? "Voz do navegador"
-                  : "Áudio pré-gravado"}
+                  : "Áudio alternativo"}
           </span>
         </div>
 

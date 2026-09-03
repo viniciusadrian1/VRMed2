@@ -1,0 +1,6 @@
+{
+  "name": "Orelha interna",
+  "shortDescription": "Conjunto de estruturas do labirinto responsáveis pela audição e pelo equilíbrio.",
+  "fullDescription": "A orelha interna aloja-se na porção petrosa do osso temporal e é constituída por um labirinto ósseo, escavado no osso, dentro do qual se encontra o labirinto membranáceo, preenchido por líquidos. A cóclea, de formato espiralado, contém o órgão espiral, responsável por transformar as vibrações sonoras em impulsos nervosos, sede da audição. O vestíbulo abriga o utrículo e o sáculo, cujas máculas percebem a posição da cabeça e as acelerações lineares. Os canais semicirculares, dispostos em três planos do espaço, detectam os movimentos angulares e rotacionais da cabeça. As informações auditivas e de equilíbrio são conduzidas ao encéfalo pelo nervo vestibulococlear, que reúne os ramos coclear e vestibular. Em conjunto, essas estruturas garantem a percepção do som e a manutenção do equilíbrio corporal.",
+  "sources": ["Gray's Anatomy, 42ª ed.", "Moore — Anatomia Orientada para a Clínica", "Netter — Atlas de Anatomia Humana"]
+}
