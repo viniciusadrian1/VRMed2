@@ -29,6 +29,9 @@ export default function PrivacyPage() {
         <h1 className="font-serif text-4xl font-medium tracking-tight">
           Política de Privacidade
         </h1>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Última atualização: 3 de setembro de 2026
+        </p>
         <p className="mt-3 text-muted-foreground">
           O VRmed é um projeto de Iniciação Científica em educação médica. Esta
           página descreve, de forma transparente, quais dados a aplicação coleta
@@ -75,8 +78,8 @@ export default function PrivacyPage() {
                 irreversível e uma categoria temática.
               </li>
               <li>
-                Utilizamos uma solução de analytics que prioriza a privacidade,
-                sem rastreamento entre sites.
+                Utilizamos o Umami, uma solução de analytics que prioriza a
+                privacidade, sem cookies nem rastreamento entre sites.
               </li>
             </ul>
           </section>
@@ -108,15 +111,43 @@ export default function PrivacyPage() {
               Dados armazenados no seu navegador
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Sessões de estudo, anotações e conversas ficam salvas apenas no
-              seu próprio navegador (armazenamento local) e nunca são enviadas a
-              servidores. Você pode removê-las a qualquer momento limpando os
-              dados do site.
+              Sessões de estudo, anotações e o histórico de conversas ficam
+              salvos apenas no seu navegador (armazenamento local). As mensagens
+              que você envia ao tutor de IA são transmitidas ao nosso servidor
+              somente para gerar a resposta e não são guardadas nele. Você pode
+              remover tudo limpando os dados do site.
             </p>
           </section>
 
           <section>
+            <h2 className="font-serif text-xl font-medium">
+              Serviços de terceiros
+            </h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+              <li>
+                <strong className="font-medium text-foreground">OpenAI</strong>{" "}
+                — as perguntas ao tutor são processadas pela API da OpenAI, nos
+                Estados Unidos, exclusivamente para gerar a resposta. Não inclua
+                dados pessoais nas perguntas.
+              </li>
+              <li>
+                <strong className="font-medium text-foreground">Umami</strong> —
+                analytics sem cookies nem rastreamento entre sites, carregado só
+                depois do seu consentimento no banner.
+              </li>
+              <li>
+                <strong className="font-medium text-foreground">Spotify</strong>{" "}
+                — opcional, na Sala de Estudos: o login usa apenas escopos de
+                reprodução e playlists, os tokens ficam só no seu navegador e
+                &quot;Desconectar Spotify&quot; os apaga. Nada passa pelo
+                servidor do VRmed.
+              </li>
+            </ul>
+          </section>
+
+          <section>
             <h2 className="font-serif text-xl font-medium">Contato</h2>
+            {/* TODO(dono): incluir e-mail do grupo e, se houver, nº do CAAE */}
             <p className="mt-2 text-muted-foreground">
               Dúvidas sobre o tratamento de dados podem ser encaminhadas à
               equipe responsável pelo projeto de Iniciação Científica do VRmed.

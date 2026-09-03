@@ -158,7 +158,17 @@ export function SalaApp() {
                     ? "O login não terminou — tente de novo."
                     : spotifyEstado === "conectado"
                       ? "O rádio da sala controla o que toca no seu celular, computador ou no Spotify do Quest (Premium para controlar)."
-                      : "Usa só o estado de reprodução e suas playlists, guardados neste navegador; nada vai para o servidor do VRmed. Conecte antes de entrar em VR."}
+                      : (
+                          <>
+                            Usa só o estado de reprodução e suas playlists,
+                            guardados neste navegador; nada vai para o servidor
+                            do VRmed. Conecte antes de entrar em VR. Veja a{" "}
+                            <Link href="/privacidade" className="underline">
+                              política de privacidade
+                            </Link>
+                            .
+                          </>
+                        )}
                 </p>
               </div>
             )}
