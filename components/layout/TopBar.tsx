@@ -36,7 +36,7 @@ export function TopBar({ title, description, actions }: TopBarProps) {
           aria-label="Sobre o projeto"
           title="Sobre o projeto"
         >
-          <Link href="/#sobre">
+          <Link href="/#pesquisa">
             <HelpCircle />
           </Link>
         </Button>
