@@ -20,6 +20,15 @@ O produto continua sendo o site; Unity NÃO vira runtime. Claude opera o Editor
 via MCP (ver memória unity-mcp-setup: servidor HTTP :8080 da janela MCP for
 Unity precisa estar ligado).
 
+**Auditoria geral (2026-09-03):** varredura da plataforma inteira por 13 lentes + juiz +
+refutador adversarial (`docs/AUDITORIA-2026-09-03.md`). 109 achados; 29 corrigidos em 27
+commits (vitrine honesta = fontes do tutor, par patológico, aviso educacional; acessibilidade
+de quiz/duelo por teclado; robustez do tutor; overlay que travava o catálogo). Pendências que
+exigem headset ou decisão do grupo: bloquear modelos > 150k no Entrar em VR (#14), rótulo da
+estrutura em VR (#13), persistência do feedback no Render (#28), unificar store de XR (#20),
+rate limit no /api/chat (#27). Backlog de 69 achados aprovados (47 sem refutação adversarial
+por limite de uso) aguardando um 3º lote.
+
 **Sala no Quest (teste do grupo, 2026-09-02):** origem do VR movida para o CENTRO DO ASSENTO
 (`XROrigin [0,0,-1.15]`; antes ficava em z −0,55, atrás do encosto, e a cabeça entrava nele).
 Painéis reposicionados a ~1,1 m dos olhos (flashcards à esquerda, tutor à direita, hub atrás do
