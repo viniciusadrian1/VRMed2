@@ -464,7 +464,7 @@ export default function LandingPage() {
         <div className="border-t border-border">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 py-5 text-xs text-muted-foreground md:flex-row md:px-8">
             <p>© {new Date().getFullYear()} VRmed · Iniciação Científica</p>
-            <p>Feito para estudantes da área da saúde.</p>
+            <p className="text-center md:text-right">Conteúdo educacional para estudo de anatomia. Não substitui livros-texto, aulas, laudos nem avaliação médica.</p>
           </div>
         </div>
       </footer>
