@@ -161,10 +161,10 @@ function Radio() {
     ? aviso
     : viaSpotify
       ? reproducao
-        ? `${reproducao.tocando ? "♪" : "II"} ${reproducao.faixa} — ${reproducao.artista}`
+        ? `${reproducao.tocando ? "Tocando:" : "Pausado:"} ${reproducao.faixa} — ${reproducao.artista}`
         : "Spotify conectado — dê play no celular ou no Quest"
       : nome
-        ? `♪ ${nome}`
+        ? `Tocando: ${nome}`
         : "Rádio lo-fi — clique para ligar";
 
   return (

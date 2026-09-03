@@ -546,7 +546,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
           {`Você ${pontosJogador} × ${pontosBot} ${BOTS[dificuldade].nome.split(" (")[0]}`}
         </Text3D>
         <BotaoLousa
-          texto="→ Jogar de novo"
+          texto="Jogar de novo"
           position={[LOUSA_X, -0.17, LOUSA_Z]}
           cor="#bfe8cf"
           size={0.065}
@@ -554,7 +554,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
           onClick={() => comecar(dificuldade)}
         />
         <BotaoLousa
-          texto="→ Trocar dificuldade"
+          texto="Trocar dificuldade"
           position={[LOUSA_X, -0.31, LOUSA_Z]}
           size={0.055}
           width={1.1}

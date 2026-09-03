@@ -26,6 +26,11 @@ export const ARENA_FONT = "/fonts/inter-600.woff";
  * acontecer no meio da rodada (um "ó" que ainda não apareceu, por exemplo),
  * o headset engasga. Pré-carregando dígitos, acentos e pontuação, o custo
  * fica todo no carregamento da página.
+ *
+ * REGRA: qualquer glifo novo usado em <Text3D> (todos os modos passam por
+ * aqui — Arena, Duelo e Sala) precisa (1) existir em inter-600.woff E (2)
+ * entrar na string abaixo. Glifo fora da fonte faz o troika buscar um
+ * fallback na CDN (jsdelivr) em runtime — proibido no evento sem rede.
  */
 // Só no navegador: o troika usa `self` e quebraria a pré-renderização.
 if (typeof window !== "undefined") {
@@ -33,7 +38,7 @@ if (typeof window !== "undefined") {
     {
       font: ARENA_FONT,
       characters:
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ·×ÁÂÃÀÇÉÊÍÓÔÕÚáâãàçéêíóôõú.,:!?()-",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ·×ÁÂÃÀÇÉÊÍÓÔÕÚáâãàçéêíóôõú.,:!?()-<>↓…—+/",
     },
     () => {},
   );
