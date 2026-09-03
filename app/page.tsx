@@ -442,6 +442,18 @@ export default function LandingPage() {
             <Link href="/quiz" className="text-muted-foreground hover:text-foreground">
               Quiz
             </Link>
+            <Link href="/sala" className="text-muted-foreground hover:text-foreground">
+              Sala de estudos
+            </Link>
+            <Link href="/duelo" className="text-muted-foreground hover:text-foreground">
+              Duelo 1×1
+            </Link>
+            <Link href="/clinica" className="text-muted-foreground hover:text-foreground">
+              Clínica
+            </Link>
+            <Link href="/arena" className="text-muted-foreground hover:text-foreground">
+              Arena VR
+            </Link>
             <Link href="/history" className="text-muted-foreground hover:text-foreground">
               Histórico
             </Link>

@@ -4,7 +4,18 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vrmed.vercel.app";
 
 /** Mapa do site com as rotas públicas (exclui as páginas administrativas). */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/viewer", "/compare", "/quiz", "/history", "/privacidade"];
+  const routes = [
+    "",
+    "/viewer",
+    "/compare",
+    "/quiz",
+    "/sala",
+    "/duelo",
+    "/clinica",
+    "/arena",
+    "/history",
+    "/privacidade",
+  ];
   return routes.map((path) => ({
     url: `${SITE_URL}${path}`,
     changeFrequency: "monthly",
