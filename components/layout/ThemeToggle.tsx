@@ -9,7 +9,7 @@ import { useMounted } from "@/hooks/use-mounted";
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = useMounted();
-  const isDark = resolvedTheme === "dark";
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
     <Button
@@ -20,7 +20,7 @@ export function ThemeToggle() {
       title={isDark ? "Tema claro" : "Tema escuro"}
     >
       {/* Antes da montagem renderiza um ícone neutro para evitar mismatch de hidratação */}
-      {mounted && isDark ? <Sun /> : <Moon />}
+      {isDark ? <Sun /> : <Moon />}
     </Button>
   );
 }
