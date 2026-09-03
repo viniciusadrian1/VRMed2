@@ -136,6 +136,14 @@ export function SalaApp() {
             >
               Entrar em VR
             </button>
+            <button
+              type="button"
+              onClick={() => setTutorAberto(true)}
+              className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-5 py-2 text-sm font-medium text-white backdrop-blur hover:bg-black/70"
+            >
+              <BookOpen className="size-4 text-[#c8935a]" />
+              Tutor de IA
+            </button>
             {xrError && (
               <p className="pointer-events-auto max-w-md rounded-lg border border-red-400/40 bg-red-950/70 px-4 py-2 text-xs text-red-200">
                 Não foi possível iniciar o VR: {xrError}
@@ -182,7 +190,11 @@ export function SalaApp() {
 
           {/* Gaveta do tutor (desktop) */}
           {tutorAberto && (
-            <aside className="absolute bottom-0 right-0 top-0 z-20 flex w-full max-w-md flex-col border-l border-white/10 bg-[#10151c]/95 backdrop-blur">
+            <aside
+              role="dialog"
+              aria-label="Tutor de IA"
+              className="absolute bottom-0 right-0 top-0 z-20 flex w-full max-w-md flex-col border-l border-white/10 bg-[#10151c]/95 backdrop-blur"
+            >
               <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
                 <span className="flex items-center gap-2 text-sm font-semibold text-white">
                   <BookOpen className="size-4 text-[#c8935a]" />
@@ -197,7 +209,7 @@ export function SalaApp() {
                   <X className="size-4" />
                 </button>
               </header>
-              <div className="flex-1 space-y-3 overflow-y-auto p-4">
+              <div aria-live="polite" className="flex-1 space-y-3 overflow-y-auto p-4">
                 {mensagens.length === 0 && (
                   <p className="text-sm text-white/50">
                     Pergunte qualquer coisa de anatomia, fisiologia ou
@@ -222,6 +234,8 @@ export function SalaApp() {
                 <input
                   value={pergunta}
                   onChange={(event) => setPergunta(event.target.value)}
+                  aria-label="Sua dúvida de estudo"
+                  autoFocus
                   placeholder="Sua dúvida de estudo…"
                   className="flex-1 rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#c8935a]/60"
                 />
