@@ -209,8 +209,8 @@ export function SalaApp() {
                     key={i}
                     className={
                       m.role === "user"
-                        ? "ml-8 rounded-xl bg-[#c8935a]/20 px-3 py-2 text-sm text-white"
-                        : "mr-8 rounded-xl bg-white/5 px-3 py-2 text-sm text-white/90"
+                        ? "ml-8 whitespace-pre-wrap break-words rounded-xl bg-[#c8935a]/20 px-3 py-2 text-sm text-white"
+                        : "mr-8 whitespace-pre-wrap break-words rounded-xl bg-white/5 px-3 py-2 text-sm text-white/90"
                     }
                   >
                     {m.content || "…"}
