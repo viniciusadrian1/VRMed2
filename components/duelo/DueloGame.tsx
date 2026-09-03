@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -62,6 +62,9 @@ const BOTS: Record<
   residente: { nome: "Dra. Reis (residente)", atrasoMin: 4, atrasoMax: 7, acerto: 0.72 },
   especialista: { nome: "Dr. Chefe (especialista)", atrasoMin: 2.6, atrasoMax: 4.6, acerto: 0.9 },
 };
+
+// Ordem iniciante/residente/especialista = teclas 1/2/3 (mesma ordem dos menus 3D).
+const NIVEIS = Object.keys(BOTS) as Dificuldade[];
 
 type Fase = "menu" | "contagem" | "rodada" | "feedback" | "fim";
 
@@ -357,6 +360,33 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       travadoAte.current = relogio.current + 1.6;
     }
   };
+
+  // Atalho de teclado para DESKTOP (no headset não há teclado — lá joga-se com
+  // laser/olhar). Sem array de deps de propósito: re-registra a cada render e
+  // enxerga fase/rodada/dificuldade atuais (comecar/responder já são recriadas
+  // por render). `"123".indexOf("")` retorna 0 — daí o `&& k`. Escape NÃO é
+  // mapeado (no VR ele encerra a sessão). Reaproveita responder(), que já trava
+  // rodada encerrada/lockout, então não duplica pontuação.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      const k = e.key.toLowerCase();
+      if (fase === "menu") {
+        const i = "123".indexOf(k);
+        if (i >= 0 && k) comecar(NIVEIS[i]);
+        return;
+      }
+      if (fase === "rodada" && rodada) {
+        let i = "1234".indexOf(k);
+        if (i < 0) i = "abcd".indexOf(k);
+        if (i >= 0 && k && rodada.opcoes[i]) responder(rodada.opcoes[i]);
+        return;
+      }
+      if (fase === "fim" && k === "enter") comecar(dificuldade);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   // Cronômetro, contagem regressiva e o "raciocínio" do bot — tudo num
   // useFrame, empurrando para o React só quando um valor visível muda.

@@ -184,7 +184,8 @@ export function DueloApp() {
             )}
             <p className="max-w-lg px-4 text-center text-[11px] text-white/50">
               Duelo de conhecimento médico — funciona também no desktop com o
-              mouse. Escolha a dificuldade no painel 3D.
+              mouse ou o teclado (1–3 escolhe a dificuldade, 1–4/A–D responde,
+              Enter repete).
             </p>
           </div>
         </>
@@ -192,6 +193,8 @@ export function DueloApp() {
 
       <Canvas
         key={ambiente}
+        role="application"
+        aria-label="Duelo 1×1 em 3D. Menu: teclas 1 a 3 escolhem a dificuldade; na rodada, 1 a 4 ou A a D respondem; ao final, Enter joga de novo."
         shadows={false}
         dpr={1}
         frameloop="always"
