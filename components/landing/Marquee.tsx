@@ -34,8 +34,10 @@ export function Marquee({ items, label }: MarqueeProps) {
     );
   }
 
-  // Duplicado para a rolagem parecer infinita.
-  const loop = [...items, ...items];
+  // Repetido 4× para a rolagem parecer infinita: com poucas fontes, duas
+  // cópias não preenchem a faixa e deixam um vão vazio; -50% equivale a
+  // duas cópias, então o reset continua sem emenda visível.
+  const loop = Array(4).fill(items).flat();
 
   return (
     <div

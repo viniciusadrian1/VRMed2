@@ -40,10 +40,10 @@ const ITEMS: ShowcaseItem[] = [
     eyebrow: "Tutor de IA",
     title: "Uma dúvida, uma fonte confiável.",
     description:
-      "Pergunte sobre a estrutura em foco e receba respostas claras, sempre fundamentadas em referências médicas reconhecidas — nunca em achismos.",
+      "Pergunte sobre a estrutura em foco e receba respostas curtas e diretas, fundamentadas nos tratados da graduação, nunca em achismos.",
     bullets: [
       "Contextualizado no órgão que você estuda",
-      "Cita apenas fontes médicas reconhecidas",
+      "Indica em qual tratado aprofundar",
       "Respostas avaliadas por especialistas",
     ],
     cta: { href: "/viewer", label: "Conversar com o tutor" },

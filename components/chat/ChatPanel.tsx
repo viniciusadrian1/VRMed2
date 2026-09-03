@@ -160,7 +160,8 @@ function ChatPanelContent() {
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Tire dúvidas de anatomia e fisiologia. Respostas curtas, com base
-                nos tratados da graduação (Moore, Gray, Netter, Guyton).
+                nos tratados da graduação (Moore, Gray, Netter, Sobotta, Guyton,
+                Robbins).
               </p>
             </div>
             <div className="flex w-full flex-col gap-2">

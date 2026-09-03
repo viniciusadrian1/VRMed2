@@ -207,23 +207,24 @@ estruturado em torno de seis diretrizes, derivadas dos requisitos da IC:
 
 1. **Papel** — tutor de anatomia/fisiologia para estudantes de medicina, com
    profundidade calibrada para a graduação e incentivo ao estudo ativo.
-2. **Fontes (regra inegociável)** — toda afirmação deve se basear apenas nas
-   fontes médicas reconhecidas (PubMed, UpToDate, Mayo Clinic, Cleveland Clinic,
-   NIH/MedlinePlus, WHO, Cochrane, NEJM, JAMA, The Lancet, BMJ, AMBOSS, Gray's
-   Anatomy, Netter, Sobotta, Moore) e citar a fonte no formato `[Fonte: X]`.
+2. **Fontes** — ensina apenas o que está consolidado nos tratados da graduação
+   (Moore, Gray's Anatomy, Netter, Sobotta, Guyton & Hall, Robbins); veta sites,
+   blogs e artigos não verificáveis; indica onde estudar uma única vez, no fim,
+   em frase natural, e só com certeza; nunca inventa referência.
 3. **Escopo** — recusa cordial a perguntas fora do âmbito educacional médico.
 4. **Limites clínicos** — proibição explícita de diagnóstico ou conduta para
    casos reais; orientação a procurar um profissional.
-5. **Formato** — português do Brasil, Markdown, respostas concisas.
+5. **Formato** — português do Brasil, texto puro sem Markdown (a gaveta da Sala
+   e o painel VR não renderizam Markdown), 2 a 5 frases.
 6. **Contexto dinâmico** — o órgão/sistema atualmente visualizado é acrescentado
    ao final do prompt.
 
 O chat usa o **ChatGPT da OpenAI** (`gpt-4o` por padrão), via Route Handler do
 Next.js com resposta em streaming. O bloco estável de diretrizes é mantido no
 início do system prompt, favorecendo o cache automático de prompt da OpenAI; o
-contexto do modelo em foco é anexado ao final. As citações `[Fonte: X]` são
-detectadas no cliente e renderizadas como chips visuais
-(`components/chat/SourceCitation.tsx`).
+contexto do modelo em foco é anexado ao final. O chip de citação em
+`components/chat/SourceCitation.tsx` é legado do prompt antigo (`[Fonte: X]`) e
+não é mais acionado.
 
 ---
 

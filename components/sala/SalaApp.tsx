@@ -191,7 +191,7 @@ export function SalaApp() {
                   <p className="text-sm text-white/50">
                     Pergunte qualquer coisa de anatomia, fisiologia ou
                     patologia. Respostas curtas, com base nos tratados da
-                    graduação (Moore, Gray, Netter, Guyton).
+                    graduação (Moore, Gray, Netter, Sobotta, Guyton, Robbins).
                   </p>
                 )}
                 {mensagens.map((m, i) => (

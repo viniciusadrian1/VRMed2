@@ -50,20 +50,21 @@ const STEPS = [
 
 const SOURCE_GROUPS: { label: string; items: string[] }[] = [
   {
-    label: "Bases e diretrizes",
-    items: ["PubMed", "Cochrane Library", "UpToDate", "AMBOSS"],
+    label: "Anatomia",
+    items: [
+      "Moore (Anatomia Orientada para a Clínica)",
+      "Gray's Anatomy",
+      "Netter",
+      "Sobotta",
+    ],
   },
   {
-    label: "Periódicos científicos",
-    items: ["NEJM", "JAMA", "The Lancet", "BMJ"],
+    label: "Fisiologia",
+    items: ["Guyton & Hall"],
   },
   {
-    label: "Instituições de referência",
-    items: ["Mayo Clinic", "Cleveland Clinic", "NIH / MedlinePlus", "WHO"],
-  },
-  {
-    label: "Atlas de anatomia",
-    items: ["Gray's Anatomy", "Netter Atlas", "Sobotta", "Moore"],
+    label: "Patologia",
+    items: ["Robbins"],
   },
 ];
 
@@ -191,7 +192,7 @@ export default function LandingPage() {
         <section className="border-y border-border bg-card py-8">
           <div className="mx-auto max-w-6xl px-5 md:px-8">
             <p className="mb-5 text-center text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              Fundamentado em referências médicas reconhecidas
+              Fundamentado nos tratados da graduação
             </p>
             <Marquee items={ALL_SOURCES} label="Fontes médicas de referência" />
           </div>
@@ -307,10 +308,10 @@ export default function LandingPage() {
           <SectionHeading
             eyebrow="Fontes"
             title="Confiança que você pode citar."
-            description="O tutor de IA é instruído a responder citando exclusivamente fontes médicas reconhecidas. Estas são as referências utilizadas:"
+            description="O tutor de IA é instruído a ensinar só o que está consolidado nos tratados usados na graduação e a indicar, no fim da resposta, onde aprofundar:"
             className="mb-12"
           />
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-3">
             {SOURCE_GROUPS.map((group, index) => (
               <Reveal key={group.label} delay={(index % 4) * 0.07}>
                 <h3 className="mb-3 text-sm font-semibold text-muted-foreground">

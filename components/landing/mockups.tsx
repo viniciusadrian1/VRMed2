@@ -181,14 +181,9 @@ export function TutorMockup() {
             Decorre da sobrecarga crônica de pressão — sobretudo hipertensão
             arterial e estenose aórtica.
           </p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            <span className="rounded-full border border-border bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
-              Fonte · Mayo Clinic
-            </span>
-            <span className="rounded-full border border-border bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
-              Fonte · NEJM
-            </span>
-          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Isso está bem descrito no Guyton, no capítulo de músculo cardíaco.
+          </p>
         </div>
 
         {/* Campo de entrada */}
