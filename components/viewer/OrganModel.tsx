@@ -75,6 +75,7 @@ export function OrganModel() {
   const annotationMode = useVRMedStore((s) => s.annotationMode);
   const addAnnotation = useVRMedStore((s) => s.addAnnotation);
   const setInspectedLabel = useVRMedStore((s) => s.setInspectedLabel);
+  const inspectedLabel = useVRMedStore((s) => s.inspectedLabel);
   const invalidate = useThree((s) => s.invalidate);
   const inSession = useXR((state) => Boolean(state.session));
   const organ = getOrganById(organId);
@@ -138,26 +139,47 @@ export function OrganModel() {
     };
   }, []);
 
-  // Realça a estrutura clicada, restaurando o destaque anterior.
-  const highlightMesh = (mesh: THREE.Mesh) => {
+  // O destaque (emissive) segue o store: assim o X da InspectBar e os pontos
+  // numerados também controlam a cor, não só o clique direto na malha.
+  useEffect(() => {
+    // Restaura o destaque anterior antes de aplicar o novo.
     const previous = highlightRef.current;
     if (previous) {
       previous.materials.forEach((material, index) =>
         material.emissive.copy(previous.originals[index]),
       );
     }
-    const materials = (
-      Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-    ).filter(
-      (material): material is THREE.MeshStandardMaterial =>
-        Boolean(material) && "emissive" in material,
-    );
+    highlightRef.current = null;
+
+    if (!inspectedLabel || !modelReady || !contentRef.current) {
+      invalidate();
+      return;
+    }
+
+    // Todas as malhas com o mesmo rótulo são realçadas (uma estrutura pode ter
+    // várias malhas). O Set deduplica materiais caso alguma seja compartilhada,
+    // evitando clonar um "original" que já foi pintado de azul.
+    const materials = new Set<THREE.MeshStandardMaterial>();
+    contentRef.current.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      if (identifyStructure(mesh, organ?.name) !== inspectedLabel) return;
+      const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      list.forEach((material) => {
+        if (material && "emissive" in material) {
+          materials.add(material as THREE.MeshStandardMaterial);
+        }
+      });
+    });
+
+    const collected = [...materials];
     highlightRef.current = {
-      materials,
-      originals: materials.map((material) => material.emissive.clone()),
+      materials: collected,
+      originals: collected.map((material) => material.emissive.clone()),
     };
-    materials.forEach((material) => material.emissive.setHex(0x1f5fa8));
-  };
+    collected.forEach((material) => material.emissive.setHex(0x1f5fa8));
+    invalidate();
+  }, [inspectedLabel, modelReady, organ?.name, invalidate]);
 
   // Clique no modelo: cria anotação (modo marcação) ou identifica a estrutura.
   const handleModelClick = (event: ThreeEvent<MouseEvent>) => {
@@ -177,10 +199,9 @@ export function OrganModel() {
     }
 
     // Identifica a estrutura nomeada; sem nome (órgão de malha única),
-    // identifyStructure recai no nome do órgão.
+    // identifyStructure recai no nome do órgão. O destaque é aplicado pelo
+    // useEffect que observa `inspectedLabel`.
     setInspectedLabel(identifyStructure(event.object, organ?.name));
-    highlightMesh(event.object as THREE.Mesh);
-    invalidate();
   };
 
   if (!organ || !organId) return null;
