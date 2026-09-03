@@ -44,7 +44,7 @@ const ITEMS: ShowcaseItem[] = [
     bullets: [
       "Contextualizado no órgão que você estuda",
       "Indica em qual tratado aprofundar",
-      "Respostas avaliadas por especialistas",
+      "Avalie com 👍/👎 e alimente a validação da pesquisa",
     ],
     cta: { href: "/viewer", label: "Conversar com o tutor" },
     mockup: <TutorMockup />,

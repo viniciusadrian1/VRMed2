@@ -373,7 +373,7 @@ export default function LandingPage() {
                   {[
                     "Consentimento solicitado antes de qualquer coleta.",
                     "Dados anônimos, sem identificação dos estudantes.",
-                    "Avaliação das respostas da IA por especialistas.",
+                    "Respostas avaliadas pelos estudantes são revisadas pela equipe da pesquisa.",
                   ].map((point) => (
                     <li key={point} className="flex gap-3">
                       <ShieldCheck className="size-5 shrink-0 text-primary" />
