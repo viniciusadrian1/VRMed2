@@ -607,7 +607,13 @@ function TutorVR({ onFechar }: { onFechar: () => void }) {
       },
     )
       .then(() => setResposta(buffer.current))
-      .catch(() => setResposta("Tutor indisponível — sem conexão com a IA."))
+      .catch((error: unknown) =>
+        setResposta(
+          error instanceof Error
+            ? error.message
+            : "Não foi possível contatar o tutor de IA.",
+        ),
+      )
       .finally(() => setOcupado(false));
   };
 

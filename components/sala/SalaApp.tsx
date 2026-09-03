@@ -81,11 +81,10 @@ export function SalaApp() {
     setMensagens([...historico, { role: "assistant", content: "" }]);
 
     abortRef.current = new AbortController();
-    // O servidor aceita até 40 mensagens não vazias: uma sessão longa ou
-    // uma resposta vazia (recusa do modelo) deixavam o tutor em 400 para
-    // sempre.
+    // O corte de histórico (40 msgs no servidor) é centralizado em
+    // streamChatResponse (lib/chat-client.ts).
     streamChatResponse(
-      { messages: historico.filter((m) => m.content.trim()).slice(-20) },
+      { messages: historico },
       (chunk) => {
         setMensagens((atual) => {
           const copia = [...atual];
@@ -105,7 +104,9 @@ export function SalaApp() {
           copia[copia.length - 1] = {
             role: "assistant",
             content:
-              error instanceof Error ? error.message : "Tutor indisponível.",
+              error instanceof Error
+                ? error.message
+                : "Não foi possível contatar o tutor de IA.",
           };
           return copia;
         });

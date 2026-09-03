@@ -26,12 +26,14 @@ function ChatPanelContent() {
   const addChatMessage = useVRMedStore((s) => s.addChatMessage);
   const appendToChatMessage = useVRMedStore((s) => s.appendToChatMessage);
   const clearChat = useVRMedStore((s) => s.clearChat);
+  const setChat = useVRMedStore((s) => s.setChat);
   const setChatOpen = useVRMedStore((s) => s.setChatOpen);
   const organId = useVRMedStore((s) => s.currentOrganId);
   const organ = getOrganById(organId);
 
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Controla o streaming em andamento para poder abortá-lo.
@@ -51,12 +53,14 @@ function ChatPanelContent() {
   const handleClearChat = () => {
     abortRef.current?.abort();
     setIsStreaming(false);
+    setErro(null);
     clearChat();
   };
 
   const sendMessage = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isStreaming) return;
+    setErro(null);
 
     const userMessage: ChatMessage = {
       id: genId(),
@@ -71,9 +75,9 @@ function ChatPanelContent() {
 
     // Lê o estado mais recente da store (evita um `chat` desatualizado em
     // envios rápidos e sucessivos).
-    const history = [...useVRMedStore.getState().chat, userMessage]
-      .filter((message) => message.content.trim().length > 0)
-      .map((message) => ({ role: message.role, content: message.content }));
+    const history = [...useVRMedStore.getState().chat, userMessage].map(
+      (message) => ({ role: message.role, content: message.content }),
+    );
 
     const assistantId = genId();
     addChatMessage({
@@ -105,15 +109,28 @@ function ChatPanelContent() {
       // Abortos (troca de órgão, fechar painel, limpar) não são erros.
       if (controller.signal.aborted) return;
       const message =
-        error instanceof Error ? error.message : "Erro ao falar com o tutor.";
-      appendToChatMessage(
-        assistantId,
-        `\n\n⚠️ Não foi possível obter a resposta: ${message}`,
-      );
+        error instanceof Error
+          ? error.message
+          : "Não foi possível contatar o tutor de IA.";
+      // O erro não pode virar um turno "assistant": seria persistido, reenviado
+      // ao modelo e ganharia botões de feedback. Remove o placeholder (lendo o
+      // estado mais recente da store, não o `chat` do closure) e mostra o aviso
+      // à parte, com opção de tentar de novo.
+      setChat(useVRMedStore.getState().chat.filter((m) => m.id !== assistantId));
+      setErro(message);
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
       setIsStreaming(false);
     }
+  };
+
+  // Reenvia a última pergunta após uma falha (sendMessage re-adiciona a
+  // pergunta e o placeholder do assistente).
+  const retry = () => {
+    const last = useVRMedStore.getState().chat.at(-1);
+    if (!last || last.role !== "user") return;
+    setChat(useVRMedStore.getState().chat.slice(0, -1));
+    void sendMessage(last.content);
   };
 
   return (
@@ -195,6 +212,17 @@ function ChatPanelContent() {
       </div>
 
       <div className="shrink-0 border-t border-border p-3">
+        {erro && (
+          <p
+            role="alert"
+            className="mb-2 flex items-center justify-between gap-2 text-xs text-destructive"
+          >
+            <span>{erro}</span>
+            <Button variant="ghost" size="sm" onClick={retry}>
+              Tentar novamente
+            </Button>
+          </p>
+        )}
         <div className="flex items-end gap-2">
           <Textarea
             ref={textareaRef}

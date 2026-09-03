@@ -14,10 +14,14 @@ export async function streamChatResponse(
   onChunk: (text: string) => void,
   signal?: AbortSignal,
 ): Promise<void> {
+  // O servidor aceita no máximo 40 mensagens não vazias (app/api/chat/route.ts).
+  // Sem este corte, um chat longo persistido no localStorage deixava o tutor
+  // em 400 para sempre; 20 mensagens (10 trocas) bastam de contexto.
+  const messages = payload.messages.filter((m) => m.content.trim()).slice(-20);
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, messages }),
     signal,
   });
 
