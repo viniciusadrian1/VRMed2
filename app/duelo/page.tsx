@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DueloApp } from "@/components/duelo/DueloApp";
 
 export const metadata: Metadata = {
-  title: "Duelo 1×1 · VRmed",
+  title: "Duelo 1×1",
   description:
     "Duelo de conhecimento médico em 3D/VR: identifique órgãos e estruturas anatômicas antes do oponente. Contra bot em três dificuldades; online em breve.",
 };
