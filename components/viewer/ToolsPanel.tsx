@@ -47,7 +47,12 @@ function ToolsPanelContent({ onClose }: { onClose: () => void }) {
           <TabsContent value="anotacoes" className="mt-0">
             <AnnotationPanel />
           </TabsContent>
-          <TabsContent value="audio" className="mt-0">
+          {/* forceMount mantém a narração viva ao trocar de aba; a classe esconde quando inativa */}
+          <TabsContent
+            value="audio"
+            forceMount
+            className="mt-0 data-[state=inactive]:hidden"
+          >
             <AudioNarration />
           </TabsContent>
         </div>
