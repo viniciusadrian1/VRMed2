@@ -14,9 +14,12 @@ const CSV_COLUMNS = [
   "aiResponse",
 ];
 
-/** Converte os registros de feedback para CSV (com escape de aspas). */
+/** Converte os registros de feedback para CSV (com escape de aspas e de fórmulas (CSV injection)). */
 function toCsv(rows: FeedbackPayload[]): string {
-  const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+  const escape = (value: string) => {
+    const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+    return `"${safe.replace(/"/g, '""')}"`;
+  };
   const lines = rows.map((row) =>
     [
       row.timestamp,

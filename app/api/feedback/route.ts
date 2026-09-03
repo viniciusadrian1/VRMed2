@@ -14,10 +14,25 @@ const feedbackSchema = z.object({
     .max(4),
   comment: z.string().max(2000),
   currentOrgan: z.string().max(80),
-  timestamp: z.string().max(40),
 });
 
+// ponytail: limite em memória por instância; trocar por store compartilhado se houver mais de uma réplica
+const hits = new Map<string, number[]>();
+
 export async function POST(request: Request) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  const now = Date.now();
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 60_000);
+  if (recent.length >= 10) {
+    return Response.json(
+      { error: "Muitos envios; aguarde um minuto." },
+      { status: 429 },
+    );
+  }
+  recent.push(now);
+  hits.set(ip, recent);
+
   let rawBody: unknown;
   try {
     rawBody = await request.json();
@@ -37,7 +52,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await appendFeedback(parsed.data);
+    await appendFeedback({ ...parsed.data, timestamp: new Date().toISOString() });
   } catch {
     return Response.json(
       { error: "Não foi possível registrar o feedback." },

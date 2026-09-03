@@ -40,7 +40,7 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
     selectedTags: FeedbackTag[],
     commentText: string,
   ) => {
-    const payload: FeedbackPayload = {
+    const payload: Omit<FeedbackPayload, "timestamp"> = {
       messageId: message.id,
       userPrompt,
       aiResponse: message.content,
@@ -48,7 +48,6 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
       tags: selectedTags,
       comment: commentText,
       currentOrgan: organId ?? "",
-      timestamp: new Date().toISOString(),
     };
     void fetch("/api/feedback", {
       method: "POST",
