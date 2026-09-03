@@ -296,6 +296,8 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   const [humorBot, setHumorBot] = useState<HumorOponente>("idle");
   const [feedback, setFeedback] = useState("");
   const [erroJogador, setErroJogador] = useState(false);
+  // Alternativas já erradas nesta rodada: ficam cinzas e param de aceitar clique.
+  const [errados, setErrados] = useState<string[]>([]);
   const [contagem, setContagem] = useState(3);
   const [tempoRestante, setTempoRestante] = useState(TEMPO_RODADA);
 
@@ -327,6 +329,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     rodadaEncerrada.current = false;
     setTempoRestante(TEMPO_RODADA);
     setErroJogador(false);
+    setErrados([]);
     botPlano.current = planejarBot(BOTS[dificuldade]);
     setFase("rodada");
   };
@@ -342,6 +345,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   const responder = (opcao: string) => {
     if (faseRef.current !== "rodada" || rodadaEncerrada.current) return;
     if (relogio.current < travadoAte.current) return;
+    if (errados.includes(opcao)) return;
     if (opcao === rodada.alvo) {
       playHit();
       setPontosJogador((p) => p + rodada.pontos);
@@ -349,6 +353,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     } else {
       playMiss();
       setErroJogador(true);
+      setErrados((e) => [...e, opcao]);
       travadoAte.current = relogio.current + 1.6;
     }
   };
@@ -614,7 +619,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
                     width={1.55}
                     height={0.18}
                     position={[0, 0.1 - i * 0.22, 0.01]}
-                    color={erroJogador ? "#5c6b7a" : ARENA_COLORS.primary}
+                    color={erroJogador || errados.includes(opcao) ? "#5c6b7a" : ARENA_COLORS.primary}
                     onClick={() => responder(opcao)}
                   />
                 ))}
@@ -666,7 +671,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
                   key={opcao}
                   texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
                   position={[LOUSA_X, -0.09 - i * 0.1, LOUSA_Z]}
-                  cor={erroJogador ? "#8fae94" : "#f8fbef"}
+                  cor={erroJogador || errados.includes(opcao) ? "#8fae94" : "#f8fbef"}
                   size={0.052}
                   width={1.1}
                   onClick={() => responder(opcao)}
