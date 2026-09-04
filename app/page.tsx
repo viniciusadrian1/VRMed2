@@ -9,20 +9,27 @@ import {
   Sparkles,
 } from "lucide-react";
 import { BentoGrid } from "@/components/landing/BentoGrid";
-import { FeatureShowcase } from "@/components/landing/FeatureShowcase";
+import { CatalogExplorer } from "@/components/landing/CatalogExplorer";
 import { HeroScene } from "@/components/landing/HeroScene";
+import { HowItWorks } from "@/components/landing/HowItWorks";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { Marquee } from "@/components/landing/Marquee";
 import { Reveal } from "@/components/landing/Reveal";
-import { SectionHeading } from "@/components/landing/SectionHeading";
+import { SectionIntro } from "@/components/landing/SectionIntro";
+import { SourcesPanel } from "@/components/landing/SourcesPanel";
+import { StickyShowcase, type ShowItem } from "@/components/landing/StickyShowcase";
+import {
+  CompareMockup,
+  TutorMockup,
+  ViewerMockup,
+} from "@/components/landing/mockups";
 import { Logo } from "@/components/layout/Logo";
 import { Badge } from "@/components/ui/badge";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
+import { CrosshairFrame } from "@/components/ui/crosshair-frame";
 import { DotPattern } from "@/components/ui/dot-pattern";
-import { MagicCard } from "@/components/ui/magic-card";
 import { NumberTicker } from "@/components/ui/number-ticker";
-import { Timeline } from "@/components/ui/timeline";
+import { ScanBeam } from "@/components/ui/scan-beam";
 import { WordReveal } from "@/components/ui/word-reveal";
 import { getComparableOrgans, ORGANS, REGIONS, SYSTEMS } from "@/lib/organs";
 
@@ -41,6 +48,51 @@ const HERO_STATS: {
   { icon: Sparkles, text: "IA", label: "Tutor com fontes" },
   { icon: MonitorSmartphone, text: "VR", label: "No navegador" },
   { icon: Languages, value: 100, suffix: "%", label: "Em português" },
+];
+
+const SHOWCASE_ITEMS: ShowItem[] = [
+  {
+    indice: "01",
+    eyebrow: "Visualizador 3D",
+    titulo: "Disseque sem bisturi.",
+    descricao:
+      "Gire, amplie e isole cada camada de um modelo anatômico. Clique numa estrutura e descubra na hora o que ela é — com pontos numerados sobre as principais.",
+    bullets: [
+      "Controle livre de câmera e manipulação direta",
+      "Camadas com opacidade, cor e modo raio-X",
+      "Identificação por clique e pontos numerados",
+    ],
+    cta: { href: "/viewer", label: "Abrir o visualizador" },
+    visual: <ViewerMockup />,
+  },
+  {
+    indice: "02",
+    eyebrow: "Tutor de IA",
+    titulo: "Uma dúvida, uma fonte confiável.",
+    descricao:
+      "Pergunte sobre a estrutura em foco e receba respostas curtas e diretas, fundamentadas nos tratados da graduação, nunca em achismos.",
+    bullets: [
+      "Contextualizado no órgão que você estuda",
+      "Indica em qual tratado aprofundar",
+      "Avalie com 👍/👎 e alimente a validação da pesquisa",
+    ],
+    cta: { href: "/viewer", label: "Conversar com o tutor" },
+    visual: <TutorMockup />,
+  },
+  {
+    indice: "03",
+    eyebrow: "Saudável × patológico",
+    titulo: "Veja a doença, lado a lado.",
+    descricao:
+      "Compare a anatomia normal e a alterada com câmeras sincronizadas. Entenda visualmente o que a patologia transforma — como o fígado cirrótico ao lado do saudável.",
+    bullets: [
+      "Câmeras espelhadas para comparação precisa",
+      "Legendas com as diferenças anatômicas chave",
+      "Fígado com par patológico real; coração e pulmão em preparação",
+    ],
+    cta: { href: "/compare", label: "Comparar modelos" },
+    visual: <CompareMockup />,
+  },
 ];
 
 const STEPS = [
@@ -71,14 +123,8 @@ const SOURCE_GROUPS: { label: string; items: string[] }[] = [
       "Sobotta",
     ],
   },
-  {
-    label: "Fisiologia",
-    items: ["Guyton & Hall"],
-  },
-  {
-    label: "Patologia",
-    items: ["Robbins"],
-  },
+  { label: "Fisiologia", items: ["Guyton & Hall"] },
+  { label: "Patologia", items: ["Robbins"] },
 ];
 
 const ALL_SOURCES = SOURCE_GROUPS.flatMap((group) => group.items);
@@ -86,17 +132,17 @@ const ALL_SOURCES = SOURCE_GROUPS.flatMap((group) => group.items);
 const CATALOG_TIERS = [
   {
     label: "Sistemas",
-    caption: "Corpo inteiro, por sistema anatômico",
+    caption: "Corpo inteiro, organizado por sistema anatômico.",
     items: SYSTEMS.map((s) => s.name),
   },
   {
     label: "Regiões",
-    caption: "Anatomia regional detalhada e nomeada",
+    caption: "Anatomia regional detalhada, com estruturas nomeadas.",
     items: REGIONS.map((r) => r.name),
   },
   {
     label: "Órgãos",
-    caption: `Modelos individuais; ${getComparableOrgans().length} com par patológico`,
+    caption: `Modelos individuais; ${getComparableOrgans().length} com par patológico.`,
     items: ORGANS.map((o) => o.name),
   },
 ];
@@ -113,24 +159,36 @@ export default function LandingPage() {
       <main id="conteudo-principal">
         {/* ----------------------------- Hero ----------------------------- */}
         <section className="vrmed-radial relative overflow-hidden">
-          <DotPattern className="text-primary/[0.13] [mask-image:radial-gradient(70%_60%_at_50%_30%,#000,transparent)]" />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:gap-10 md:px-8 md:py-24">
+          <DotPattern className="text-primary/[0.07] [mask-image:radial-gradient(78%_65%_at_50%_22%,#000,transparent)]" />
+
+          <div className="relative mx-auto flex min-h-[calc(100dvh-4rem)] max-w-6xl flex-col justify-center gap-14 px-5 py-16 md:px-8 lg:grid lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:py-20">
             <Reveal>
+              <p className="mb-6 flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.28em] text-primary">
+                <span className="relative flex size-2" aria-hidden>
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary/60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-primary" />
+                </span>
+                Atlas 3D · VR · pt-BR
+              </p>
+
               <Badge variant="accent" className="mb-5">
                 <Sparkles className="size-3" />
                 Projeto de Iniciação Científica
               </Badge>
+
               <WordReveal
                 as="h1"
                 text="A anatomia humana, em 3D e ao seu alcance."
-                className="text-balance font-serif text-[2.6rem] font-medium leading-[1.05] tracking-tight md:text-6xl"
+                className="text-balance font-serif text-[2.9rem] font-medium leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl"
               />
-              <p className="mt-5 max-w-md text-pretty text-base text-muted-foreground md:text-lg">
+
+              <p className="mt-6 max-w-md text-pretty text-base text-muted-foreground md:text-lg">
                 O VRmed reúne modelos 3D interativos, cortes anatômicos,
                 realidade virtual e um tutor de IA — feito para estudantes de
                 medicina e das áreas da saúde.
               </p>
-              <div className="mt-7 flex flex-wrap items-center gap-3">
+
+              <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Button asChild size="lg" className="shadow-md">
                   <Link href="/viewer">
                     Iniciar estudo
@@ -141,6 +199,7 @@ export default function LandingPage() {
                   <Link href="#recursos">Ver recursos</Link>
                 </Button>
               </div>
+
               <p className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
                 <ShieldCheck className="size-4 shrink-0 text-primary" />
                 Respostas do tutor fundamentadas apenas em fontes médicas
@@ -150,21 +209,19 @@ export default function LandingPage() {
 
             <Reveal delay={0.15}>
               <div className="relative">
-                {/* Halo suave atrás do modelo */}
                 <div
-                  className="absolute inset-0 -z-10 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_18%,transparent),transparent)] blur-2xl"
+                  className="absolute inset-0 -z-10 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--primary)_20%,transparent),transparent)] blur-2xl"
                   aria-hidden
                 />
-                <div className="relative h-[340px] w-full overflow-hidden rounded-3xl border border-border bg-card/40 shadow-2xl shadow-primary/10 backdrop-blur-sm md:h-[480px]">
+                <CrosshairFrame
+                  coord="arraste para girar"
+                  className="h-[400px] w-full overflow-hidden rounded-3xl border border-border bg-card/30 shadow-2xl shadow-primary/10 backdrop-blur-sm md:h-[560px]"
+                >
                   <HeroScene />
-                  {/* Etiqueta flutuante: identificação por clique */}
-                  <span className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs font-medium shadow-md backdrop-blur">
-                    <span className="size-2 rounded-full bg-primary" />
-                    Corte transversal · 4 camadas
-                  </span>
-                </div>
-                {/* Chip flutuante: tutor de IA */}
-                <div className="absolute -right-2 top-6 hidden rounded-xl border border-border bg-card px-3 py-2 shadow-lg md:block">
+                  <ScanBeam />
+                </CrosshairFrame>
+
+                <div className="absolute -right-2 top-8 hidden rounded-xl border border-border bg-card px-3 py-2 shadow-lg md:block">
                   <p className="flex items-center gap-1.5 text-xs font-semibold text-primary">
                     <Sparkles className="size-3.5" />
                     Tutor de IA
@@ -178,7 +235,7 @@ export default function LandingPage() {
           </div>
 
           {/* Faixa de estatísticas */}
-          <div className="relative mx-auto max-w-6xl px-5 pb-14 md:px-8">
+          <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-8 md:px-8">
             <Reveal>
               <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-4">
                 {HERO_STATS.map((stat) => (
@@ -190,7 +247,7 @@ export default function LandingPage() {
                     <dt className="order-2 text-xs text-muted-foreground">
                       {stat.label}
                     </dt>
-                    <dd className="order-1 font-serif text-2xl font-medium md:text-3xl">
+                    <dd className="order-1 font-serif text-3xl font-medium md:text-4xl">
                       {stat.text ?? (
                         <NumberTicker value={stat.value ?? 0} suffix={stat.suffix} />
                       )}
@@ -205,7 +262,7 @@ export default function LandingPage() {
         {/* --------------------------- Faixa de fontes -------------------- */}
         <section className="border-y border-border bg-card py-8">
           <div className="mx-auto max-w-6xl px-5 md:px-8">
-            <p className="mb-5 text-center text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="mb-5 text-center font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
               Fundamentado nos tratados da graduação
             </p>
             <Marquee items={ALL_SOURCES} label="Fontes médicas de referência" />
@@ -215,102 +272,71 @@ export default function LandingPage() {
         {/* ----------------------------- Recursos ------------------------- */}
         <section
           id="recursos"
-          className="mx-auto max-w-6xl scroll-mt-20 px-5 py-20 md:px-8 md:py-28"
+          className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-20 md:px-8 md:pt-28"
         >
-          <SectionHeading
+          <SectionIntro
+            index="01"
             eyebrow="Recursos"
             title="Estude com a profundidade de uma dissecação."
-            description="Cada ferramenta foi pensada para transformar a anatomia plana do papel numa experiência tridimensional, interativa e fundamentada."
-            className="mb-16"
+            description="Cada ferramenta transforma a anatomia plana do papel numa experiência tridimensional, interativa e fundamentada. Role para percorrer as três principais."
+            className="mb-4"
           />
-          <FeatureShowcase />
-        </section>
-
-        {/* ------------------------ Bento de capacidades ------------------ */}
-        <section className="border-y border-border bg-card">
-          <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
-            <SectionHeading
-              eyebrow="E ainda"
-              title="Tudo o que um plantão de estudos precisa."
-              className="mb-12"
-            />
-            <BentoGrid />
-          </div>
+          <StickyShowcase items={SHOWCASE_ITEMS} />
         </section>
 
         {/* ----------------------------- Catálogo ------------------------- */}
-        <section
-          id="catalogo"
-          className="mx-auto max-w-6xl scroll-mt-20 px-5 py-20 md:px-8 md:py-28"
-        >
-          <SectionHeading
-            eyebrow="Catálogo"
-            title="Três níveis de detalhe, um corpo inteiro para explorar."
-            description="Comece pelo sistema completo, aprofunde numa região e termine no órgão — todos no mesmo ambiente."
+        <section className="border-y border-border bg-card">
+          <div
+            id="catalogo"
+            className="mx-auto max-w-6xl scroll-mt-20 px-5 py-20 md:px-8 md:py-28"
+          >
+            <SectionIntro
+              index="02"
+              eyebrow="Catálogo"
+              title="Três níveis de detalhe, um corpo inteiro para explorar."
+              description="Comece pelo sistema completo, aprofunde numa região e termine no órgão — todos no mesmo ambiente."
+              className="mb-10"
+            />
+            <Reveal>
+              <CatalogExplorer tiers={CATALOG_TIERS} />
+            </Reveal>
+            <Reveal className="mt-10 flex justify-center">
+              <Button asChild size="lg">
+                <Link href="/viewer">
+                  Explorar o catálogo
+                  <ArrowRight />
+                </Link>
+              </Button>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ------------------------ Bento de capacidades ------------------ */}
+        <section className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
+          <SectionIntro
+            index="03"
+            eyebrow="E ainda"
+            title="Tudo o que um plantão de estudos precisa."
             className="mb-12"
           />
-          <div className="grid gap-5 md:grid-cols-3">
-            {CATALOG_TIERS.map((tier, index) => (
-              <Reveal key={tier.label} delay={index * 0.08}>
-                <div className="h-full rounded-2xl border border-border bg-card shadow-sm">
-                  <MagicCard className="flex h-full flex-col p-6">
-                    <div className="flex items-baseline justify-between">
-                      <h3 className="font-serif text-xl font-medium">
-                        {tier.label}
-                      </h3>
-                      <span className="text-sm font-semibold text-primary">
-                        {tier.items.length}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {tier.caption}
-                    </p>
-                    <ul className="mt-4 flex flex-wrap gap-2">
-                      {tier.items.map((item) => (
-                        <li
-                          key={item}
-                          className="rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-medium"
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </MagicCard>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal className="mt-10 flex justify-center">
-            <Button asChild size="lg">
-              <Link href="/viewer">
-                Explorar o catálogo
-                <ArrowRight />
-              </Link>
-            </Button>
-          </Reveal>
+          <BentoGrid />
         </section>
 
         {/* -------------------------- Como funciona ----------------------- */}
         <section className="border-y border-border bg-card">
           <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
-            <SectionHeading
+            <SectionIntro
+              index="04"
               eyebrow="Como funciona"
               title="Três passos, do primeiro acesso ao domínio do conteúdo."
               className="mb-12"
             />
-            <Reveal>
-              <Timeline
-                className="mx-auto max-w-2xl"
-                items={STEPS.map((step) => ({
-                  titulo: step.title,
-                  conteudo: (
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {step.description}
-                    </p>
-                  ),
-                }))}
-              />
-            </Reveal>
+            <HowItWorks
+              steps={STEPS.map((step) => ({
+                titulo: step.title,
+                descricao: step.description,
+              }))}
+            />
           </div>
         </section>
 
@@ -319,31 +345,14 @@ export default function LandingPage() {
           id="fontes"
           className="mx-auto max-w-6xl scroll-mt-20 px-5 py-20 md:px-8 md:py-28"
         >
-          <SectionHeading
+          <SectionIntro
+            index="05"
             eyebrow="Fontes"
             title="Confiança que você pode citar."
             description="O tutor de IA é instruído a ensinar só o que está consolidado nos tratados usados na graduação e a indicar, no fim da resposta, onde aprofundar:"
             className="mb-12"
           />
-          <div className="grid gap-8 sm:grid-cols-3">
-            {SOURCE_GROUPS.map((group, index) => (
-              <Reveal key={group.label} delay={(index % 4) * 0.07}>
-                <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-                  {group.label}
-                </h3>
-                <ul className="flex flex-col gap-2">
-                  {group.items.map((item) => (
-                    <li
-                      key={item}
-                      className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-            ))}
-          </div>
+          <SourcesPanel groups={SOURCE_GROUPS} />
         </section>
 
         {/* --------------------------- Pesquisa --------------------------- */}
@@ -355,10 +364,10 @@ export default function LandingPage() {
             <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
               <div className="grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:p-12">
                 <div>
-                  <p className="text-sm font-medium uppercase tracking-[0.14em] text-primary">
+                  <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-primary">
                     Para pesquisadores
                   </p>
-                  <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight">
+                  <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight md:text-4xl">
                     Construído como pesquisa, aberto à pesquisa.
                   </h2>
                   <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground md:text-base">
@@ -396,7 +405,6 @@ export default function LandingPage() {
                   ))}
                 </ul>
               </div>
-              <BorderBeam />
             </div>
           </Reveal>
         </section>
@@ -404,10 +412,10 @@ export default function LandingPage() {
         {/* ------------------------------ CTA final ----------------------- */}
         <section className="px-5 pb-20 md:px-8 md:pb-28">
           <Reveal className="mx-auto max-w-6xl">
-            <div className="vrmed-radial relative overflow-hidden rounded-3xl border border-border px-6 py-16 text-center md:py-20">
-              <DotPattern className="text-primary/[0.13] [mask-image:radial-gradient(60%_80%_at_50%_50%,#000,transparent)]" />
+            <div className="vrmed-radial relative overflow-hidden rounded-3xl border border-border px-6 py-20 text-center md:py-24">
+              <DotPattern className="text-primary/[0.09] [mask-image:radial-gradient(60%_80%_at_50%_50%,#000,transparent)]" />
               <div className="relative mx-auto max-w-xl">
-                <h2 className="text-balance font-serif text-3xl font-medium tracking-tight md:text-4xl">
+                <h2 className="text-balance font-serif text-3xl font-medium tracking-tight md:text-5xl">
                   Sua próxima aula de anatomia começa aqui.
                 </h2>
                 <p className="mt-4 text-pretty text-muted-foreground">
