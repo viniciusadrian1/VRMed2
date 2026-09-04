@@ -95,7 +95,10 @@ COLUNAS = (
     "dataset", "case_id", "structure", "gt_roi_name", "variante",
     "dice", "iou", "nsd_1mm", "nsd_2mm", "hd95_mm", "assd_mm", "hd_mm",
     "volume_error_pct", "volume_pred_ml", "volume_gt_ml",
-    "recall_gt", "containment_pred_em_gt", "estrutura_pequena",
+    "recall_gt", "precision_pred", "containment_pred_em_gt", "estrutura_pequena",
+    "nsd_1vox", "nsd_2vox", "nsd_tau_vox_mm",
+    "fp_fora_do_suporte_ml", "fp_dentro_do_suporte_ml", "fn_dentro_do_suporte_ml",
+    "erro_absoluto_ml",
     "pipeline_version", "segmentation_model", "reconstruction_method",
     "sigma", "taubin_iterations", "spacing_mm", "ressalva", "erro",
 )
@@ -115,9 +118,14 @@ def recall_containment(pred: np.ndarray, gt: np.ndarray) -> dict:
     p, g = np.asarray(pred) > 0.5, np.asarray(gt) > 0.5
     inter = int(np.count_nonzero(p & g))
     n_p, n_g = int(p.sum()), int(g.sum())
+    # precision e containment sao a MESMA razao |P inter G| / |P|. Mantemos as duas
+    # chaves porque a coorte pede "precision" pelo nome e o relatorio ja publicou
+    # "containment"; sao rotulos do mesmo numero, nao duas medidas.
+    prec = (inter / n_p) if n_p else "invalido: predicao vazia"
     return {
         "recall_gt": (inter / n_g) if n_g else "invalido: GT vazio",
-        "containment_pred_em_gt": (inter / n_p) if n_p else "invalido: predicao vazia",
+        "precision_pred": prec,
+        "containment_pred_em_gt": prec,
     }
 
 
@@ -228,13 +236,11 @@ def _bloco_lobos(dir_pred: Path, spacing) -> list[dict]:
 # ------------------------------------------------------------------------- benchmark
 
 
-# ROIs cuja DEFINICAO de contorno trunca em Z, e que por isso ganham duas linhas:
-# `recorte_z` (predicao limitada a janela onde o GT existe) e `sem_recorte`.
-# A janela e empirica — vem de z_gt.min()/max() DESTE caso, nao do atlas: o pipeline
-# nao localiza cricoide nem arteria pulmonar. Logo o recorte e circular por construcao
-# (define como comparavel exatamente onde o GT existe) e NAO detecta o caso em que o
-# contornador divergiu do atlas. Declarado, nao escondido.
-ROIS_COM_JANELA_Z = ("Esophagus", "Heart")
+# ROIs cuja DEFINICAO de contorno e conhecida por truncar em Z. Hoje isto e apenas
+# DOCUMENTACAO: as duas avaliacoes (A_suporte_gt e B_campo_completo) saem para TODAS
+# as estruturas, justamente para que a escolha de onde recortar nao possa ser feita
+# depois de ver o resultado.
+ROIS_COM_TRUNCAGEM_CONHECIDA = ("Esophagus", "Heart")
 
 
 def rodar(caso: str, raiz: Path = RAIZ_PADRAO, log=print) -> dict:
@@ -289,85 +295,93 @@ def rodar(caso: str, raiz: Path = RAIZ_PADRAO, log=print) -> dict:
             },
         }
 
-        if gt_roi in ROIS_COM_JANELA_Z:
-            # A janela de contorno do GT limita o que da para comparar.
-            # Vale para Esophagus (atlas contorna so do cricoide a juncao GE) E para
-            # Heart (o atlas corta no nivel inferior da arteria pulmonar, enquanto o
-            # TotalSegmentator segue subindo). Antes so o esofago tinha as duas linhas,
-            # e a assimetria era o oposto do que a magnitude do efeito pede: no esofago
-            # o recorte move 0,014 ml e no coracao move ~96 ml. Ressalva que so existe
-            # em prosa nao corrige numero nenhum.
-            z_gt = _fatias_com_voxel(gt)
-            z_pred = _fatias_com_voxel(pred)
-            z0, z1 = int(z_gt.min()), int(z_gt.max())
-            recortada = pred.copy()
-            recortada[:, :, :z0] = False
-            recortada[:, :, z1 + 1:] = False
-            descartadas = sorted(set(z_pred.tolist()) - set(range(z0, z1 + 1)))
-            detalhes[gt_roi]["recorte_z"] = {
-                "intervalo_z_do_gt": [z0, z1],
-                # duas contagens diferentes de proposito: a janela e o preenchimento dela
-                "n_fatias_no_intervalo": int(z1 - z0 + 1),
-                "n_fatias_gt_nao_vazias": int(z_gt.size),
-                "n_fatias_predicao_nao_vazias": int(z_pred.size),
-                "n_fatias_predicao_descartadas": len(descartadas),
-                "fatias_descartadas": descartadas,
-                "volume_descartado_ml": _ml(pred & ~recortada, spacing),
-            }
-            l1 = _medir(recortada, gt, spacing,
-                        _linha_base(ident, structure, gt_roi, "recorte_z"))
-            l1["ressalva"] += (
-                f" Predicao recortada ao intervalo Z do GT [{z0}, {z1}]; "
-                f"{len(descartadas)} fatia(s) de predicao descartada(s) "
-                f"({detalhes[gt_roi]['recorte_z']['volume_descartado_ml']:.2f} ml). "
-                "ESTA e a linha comparavel."
-            )
-            # DECOMPOSICAO DO ERRO DE VOLUME. O erro liquido cancela: predicao a MAIS
-            # fora da janela menos predicao a MENOS dentro dela pode somar quase zero e
-            # sugerir concordancia que nao existe. Guardamos os dois termos e a soma dos
-            # modulos, que e o numero que nao cancela.
-            fora_ml = _ml(pred & ~recortada, spacing)
-            falta_ml = _ml(gt & ~pred, spacing)
-            sobra_dentro_ml = _ml(recortada & ~gt, spacing)
-            vol_gt_ml = _ml(gt, spacing)
-            detalhes[gt_roi]["decomposicao_volume"] = {
-                "predicao_fora_da_janela_ml": fora_ml,
-                "sobra_dentro_da_janela_ml": sobra_dentro_ml,
-                "falta_ml": falta_ml,
-                "soma_dos_modulos_ml": round(fora_ml + sobra_dentro_ml + falta_ml, 4),
-                "soma_dos_modulos_pct_do_gt": (
-                    round(100.0 * (fora_ml + sobra_dentro_ml + falta_ml) / vol_gt_ml, 3)
-                    if vol_gt_ml else "nao aplicavel"
-                ),
-                "nota": ("o erro percentual de volume publicado e LIQUIDO e cancela estes "
-                         "termos; a soma dos modulos e a discordancia que nao cancela"),
-            }
-            l1["ressalva"] += (
-                f" Discordancia que NAO cancela: {fora_ml:.1f} ml de predicao fora da janela"
-                f" + {sobra_dentro_ml:.1f} ml sobrando dentro + {falta_ml:.1f} ml faltando"
-                f" = {fora_ml + sobra_dentro_ml + falta_ml:.1f} ml"
-                + (f" ({100.0*(fora_ml+sobra_dentro_ml+falta_ml)/vol_gt_ml:.1f} % do GT)." if vol_gt_ml else ".")
-            )
+        # DUAS AVALIACOES, SEMPRE AS DUAS, PARA TODA ESTRUTURA (Parte 3).
+        #
+        # A — suporte do GT: compara so onde o GT existe em Z. E o unico jeito de
+        #     separar "contorno diferente" de "extensao diferente"... e e CIRCULAR
+        #     por construcao: a janela vem de z_gt.min()/max() DESTE caso, nao de
+        #     referencia anatomica. O pipeline nao localiza cricoide nem arteria
+        #     pulmonar, entao A define como comparavel exatamente onde o GT existe
+        #     e NAO detecta o caso em que o contornador divergiu do atlas.
+        # B — campo completo: compara toda a extensao da predicao. E a avaliacao
+        #     honesta do que o modelo produz, e e sempre >= tao ruim quanto A.
+        #
+        # Antes, A so era calculada para Esophagus e Heart. A aplicacao seletiva
+        # era o problema: escolher onde recortar depois de ver o resultado e
+        # exatamente o que a Parte 10 proibe. Agora as duas saem para todas.
+        z_gt = _fatias_com_voxel(gt)
+        z_pred = _fatias_com_voxel(pred)
+        z0, z1 = int(z_gt.min()), int(z_gt.max())
+        no_suporte = pred.copy()
+        no_suporte[:, :, :z0] = False
+        no_suporte[:, :, z1 + 1:] = False
+        descartadas = sorted(set(z_pred.tolist()) - set(range(z0, z1 + 1)))
 
-            l2 = _medir(pred, gt, spacing,
-                        _linha_base(ident, structure, gt_roi, "sem_recorte"))
-            l2["ressalva"] += (
-                f" SEM recorte: a predicao inclui {structure} fora da janela que o GT desenhou. "
-                "Linha LIXO POR CONSTRUCAO — serve so para mostrar o tamanho do efeito."
-            )
-            linhas += [l1, l2]
-            log(f"  {gt_roi}: recorte_z dice={l1['dice']:.4f} | sem_recorte dice={l2['dice']:.4f}")
-        else:
-            linha = _medir(pred, gt, spacing, _linha_base(ident, structure, gt_roi, "padrao"))
-            linhas.append(linha)
-            log(f"  {gt_roi}: dice={linha['dice']:.4f} hd95={linha['hd95_mm']:.3f} mm "
-                f"vol_err={linha['volume_error_pct']:+.2f}%")
+        detalhes[gt_roi]["suporte_gt"] = {
+            "intervalo_z_do_gt": [z0, z1],
+            "n_fatias_no_intervalo": int(z1 - z0 + 1),
+            "n_fatias_gt_nao_vazias": int(z_gt.size),
+            "n_fatias_predicao_nao_vazias": int(z_pred.size),
+            "n_fatias_predicao_descartadas": len(descartadas),
+            "volume_descartado_ml": _ml(pred & ~no_suporte, spacing),
+            "circular": ("a janela vem do alcance do proprio GT deste caso, nao de "
+                         "referencia anatomica — nao detecta GT que divergiu do atlas"),
+        }
+
+        # DECOMPOSICAO DO ERRO DE VOLUME (Parte 4): erros de sinal oposto cancelam
+        # no erro liquido e produzem falsa sensacao de concordancia. Publicamos os
+        # tres termos separados, o liquido e o absoluto.
+        fp_fora = _ml(pred & ~no_suporte, spacing)          # predicao fora do suporte do GT
+        fp_dentro = _ml(no_suporte & ~gt, spacing)          # sobra dentro do suporte
+        fn_dentro = _ml(gt & ~pred, spacing)                # falta (GT so existe no suporte)
+        vol_gt_ml = _ml(gt, spacing)
+        vol_pred_ml = _ml(pred, spacing)
+        absoluto = round(fp_fora + fp_dentro + fn_dentro, 4)
+        detalhes[gt_roi]["decomposicao_volume"] = {
+            "fp_fora_do_suporte_ml": fp_fora,
+            "fp_dentro_do_suporte_ml": fp_dentro,
+            "fn_dentro_do_suporte_ml": fn_dentro,
+            "erro_liquido_ml": round(vol_pred_ml - vol_gt_ml, 4),
+            "erro_absoluto_ml": absoluto,
+            "erro_absoluto_pct_do_gt": (round(100.0 * absoluto / vol_gt_ml, 3)
+                                        if vol_gt_ml else "nao aplicavel"),
+            "nota": ("o erro percentual de volume das linhas e LIQUIDO e cancela estes "
+                     "termos; erro_absoluto_ml e a discordancia que nao cancela"),
+        }
+
+        lA = _medir(no_suporte, gt, spacing,
+                    _linha_base(ident, structure, gt_roi, "A_suporte_gt"))
+        lA["ressalva"] += (
+            f" [A] Predicao limitada ao suporte do GT em Z [{z0}, {z1}]; "
+            f"{len(descartadas)} fatia(s) descartada(s) "
+            f"({detalhes[gt_roi]['suporte_gt']['volume_descartado_ml']:.2f} ml). "
+            "A janela vem do proprio GT — CIRCULAR por construcao."
+        )
+        lB = _medir(pred, gt, spacing,
+                    _linha_base(ident, structure, gt_roi, "B_campo_completo"))
+        lB["ressalva"] += (
+            f" [B] Toda a extensao da predicao, sem recorte. Discordancia que NAO cancela: "
+            f"{fp_fora:.1f} ml FP fora do suporte + {fp_dentro:.1f} ml FP dentro"
+            f" + {fn_dentro:.1f} ml FN dentro = {absoluto:.1f} ml"
+            + (f" ({100.0 * absoluto / vol_gt_ml:.1f} % do GT)." if vol_gt_ml else ".")
+        )
+        for l in (lA, lB):
+            l["fp_fora_do_suporte_ml"] = fp_fora
+            l["fp_dentro_do_suporte_ml"] = fp_dentro
+            l["fn_dentro_do_suporte_ml"] = fn_dentro
+            l["erro_absoluto_ml"] = absoluto
+        linhas += [lA, lB]
+        log(f"  {gt_roi}: A dice={lA['dice']:.4f} | B dice={lB['dice']:.4f} "
+            f"| erro_abs={absoluto:.1f} ml ({fp_fora:.1f} fora + {fp_dentro:.1f} sobra "
+            f"+ {fn_dentro:.1f} falta)")
 
     for nome in ESTRUTURAS_SEM_COBERTURA:
         linha = _linha_base(ident, nome, SEM_COBERTURA, "padrao")
         for c in ("dice", "iou", "nsd_1mm", "nsd_2mm", "hd95_mm", "assd_mm", "hd_mm",
                   "volume_error_pct", "volume_pred_ml", "volume_gt_ml",
-                  "recall_gt", "containment_pred_em_gt", "estrutura_pequena"):
+                  "recall_gt", "precision_pred", "containment_pred_em_gt", "estrutura_pequena",
+                  "fp_fora_do_suporte_ml", "fp_dentro_do_suporte_ml", "fn_dentro_do_suporte_ml",
+                  "erro_absoluto_ml"):
             linha[c] = SEM_COBERTURA
         linha["ressalva"] = "o LCTSC nao contorna esta estrutura; nao estimada por nenhuma outra via"
         linhas.append(linha)
@@ -386,7 +400,9 @@ def _json_por_linha(r: dict) -> list[dict]:
     """Um registro por linha, com metrics agrupadas e as chaves de reproducao no topo."""
     chaves_metrica = ("dice", "iou", "nsd_1mm", "nsd_2mm", "hd95_mm", "assd_mm", "hd_mm",
                       "volume_error_pct", "volume_pred_ml", "volume_gt_ml",
-                      "recall_gt", "containment_pred_em_gt", "estrutura_pequena")
+                      "recall_gt", "precision_pred", "containment_pred_em_gt", "estrutura_pequena",
+                  "fp_fora_do_suporte_ml", "fp_dentro_do_suporte_ml", "fn_dentro_do_suporte_ml",
+                  "erro_absoluto_ml")
     return [{
         "dataset": l["dataset"], "case_id": l["case_id"], "structure": l["structure"],
         "gt_roi_name": l["gt_roi_name"], "variante": l["variante"],

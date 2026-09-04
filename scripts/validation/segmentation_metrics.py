@@ -119,12 +119,29 @@ def surface_distances(a: Mascara, b: Mascara, spacing: Spacing) -> dict:
         dentro = int(np.count_nonzero(d_ab <= tau)) + int(np.count_nonzero(d_ba <= tau))
         return float(dentro / (d_ab.size + d_ba.size))
 
+    # NSD com limiar ANCORADO NO VOXEL, alem dos limiares fixos em mm.
+    #
+    # Por que: `nsd_1mm` e `nsd_2mm` sao cegos ao eixo mais grosso sempre que o
+    # spacing desse eixo excede o limiar. No LCTSC (0,977 x 0,977 x 3,0 mm)
+    # NENHUM deslocamento em Z cabe sob 1 mm ou 2 mm — o menor deslocamento
+    # possivel em Z ja vale 3,0 mm. As duas colunas creditam apenas concordancia
+    # NO PLANO, e por isso nao podem sustentar argumento sobre o eixo Z.
+    #
+    # O limiar ancorado usa `k x max(spacing)`: e a menor distancia que a grade
+    # consegue expressar em TODOS os eixos, entao a metrica deixa de ter um eixo
+    # estruturalmente cego. k = 1 e k = 2 sao os mesmos multiplicadores dos
+    # limiares fixos, escolhidos por simetria com eles e NAO por produzirem
+    # numero melhor. Em grade isotropica de 1 mm as duas familias coincidem.
+    passo = float(max(spacing))
     return {
         "assd_mm": float((d_ab.sum() + d_ba.sum()) / (d_ab.size + d_ba.size)),
         "hd95_mm": float(max(np.percentile(d_ab, 95), np.percentile(d_ba, 95))),
         "hd_mm": float(max(d_ab.max(), d_ba.max())),
         "nsd_1mm": nsd(1.0),
         "nsd_2mm": nsd(2.0),
+        "nsd_1vox": nsd(1.0 * passo),
+        "nsd_2vox": nsd(2.0 * passo),
+        "nsd_tau_vox_mm": passo,
     }
 
 
