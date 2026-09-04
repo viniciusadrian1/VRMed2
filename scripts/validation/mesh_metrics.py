@@ -94,10 +94,33 @@ def comparar_mascara_malha(mask: np.ndarray, mesh: trimesh.Trimesh, affine: np.n
 
 
 def _distancias_mm(origem: trimesh.Trimesh, alvo: trimesh.Trimesh, n: int, rng) -> np.ndarray:
-    """Distancia ponto-superficie (mm) de n pontos amostrados em `origem` ate `alvo`."""
-    pontos, _ = trimesh.sample.sample_surface(origem, n, seed=int(rng.integers(1 << 31)))
-    _fechado, dist_m, _tid = trimesh.proximity.closest_point(alvo, pontos)
-    return np.asarray(dist_m) * 1000.0  # metros -> mm
+    """Distancia ponto-superficie (mm) de n pontos amostrados em `origem` ate `alvo`.
+
+    A CONSULTA RODA EM MILIMETROS, nao em metros — e isso nao e cosmetica.
+
+    `trimesh.constants.tol.zero` e 1e-13 ABSOLUTO, e `trimesh.triangles.closest_point`
+    o usa para decidir a regiao de Voronoi do triangulo (`is_ab = (vc < tol.zero) ...`),
+    comparando contra produtos de produtos escalares. Com a malha em METROS e aresta
+    mediana da ordem de 7e-4 m, essas quantidades caem em ~1e-13/1e-14 — abaixo do
+    limiar — e o ramo errado e escolhido. O efeito e um PISO DE RUIDO: comparada uma
+    malha com ELA MESMA, cuja resposta verdadeira e exatamente 0, a funcao devolvia
+    hausdorff de 0,15 a 0,31 mm em malha anatomica real.
+
+    Medido: lung_left 0,1721 / aorta 0,1694 / esophagus 0,1723 / heart 0,1537 mm em
+    metros, e 0,000000 nas quatro com os mesmos vertices multiplicados por 1000.
+
+    O piso nao era constante — crescia com o numero de amostras (0,1302 mm a 4000
+    amostras contra 0,1721 a 20000 na mesma malha) —, entao nem descontar dava. Em
+    milimetros as quantidades sobem ~1e9 e o limiar deixa de morder.
+    """
+    fator = 1000.0  # metros -> mm
+    origem_mm = origem.copy()
+    origem_mm.vertices = np.asarray(origem.vertices, dtype=np.float64) * fator
+    alvo_mm = alvo.copy()
+    alvo_mm.vertices = np.asarray(alvo.vertices, dtype=np.float64) * fator
+    pontos, _ = trimesh.sample.sample_surface(origem_mm, n, seed=int(rng.integers(1 << 31)))
+    _fechado, dist_mm, _tid = trimesh.proximity.closest_point(alvo_mm, pontos)
+    return np.asarray(dist_mm)  # ja em mm: a consulta rodou na malha escalada
 
 
 def comparar_malhas(
@@ -145,3 +168,19 @@ if __name__ == "__main__":
     )
     derivado = trimesh.Trimesh(vertices=v, faces=f, process=True)
     print("master x derivado:", json.dumps(comparar_malhas(malha, derivado), indent=2))
+
+    # CONTROLE DE IDENTIDADE — o assert que faltava, e que teria pego o bug de escala.
+    # Comparar uma malha com ela mesma tem resposta VERDADEIRA exatamente 0. Enquanto
+    # a consulta rodava em metros, o `tol.zero` absoluto do trimesh fazia isso devolver
+    # 0,15 a 0,31 mm em malha anatomica, um piso que contaminou todo Hausdorff publicado
+    # do bloco C (decimacao) — a maioria dos valores da ablacao caia DENTRO do piso.
+    # Sem este controle, um instrumento com piso passa despercebido indefinidamente.
+    ident = comparar_malhas(malha, malha.copy())
+    print("CONTROLE identidade (tem que ser 0):", json.dumps(ident, indent=2))
+    assert ident["hausdorff_mm"] == 0.0, (
+        f"piso de ruido de volta: malha contra ela mesma deu hausdorff {ident['hausdorff_mm']} mm, "
+        "esperado 0.0 — a consulta ponto-superficie voltou a rodar numa escala em que "
+        "trimesh.constants.tol.zero (1e-13 ABSOLUTO) morde os determinantes baricentricos"
+    )
+    assert ident["rms_mm"] == 0.0, f"rms de identidade nao-nulo: {ident['rms_mm']} mm"
+    print("OK: controle de identidade passou (piso = 0)")
