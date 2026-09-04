@@ -20,6 +20,14 @@ O produto continua sendo o site; Unity NÃO vira runtime. Claude opera o Editor
 via MCP (ver memória unity-mcp-setup: servidor HTTP :8080 da janela MCP for
 Unity precisa estar ligado).
 
+**Componentes 21st.dev na landing (2026-09-03):** 6 componentes Magic UI/Aceternity adaptados aos
+nossos tokens (azul clinico + ambar, tema claro/escuro) e com guard de prefers-reduced-motion, em
+components/ui/: dot-pattern (fundo do hero e do CTA, no lugar do vrmed-grid), number-ticker (faixa
+de stats: 18 e 100%), magic-card (spotlight nos 3 cards do Catalogo), word-reveal (H1 do hero,
+palavra a palavra), border-beam (um feixe ambar no card Pesquisa), timeline (secao Como funciona).
+A Marquee custom foi mantida (ja tinha pausa no hover, fade e reduced-motion). Sem dependencia nova
+(framer-motion/lucide/tailwind ja existiam).
+
 **Auditoria geral (2026-09-03):** varredura da plataforma inteira por 13 lentes + juiz +
 refutador adversarial (`docs/AUDITORIA-2026-09-03.md`). 109 achados; 29 corrigidos em 27
 commits (vitrine honesta = fontes do tutor, par patológico, aviso educacional; acessibilidade

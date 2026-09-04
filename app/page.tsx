@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Boxes,
   Languages,
+  type LucideIcon,
   MonitorSmartphone,
   ShieldCheck,
   Sparkles,
@@ -16,18 +17,30 @@ import { Reveal } from "@/components/landing/Reveal";
 import { SectionHeading } from "@/components/landing/SectionHeading";
 import { Logo } from "@/components/layout/Logo";
 import { Badge } from "@/components/ui/badge";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
+import { DotPattern } from "@/components/ui/dot-pattern";
+import { MagicCard } from "@/components/ui/magic-card";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { Timeline } from "@/components/ui/timeline";
+import { WordReveal } from "@/components/ui/word-reveal";
 import { getComparableOrgans, ORGANS, REGIONS, SYSTEMS } from "@/lib/organs";
 
 /* -------------------------------------------------------------------------- */
 /* Dados estáticos da página                                                   */
 /* -------------------------------------------------------------------------- */
 
-const HERO_STATS = [
-  { icon: Boxes, value: "18", label: "Modelos 3D" },
-  { icon: Sparkles, value: "IA", label: "Tutor com fontes" },
-  { icon: MonitorSmartphone, value: "VR", label: "No navegador" },
-  { icon: Languages, value: "100%", label: "Em português" },
+const HERO_STATS: {
+  icon: LucideIcon;
+  label: string;
+  value?: number;
+  suffix?: string;
+  text?: string;
+}[] = [
+  { icon: Boxes, value: 18, label: "Modelos 3D" },
+  { icon: Sparkles, text: "IA", label: "Tutor com fontes" },
+  { icon: MonitorSmartphone, text: "VR", label: "No navegador" },
+  { icon: Languages, value: 100, suffix: "%", label: "Em português" },
 ];
 
 const STEPS = [
@@ -100,19 +113,18 @@ export default function LandingPage() {
       <main id="conteudo-principal">
         {/* ----------------------------- Hero ----------------------------- */}
         <section className="vrmed-radial relative overflow-hidden">
-          <div
-            className="vrmed-grid pointer-events-none absolute inset-0 opacity-60 [mask-image:radial-gradient(70%_60%_at_50%_30%,#000,transparent)]"
-            aria-hidden
-          />
+          <DotPattern className="text-primary/[0.13] [mask-image:radial-gradient(70%_60%_at_50%_30%,#000,transparent)]" />
           <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:gap-10 md:px-8 md:py-24">
             <Reveal>
               <Badge variant="accent" className="mb-5">
                 <Sparkles className="size-3" />
                 Projeto de Iniciação Científica
               </Badge>
-              <h1 className="text-balance font-serif text-[2.6rem] font-medium leading-[1.05] tracking-tight md:text-6xl">
-                A anatomia humana, em 3D e ao seu alcance.
-              </h1>
+              <WordReveal
+                as="h1"
+                text="A anatomia humana, em 3D e ao seu alcance."
+                className="text-balance font-serif text-[2.6rem] font-medium leading-[1.05] tracking-tight md:text-6xl"
+              />
               <p className="mt-5 max-w-md text-pretty text-base text-muted-foreground md:text-lg">
                 O VRmed reúne modelos 3D interativos, cortes anatômicos,
                 realidade virtual e um tutor de IA — feito para estudantes de
@@ -179,7 +191,9 @@ export default function LandingPage() {
                       {stat.label}
                     </dt>
                     <dd className="order-1 font-serif text-2xl font-medium md:text-3xl">
-                      {stat.value}
+                      {stat.text ?? (
+                        <NumberTicker value={stat.value ?? 0} suffix={stat.suffix} />
+                      )}
                     </dd>
                   </div>
                 ))}
@@ -238,28 +252,30 @@ export default function LandingPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {CATALOG_TIERS.map((tier, index) => (
               <Reveal key={tier.label} delay={index * 0.08}>
-                <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm">
-                  <div className="flex items-baseline justify-between">
-                    <h3 className="font-serif text-xl font-medium">
-                      {tier.label}
-                    </h3>
-                    <span className="text-sm font-semibold text-primary">
-                      {tier.items.length}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {tier.caption}
-                  </p>
-                  <ul className="mt-4 flex flex-wrap gap-2">
-                    {tier.items.map((item) => (
-                      <li
-                        key={item}
-                        className="rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-medium"
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="h-full rounded-2xl border border-border bg-card shadow-sm">
+                  <MagicCard className="flex h-full flex-col p-6">
+                    <div className="flex items-baseline justify-between">
+                      <h3 className="font-serif text-xl font-medium">
+                        {tier.label}
+                      </h3>
+                      <span className="text-sm font-semibold text-primary">
+                        {tier.items.length}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {tier.caption}
+                    </p>
+                    <ul className="mt-4 flex flex-wrap gap-2">
+                      {tier.items.map((item) => (
+                        <li
+                          key={item}
+                          className="rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-medium"
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </MagicCard>
                 </div>
               </Reveal>
             ))}
@@ -282,21 +298,19 @@ export default function LandingPage() {
               title="Três passos, do primeiro acesso ao domínio do conteúdo."
               className="mb-12"
             />
-            <ol className="grid gap-8 md:grid-cols-3">
-              {STEPS.map((step, index) => (
-                <Reveal key={step.title} delay={index * 0.1}>
-                  <li className="relative flex flex-col gap-3">
-                    <span className="grid size-11 place-items-center rounded-full bg-primary font-serif text-lg text-primary-foreground shadow-sm">
-                      {index + 1}
-                    </span>
-                    <h3 className="text-lg font-semibold">{step.title}</h3>
+            <Reveal>
+              <Timeline
+                className="mx-auto max-w-2xl"
+                items={STEPS.map((step) => ({
+                  titulo: step.title,
+                  conteudo: (
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {step.description}
                     </p>
-                  </li>
-                </Reveal>
-              ))}
-            </ol>
+                  ),
+                }))}
+              />
+            </Reveal>
           </div>
         </section>
 
@@ -338,7 +352,7 @@ export default function LandingPage() {
           className="mx-auto max-w-6xl scroll-mt-20 px-5 pb-20 md:px-8 md:pb-28"
         >
           <Reveal>
-            <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+            <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
               <div className="grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:p-12">
                 <div>
                   <p className="text-sm font-medium uppercase tracking-[0.14em] text-primary">
@@ -382,6 +396,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
               </div>
+              <BorderBeam />
             </div>
           </Reveal>
         </section>
@@ -390,10 +405,7 @@ export default function LandingPage() {
         <section className="px-5 pb-20 md:px-8 md:pb-28">
           <Reveal className="mx-auto max-w-6xl">
             <div className="vrmed-radial relative overflow-hidden rounded-3xl border border-border px-6 py-16 text-center md:py-20">
-              <div
-                className="vrmed-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(60%_80%_at_50%_50%,#000,transparent)]"
-                aria-hidden
-              />
+              <DotPattern className="text-primary/[0.13] [mask-image:radial-gradient(60%_80%_at_50%_50%,#000,transparent)]" />
               <div className="relative mx-auto max-w-xl">
                 <h2 className="text-balance font-serif text-3xl font-medium tracking-tight md:text-4xl">
                   Sua próxima aula de anatomia começa aqui.
