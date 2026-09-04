@@ -65,6 +65,18 @@ escala** (grande > 100 cm³ · médio 1–100 cm³ · pequeno < 1 cm³).
 faixa**. Ganho na média com regressão nas estruturas pequenas é reprovação — a
 média global é dominada por pulmão/fígado/coração e esconde o colapso do fino.
 
+### 5. Benchmark de σ por faixa de calibre — `scripts/validation/benchmark_sigma.py`
+
+```bash
+python scripts/validation/benchmark_sigma.py   # 21 alvos × 4 variantes = 84 linhas
+python scripts/validation/espessura.py         # calibre = 2 × mediana(EDT no esqueleto)
+```
+
+Agrega por **calibre** (< 3 · 3–10 · 10–30 · > 30 mm), não por volume, e separa Tier 1
+(fidelidade à máscara) de Tier 3 (fantoma analítico). Relatório completo, com as 5 ablações
+e a recomendação de default para MASTER e DERIVADOS:
+[`RELATORIO-VALIDACAO-RECONSTRUCAO.md`](RELATORIO-VALIDACAO-RECONSTRUCAO.md).
+
 ## Resultados que já mudaram decisões
 
 1. **Surface Nets não vira default.** Perdeu em Dice/ASSD/volume contra o

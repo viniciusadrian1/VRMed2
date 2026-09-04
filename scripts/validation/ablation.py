@@ -37,11 +37,13 @@ RAIZ = Path(__file__).resolve().parents[2]
 if str(RAIZ) not in sys.path:  # roda como script ou como -m, tanto faz
     sys.path.insert(0, str(RAIZ))
 
-from scripts.clinica.malha import encostar  # noqa: E402
+from scripts.clinica.malha import decimar, encostar  # noqa: E402
 from scripts.geometry.mask_processing import REGRAS, RegraMascara, classe_de, processar_mascara  # noqa: E402
 from scripts.geometry.reconstruction import reconstruct_surface  # noqa: E402
 from scripts.validation.benchmark import volume_mascara_ml, zooms_de  # noqa: E402
+from scripts.validation.mesh_metrics import comparar_malhas  # noqa: E402
 from scripts.validation.phantom import esfera_com_cavidade, tubo_fino  # noqa: E402
+from scripts.validation.topology_metrics import qualidade_topologica  # noqa: E402
 
 DADOS = RAIZ / ".clinica-dados"
 SAIDA = DADOS / "ablation"
@@ -208,11 +210,87 @@ def ablacao_encostar() -> dict[str, Any]:
     }
 
 
+def ablacao_decimacao() -> dict[str, Any]:
+    """MASTER (marching cubes, sigma auto, sem afastamento) x niveis de decimacao.
+
+    Alvos escolhidos por CALIBRE (espessura caracteristica), nao por volume:
+    tubo de 2 e 5 mm (fantoma), esophagus e trachea (~10-30 mm), aorta e heart (>30 mm).
+    A pergunta e se a decimacao machuca mais o fino — e o que o piso de 3000 tris
+    do pipeline faz com uma estrutura que ja nasce com poucos triangulos.
+    """
+    casos: list[tuple[str, str, str, np.ndarray, np.ndarray]] = []
+    for d in (2.0, 5.0):
+        mask, affine = tubo_fino(d, 30.0, spacing=(0.5, 0.5, 0.5))
+        casos.append((f"tubo_{d:g}mm", FANTOMA, f"{d:g}mm", mask, affine))
+    for nome, faixa in (("esophagus", "10-30mm"), ("trachea", "10-30mm"),
+                        ("aorta", ">30mm"), ("heart", ">30mm")):
+        casos.append((nome, INTERNO, faixa, *_carregar(DADOS / "torax-alta_masks" / f"{nome}.nii.gz")))
+
+    linhas = []
+    for nome, tipo, faixa, mask, affine in casos:
+        r = reconstruct_surface(mask, affine, method="marching_cubes", taubin_iters=4, offset_mm=0.0)
+        if r is None:
+            linhas.append({"alvo": nome, "tipo_referencia": tipo, "faixa_calibre_mm": faixa,
+                           "variante": "master", "erro": "reconstruct_surface devolveu None"})
+            continue
+        master = r.mesh
+        top_master = qualidade_topologica(master)
+        tris_master = int(len(master.faces))
+        area_master = float(master.area)
+
+        alvos_tris = [(f"{int(p * 100)}%", max(4, int(tris_master * p))) for p in (0.7, 0.5, 0.3, 0.1)]
+        alvos_tris.append(("piso_3000", 3000))
+        for rotulo, orcamento in alvos_tris:
+            t0 = time.perf_counter()
+            try:
+                derivado = decimar(master, orcamento)
+            except Exception as exc:
+                linhas.append({"alvo": nome, "tipo_referencia": tipo, "faixa_calibre_mm": faixa,
+                               "variante": rotulo, "erro": f"{type(exc).__name__}: {exc}",
+                               "tempo_s": round(time.perf_counter() - t0, 3)})
+                continue
+            dt = time.perf_counter() - t0
+            cmp_ = comparar_malhas(master, derivado)
+            top = qualidade_topologica(derivado)
+            linhas.append({
+                "alvo": nome, "tipo_referencia": tipo, "faixa_calibre_mm": faixa,
+                "variante": rotulo, "orcamento_tris": orcamento,
+                "tris_antes": tris_master,
+                "tris_depois": int(len(derivado.faces)),
+                "reducao_pct": cmp_["reducao_tris_pct"],
+                "hausdorff_mm": cmp_["hausdorff_mm"],
+                "rms_mm": cmp_["rms_mm"],
+                "volume_error_pct": cmp_["volume_error_pct"],
+                "area_error_pct": round((float(derivado.area) - area_master) / area_master * 100.0, 3)
+                                  if area_master else None,
+                "watertight_antes": top_master["watertight"],
+                "watertight_depois": top["watertight"],
+                "n_componentes_antes": top_master["n_componentes"],
+                "n_componentes_depois": top["n_componentes"],
+                "tempo_s": round(dt, 3),
+            })
+    return {
+        "etapa": "decimacao",
+        "pergunta": "a decimacao machuca mais o calibre fino? e o piso de 3000 tris destroi o fino?",
+        "controle": "mesma MASTER por alvo (marching_cubes, sigma auto, taubin 4, offset 0); "
+                    "so o orcamento de triangulos muda. Tier1: erro medido contra a MASTER, nao contra a mascara",
+        "tipos_referencia": [INTERNO, FANTOMA],
+        "aviso": "piso_3000 aplicado a alvo que ja tem <=3000 tris e no-op (reducao 0) — "
+                 "o piso nao protege o fino, so nao o corta mais",
+        "campos": _CAMPOS_DECIMACAO,
+        "linhas": linhas,
+    }
+
+
 # ---------------------------------------------------------------- saida
 
 
 _CAMPOS = ("volume_malha_ml", "volume_mascara_ml", "volume_error_pct", "area_mm2",
            "tris", "vertices", "watertight", "n_componentes", "tempo_s")
+
+_CAMPOS_DECIMACAO = ("tris_antes", "tris_depois", "reducao_pct", "hausdorff_mm", "rms_mm",
+                     "volume_error_pct", "area_error_pct", "watertight_antes", "watertight_depois",
+                     "n_componentes_antes", "n_componentes_depois", "tempo_s")
 
 
 def _fmt(v: Any) -> str:
@@ -228,7 +306,8 @@ def imprimir(bloco: dict[str, Any]) -> None:
     print(f"    controle: {bloco['controle']}")
     if "aviso" in bloco:
         print(f"    AVISO: {bloco['aviso']}")
-    cab = f"{'alvo':<26}{'variante':<16}{'ref':<20}" + "".join(f"{c[:12]:>13}" for c in _CAMPOS)
+    campos = bloco.get("campos", _CAMPOS)
+    cab = f"{'alvo':<26}{'variante':<16}{'ref':<20}" + "".join(f"{c[:12]:>13}" for c in campos)
     print(cab)
     anterior: dict[str, Any] | None = None
     alvo_ant = None
@@ -240,8 +319,8 @@ def imprimir(bloco: dict[str, Any]) -> None:
             anterior = None
             continue
         print(f"{l['alvo']:<26}{l['variante']:<16}{l['tipo_referencia']:<20}"
-              + "".join(f"{_fmt(l[c]):>13}" for c in _CAMPOS))
-        if anterior is not None:
+              + "".join(f"{_fmt(l[c]):>13}" for c in campos))
+        if anterior is not None and "volume_malha_ml" in l:
             d = {c: l[c] - anterior[c] for c in ("volume_malha_ml", "area_mm2", "tris") if not isinstance(l[c], bool)}
             pct = d["volume_malha_ml"] / anterior["volume_malha_ml"] * 100.0 if anterior["volume_malha_ml"] else float("nan")
             print(f"{'':<26}{'  ^ delta':<36}"
@@ -257,7 +336,8 @@ def imprimir(bloco: dict[str, Any]) -> None:
 
 
 def main() -> int:
-    blocos = [ablacao_gaussiana(), ablacao_taubin(), ablacao_fill_holes(), ablacao_encostar()]
+    blocos = [ablacao_gaussiana(), ablacao_taubin(), ablacao_fill_holes(), ablacao_encostar(),
+              ablacao_decimacao()]
     for b in blocos:
         imprimir(b)
 
@@ -280,9 +360,10 @@ def main() -> int:
     # Autoteste: as duas variantes de cada par tem que ser DIFERENTES em pelo menos
     # um alvo, senao a ablacao nao ablacionou nada e a tabela e decorativa.
     for b in blocos:
-        vols = [l.get("volume_malha_ml") for l in b["linhas"] if "erro" not in l]
+        chave = "tris_depois" if b["etapa"] == "decimacao" else "volume_malha_ml"
+        vols = [l.get(chave) for l in b["linhas"] if "erro" not in l]
         assert len(set(vols)) > 1, f"ablacao {b['etapa']} nao produziu diferenca alguma"
-    print("autoteste: as 4 ablacoes produziram diferenca mensuravel OK")
+    print(f"autoteste: as {len(blocos)} ablacoes produziram diferenca mensuravel OK")
     return 0
 
 

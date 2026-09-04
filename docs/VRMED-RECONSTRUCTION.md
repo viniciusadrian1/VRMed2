@@ -85,9 +85,16 @@ Leitura honesta:
 - Surface Nets preserva melhor o fino (−57% em 1,5 mm contra −80%) e pior o
   grande. É um trade-off real, não "melhor" ou "pior".
 
-## Recomendação técnica (a implementar na próxima fase)
+## Recomendação técnica (medida — ver relatório)
 
-**σ por classe anatômica**, reaproveitando as classes que já existem em
+> **Atualizado.** O benchmark por faixa de calibre já rodou. Resultado, ablações e
+> recomendação de default estão em
+> [`RELATORIO-VALIDACAO-RECONSTRUCAO.md`](RELATORIO-VALIDACAO-RECONSTRUCAO.md).
+> Resumo: **σ = 0 vence em erro de volume nas 4 faixas** (< 3, 3–10, 10–30, > 30 mm),
+> então a saída não é σ por classe — é σ = 0 na MASTER, com Taubin mantido. A tabela por
+> classe abaixo era a hipótese pré-medição; ficou superada.
+
+A hipótese original era **σ por classe anatômica**, reaproveitando as classes de
 `scripts/geometry/mask_processing.py` (`orgao`, `vaso`, `via_aerea`, `camara`,
 `lesao`):
 
