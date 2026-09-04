@@ -76,6 +76,19 @@ def main() -> int:
     parser.add_argument("--pulmoes-inteiros", action="store_true", help="une os lobos em pulmão esq/dir")
     parser.add_argument("--sem-pulmoes", action="store_true", help="não exporta os pulmões (caso cardíaco)")
     parser.add_argument("--cores-tc", default=None, help="CT para pintar pelo HU (padrão: --input se for NIfTI)")
+    # --- Fase 1: método de extração de superfície e master mesh (atrás de flag) ---
+    parser.add_argument(
+        "--reconstrucao",
+        default="marching_cubes",
+        choices=["marching_cubes", "surface_nets", "flying_edges", "sdf"],
+        help="extração de superfície (default = comportamento histórico; os outros são candidatos em benchmark)",
+    )
+    parser.add_argument(
+        "--master",
+        action="store_true",
+        help="gera a MASTER mesh: sem decimação de VR, sem afastamento artificial — referência de fidelidade "
+        "para validação/medição. Os derivados (web/quest/AR) saem da master, nunca o contrário.",
+    )
     args = parser.parse_args()
 
     entrada = Path(args.input)
@@ -163,7 +176,10 @@ def main() -> int:
     # ----- 4. Malhas brutas (para conhecer os tamanhos) -----
     brutas: list[tuple[str, trimesh.Trimesh, int, float, list[str]]] = []
     for nome, mask in mascaras.items():
-        resultado = M.malha_de_volume(mask, affine, afastamento_mm=M.afastamento_de(nome))
+        # Na master a geometria representa a anatomia: nada de afastamento
+        # artificial para resolver z-fighting (isso é problema do renderer).
+        afastamento = 0.0 if args.master else M.afastamento_de(nome)
+        resultado = M.malha_de_volume(mask, affine, afastamento_mm=afastamento, metodo=args.reconstrucao)
         if resultado is None:
             log(f"  - {nome}: vazia no exame, pulando")
             relatorio["estruturas"][nome] = {"presente": False}
@@ -172,12 +188,18 @@ def main() -> int:
         brutas.append((nome, *resultado, vol_mascara, M.toca_borda(mask, affine)))
 
     # ----- 5. Orçamento proporcional + decimação + pintura -----
-    orcamento_por = orcamentos({n: t for n, _, t, _, _ in brutas}, args.max_tris, PISO_TRIS)
+    # MASTER: sem orçamento de VR — a referência nunca é degradada para caber
+    # num dispositivo; quem se adapta são os derivados.
+    orcamento_por = (
+        {n: t for n, _, t, _, _ in brutas}
+        if args.master
+        else orcamentos({n: t for n, _, t, _, _ in brutas}, args.max_tris, PISO_TRIS)
+    )
     cena = trimesh.Scene()
     total_tris = 0
     for nome, bruta, tris_brutos, vol_mascara, bordas in brutas:
         orcamento = orcamento_por[nome]
-        malha = M.decimar(bruta, orcamento)
+        malha = bruta if args.master else M.decimar(bruta, orcamento)
         papel = M.papel_de(nome, com_camaras)
         M.pintar(malha, nome, papel, ct)
         cena.add_geometry(malha, node_name=nome, geom_name=nome)
@@ -205,10 +227,19 @@ def main() -> int:
     relatorio["etapas_s"]["malhas"] = round(time.time() - inicio, 1)
     relatorio["triangulos_total"] = total_tris
     relatorio["com_camaras"] = com_camaras
+    # Proveniência: um caso não é só um arquivo, é a reprodução de uma receita.
+    relatorio["reconstrucao"] = {
+        "metodo": args.reconstrucao,
+        "master": bool(args.master),
+        "afastamento_artificial": not args.master,
+        "max_tris": None if args.master else args.max_tris,
+    }
     if total_tris == 0:
         log("ERRO: nenhuma estrutura gerou malha — o exame cobre a região do preset?")
         return 1
-    if total_tris > 150_000:
+    if args.master:
+        log(f"MASTER: {total_tris} tris sem decimação — referência de fidelidade, não é asset de VR.")
+    elif total_tris > 150_000:
         log(f"AVISO: {total_tris} tris > orçamento VR (150k). Reduza --max-tris.")
 
     # ----- 6. Exporta -----

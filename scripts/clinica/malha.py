@@ -118,6 +118,21 @@ def toca_borda(mask: np.ndarray, affine: np.ndarray) -> list[str]:
     return faces
 
 
+def _reconstrutor():
+    """Importa scripts/geometry/reconstruction.py (Fase 1) sem exigir que
+    `scripts` seja pacote: basta `scripts/` no sys.path, como já faz o
+    tc-para-vrmed.py."""
+    import sys
+    from pathlib import Path
+
+    raiz = str(Path(__file__).resolve().parents[1])  # .../scripts
+    if raiz not in sys.path:
+        sys.path.insert(0, raiz)
+    from geometry import reconstruction  # type: ignore[import-not-found]
+
+    return reconstruction
+
+
 def malha_de_volume(
     mask: np.ndarray,
     affine: np.ndarray,
@@ -125,13 +140,34 @@ def malha_de_volume(
     level: float = 0.5,
     afastamento_mm: float = 0.15,
     taubin: int = 4,
+    metodo: str = "marching_cubes",
 ) -> tuple[trimesh.Trimesh, int] | None:
-    """Máscara binária → malha em metros (eixos glTF), ainda sem decimação."""
+    """Máscara binária → malha em metros (eixos glTF), ainda sem decimação.
+
+    `metodo` seleciona a extração de superfície (Fase 1). O default
+    "marching_cubes" é EXATAMENTE o comportamento histórico — os demais
+    ("surface_nets", "flying_edges", "sdf") delegam para
+    scripts/geometry/reconstruction.py e existem para benchmark antes de
+    virarem padrão (nada muda sem número que justifique).
+    """
     from scipy import ndimage
     from skimage import measure
 
     if mask.sum() < 50:  # estrutura ausente ou ruído
         return None
+
+    if metodo != "marching_cubes":
+        resultado = _reconstrutor().reconstruct_surface(
+            mask,
+            affine,
+            method=metodo,
+            smoothing="none" if taubin == 0 else "auto",
+            sigma_mm=sigma_mm,
+            taubin_iters=taubin,
+            offset_mm=afastamento_mm,
+            level=level,
+        )
+        return None if resultado is None else (resultado.mesh, resultado.tris_brutos)
     zooms = zooms_de(affine)
     if sigma_mm is None:
         sigma_mm = max(0.6, 0.5 * float(zooms.max()))

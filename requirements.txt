@@ -1,0 +1,37 @@
+# VRmed — pipeline clínico (Python). Dependências DIRETAS, com versão fixada.
+#
+# Ambiente de referência (o único onde o pipeline roda hoje):
+#   Windows 11 · Python 3.13.11 · GPU NVIDIA RTX 4060 Ti · CUDA 12.4
+#   venv: .venv-pipeline (gitignored)
+#
+# Reproduzir:
+#   py -3.13 -m venv .venv-pipeline
+#   .venv-pipeline/Scripts/python.exe -m pip install -r requirements.txt
+#   # torch com CUDA precisa do índice da NVIDIA (a wheel do PyPI é CPU-only):
+#   .venv-pipeline/Scripts/python.exe -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+#
+# Reprodução EXATA (todas as transitivas): use requirements-lock.txt.
+#
+# ATENÇÃO (regra que já custou tempo): NÃO deixar o pip trocar o torch CUDA por
+# uma build CPU — o TotalSegmentator cai para minutos/horas por caso sem GPU.
+
+# --- Imagem médica: leitura, geometria e I/O ---
+SimpleITK==2.5.6          # ingestão DICOM (GDCM), rescale→HU, ordenação espacial, resample
+nibabel==5.4.2            # I/O NIfTI (volume canônico e máscaras)
+pydicom==3.0.2            # leitura de tags DICOM e anonimização (remoção de PHI)
+
+# --- Segmentação por IA (inferência, nunca treino) ---
+TotalSegmentator==2.18.0  # nnU-Net pré-treinado; puxa torch como transitiva
+
+# --- Numérico / processamento de imagem ---
+numpy==2.5.2
+scipy==1.18.1             # ndimage: componentes, distance transform, filtros
+scikit-image==0.26.0      # marching_cubes (baseline de extração de superfície)
+
+# --- Geometria / malha ---
+vtk==9.7.0                # vtkSurfaceNets3D, vtkFlyingEdges3D, windowed-sinc, voxelização
+trimesh==5.0.0            # malha, Taubin, export GLB
+fast-simplification==0.2.0  # decimação QEM por estrutura (NUNCA o --simplify do gltf-transform)
+
+# --- Utilidades ---
+pillow==12.3.0            # imagens de QA (máscara sobre CT)
