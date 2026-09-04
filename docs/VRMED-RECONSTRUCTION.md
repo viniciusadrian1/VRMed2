@@ -107,6 +107,18 @@ A hipótese original era **σ por classe anatômica**, reaproveitando as classes
 Antes de virar default, rodar o benchmark com σ por classe e comparar por faixa
 de escala (o critério do §16: vencer em **cada** faixa, não na média).
 
+## Suavização no domínio da malha (Fase 3)
+
+`reconstruct_surface` ganhou `mesh_smoothing` (`"taubin"` default — comportamento anterior
+bit a bit —, `"windowed_sinc"`, `"none"`) mais `ws_iters` e `ws_pass_band`.
+
+Benchmark de Taubin 4/8/12/20 e WindowedSinc por faixa de calibre:
+[`RELATORIO-VALIDACAO-RECONSTRUCAO.md` §8](RELATORIO-VALIDACAO-RECONSTRUCAO.md).
+Resultado: **nenhuma variante supera o baseline sob o critério declarado**, e o `taubin_iters = 4`
+segue como default. A primeira execução reprovava as quatro variantes por um **artefato do
+instrumento** (dimensão medida por bounding box, que mede a escada e não o calibre) — corrigido
+para `calibre_mediano_secao`, com autoteste que falha se calibre e volume discordarem de sinal.
+
 ## Master mesh
 
 `--master` gera a referência de fidelidade: **sem decimação de VR** e **sem o

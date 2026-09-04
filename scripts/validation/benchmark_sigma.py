@@ -52,7 +52,7 @@ from scripts.geometry.reconstruction import (  # noqa: E402
     zooms_de,
 )
 from scripts.validation.mesh_metrics import comparar_mascara_malha  # noqa: E402
-from scripts.validation.phantom import cilindro, esfera, tubo_fino  # noqa: E402
+from scripts.validation.phantom import cilindro, esfera, tubo_fino, tubo_oco  # noqa: E402
 from scripts.validation.topology_metrics import (  # noqa: E402
     comparar_continuidade,
     qualidade_topologica,
@@ -182,6 +182,13 @@ def recortar(mask: np.ndarray, affine: np.ndarray, margem_vox: int = 4) -> tuple
 
 def _construir_fantoma(tipo: str, dims: dict[str, float], spacing: tuple[float, float, float]):
     """Devolve (mask, affine, area_analitica_mm2, volume_analitico_mm3)."""
+    if tipo == "tubo_oco":
+        # parede anular com lúmen passante: área = lateral externa + lateral
+        # interna + as duas coroas das pontas. V = π/4·(de² − di²)·h.
+        de, di, h = dims["de"], dims["di"], dims["h"]
+        mask, affine = tubo_oco(de, di, h, spacing=spacing)
+        area = np.pi * de * h + np.pi * di * h + 2.0 * (np.pi / 4.0) * (de**2 - di**2)
+        return mask, affine, area, np.pi / 4.0 * (de**2 - di**2) * h
     r = dims["d"] / 2.0
     if tipo == "esfera":
         mask, affine = esfera(dims["d"], spacing=spacing)
@@ -195,10 +202,11 @@ def _construir_fantoma(tipo: str, dims: dict[str, float], spacing: tuple[float, 
     return mask, affine, 2.0 * np.pi * r * h + 2.0 * np.pi * r**2, np.pi / 4.0 * dims["d"] ** 2 * h
 
 
-def alvos_fantoma() -> list[Alvo]:
+def alvos_fantoma(fantomas: tuple = _FANTOMAS) -> list[Alvo]:
+    """`fantomas` no formato de `_FANTOMAS` (default = os deste benchmark)."""
     alvos: list[Alvo] = []
     for rotulo, spacing in SPACINGS_FANTOMA:
-        for nome, calibre, tipo, dims in _FANTOMAS:
+        for nome, calibre, tipo, dims in fantomas:
             mask, affine, area, volume = _construir_fantoma(tipo, dims, spacing)
             alvos.append(
                 Alvo(
@@ -212,7 +220,12 @@ def alvos_fantoma() -> list[Alvo]:
                     area_ref_mm2=area,
                     area_ref_tipo="analitico",
                     rotulo_spacing=rotulo,
-                    extra={"voxels": int(mask.sum()), "shape": list(mask.shape)},
+                    extra={
+                        "voxels": int(mask.sum()),
+                        "shape": list(mask.shape),
+                        "tipo": tipo,  # consumido por benchmark_smoothing (SDF analítica)
+                        "dims": dict(dims),
+                    },
                 )
             )
     return alvos
@@ -396,7 +409,14 @@ def _mediana(valores: list[Any]) -> float | None:
     return statistics.median(limpos) if limpos else None
 
 
-def _bloco_tier(linhas: list[dict[str, Any]], tier: str) -> list[str]:
+def _bloco_tier(
+    linhas: list[dict[str, Any]],
+    tier: str,
+    variantes: dict[str, Any] | None = None,
+    experimental: tuple[str, ...] = EXPERIMENTAL,
+) -> list[str]:
+    """`variantes`/`experimental` default = os deste benchmark; outro benchmark passa os seus."""
+    variantes = VARIANTES if variantes is None else variantes
     do_tier = [l for l in linhas if l["tier"] == tier]
     if not do_tier:
         return []
@@ -413,7 +433,7 @@ def _bloco_tier(linhas: list[dict[str, Any]], tier: str) -> list[str]:
             " watertight | n_comp | d_comp | frac_maior | tris | verts | tempo_s |",
             "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
-        for variante in VARIANTES:
+        for variante in variantes:
             do_par = [l for l in da_faixa if l["variante"] == variante]
             if not do_par:
                 continue
@@ -421,7 +441,7 @@ def _bloco_tier(linhas: list[dict[str, Any]], tier: str) -> list[str]:
             med = {m: _mediana([l[m] for l in ok]) for m in METRICAS_AGREGADAS}
             n_pres = sum(1 for l in do_par if l["estrutura_preservada"])
             n_wt = sum(1 for l in ok if l["watertight"])
-            marca = " *" if variante in EXPERIMENTAL else ""
+            marca = " *" if variante in experimental else ""
             out.append(
                 f"| {variante}{marca} | {len(ok)}/{len(do_par)} | {n_pres}/{len(do_par)} | "
                 f"{_fmt(med['dice_reconstrucao'], 4)} | {_fmt(med['assd_mm'])} | "
@@ -485,28 +505,49 @@ def montar_summary(linhas: list[dict[str, Any]]) -> str:
     return "\n".join(out)
 
 
-def gravar(linhas: list[dict[str, Any]], out_dir: Path) -> None:
+def gravar(
+    linhas: list[dict[str, Any]],
+    out_dir: Path,
+    *,
+    prefixo: str = "sigma",
+    cabecalho: dict[str, Any] | None = None,
+    colunas: tuple[str, ...] = COLUNAS,
+    summary: str | None = None,
+    linhas_json: list[dict[str, Any]] | None = None,
+) -> None:
+    """Grava benchmark_<prefixo>.{json,csv} e summary_<prefixo>.md.
+
+    Os kwargs default reproduzem exatamente a saída do benchmark de sigma; outro
+    benchmark passa o seu cabeçalho, suas colunas e o seu markdown já montado.
+    `linhas_json` permite gravar no JSON um formato diferente do CSV (ex.: com
+    campos de reprodutibilidade e um bloco `metrics` aninhado).
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "benchmark_sigma.json").write_text(
+    corpo = cabecalho if cabecalho is not None else {
+        "variantes": {k: {**v, "experimental": k in EXPERIMENTAL} for k, v in VARIANTES.items()},
+        "baseline": BASELINE,
+        "faixas_calibre_mm": [{"faixa": n, "min": lo, "max": hi} for n, lo, hi in FAIXAS],
+        "tier2": "ausente: sem ground truth de segmentação independente no repositório",
+    }
+    (out_dir / f"benchmark_{prefixo}.json").write_text(
         json.dumps(
-            {
-                "variantes": {k: {**v, "experimental": k in EXPERIMENTAL} for k, v in VARIANTES.items()},
-                "baseline": BASELINE,
-                "faixas_calibre_mm": [{"faixa": n, "min": lo, "max": hi} for n, lo, hi in FAIXAS],
-                "tier2": "ausente: sem ground truth de segmentação independente no repositório",
-                "resultados": linhas,
-            },
+            {**corpo, "resultados": linhas if linhas_json is None else linhas_json},
             indent=2,
             ensure_ascii=False,
         ),
         encoding="utf-8",
     )
-    with (out_dir / "benchmark_sigma.csv").open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=COLUNAS)
+    with (out_dir / f"benchmark_{prefixo}.csv").open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=colunas)
         w.writeheader()
         for l in linhas:
-            w.writerow({**l, "spacing_mm": "x".join(f"{z:g}" for z in l["spacing_mm"])})
-    (out_dir / "summary_sigma.md").write_text(montar_summary(linhas), encoding="utf-8")
+            linha = {k: l.get(k) for k in colunas}
+            if isinstance(linha.get("spacing_mm"), (list, tuple)):
+                linha["spacing_mm"] = "x".join(f"{z:g}" for z in linha["spacing_mm"])
+            w.writerow(linha)
+    (out_dir / f"summary_{prefixo}.md").write_text(
+        montar_summary(linhas) if summary is None else summary, encoding="utf-8"
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

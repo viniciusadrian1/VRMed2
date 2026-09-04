@@ -35,3 +35,13 @@ fast-simplification==0.2.0  # decimação QEM por estrutura (NUNCA o --simplify 
 
 # --- Utilidades ---
 pillow==12.3.0            # imagens de QA (máscara sobre CT)
+
+# --- Validação Tier2 (NÃO faz parte do pipeline de produção) ---
+# Só é usada por scripts/validation/tier2/ para converter o RTSTRUCT do ground
+# truth (LCTSC/TCIA) em máscaras NIfTI. Nenhum caminho de scripts/clinica/,
+# scripts/geometry/ ou tc-para-vrmed.py importa isto — instale só para rodar a
+# avaliação de acurácia de segmentação. Versão instalada: 5 (MIT).
+# Pegadinha: a v5 chama pydicom.read_file, removido no pydicom 3; o shim
+# `_compat_pydicom()` em scripts/validation/tier2/rtstruct.py restaura o alias
+# em vez de rebaixar o pydicom==3.0.2 que a produção usa.
+# dcmrtstruct2nii==5

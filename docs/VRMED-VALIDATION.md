@@ -95,10 +95,13 @@ e a recomendação de default para MASTER e DERIVADOS:
 
 ## Limitações honestas
 
-- Não há **ground-truth anotado à mão** no repositório: as métricas de
-  segmentação foram validadas por sanidade (identidade, dilatação controlada) e
-  o erro de reconstrução, por fantoma. Medir a acurácia da **segmentação** exige
-  baixar um dataset rotulado (ver `ANALISE-3`, seção de datasets).
+- **Tier 2 deixou de estar ausente** (2026-09-04): `scripts/validation/tier2/` mede a
+  segmentação contra o **LCTSC/TCIA** (CC BY 3.0, ground truth de 2017, independente do
+  TotalSegmentator). **1 caso, 5 estruturas**; aorta e traqueia não são anotadas pelo
+  dataset e saem como "não medido". Resultado e ressalvas de definição em
+  [`RELATORIO-VALIDACAO-RECONSTRUCAO.md` §9](RELATORIO-VALIDACAO-RECONSTRUCAO.md).
+  Com n=1 isso **não é estimativa de acurácia do modelo** — é a primeira medida com o
+  instrumento montado.
 - O benchmark mede **malha × máscara**. A máscara não é a verdade — ela já é uma
   discretização. Por isso o fantoma existe: é o que separa "fiel à máscara" de
   "fiel à anatomia".

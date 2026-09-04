@@ -129,6 +129,252 @@ def esfera_com_cavidade(
     return (r <= diametro_mm / 2.0) & (r > diametro_cavidade_mm / 2.0), affine
 
 
+# ---------------------------------------------------------------------------
+# Fantomas de TOPOLOGIA
+#
+# Os fantomas acima medem QUANTO volume some. Os abaixo medem se a suavização
+# muda a TOPOLOGIA: apaga uma junção, fecha um lúmen, cria uma ponte entre duas
+# estruturas ou arrebenta uma conexão fina. São perguntas de contagem
+# (componentes, cavidades, borda aberta), não de milímetro.
+# ---------------------------------------------------------------------------
+
+
+def _dist_a_segmento(p: np.ndarray, a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Distância de cada ponto ao segmento [a, b]. Comparada a um raio, dá uma cápsula."""
+    ab = b - a
+    ap = p - a
+    t = np.clip((ap @ ab) / float(ab @ ab), 0.0, 1.0)
+    return np.linalg.norm(ap - t[..., None] * ab, axis=-1)
+
+
+def bifurcacao(
+    diametro_mm: float,
+    comprimento_mm: float,
+    angulo_graus: float,
+    spacing: Spacing = (1.0, 1.0, 1.0),
+    margem_mm: float = 4.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Tronco em Y: um cilindro sobe em −z e se divide em dois ramos de mesmo diâmetro.
+
+    Detecta se a suavização APAGA a junção (os ramos se soltam do tronco: 1 → 2 ou 3
+    componentes) ou FUNDE os dois ramos num bloco só (o vão entre eles some).
+
+    VOLUME ANALÍTICO: **não aplicável**. Os três cilindros se interceptam na junção e
+    a interseção não tem forma fechada simples. A referência deste caso é o volume da
+    MÁSCARA (`volume_da_mascara_mm3`), que já é uma discretização — não é verdade
+    analítica. Só serve para comparar duas versões do pipeline na MESMA grade.
+    """
+    raio = diametro_mm / 2.0
+    comp = float(comprimento_mm)
+    meia = np.radians(angulo_graus) / 2.0
+    ramo_x = comp * np.sin(meia)
+    ramo_z = comp * np.cos(meia)
+    extent = (
+        2 * (ramo_x + raio + margem_mm),
+        2 * (raio + margem_mm),
+        2 * (comp + raio + margem_mm),  # o tronco desce até −comp
+    )
+    pts, affine = _grade(extent, spacing)
+
+    origem = np.zeros(3)
+    segmentos = (
+        (np.array([0.0, 0.0, -comp]), origem),          # tronco
+        (origem, np.array([ramo_x, 0.0, ramo_z])),      # ramo +x
+        (origem, np.array([-ramo_x, 0.0, ramo_z])),     # ramo −x
+    )
+
+    def dentro(p: np.ndarray) -> np.ndarray:
+        d = np.full(p.shape[:-1], np.inf)
+        for a, b in segmentos:
+            d = np.minimum(d, _dist_a_segmento(p, a, b))
+        return d <= raio
+
+    return _ocupacao(pts, spacing, dentro) >= 0.5, affine
+
+
+def tubo_oco(
+    diametro_externo_mm: float,
+    diametro_interno_mm: float,
+    comprimento_mm: float,
+    spacing: Spacing = (1.0, 1.0, 1.0),
+    margem_mm: float = 4.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Cilindro com lúmen vazio ao longo de z (parede anular).
+
+    Detecta se a suavização FECHA o lúmen: se o volume medido subir para
+    π/4 · de² · h, o vazio foi engolido.
+
+    Volume analítico = π/4 · (de² − di²) · h.
+    """
+    re = diametro_externo_mm / 2.0
+    ri = diametro_interno_mm / 2.0
+    meia_altura = comprimento_mm / 2.0
+    lado = diametro_externo_mm + 2 * margem_mm
+    pts, affine = _grade((lado, lado, comprimento_mm + 2 * margem_mm), spacing)
+
+    def dentro(p: np.ndarray) -> np.ndarray:
+        r = np.linalg.norm(p[..., :2], axis=-1)
+        return (r <= re) & (r > ri) & (np.abs(p[..., 2]) <= meia_altura)
+
+    return _ocupacao(pts, spacing, dentro) >= 0.5, affine
+
+
+def dois_cilindros_em_contato(
+    diametro_mm: float,
+    comprimento_mm: float,
+    spacing: Spacing = (1.0, 1.0, 1.0),
+    margem_mm: float = 4.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Dois cilindros paralelos a z separados por EXATAMENTE 1 voxel de vão em x.
+
+    Detecta se a suavização cria uma PONTE e funde 2 componentes em 1.
+
+    Por que 1 voxel e não tangência real (vão 0): em 26-conexo dois cilindros
+    tangentes já saem da PRÓPRIA MÁSCARA como 1 componente — não haveria como
+    distinguir a ponte criada pelo pipeline da geometria original, e o fantoma não
+    detectaria nada. Com vão de um voxel a máscara tem 2 componentes (verificado no
+    autoteste) e qualquer fusão posterior é atribuível ao pipeline. O vão em mm
+    depende do spacing: é `spacing[0]`, o menor vão representável nessa grade.
+
+    Volume analítico = 2 · π/4 · d² · h (exato: os cilindros não se interceptam).
+    Componentes esperados na máscara: 2.
+    """
+    passo_x = float(spacing[0])
+    centro = (diametro_mm + passo_x) / 2.0  # vão borda a borda = passo_x
+    raio = diametro_mm / 2.0
+    meia_altura = comprimento_mm / 2.0
+    extent = (
+        2 * centro + diametro_mm + 2 * margem_mm,
+        diametro_mm + 2 * margem_mm,
+        comprimento_mm + 2 * margem_mm,
+    )
+    pts, affine = _grade(extent, spacing)
+
+    def dentro(p: np.ndarray) -> np.ndarray:
+        dy = p[..., 1]
+        r1 = np.hypot(p[..., 0] + centro, dy)
+        r2 = np.hypot(p[..., 0] - centro, dy)
+        return ((r1 <= raio) | (r2 <= raio)) & (np.abs(p[..., 2]) <= meia_altura)
+
+    return _ocupacao(pts, spacing, dentro) >= 0.5, affine
+
+
+def estrutura_parcialmente_cortada(
+    diametro_mm: float, spacing: Spacing = (1.0, 1.0, 1.0), margem_mm: float = 4.0
+) -> tuple[np.ndarray, np.ndarray]:
+    """Esfera cujo topo é cortado pela borda do volume — o FOV acaba no meio dela.
+
+    É o caso real de pulmão/aorta cortados pelo campo de visão. Detecta se o
+    pipeline ABRE a malha na borda (não-watertight, volume inválido) ou INVENTA uma
+    tampa plana (malha fechada com volume que ninguém mediu).
+
+    Geometria: a calota de altura h = r/2 fica FORA da grade; a esfera é deslocada em
+    +z para que só o topo seja cortado (o fundo continua com margem).
+
+    Volume analítico remanescente = 4/3·π·r³ − π·h²·(3r − h)/3, com h = r/2 (fórmula
+    da calota esférica). ATENÇÃO: o plano de corte efetivo tem ambiguidade de meio
+    voxel (a máscara guarda centros de voxel, o plano está na face externa do
+    último), o que em fatia grossa vale vários por cento — por isso o autoteste
+    verifica o CORTE (a máscara toca a borda), não esse volume.
+    """
+    raio = diametro_mm / 2.0
+    lado = diametro_mm + 2 * margem_mm
+    pts, affine = _grade((lado, lado, diametro_mm), spacing)
+    passo_z = float(spacing[2])
+    z_face = float(pts[0, 0, -1, 2]) + passo_z / 2.0  # face externa do último voxel
+    z_centro = z_face - raio / 2.0  # sobra do lado de fora uma calota de altura r/2
+    centro = np.array([0.0, 0.0, z_centro])
+    mask = _ocupacao(pts, spacing, lambda p: np.linalg.norm(p - centro, axis=-1) <= raio) >= 0.5
+    return mask, affine
+
+
+def ponte_fina(
+    diametro_mm: float,
+    gap_mm: float,
+    spacing: Spacing = (1.0, 1.0, 1.0),
+    diametro_ponte_mm: float = 2.0,
+    margem_mm: float = 4.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Duas esferas ligadas por um cilindro fino (a ponte) ao longo de x.
+
+    Detecta se a suavização REMOVE a conexão fina: 1 componente na máscara virando 2
+    na malha significa que a ponte foi apagada — a estrutura continua "bonita" e o
+    Dice quase não cai, mas a conectividade morreu.
+
+    `gap_mm` é o vão entre as esferas (borda a borda), preenchido pela ponte de
+    `diametro_ponte_mm`.
+
+    VOLUME ANALÍTICO: **não aplicável**. A ponte penetra as duas esferas e a
+    interseção não tem forma fechada simples aqui. Referência = volume da máscara.
+    Componentes esperados na máscara: 1.
+    """
+    raio = diametro_mm / 2.0
+    raio_ponte = diametro_ponte_mm / 2.0
+    centro = (diametro_mm + gap_mm) / 2.0
+    lado = diametro_mm + 2 * margem_mm
+    pts, affine = _grade((2 * centro + lado, lado, lado), spacing)
+
+    def dentro(p: np.ndarray) -> np.ndarray:
+        d1 = np.linalg.norm(p - np.array([-centro, 0.0, 0.0]), axis=-1)
+        d2 = np.linalg.norm(p - np.array([centro, 0.0, 0.0]), axis=-1)
+        r_ponte = np.linalg.norm(p[..., 1:], axis=-1)
+        # a ponte vai de centro a centro: entra nas duas esferas, sem junta aberta
+        ponte = (r_ponte <= raio_ponte) & (np.abs(p[..., 0]) <= centro)
+        return (d1 <= raio) | (d2 <= raio) | ponte
+
+    return _ocupacao(pts, spacing, dentro) >= 0.5, affine
+
+
+# nome -> (construtor, kwargs, n_componentes_esperado, tem_cavidade, volume_analitico_mm3)
+# volume_analitico_mm3 = None significa "não aplicável": a geometria não tem forma
+# fechada simples e a referência é o volume da MÁSCARA, que não é verdade analítica.
+# `n_componentes_esperado` é contado em 26-conexo (`np.ones((3, 3, 3))`), a mesma
+# conectividade de `topology_metrics.CONECTIVIDADE`.
+CASOS_TOPOLOGIA: dict[str, tuple] = {
+    "bifurcacao": (
+        bifurcacao,
+        {"diametro_mm": 6.0, "comprimento_mm": 20.0, "angulo_graus": 60.0, "spacing": (0.5, 0.5, 0.5)},
+        1,
+        False,
+        None,  # interseção dos três cilindros: sem forma fechada
+    ),
+    "tubo_oco": (
+        tubo_oco,
+        {
+            "diametro_externo_mm": 10.0,
+            "diametro_interno_mm": 6.0,
+            "comprimento_mm": 20.0,
+            "spacing": (0.5, 0.5, 0.5),
+        },
+        1,
+        True,
+        np.pi / 4.0 * (10.0**2 - 6.0**2) * 20.0,
+    ),
+    "dois_cilindros_em_contato": (
+        dois_cilindros_em_contato,
+        {"diametro_mm": 8.0, "comprimento_mm": 20.0, "spacing": (0.5, 0.5, 0.5)},
+        2,
+        False,
+        2.0 * np.pi / 4.0 * 8.0**2 * 20.0,
+    ),
+    "estrutura_parcialmente_cortada": (
+        estrutura_parcialmente_cortada,
+        {"diametro_mm": 20.0, "spacing": (0.5, 0.5, 0.5)},
+        1,
+        False,
+        # esfera r=10 menos a calota de altura h=5 que ficou fora do FOV
+        4.0 / 3.0 * np.pi * 10.0**3 - np.pi * 5.0**2 * (3 * 10.0 - 5.0) / 3.0,
+    ),
+    "ponte_fina": (
+        ponte_fina,
+        {"diametro_mm": 10.0, "gap_mm": 6.0, "spacing": (0.5, 0.5, 0.5), "diametro_ponte_mm": 2.0},
+        1,
+        False,
+        None,  # a ponte penetra as esferas: sem forma fechada
+    ),
+}
+
+
 def medir_esfera(mesh) -> dict:
     """Mede uma malha esférica em METROS (saída do pipeline) e devolve mm.
 
@@ -208,5 +454,57 @@ def _demo() -> None:
           f"(1 corpo => cavidade foi preenchida)")
 
 
+def _autoteste_topologia() -> None:
+    """Sanidade da GEOMETRIA dos fantomas de topologia (não mede pipeline nenhum).
+
+    Se um destes falhar, o fantoma está errado e qualquer conclusão tirada dele
+    também estaria. Nada aqui prova que o pipeline preserva topologia — prova só
+    que a máscara de entrada tem a topologia que a tabela declara.
+    """
+    from scipy import ndimage
+
+    conectividade = np.ones((3, 3, 3), dtype=bool)
+
+    for nome, (construtor, kwargs, n_esperado, tem_cavidade, v_analitico) in CASOS_TOPOLOGIA.items():
+        mask, affine = construtor(**kwargs)
+        n_obtido = int(ndimage.label(mask, structure=conectividade)[1])
+        v_mask = volume_da_mascara_mm3(mask, affine)
+        ref = f"{v_analitico:.1f}" if v_analitico is not None else "nao aplicavel"
+        print(
+            f"[{nome}] grade={tuple(mask.shape)} voxels={int(mask.sum())} "
+            f"componentes={n_obtido} (esperado {n_esperado}) cavidade={tem_cavidade} "
+            f"V_mascara={v_mask:.1f} mm3  V_analitico={ref}"
+        )
+        assert n_obtido == n_esperado, f"{nome}: {n_obtido} componentes, esperado {n_esperado}"
+
+    # tubo_oco: a máscara tem de bater com o anel analítico. Lúmen preenchido daria
+    # +56% (π/4·de²·h em vez de π/4·(de²−di²)·h), muito acima dos 15%.
+    mask, affine = tubo_oco(**CASOS_TOPOLOGIA["tubo_oco"][1])
+    v_ana = CASOS_TOPOLOGIA["tubo_oco"][4]
+    erro = 100.0 * (volume_da_mascara_mm3(mask, affine) - v_ana) / v_ana
+    print(f"[tubo_oco] erro de volume da mascara = {erro:+.1f} % (limite +-15 %)")
+    assert abs(erro) <= 15.0, f"tubo_oco fora de 15%: {erro:+.1f} %"
+
+    # estrutura_parcialmente_cortada: prova de que o corte existe — a máscara toca a
+    # última fatia em z. Se não tocar, a esfera coube inteira e o fantoma é inútil.
+    mask, _ = estrutura_parcialmente_cortada(**CASOS_TOPOLOGIA["estrutura_parcialmente_cortada"][1])
+    print(f"[estrutura_parcialmente_cortada] voxels na ultima fatia z = {int(mask[:, :, -1].sum())}")
+    assert mask[:, :, -1].any(), "a esfera nao encosta na borda: nao ha corte"
+    assert not mask[:, :, 0].any(), "cortou tambem no fundo: era para ser so o topo"
+
+    # ponte_fina: a ponte tem de existir NA MÁSCARA (1 componente), senão o teste do
+    # pipeline mediria a discretização, não a suavização.
+    mask, _ = ponte_fina(**CASOS_TOPOLOGIA["ponte_fina"][1])
+    n = int(ndimage.label(mask, structure=conectividade)[1])
+    assert n == 1, f"ponte_fina: mascara ja sai com {n} componentes"
+
+    print("autoteste OK")
+
+
 if __name__ == "__main__":
-    _demo()
+    import sys
+
+    if "--topologia" in sys.argv:
+        _autoteste_topologia()
+    else:
+        _demo()
