@@ -28,7 +28,7 @@ from ...clinica.segmentacao import rodar_segmentacao  # mesmas opcoes da produca
 from . import geometria, mapeamento, rtstruct as rtst, tcia
 
 COLECAO = "LCTSC"
-RAIZ_PADRAO = Path(".clinica-dados/tier2-lctsc")
+RAIZ_PADRAO = Path(".clinica-dados/tier2/lctsc")
 PACOTES = ("numpy", "scipy", "nibabel", "SimpleITK", "pydicom", "dcmrtstruct2nii", "TotalSegmentator")
 
 

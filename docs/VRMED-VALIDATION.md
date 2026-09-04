@@ -84,14 +84,36 @@ e a recomendação de default para MASTER e DERIVADOS:
    10 mm: −29,0% de volume contra −6,9%). A recomendação da pesquisa foi
    falseada pelo experimento.
 2. **A gaussiana na máscara binária é o que apaga vaso fino.** Num tubo de 2 mm:
-   −89% de volume com ela, −30% sem. Direção: **σ por classe**, não remoção geral
-   (ela ajuda a estrutura grande). Detalhes em `VRMED-RECONSTRUCTION.md`.
+   −89% de volume com ela, −30% sem. Detalhes em `VRMED-RECONSTRUCTION.md`.
+
+   > **Histórico — hipótese superada.** A direção proposta na época era **σ por classe**
+   > anatômica (`orgao`/`camara` mantendo σ, `vaso`/`via_aerea`/`lesao` sem gaussiana),
+   > porque a gaussiana ajudava a estrutura grande. O benchmark por faixa de calibre
+   > **superou essa hipótese**: σ = 0 venceu em erro de volume nas **quatro** faixas
+   > (−28,24 / −3,57 / −0,55 / −0,13 % contra −89,99 / −8,79 / −1,40 / −0,40 %), sem
+   > exceção — então não há faixa em que valha a pena manter a gaussiana, e a
+   > condicionalidade por classe deixou de ter função no caminho da MASTER. Registrado
+   > como hipótese falseada, não apagado. Ver `RELATORIO-VALIDACAO-RECONSTRUCAO.md` §2.1.
 3. **Metade das estruturas publicadas não é watertight** (3/6 nos dois casos de
    tórax) — então `volume_ml` (`malha.py`) é inválido justamente nas maiores
    (pulmões, aorta, coração), que são cortadas pelo campo de visão.
 4. **Os GLBs publicados estão em Draco e o trimesh não os decodifica** (lê zeros).
    Toda validação tem de rodar na malha **pré-Draco**; medir o asset publicado dá
    número falso.
+
+## Estado congelado da configuração
+
+| item | estado | evidência |
+|---|---|---|
+| `sigma = 0` | **default da MASTER** | venceu em erro de volume nas 4 faixas de calibre (§2.1) |
+| `Taubin = 4` | **default vigente** | nenhuma variante superou sob o critério declarado (§8.6) |
+| σ por classe | **hipótese superada** para o caminho MASTER | σ = 0 vence em todas as faixas, não só em algumas (§2.1) |
+| Taubin 8 / 12 / 20 | **experimental** | melhora calibre no fino e área no grosso, piora área no fino (§8.2–8.3) |
+| WindowedSinc (20; 0,1) | **experimental** | perde para Taubin 20 nos três eixos em estrutura fina (§8.3) |
+| Surface Nets | **experimental** | perde em volume, área, Dice, ASSD, HD95 e watertight nas 4 faixas (§3.2) |
+| `marching_cubes` | **baseline oficial** | nenhuma alternativa testada o superou |
+
+MASTER completa: `marching_cubes · σ = 0 · Taubin = 4 · level = 0,5 · offset = 0 · sem decimação`.
 
 ## Limitações honestas
 

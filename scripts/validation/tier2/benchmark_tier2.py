@@ -57,7 +57,7 @@ from scipy.ndimage import label
 from ..segmentation_metrics import compare_masks
 from . import geometria, mapeamento, rtstruct as rtst
 
-RAIZ_PADRAO = Path(".clinica-dados/tier2-lctsc")
+RAIZ_PADRAO = Path(".clinica-dados/tier2/lctsc")
 NA = "nao aplicavel"
 NM = "nao medido"
 SEM_COBERTURA = "nao medido: dataset nao anota esta estrutura"
