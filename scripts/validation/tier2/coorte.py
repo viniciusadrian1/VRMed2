@@ -208,7 +208,10 @@ def processar(
             (raiz / cid / "tier2_caso.json").write_text(
                 json.dumps(r, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
             feitos.append(cid)
-            n_ok = sum(1 for l in r["linhas"] if l.get("erro") is None and isinstance(l.get("dice"), float))
+            # `erro` vem como string VAZIA quando nao houve erro, nao como None —
+            # testar `is None` fazia o log dizer "0 linhas com metrica" enquanto o
+            # arquivo tinha 12. Bug so do contador; os dados sempre estiveram certos.
+            n_ok = sum(1 for l in r["linhas"] if not l.get("erro") and isinstance(l.get("dice"), float))
             log(f"[{i}/{len(alvo)}] {cid}: OK ({n_ok} linhas com metrica)")
         except Exception as e:
             falhos.append({"case_id": cid, "erro": f"{type(e).__name__}: {e}",
