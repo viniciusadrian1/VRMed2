@@ -24,6 +24,7 @@ import csv
 import json
 import statistics
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, Iterable
@@ -38,14 +39,28 @@ FAIXA_PEQUENO = "pequeno (<1 cm3)"
 ORDEM_FAIXAS = (FAIXA_GRANDE, FAIXA_MEDIO, FAIXA_PEQUENO)
 
 COLUNAS = (
-    "case", "estrutura", "faixa", "pipeline", "spacing_mm", "tris",
-    "volume_mask_ml", "volume_mesh_ml", "volume_error_pct",
-    "dice", "hd95_mm", "assd_mm", "tempo_s", "erro",
+    "case", "estrutura", "faixa", "pipeline", "tipo_referencia", "spacing_mm",
+    "tempo_s", "volume_malha_ml", "volume_mascara_ml", "volume_error_pct",
+    "area_superficie_mm2", "triangle_count", "vertex_count",
+    "watertight", "n_componentes", "euler_number",
+    "hd95_mm", "assd_mm", "dice", "tamanho_glb_mb", "erro",
 )
 
+# Guardrail 1: estes casos comparam pipelines entre si contra a MÁSCARA de entrada.
+# Não existe ground truth clínico aqui — Dice/HD95/ASSD medem reconstrução, não segmentação.
+TIPO_REFERENCIA = "benchmark_interno"
+
 # Métricas agregadas no summary, na ordem em que aparecem na tabela.
-METRICAS = ("dice", "hd95_mm", "assd_mm", "volume_error_pct", "tris")
-DE_METRICS = ("dice", "hd95_mm", "assd_mm", "volume_mask_ml", "volume_mesh_ml", "volume_error_pct")
+METRICAS = (
+    "dice", "hd95_mm", "assd_mm", "volume_error_pct", "area_superficie_mm2",
+    "triangle_count", "vertex_count", "n_componentes", "euler_number", "tamanho_glb_mb",
+)
+# nome em comparar_mascara_malha -> nome da coluna
+DE_METRICS = {
+    "dice": "dice", "hd95_mm": "hd95_mm", "assd_mm": "assd_mm",
+    "volume_mask_ml": "volume_mascara_ml", "volume_mesh_ml": "volume_malha_ml",
+    "volume_error_pct": "volume_error_pct",
+}
 
 
 def zooms_de(affine: np.ndarray) -> np.ndarray:
@@ -74,6 +89,38 @@ def _finito(v: Any) -> float | None:
     return v if np.isfinite(v) else None
 
 
+def tamanho_glb_mb(mesh) -> float:
+    """Peso de entrega: exporta para um GLB temporário, mede o arquivo e apaga.
+
+    É o único número que responde "isso cabe no navegador"; sem Draco e sem
+    quantização — é o custo bruto da malha, não o do asset final.
+    """
+    import trimesh
+
+    with tempfile.TemporaryDirectory() as tmp:
+        destino = Path(tmp) / "bench.glb"
+        trimesh.Scene(mesh).export(destino)
+        return round(destino.stat().st_size / 1e6, 4)
+
+
+def metricas_de_malha(mesh) -> dict[str, Any]:
+    """Métricas da MALHA em si (topologia/tamanho), separadas do erro geométrico.
+
+    Guardrail 2: nada aqui entra no Dice/HD95 — malha rachada e malha grande são
+    problemas diferentes e ficam em colunas diferentes.
+    """
+    return {
+        # a malha está em METROS: m2 -> mm2
+        "area_superficie_mm2": round(float(mesh.area) * 1e6, 3),
+        "triangle_count": int(len(mesh.faces)),
+        "vertex_count": int(len(mesh.vertices)),
+        "watertight": bool(mesh.is_watertight),
+        "n_componentes": int(mesh.body_count),
+        "euler_number": int(mesh.euler_number),
+        "tamanho_glb_mb": tamanho_glb_mb(mesh),
+    }
+
+
 def estruturas_de(dir_masks: Path) -> list[tuple[str, Path]]:
     return sorted((p.name.split(".nii")[0], p) for p in dir_masks.glob("*.nii*"))
 
@@ -99,13 +146,12 @@ def rodar(dir_masks: Path, pipelines: Iterable[str]) -> list[dict[str, Any]]:
         spacing = [round(float(z), 4) for z in zooms_de(affine)]
 
         for pipeline in pipelines:
-            linha: dict[str, Any] = {
+            linha: dict[str, Any] = {c: None for c in COLUNAS}
+            linha.update({
                 "case": caso, "estrutura": estrutura, "faixa": faixa, "pipeline": pipeline,
-                "spacing_mm": spacing, "tris": None,
-                "volume_mask_ml": round(vol_mask, 4), "volume_mesh_ml": None,
-                "volume_error_pct": None, "dice": None, "hd95_mm": None, "assd_mm": None,
-                "tempo_s": None, "erro": None,
-            }
+                "tipo_referencia": TIPO_REFERENCIA, "spacing_mm": spacing,
+                "volume_mascara_ml": round(vol_mask, 4),
+            })
             t0 = time.perf_counter()
             try:
                 resultado = reconstruct_surface(mask, affine, method=pipeline)
@@ -113,10 +159,10 @@ def rodar(dir_masks: Path, pipelines: Iterable[str]) -> list[dict[str, Any]]:
                 if resultado is None:  # estrutura abaixo do mínimo de voxels
                     raise RuntimeError("reconstruct_surface devolveu None (máscara pequena demais)")
                 malha = resultado.mesh
-                linha["tris"] = int(len(malha.faces))
+                linha.update(metricas_de_malha(malha))
                 metricas = comparar_mascara_malha(mask, malha, affine)
-                for campo in DE_METRICS:
-                    linha[campo] = _finito(metricas.get(campo))
+                for origem, coluna in DE_METRICS.items():
+                    linha[coluna] = _finito(metricas.get(origem))
             except Exception as exc:  # um pipeline que quebra não derruba a matriz inteira
                 linha["tempo_s"] = round(time.perf_counter() - t0, 4)
                 linha["erro"] = f"{type(exc).__name__}: {exc}"
@@ -125,7 +171,9 @@ def rodar(dir_masks: Path, pipelines: Iterable[str]) -> list[dict[str, Any]]:
             print(
                 f"  {estrutura:28s} {pipeline:16s} dice={_fmt(linha['dice'])} "
                 f"hd95={_fmt(linha['hd95_mm'], 2)} assd={_fmt(linha['assd_mm'])} "
-                f"tris={linha['tris']} t={_fmt(linha['tempo_s'], 2)}s"
+                f"tris={linha['triangle_count']} comp={linha['n_componentes']} "
+                f"wt={linha['watertight']} glb={_fmt(linha['tamanho_glb_mb'], 2)}MB "
+                f"t={_fmt(linha['tempo_s'], 2)}s"
             )
     return linhas
 
@@ -154,6 +202,20 @@ def montar_summary(linhas: list[dict[str, Any]], pipelines: list[str]) -> str:
         "estruturas pequenas, por isso a separação. Distâncias em mm físicos."
     )
     out.append("")
+    out += [
+        f"**tipo_referencia: `{TIPO_REFERENCIA}`.** Dice / HD95 / ASSD aqui são medidos contra a"
+        " MÁSCARA de entrada rasterizada de volta na mesma grade — ou seja, medem apenas o erro"
+        " de RECONSTRUÇÃO. NÃO são ground truth clínico e não dizem nada sobre a qualidade da"
+        " segmentação: uma máscara errada com reconstrução perfeita dá Dice ~1 aqui.",
+        "",
+        "Cada erro fica na sua coluna, sem nota agregada: reconstrução (dice/hd95/assd/volume),"
+        " topologia (watertight/n_componentes/euler_number), custo de entrega"
+        " (triangle_count/vertex_count/tamanho_glb_mb, GLB sem Draco) e tempo.",
+        "",
+        "`watertight` é contagem de malhas fechadas / malhas ok, não mediana."
+        " `n_componentes` > 1 = corpos desconexos (ilhas). Euler = 2 por componente fechado sem alça.",
+        "",
+    ]
 
     for faixa in ORDEM_FAIXAS:
         da_faixa = [l for l in linhas if l["faixa"] == faixa]
@@ -163,8 +225,9 @@ def montar_summary(linhas: list[dict[str, Any]], pipelines: list[str]) -> str:
         out += [
             f"## {faixa}", "",
             f"Estruturas ({len(estruturas)}): {', '.join(estruturas)}", "",
-            "| pipeline | n | dice | hd95_mm | assd_mm | volume_error_% | tris | tempo_s | falhas |",
-            "|---|---|---|---|---|---|---|---|---|",
+            "| pipeline | n | dice | hd95_mm | assd_mm | volume_error_% | area_mm2 | tris | verts |"
+            " watertight | n_comp | euler | glb_mb | tempo_s | falhas |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for pipeline in pipelines:
             do_par = [l for l in da_faixa if l["pipeline"] == pipeline]
@@ -172,11 +235,15 @@ def montar_summary(linhas: list[dict[str, Any]], pipelines: list[str]) -> str:
                 continue
             ok = [l for l in do_par if l["erro"] is None]
             med = {m: _mediana([l[m] for l in ok]) for m in METRICAS}
+            n_wt = sum(1 for l in ok if l["watertight"])
             out.append(
                 f"| {pipeline} | {len(ok)} | {_fmt(med['dice'], 4)} | {_fmt(med['hd95_mm'], 2)} | "
                 f"{_fmt(med['assd_mm'])} | {_fmt(med['volume_error_pct'], 2)} | "
-                f"{_fmt(med['tris'], 0)} | {_fmt(_mediana([l['tempo_s'] for l in ok]), 2)} | "
-                f"{len(do_par) - len(ok)} |"
+                f"{_fmt(med['area_superficie_mm2'], 0)} | {_fmt(med['triangle_count'], 0)} | "
+                f"{_fmt(med['vertex_count'], 0)} | {n_wt}/{len(ok)} | "
+                f"{_fmt(med['n_componentes'], 0)} | {_fmt(med['euler_number'], 0)} | "
+                f"{_fmt(med['tamanho_glb_mb'], 3)} | "
+                f"{_fmt(_mediana([l['tempo_s'] for l in ok]), 2)} | {len(do_par) - len(ok)} |"
             )
         out.append("")
     return "\n".join(out)

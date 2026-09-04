@@ -56,6 +56,29 @@ CAMARAS = (
 )
 
 
+def sigma_para(nome: str, zooms: np.ndarray) -> float | None:
+    """σ da gaussiana POR CLASSE anatômica (medido, não suposto).
+
+    A ablação (scripts/validation/ablation.py) mostrou que o efeito da gaussiana
+    INVERTE com a escala:
+      - órgão/lobo: custo de volume é ruído (−0,09 % no coração) e ela remove
+        ~11 % de área de casca de voxel → vale manter;
+      - estrutura fina: come 69,8 % do volume de um tubo de 2 mm e 23,2 % de um
+        de 3 mm (contra −5,2 % e −1,8 % sem ela) → não aplicar.
+    Devolve None (= σ automático) para as classes que se beneficiam e 0.0 para
+    vaso/via aérea/lesão, cujo diâmetro costuma ficar perto do voxel.
+    """
+    _garantir_scripts_no_path()
+    from geometry.mask_processing import classe_de  # type: ignore[import-not-found]
+
+    # Lobo pulmonar cai em "via_aerea" pelo nome (lung_*), mas é parênquima
+    # grande — a ablação mostrou que ele SE BENEFICIA da gaussiana (−11 % de
+    # área de escada a custo de −0,04 % de volume). Só o fino perde de verdade.
+    if nome.startswith("lung_") and "lobe" in nome:
+        return None
+    return 0.0 if classe_de(nome) in ("vaso", "via_aerea", "lesao") else None
+
+
 def afastamento_de(nome: str) -> float:
     """0,15 mm só nas câmaras/miocárdio (superfícies opacas coincidentes:
     cavidade do VE × face interna do miocárdio). Num vaso de 3 mm o mesmo
@@ -118,16 +141,20 @@ def toca_borda(mask: np.ndarray, affine: np.ndarray) -> list[str]:
     return faces
 
 
-def _reconstrutor():
-    """Importa scripts/geometry/reconstruction.py (Fase 1) sem exigir que
-    `scripts` seja pacote: basta `scripts/` no sys.path, como já faz o
-    tc-para-vrmed.py."""
+def _garantir_scripts_no_path() -> None:
+    """Põe `scripts/` no sys.path — os módulos novos (geometry/) são importáveis
+    de lá sem exigir que `scripts` seja pacote, como já faz o tc-para-vrmed.py."""
     import sys
     from pathlib import Path
 
     raiz = str(Path(__file__).resolve().parents[1])  # .../scripts
     if raiz not in sys.path:
         sys.path.insert(0, raiz)
+
+
+def _reconstrutor():
+    """Importa scripts/geometry/reconstruction.py (Fase 1)."""
+    _garantir_scripts_no_path()
     from geometry import reconstruction  # type: ignore[import-not-found]
 
     return reconstruction

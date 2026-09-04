@@ -84,6 +84,13 @@ def main() -> int:
         help="extração de superfície (default = comportamento histórico; os outros são candidatos em benchmark)",
     )
     parser.add_argument(
+        "--sigma-por-classe",
+        action="store_true",
+        help="não borra a máscara de vaso/via aérea/lesão (σ=0). Medido na ablação: a gaussiana "
+        "come 69,8%% do volume de um tubo de 2 mm, mas ajuda órgão grande — por isso é por classe. "
+        "Candidato a default, ainda em benchmark.",
+    )
+    parser.add_argument(
         "--master",
         action="store_true",
         help="gera a MASTER mesh: sem decimação de VR, sem afastamento artificial — referência de fidelidade "
@@ -179,7 +186,20 @@ def main() -> int:
         # Na master a geometria representa a anatomia: nada de afastamento
         # artificial para resolver z-fighting (isso é problema do renderer).
         afastamento = 0.0 if args.master else M.afastamento_de(nome)
-        resultado = M.malha_de_volume(mask, affine, afastamento_mm=afastamento, metodo=args.reconstrucao)
+        # MASTER = referência de fidelidade, então sem borrar a máscara: a ablação
+        # mostrou que σ=0 melhora o erro de volume em TODOS os alvos medidos
+        # (coração −0,12→−0,03 %, esôfago −1,53→−0,31 %, tubo 2 mm −69,8→−5,2 %).
+        # O ganho da gaussiana é de APARÊNCIA (tira ~11 % de área de escada), e
+        # aparência é métrica separada de fidelidade — vale no derivado, não aqui.
+        if args.master:
+            sigma = 0.0
+        elif args.sigma_por_classe:
+            sigma = M.sigma_para(nome, zooms)
+        else:
+            sigma = None
+        resultado = M.malha_de_volume(
+            mask, affine, sigma_mm=sigma, afastamento_mm=afastamento, metodo=args.reconstrucao
+        )
         if resultado is None:
             log(f"  - {nome}: vazia no exame, pulando")
             relatorio["estruturas"][nome] = {"presente": False}
