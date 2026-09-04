@@ -21,6 +21,12 @@ def _grade(extent_mm: tuple[float, float, float], spacing: Spacing) -> tuple[np.
     """Grade centrada na origem. Devolve (pontos_mm com shape (nx,ny,nz,3), affine)."""
     sp = np.asarray(spacing, dtype=float)
     n = np.maximum(2, np.ceil(np.asarray(extent_mm, dtype=float) / sp).astype(int) + 1)
+    # n ÍMPAR em todos os eixos: garante um centro de voxel exatamente na origem,
+    # então a rede de amostragem é a MESMA para qualquer diâmetro. Com n variando
+    # entre par e ímpar, a rede deslocava meio voxel e o volume discretizado
+    # deixava de crescer com o diâmetro (d=2,0 mm dava menos que d=1,5 mm) —
+    # um fantoma não-monotônico não detecta regressão.
+    n = n + (n % 2 == 0)
     affine = np.eye(4)
     affine[:3, :3] = np.diag(sp)
     affine[:3, 3] = -(n - 1) / 2.0 * sp  # centro do volume na origem
@@ -29,13 +35,33 @@ def _grade(extent_mm: tuple[float, float, float], spacing: Spacing) -> tuple[np.
     return pts, affine
 
 
+def _ocupacao(pts_mm: np.ndarray, spacing: Spacing, dentro, supersample: int = 3) -> np.ndarray:
+    """Fração de cada voxel que cai dentro da forma, por supersampling.
+
+    Amostrar só o centro do voxel torna a discretização NÃO-MONOTÔNICA: como
+    `_grade` gera n par ou ímpar conforme o diâmetro, a rede de amostragem
+    desloca meio voxel e, por exemplo, d=1,0 mm e d=2,0 mm em spacing 0,7 mm
+    caíam ambos em 4 voxels de seção. Um fantoma que não cresce com o diâmetro
+    não serve como detector de regressão — daí o supersampling.
+    """
+    sp = np.asarray(spacing, dtype=float)
+    passos = (np.arange(supersample) + 0.5) / supersample - 0.5  # simétrico em torno de 0
+    desl = np.stack(np.meshgrid(passos * sp[0], passos * sp[1], passos * sp[2], indexing="ij"), axis=-1)
+    desl = desl.reshape(-1, 3)
+    acumulado = np.zeros(pts_mm.shape[:3], dtype=np.float32)
+    for d in desl:
+        acumulado += dentro(pts_mm + d).astype(np.float32)
+    return acumulado / float(len(desl))
+
+
 def esfera(
     diametro_mm: float, spacing: Spacing = (1.0, 1.0, 1.0), margem_mm: float = 5.0
 ) -> tuple[np.ndarray, np.ndarray]:
     """Esfera sólida centrada na origem. Volume analítico = π/6 · d³."""
     lado = diametro_mm + 2 * margem_mm
     pts, affine = _grade((lado, lado, lado), spacing)
-    mask = np.linalg.norm(pts, axis=-1) <= diametro_mm / 2.0
+    raio = diametro_mm / 2.0
+    mask = _ocupacao(pts, spacing, lambda p: np.linalg.norm(p, axis=-1) <= raio) >= 0.5
     return mask, affine
 
 
@@ -51,8 +77,14 @@ def cilindro(
     extent[eixo] = altura_mm + 2 * margem_mm
     pts, affine = _grade(tuple(extent), spacing)
     radiais = [i for i in range(3) if i != eixo]
-    r = np.linalg.norm(pts[..., radiais], axis=-1)
-    mask = (r <= diametro_mm / 2.0) & (np.abs(pts[..., eixo]) <= altura_mm / 2.0)
+    raio = diametro_mm / 2.0
+    meia_altura = altura_mm / 2.0
+
+    def dentro(p: np.ndarray) -> np.ndarray:
+        r = np.linalg.norm(p[..., radiais], axis=-1)
+        return (r <= raio) & (np.abs(p[..., eixo]) <= meia_altura)
+
+    mask = _ocupacao(pts, spacing, dentro) >= 0.5
     return mask, affine
 
 

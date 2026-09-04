@@ -31,6 +31,10 @@ MIN_VOXELS = 50  # abaixo disso é ruído/estrutura ausente
 METODOS = ("marching_cubes", "surface_nets", "flying_edges", "sdf")
 
 
+class SuperficieVazia(RuntimeError):
+    """A extração não produziu geometria (estrutura fina dissolvida pela suavização)."""
+
+
 @dataclass
 class ResultadoSuperficie:
     """Malha em metros/eixos glTF + a receita que a produziu."""
@@ -67,7 +71,13 @@ def _finalizar(
     taubin_iters: int,
     offset_mm: float,
 ) -> tuple[trimesh.Trimesh, int]:
-    """Índice de voxel → mm RAS → glTF(m), + Taubin/normais/afastamento."""
+    """Índice de voxel → mm RAS → glTF(m), + Taubin/normais/afastamento.
+
+    Levanta SuperficieVazia quando não sobrou geometria (estrutura dissolvida
+    pela suavização) — quem chama traduz para "ausente" em vez de quebrar.
+    """
+    if len(faces) == 0 or len(verts_vox) == 0:
+        raise SuperficieVazia("isosuperfície vazia: a estrutura não sobreviveu à suavização")
     verts_mm = verts_vox @ affine[:3, :3].T + affine[:3, 3]
     malha = trimesh.Trimesh(vertices=(verts_mm @ RAS_PARA_GLTF.T) * MM_PARA_M, faces=faces, process=True)
     tris_brutos = len(malha.faces)
@@ -99,7 +109,14 @@ def _para_vtk_image(campo: np.ndarray):
 def _do_polydata(pd) -> tuple[np.ndarray, np.ndarray]:
     from vtk.util import numpy_support
 
-    pontos = numpy_support.vtk_to_numpy(pd.GetPoints().GetData()).astype(np.float64)
+    # Isosuperfície vazia (estrutura dissolvida pela suavização, p.ex. um vaso
+    # fino): o VTK devolve polydata sem pontos e GetPoints() vira None. Sem esta
+    # guarda o filtro estourava AttributeError em vez de reportar "ausente".
+    pontos_vtk = pd.GetPoints()
+    if pontos_vtk is None or pd.GetNumberOfPolys() == 0:
+        return np.empty((0, 3), dtype=np.float64), np.empty((0, 3), dtype=np.int64)
+
+    pontos = numpy_support.vtk_to_numpy(pontos_vtk.GetData()).astype(np.float64)
     conect = numpy_support.vtk_to_numpy(pd.GetPolys().GetConnectivityArray())
     return pontos, conect.reshape(-1, 3)
 
@@ -119,7 +136,36 @@ def reconstruct_surface(
 
     smoothing: "auto" (o suavizador natural do método), "none", "taubin" ou
     "windowed_sinc" (só muda algo no flying_edges).
+
+    Devolve None também quando a estrutura NÃO SOBREVIVE à suavização (vaso fino
+    dissolvido: o campo nunca alcança `level`). É perda total, não erro de
+    programação — por isso vira "ausente" e não exceção.
     """
+    try:
+        return _reconstruir(
+            mask, affine, method=method, smoothing=smoothing, sigma_mm=sigma_mm,
+            taubin_iters=taubin_iters, offset_mm=offset_mm, level=level,
+        )
+    except SuperficieVazia:
+        return None
+    except ValueError as e:
+        # skimage: "Surface level must be within volume data range" = mesmo caso.
+        if "within volume data range" in str(e):
+            return None
+        raise
+
+
+def _reconstruir(
+    mask: np.ndarray,
+    affine: np.ndarray,
+    *,
+    method: str,
+    smoothing: str,
+    sigma_mm: float | None,
+    taubin_iters: int,
+    offset_mm: float,
+    level: float,
+) -> ResultadoSuperficie | None:
     if method not in METODOS:
         raise ValueError(f"método desconhecido: {method!r} (use um de {METODOS})")
     mask = np.asarray(mask) > 0.5
