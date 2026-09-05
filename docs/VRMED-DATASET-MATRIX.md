@@ -30,7 +30,7 @@ especializado. Os dois usos são registrados separadamente.
 | **StructSeg2019 T3** | sim | 60 | 1 oncologista + verificação | 1 (Zhejiang) | sim | **nenhuma publicada na fonte** | grand-challenge | **rejeitado** — sem licença |
 | **SegRap2023** | sim | — | — | — | sim | — | **encerrado** após o prazo do desafio | **indisponível** |
 | **RAOS** | sim | — | **1 sênior** ("annotated from scratch") | — | sim, R1 puro | ver fonte | GitHub | treino, anotador único |
-| **SAROS** | **não** | 900 | — | 28 coleções TCIA | sim | **CC BY 4.0** | direto | **pericárdio**, não esôfago |
+| **SAROS** | **não** | 900 (882 casos) | model-in-the-loop + revisão humana | 28 coleções TCIA | sim, revisado | **CC BY 4.0** (máscaras; código é MIT) | HTTP direto, sem cadastro | **usado na Fase 8** para o pericárdio. Anotação **esparsa**: ~21 % das fatias, resto = *ignore* (255) |
 | **autoPET** | não | — | — | — | **pseudo-rótulo do TotalSegmentator** | — | — | **rejeitado** — filtro 1 |
 | **CT-ORG** | não | 140 | — | — | parcial (lungs/bones semiautomáticos) | TCIA | TCIA | — |
 | **MSD Task06** | não (tumor) | 96 | — | — | sim | CC BY-SA 4.0 | AWS | — |

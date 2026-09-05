@@ -238,11 +238,42 @@ absoluto em mL.
 > **Estado do mapeamento: `Heart` (GT LCTSC) → `pericardium`, VALIDADO NO HOLDOUT.**
 > Seleção na Fase 6 (development, n=6) · validação na Fase 7 (validation + test, n=15+15).
 
-**O que isto NÃO estabelece.** Que `pericardium` seja anatomicamente o saco pericárdico. O
-holdout mostra que ela representa melhor **o objeto que o LCTSC contorna como `Heart`** — que é
-um contorno de radioterapia incluindo o saco e a gordura. A identidade anatômica da classe
-continua **não determinada**, e depende de uma referência de pericárdio que este dataset não
-tem (o SAROS anota, sob CC BY 4.0, e não foi usado).
+**O que o holdout NÃO estabelece.** Que `pericardium` seja anatomicamente o saco pericárdico.
+Ele mostra que ela representa melhor **o objeto que o LCTSC contorna como `Heart`** — um
+contorno de radioterapia que inclui saco e gordura.
+
+### Identidade anatômica (Fase 8, contra o SAROS)
+
+> **"Saco pericárdico" está REFUTADO.** Compatível com **região pericárdica preenchida**.
+> Independência da referência **indeterminada**.
+
+| | GT SAROS | predição TS | saco fibroso sintético de 2 mm |
+|---|---|---|---|
+| razão de preenchimento 2D | **1,0000** (14/14) | **1,0000** (14/14) | **0,0724** |
+| meia-espessura mediana | **14,32 mm** | 14,54 mm | **0,730 mm** |
+
+**A refutação não depende da predição.** O `pericardium` do GT do SAROS — humano-revisado — é
+ele mesmo um **sólido preenchido**, e a mesma função classifica um saco sintético de 2 mm como
+casca. Recomputado de forma independente em 5 casos adicionais: preenchimento 1,0000 exato.
+
+O paper do SAROS descreve `pericardium` como rótulo de **região corporal**, ao lado das
+cavidades e do mediastino — não como o saco. **Isso limita por definição o que se pode
+afirmar**, venha o Dice que vier.
+
+Correspondência medida (14 casos, restrita às fatias anotadas — o SAROS anota ~21 % das fatias
+e marca o resto como *ignore*): Dice **0,9657**, composição **0,9719** de um único rótulo,
+melhor alvo em 14/14 contra `mediastinum` (0,0190) e `thoracic_cavity` (0,0007).
+
+**Ressalva que não pode sair do lado desse número.** O dataset de treino da tarefa 343 é
+`Dataset343_mediastinum_1786subj`, com rótulos **idênticos** aos do SAROS e campos de
+proveniência em branco (`reference: "Jakob"`, `licence: "-"`). São 1786 sujeitos contra os 900
+do SAROS — não é *só* SAROS, mas o SAROS pode estar contido. **Um Dice de 0,9657 é compatível
+com memorização.**
+
+**A diferença que resta tem endereço:** o extremo superior, sobre a raiz dos grandes vasos. O
+SAROS os mantém dentro do `pericardium`; a predição os chama de `mediastinum`.
+
+Detalhes em [`RELATORIO-FASE8-SAROS-PERICARDIO.md`](RELATORIO-FASE8-SAROS-PERICARDIO.md).
 
 ---
 
