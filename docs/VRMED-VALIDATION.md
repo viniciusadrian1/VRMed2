@@ -117,13 +117,16 @@ MASTER completa: `marching_cubes · σ = 0 · Taubin = 4 · level = 0,5 · offse
 
 ## Limitações honestas
 
-- **Tier 2 deixou de estar ausente** (2026-09-04): `scripts/validation/tier2/` mede a
-  segmentação contra o **LCTSC/TCIA** (CC BY 3.0, ground truth de 2017, independente do
-  TotalSegmentator). **1 caso, 5 estruturas**; aorta e traqueia não são anotadas pelo
-  dataset e saem como "não medido". Resultado e ressalvas de definição em
-  [`RELATORIO-VALIDACAO-RECONSTRUCAO.md` §9](RELATORIO-VALIDACAO-RECONSTRUCAO.md).
-  Com n=1 isso **não é estimativa de acurácia do modelo** — é a primeira medida com o
-  instrumento montado.
+- **Tier 2 agora é COORTE** (2026-09-04): `scripts/validation/tier2/` mede a segmentação
+  contra o **LCTSC/TCIA** (CC BY 3.0 lida da API, ground truth humano de 2017, independente
+  do TotalSegmentator). **60 casos, 3 instituições, 5 estruturas, 0 falhas.** Relatório
+  completo com distribuição, IC bootstrap, rankings e mapas de erro:
+  [`RELATORIO-TIER2-COORTE.md`](RELATORIO-TIER2-COORTE.md).
+  *Histórico: a primeira execução foi de 1 caso só, declarada na época como "não é
+  estimativa de acurácia" — a coorte substitui aquele número, não o apaga.*
+  **Aorta e traqueia continuam sem Tier 2**: o dataset não as anota, e o SegTHOR — que
+  cobriria as duas — está **pendente de aquisição** (Data Use Agreement do Centre Henri
+  Becquerel proíbe redistribuição; o mirror do Zenodo é não autorizado e não foi usado).
 - O benchmark mede **malha × máscara**. A máscara não é a verdade — ela já é uma
   discretização. Por isso o fantoma existe: é o que separa "fiel à máscara" de
   "fiel à anatomia".

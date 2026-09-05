@@ -852,10 +852,10 @@ fragmentação que existe aqui — ver §2.5.
 
 | bloco | o que mede | quantificável hoje? |
 |---|---|---|
-| **A — segmentação** | máscara × ground truth independente | **Sim, parcialmente.** 5 estruturas, 1 caso, LCTSC (§9.3). Aorta e traqueia: não medido |
+| **A — segmentação** | máscara × ground truth independente | **Sim, em coorte.** 5 estruturas, **60 casos**, 3 instituições — ver [`RELATORIO-TIER2-COORTE.md`](RELATORIO-TIER2-COORTE.md). Aorta e traqueia: não medido (o dataset não as anota) |
 | **B — reconstrução** | malha × máscara e malha × verdade analítica | **Sim.** Tier 1 (7 estruturas) e Tier 3 (fantomas), §§2–8 |
 | **C — simplificação** | derivado × MASTER | **Sim.** Ablação de decimação, §2.4 e §3.3–3.5 |
-| **D — compressão** | asset Draco × pré-Draco | **Não.** O `trimesh` não decodifica Draco e lê zeros; medir o asset publicado dá número falso. Nunca quantificado |
+| **D — compressão** | asset Draco × pré-Draco | **Sim, desde 2026-09-04.** Desbloqueado com DracoPy (o `trimesh` de fato lê zeros e produz número falso). Deslocamento de vértice 0,0014–0,0168 mm; **topologia NÃO é neutra**. Ver [`RELATORIO-TIER2-COORTE.md` §13-D](RELATORIO-TIER2-COORTE.md) |
 
 **Os quatro nunca se somam.** Um número único de "erro do VRmed" não existe e não deve ser
 produzido.

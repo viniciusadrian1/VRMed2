@@ -185,14 +185,24 @@ def _medir(pred: np.ndarray, gt: np.ndarray, spacing, linha: dict) -> dict:
     m = compare_masks(pred, gt, spacing)
     rc = recall_containment(pred, gt)
     vol_gt = _ml(gt, spacing)
+    # Copia TUDO que compare_masks e recall_containment devolvem, filtrado por
+    # COLUNAS. Antes as chaves eram enumeradas a mao e foi exatamente isso que
+    # fez `nsd_1vox`, `nsd_2vox`, `nsd_tau_vox_mm` e `precision_pred` sairem None
+    # na coorte inteira: as colunas foram declaradas e a copia nao acompanhou.
+    # Enumerar a mao aqui e um ponto de falha silencioso — a linha ja nasce com
+    # todas as chaves de COLUNAS em None, entao a metrica ausente nao da erro,
+    # so vira "nao medido" na agregacao.
+    linha.update({k: v for k, v in m.items() if k in COLUNAS})
+    linha.update({k: v for k, v in rc.items() if k in COLUNAS})
     linha.update(
-        dice=m["dice"], iou=m["iou"], nsd_1mm=m["nsd_1mm"], nsd_2mm=m["nsd_2mm"],
-        hd95_mm=m["hd95_mm"], assd_mm=m["assd_mm"], hd_mm=m["hd_mm"],
-        volume_error_pct=m["volume_error_pct"],
         volume_pred_ml=_ml(pred, spacing), volume_gt_ml=vol_gt,
-        recall_gt=rc["recall_gt"], containment_pred_em_gt=rc["containment_pred_em_gt"],
         estrutura_pequena=bool(vol_gt < LIMIAR_PEQUENA_ML),
     )
+    faltando = [k for k in ("dice", "iou", "nsd_1mm", "nsd_2mm", "nsd_1vox", "nsd_2vox",
+                            "hd95_mm", "assd_mm", "hd_mm", "volume_error_pct",
+                            "recall_gt", "precision_pred") if linha.get(k) is None]
+    if faltando:  # falha alto em vez de gravar None silencioso
+        raise KeyError(f"metricas declaradas em COLUNAS e nao preenchidas: {faltando}")
     return linha
 
 
