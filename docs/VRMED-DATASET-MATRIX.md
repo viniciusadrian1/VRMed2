@@ -1,0 +1,99 @@
+# VRmed — matriz de datasets para o esôfago
+
+Data: 2026-09-05 · Pergunta: **existe dataset público bom o bastante para treinar um modelo
+de esôfago, e um dataset independente para validá-lo?**
+
+> Levantamento para uso educacional e experimental. Licenças foram lidas na fonte quando
+> possível; o que não foi confirmado está na §4.
+
+## 0. Os dois filtros que eliminam a maioria
+
+**Filtro 1 — o GT não pode ser saída de modelo.** Já custou caro nesta base: o Zenodo
+`10.5281/zenodo.7975081` anota heart, trachea, aorta e esophagus sob CC BY 4.0, e o "ground
+truth" dele é saída de nnU-Net. Era o candidato mais conveniente e o mais inválido.
+
+**Filtro 2 — treino e validação servem a propósitos opostos.** Um dataset que está no treino
+do TotalSegmentator **não pode validar** o `A_BASELINE_V1` — mas **pode** treinar um modelo
+especializado. Os dois usos são registrados separadamente.
+
+---
+
+## 1. A matriz
+
+| Dataset | Esôfago | N casos | N anotadores | Instituições | GT humano | Licença | Acesso | Serve para |
+|---|---|---|---|---|---|---|---|---|
+| **LCTSC** (TCIA) | sim | 60 | 1/caso | 3 (MDACC, MSKCC, MAASTRO) | sim, contorno de RT | **CC BY 3.0** (lida na API) | REST, sem cadastro | **validação** — já em uso |
+| **NSCLC-Radiomics** (TCIA) | sim | 422 | 1 ("a radiation oncologist") | MAASTRO | sim, manual | **CC BY-NC 3.0** | download sem aprovação | treino, com ressalva |
+| **TotalSegmentator dataset** (Zenodo 6802613) | sim | 1228 | equipe do Basel | 1 (Basel) | **model-in-the-loop** | **CC BY 4.0** | direto, sem cadastro | **treino** — não valida |
+| **AMOS22** (Zenodo 7262581) | sim | 500 CT + 100 MRI | 5 juniores + 3 sêniores | 2 (mesmo distrito) | **model-in-the-loop** | **conflitante**: CC BY 4.0 no Zenodo, CC BY-NC-SA no artigo | direto | treino, com ressalva |
+| **SegTHOR** | sim | 60 | 1 radioterapeuta | 1 (CHB Rouen) | sim, manual | **DUA proíbe redistribuição** | cadastro + termo assinado + aprovação humana | **bloqueado** |
+| **StructSeg2019 T3** | sim | 60 | 1 oncologista + verificação | 1 (Zhejiang) | sim | **nenhuma publicada na fonte** | grand-challenge | **rejeitado** — sem licença |
+| **SegRap2023** | sim | — | — | — | sim | — | **encerrado** após o prazo do desafio | **indisponível** |
+| **RAOS** | sim | — | **1 sênior** ("annotated from scratch") | — | sim, R1 puro | ver fonte | GitHub | treino, anotador único |
+| **SAROS** | **não** | 900 | — | 28 coleções TCIA | sim | **CC BY 4.0** | direto | **pericárdio**, não esôfago |
+| **autoPET** | não | — | — | — | **pseudo-rótulo do TotalSegmentator** | — | — | **rejeitado** — filtro 1 |
+| **CT-ORG** | não | 140 | — | — | parcial (lungs/bones semiautomáticos) | TCIA | TCIA | — |
+| **MSD Task06** | não (tumor) | 96 | — | — | sim | CC BY-SA 4.0 | AWS | — |
+
+---
+
+## 2. Os três achados que decidem
+
+**Não existe dataset público de esôfago torácico com múltiplos anotadores independentes ou
+consenso.** Dos quatro torácicos com esôfago verificados — LCTSC, NSCLC-Radiomics,
+StructSeg2019-T3, SegTHOR — todos têm **um** conjunto de contornos por caso. Isso importa
+diretamente: a Fase 5 mediu que o **sentido** do erro do esôfago inverte entre instituições
+(S3 mais estreita, S1 mais larga, amplitude 0,428). Um dataset de anotador único ensina o
+estilo desse anotador, e não há como medir quanto disso é estilo sem contornos repetidos.
+
+**NSCLC-Radiomics não é independente do LCTSC.** Ambos contêm dados do **MAASTRO** — o LCTSC
+é *"made available from three different institutions: MD Anderson, Memorial Sloan-Kettering,
+and the MAASTRO clinic, with 20 cases from each"*. Usar um para treinar e o outro para validar
+compartilharia origem em um terço da coorte.
+
+**O maior dataset disponível é o de treino do próprio modelo que queremos superar.** O
+TotalSegmentator dataset tem 1228 TCs sob CC BY 4.0, download direto — e é exatamente o
+conjunto em que o task `total` foi treinado. Ele serve para treinar um especializado, **nunca
+para validar contra o baseline**. E o GT dele é model-in-the-loop: *"After manual segmentation
+of the first 5 patients was completed, a preliminary nnU-Net was trained, and its predictions
+were manually refined"*.
+
+---
+
+## 3. Resposta objetiva
+
+**Existe dataset suficientemente bom para TREINAR um modelo de esôfago?**
+**Tecnicamente sim, metodologicamente frágil.** O TotalSegmentator dataset (1228 casos,
+CC BY 4.0) e o NSCLC-Radiomics (422 casos, CC BY-NC 3.0) dão volume. Ambos têm GT de origem
+comprometida para o propósito: o primeiro é model-in-the-loop do próprio modelo que se quer
+superar, o segundo é de anotador único e compartilha instituição com a coorte de validação.
+
+**Existe dataset INDEPENDENTE para VALIDAR?**
+**O LCTSC, e só ele** — e ele já é a coorte de avaliação. Com o `Tier2_TEST` de 15 casos
+intocado, há validação independente **disponível**, mas de uma única coleção e um único estilo
+de contorno por instituição.
+
+**Recomendação ordenada, se e quando houver decisão de treinar:**
+
+1. **SAROS** para o pericárdio — CC BY 4.0, 900 TCs, 28 coleções, anota `pericardium`. É o que
+   fecharia a lacuna da §1.8 da ontologia. **Não é esôfago**, mas é a aquisição de maior
+   retorno agora.
+2. **TotalSegmentator dataset** para treino de esôfago, com o entendimento explícito de que o
+   modelo herdaria as convenções do Basel.
+3. **NSCLC-Radiomics** como reforço, com a sobreposição MAASTRO declarada.
+4. **SegTHOR**, se e quando o acesso oficial for concedido — o DUA exige termo assinado e
+   aprovação humana, o que não é automatizável nem contornável.
+
+---
+
+## 4. Não verificado
+
+- A licença do **RAOS** não foi lida na fonte oficial.
+- O conflito de licença do **AMOS22** (CC BY 4.0 no Zenodo contra CC BY-NC-SA no artigo
+  NeurIPS) não foi resolvido — na dúvida, vale a mais restritiva.
+- **Nenhum dataset foi baixado** nesta fase. Todos os números de N casos e anotadores vêm de
+  páginas e artigos, não de inspeção do dado.
+- Não foi verificado se **NSCLC-Radiomics** ou **RAOS** estão no treino do TotalSegmentator
+  além do que o artigo declara (só Basel).
+- A definição de esôfago de cada dataset **não foi comparada estrutura a estrutura** com a do
+  VRmed — só a do LCTSC foi, e ela coincide.

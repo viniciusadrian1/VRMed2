@@ -494,6 +494,34 @@ uma fatia grande do "erro" medido não é erro.
 
 ---
 
+## 19-bis. Correção posterior (Fase 6)
+
+Duas afirmações desta fase não sobreviveram à revisão da Fase 6 e ficam registradas aqui, não
+apagadas. Ver [`RELATORIO-FASE6-ONTOLOGIA-MODELO.md`](RELATORIO-FASE6-ONTOLOGIA-MODELO.md) §5 e §6.
+
+**(a) O argumento da "amplitude zero" na medula era inválido.** Afirmei que `frac_campo_pred`
+tem amplitude 0,0000 entre instituições contra 0,27 do `frac_campo_gt`, e li isso como prova
+de que o modelo é invariante e só o contorno varia. A variável está **saturada no teto**: 25
+de 30 casos valem exatamente 1,0, o mínimo é 0,9078 e a dispersão real é **0,0922**. Amplitude
+zero entre medianas de uma variável presa no máximo é aritmética, não concordância, e
+compará-la com uma variável não saturada não é comparação válida.
+
+O que sobrevive: a predição preenche o campo em 25/30 casos e o FP é 17× maior na ponta
+cranial. Na ponta caudal a concordância é **imposta pelo campo de visão** (`erro_distal`
+mediano de 1,25 mm). Logo a divergência é **uma única decisão de fronteira cranial**, não uma
+propriedade global — mais estreito do que esta seção afirmou.
+
+**(b) `precision 0,9825` do coração é circular.** Vem da variante `A_suporte_gt`, que recorta
+a predição no suporte do GT em Z. No campo completo é **0,8740**, com 28/30 casos abaixo de
+0,90. A conclusão de que o GT é superconjunto continua de pé, mas por outra evidência: o
+`pericardium` do `trunk_cavities` explica o mesmo GT com Dice 0,9056 contra 0,7709 do `heart`.
+
+**(c) A resposta 8 desta fase ficou desatualizada.** Ela dizia que para o coração era preciso
+decidir a definição antes de agir. A Fase 6 decidiu e mediu: o objeto que o GT contorna já
+existe na saída do modelo, sob outro nome. Não é problema de segmentação — é de rótulo.
+
+---
+
 ## 20. Reprodutibilidade
 
 ```bash
