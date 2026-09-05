@@ -81,9 +81,37 @@ convenção de contorno, não fidelidade anatômica.
 | **limite inferior** | **junção gastroesofágica**, coincidindo com o atlas |
 | **cavidades** | lúmen — o VRmed representa o esôfago **preenchido**, sem lúmen vazado |
 
-**Aqui a definição do VRmed e a do GT coincidem**, e a medição confirma: diferença de
-comprimento mediana **exatamente 0,000 mm**, frações de campo quase iguais (0,566 da predição
-contra 0,557 do GT). Só 0,2119 do erro é extensão.
+**Aqui a definição do VRmed e a do GT coincidem em EXTENSÃO TOTAL**, e a medição confirma:
+diferença de comprimento mediana **exatamente 0,000 mm**. Só 0,2119 do erro é extensão.
+
+> **Correção (Fase 7): os dois limites acima NÃO são operacionais.** O pipeline **não localiza
+> cricoide nem junção gastroesofágica** — o próprio repositório declara isso em
+> `benchmark_tier2.py` e no relatório de reconstrução. Não há uma única medida de onde está
+> qualquer um dos dois marcos em nenhum dos 30 casos. O que foi medido é **distância
+> predição↔GT**, não predição↔anatomia: `erro_cranial` mediano −3,0 mm (em 18/30 a predição
+> para antes do GT) e `erro_distal` +6,0 mm (em 23/30 ela passa). Os dois erros têm sinais
+> opostos e se cancelam no comprimento total, o que explica o Δ de 0,000 mm.
+>
+> Um modelo treinado contra este GT aprenderia **onde o contornador parou**, não onde está o
+> cricoide. A definição é operacional para parede, lúmen, gordura e tecido vizinho; **não é**
+> para as duas extremidades.
+
+**Parede e lúmen — medido na Fase 7 (n=30):**
+
+O GT é **maciço**: `fill_holes` 2D preencheu **0,0000 mL em 30/30 casos**, 0 fatias com buraco.
+E o lúmen com gás está **dentro** do contorno — a fração de HU < −200 é 0,0494 no GT inteiro e
+**sobe para 0,0673** no interior erodido, o oposto do que volume parcial de borda produziria.
+
+**A distinção parede/lúmen não é representável nesta grade.** Espessura característica mediana
+**9,33 mm**; em Z isso são ~3,5 voxels (dz mediano 2,5 mm), e uma parede de 3–4 mm ocupa
+**1,0–1,6 voxel em Z**. Exigir que um modelo a separe é exigir o impossível.
+
+**Adjacência não explica o erro:** só **3,35 %** da superfície do GT está a 1 passo da traqueia
+predita e **3,80 %** da aorta (7,29 % e 5,39 % restringindo às fatias onde o vizinho existe).
+Válido nos limiares medidos — 1 passo e 2 mm.
+
+**O FN é mais gorduroso que o FP** (fração de gordura 0,1837 contra 0,1087): o que o modelo
+deixa de fora é mais gorduroso que o que ele acrescenta.
 
 **Portanto o erro do esôfago não é explicado por definição** — é o candidato legítimo a erro
 de modelo. Ver §4 para a ressalva sobre a decomposição.

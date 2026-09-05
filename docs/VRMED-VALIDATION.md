@@ -101,6 +101,27 @@ e a recomendação de default para MASTER e DERIVADOS:
    Toda validação tem de rodar na malha **pré-Draco**; medir o asset publicado dá
    número falso.
 
+## Mapeamento cardíaco — seleção × validação (Fase 7)
+
+O `Heart` do GT do LCTSC é agora mapeado para **`pericardium`** (task `trunk_cavities`), não
+para `heart`. A distinção entre os dois momentos fica registrada porque ela é o método:
+
+| | conjunto | n | Dice `heart` | Dice `pericardium` |
+|---|---|---|---|---|
+| **seleção** (Fase 6) | development | 6 | 0,7709 | 0,9056 |
+| **validação** (Fase 7) | validation | 15 | 0,7472 | **0,9093** |
+| **validação** (Fase 7) | test | 15 | 0,7488 | **0,9089** |
+
+**15/15 casos melhoraram em cada conjunto retido.** Δ Dice pareado +0,1418 e +0,1569; HD95
+−17 mm; erro absoluto de volume −164,8 e −146,6 mL. Detalhes e ressalvas em
+[`RELATORIO-FASE7-HOLDOUT-ESOFAGO.md`](RELATORIO-FASE7-HOLDOUT-ESOFAGO.md).
+
+**Isto não estabelece** que `pericardium` seja o saco pericárdico — só que representa melhor o
+objeto que o LCTSC contorna. A identidade anatômica segue **não determinada**.
+
+**O conjunto de teste foi gasto nesta hipótese.** Qualquer avaliação futura sobre ele será a
+segunda leitura, não a primeira. Um experimento novo precisa de conjunto de teste próprio.
+
 ## Estado congelado da configuração
 
 | item | estado | evidência |
