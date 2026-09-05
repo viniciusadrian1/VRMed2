@@ -230,6 +230,58 @@ parâmetros — **0,0157 voxel por parâmetro**.
 
 ---
 
+## 12-bis. Matriz modelo vs definição (Parte 14)
+
+Preenchida **só com evidência já existente**. Célula sem medida diz "não medido".
+
+| problema | parece modelo? | parece GT? | parece ambos? | evidência |
+|---|---|---|---|---|
+| **Esôfago** | **sim** | não há evidência que sustente | — | Definição do VRmed **coincide** com a do GT: Δ comprimento mediano **0,000 mm**, frações de campo 0,566 contra 0,557. Extensão 0,2119 e localização 0,1355 do erro. As 8 morfologias da Fase 5 deram no máximo **+0,0004** de Dice. A atribuição de 0,1751 a "convenção" **foi refutada**: o controle positivo do regime é uma erosão uniforme, que é assinatura de erro de modelo |
+| **Medula** | **sim, em parte** | **sim, em parte** | **sim — e as duas partes são separáveis** | **GT:** o FP é 17× maior na ponta **cranial** (4,107 mL contra 0,240 mL) e ali a predição continua enquanto o contorno para — decisão de fronteira do atlas. **Modelo:** o FN é casca de 1 voxel (`frac_FN_fino` 0,891), estável entre instituições (amplitude 0,077), e isso é erro de espessura do modelo. **Ressalva:** o argumento de "amplitude zero" que eu usara para atribuir tudo ao GT era inválido (variável saturada, ver §5) |
+| **Heart** | **não** | **não exatamente — é rótulo trocado** | — | Não é erro nem divergência de definição irreconciliável: **o objeto que o GT contorna existe na saída do modelo, com outro nome**. `pericardium` dá Dice **0,9056** contra 0,7709 do `heart`, recall 0,9811 contra 0,7010. O problema era de correspondência, e tem solução sem treino |
+| Lung_R / Lung_L | não medido | **parcialmente** | — | O GT anota pulmão inteiro e o modelo produz 5 lobos; a união apaga fissuras. Dice de 0,97/0,96 mede envoltória, não lobação. **Não há GT de lobo** — a lobação segue sem Tier 2 |
+| Aorta / Trachea | **não medido** | **não medido** | — | O LCTSC não as anota. Zero cobertura |
+
+**A leitura da matriz:** dos três problemas que motivaram esta fase, **um é de rótulo e tem
+solução imediata** (coração), **um é misto e já foi decidido pela ontologia** (medula), e
+**um é o único candidato legítimo a erro de modelo** (esôfago) — que é justamente aquele para
+o qual não há dado suficiente para treinar.
+
+---
+
+## 12-ter. Protocolo da cadeia A→B (Parte 16)
+
+**Não executável nesta fase: não existe candidato experimental de A.** Nenhuma intervenção da
+Fase 5 passou e nenhum modelo foi treinado. O que fica registrado é o protocolo e o motivo de
+ele importar.
+
+**Protocolo, para quando houver um A experimental:**
+
+```
+A_baseline      ──► MASK_baseline      ──► B_baseline ──► MASTER_baseline
+A_experimental  ──► MASK_experimental  ──► B_baseline ──► MASTER_experimental
+```
+
+`B` fica **congelado nos dois braços** — `marching_cubes · σ=0 · Taubin 4 · level 0,5 ·
+offset 0 · sem decimação`. Alterar B para favorecer A invalidaria a comparação, e isso está
+proibido por construção do protocolo.
+
+Medir nos dois braços: Dice, HD95, ASSD, erro de volume, **geometria da MASTER** (volume da
+malha, área, watertight) e **número de componentes** — este último porque fusão de componentes
+é dano silencioso que nenhuma métrica de volume ou distância detecta, como a ablação de
+decimação já mostrou.
+
+**Por que vale melhorar A — já medido no baseline.** A cadeia foi rodada em 3 casos × 5
+estruturas e o residual `C − A` deu **+0,0000 em 15/15 pares**. Na resolução da grade a
+reconstrução **não acrescenta erro mensurável** sobre a segmentação; o erro de B é inteiramente
+sub-voxel (−0,3935 % de volume numa esfera de 20 mm, medido pelo único caminho não degenerado).
+
+**Consequência:** uma melhoria em A chegaria **integralmente** à MASTER. Não há etapa
+posterior que a dilua — e não há etapa posterior que a esconda, o que também significa que uma
+piora em A chegaria inteira.
+
+---
+
 ## 13. O que está comprovado
 
 - **`pericardium` é sólido, não casca** (preenchimento 1,0000 em 6/6; meia-espessura 10,4 mm).
