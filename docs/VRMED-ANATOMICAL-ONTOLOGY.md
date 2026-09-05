@@ -77,14 +77,33 @@ convenção de contorno, não fidelidade anatômica.
 | **GT LCTSC** | `Esophagus`, do nível abaixo do cricoide à junção gastroesofágica (atlas RTOG 1106) |
 | **entra** | parede e lúmen esofágicos |
 | **não entra** | conteúdo alimentar, gordura periesofágica, traqueia adjacente |
-| **limite superior** | **VRmed adota: cricoide**, coincidindo com o atlas |
-| **limite inferior** | **junção gastroesofágica**, coincidindo com o atlas |
+| **extensão longitudinal** | **HERDADA do GT. Não é critério do VRmed e não é avaliável** — ver a caixa abaixo |
 | **cavidades** | lúmen — o VRmed representa o esôfago **preenchido**, sem lúmen vazado |
 
 **Aqui a definição do VRmed e a do GT coincidem em EXTENSÃO TOTAL**, e a medição confirma:
 diferença de comprimento mediana **exatamente 0,000 mm**. Só 0,2119 do erro é extensão.
 
-> **Correção (Fase 7): os dois limites acima NÃO são operacionais.** O pipeline **não localiza
+> **Resolvido na Fase 9 — alternativa D, escolhida por medição.** Os limites "cricoide" e
+> "junção gastroesofágica" foram **removidos** da definição: não eram observáveis, e a
+> contradição que este parágrafo registrava não podia ficar de pé.
+>
+> O pipeline localiza a **carina** (extremo caudal da `trachea`): 30/30 casos, estável em 29/30.
+> Com o marco disponível, três medidas decidiram. **(1)** As pontas do GT **não** estão a
+> deslocamento fixo dela — IQR 23,5 mm cranial e 13,6 mm caudal, ambos acima do HD95 de
+> 6,27 mm que se quer medir. **(2)** As duas pontas são **cortes, não terminações**: a fatia
+> terminal caudal tem **2,2447×** a área mediana do próprio caso, e em **30/30** está acima de
+> 1,00× — uma estrutura que acaba anatomicamente **afina**, esta acaba na largura cheia.
+> **(3)** O corte **não vem do campo de visão**: caudal no limite em 0/30, cranial em 1/30.
+>
+> Ancorar na carina injetaria erro maior que o erro medido; recortar ao trecho comum a 30/30
+> (−76 a +91 mm da carina) guardaria só 0,6881 do volume e trocaria uma fronteira arbitrária
+> por outra. **A extensão fica herdada e declarada não avaliável.**
+>
+> *Ressalva:* com 1 contorno por caso, a dispersão acima é **limite superior** da
+> reprodutibilidade — mistura anatomia com decisão do contornador. Ela prova que a extensão não
+> é reconstruível a partir do marco, não que o contornador tenha errado.
+
+> **Histórico (Fase 7): os dois limites removidos NÃO eram operacionais.** O pipeline **não localiza
 > cricoide nem junção gastroesofágica** — o próprio repositório declara isso em
 > `benchmark_tier2.py` e no relatório de reconstrução. Não há uma única medida de onde está
 > qualquer um dos dois marcos em nenhum dos 30 casos. O que foi medido é **distância

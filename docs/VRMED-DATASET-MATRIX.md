@@ -28,12 +28,14 @@ especializado. Os dois usos são registrados separadamente.
 | **AMOS22** (Zenodo 7262581) | sim | 500 CT + 100 MRI | 5 juniores + 3 sêniores | 2 (mesmo distrito) | **model-in-the-loop** | **conflitante**: CC BY 4.0 no Zenodo, CC BY-NC-SA no artigo | direto | treino, com ressalva |
 | **SegTHOR** | sim | 60 | 1 radioterapeuta | 1 (CHB Rouen) | sim, manual | **DUA proíbe redistribuição** | cadastro + termo assinado + aprovação humana | **bloqueado** |
 | **StructSeg2019 T3** | sim | 60 | 1 oncologista + verificação | 1 (Zhejiang) | sim | **nenhuma publicada na fonte** | grand-challenge | **rejeitado** — sem licença |
-| **SegRap2023** | sim | — | — | — | sim | — | **encerrado** após o prazo do desafio | **indisponível** |
+| **SegRap2023** | sim | 120 treino + 20 val | — | — | sim | **nenhuma publicada** | **gated**: exige *signed End User Agreement* por e-mail | **bloqueado** — não "encerrado" (corrigido na Fase 9) |
 | **RAOS** | sim | — | **1 sênior** ("annotated from scratch") | — | sim, R1 puro | ver fonte | GitHub | treino, anotador único |
 | **SAROS** | **não** | 900 (882 casos) | model-in-the-loop + revisão humana | 28 coleções TCIA | sim, revisado | **CC BY 4.0** (máscaras; código é MIT) | HTTP direto, sem cadastro | **usado na Fase 8** para o pericárdio. Anotação **esparsa**: ~21 % das fatias, resto = *ignore* (255) |
 | **autoPET** | não | — | — | — | **pseudo-rótulo do TotalSegmentator** | — | — | **rejeitado** — filtro 1 |
 | **CT-ORG** | não | 140 | — | — | parcial (lungs/bones semiautomáticos) | TCIA | TCIA | — |
 | **MSD Task06** | não (tumor) | 96 | — | — | sim | CC BY-SA 4.0 | AWS | — |
+| **Pediatric-CT-SEG** | **sim** | — | contornos de especialista | — | sim | ver fonte | TCIA | **Fase 9**: falha em definição documentável e em equivalência anatômica |
+| **HaN-Seg** | **cervical apenas** | — | humano | — | sim | verificável | direto | **Fase 9**: cobre só esôfago cervical, não o objeto do baseline |
 
 ---
 

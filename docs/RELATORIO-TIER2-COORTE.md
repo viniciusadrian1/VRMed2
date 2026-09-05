@@ -26,12 +26,25 @@ DOI `10.7937/K9/TCIA.2017.3r3fvz08`.
 | Modalidade | CT DICOM + RTSTRUCT DICOM |
 | Download | REST API pública, sem cadastro e sem token |
 
-**Independência do ground truth — a condição que faz um Tier 2 significar alguma coisa.**
-O task `total` do TotalSegmentator v2 foi treinado **exclusivamente em TCs clínicas de
-rotina do University Hospital Basel** (1082 treino / 57 validação / 65 teste, todos do
-mesmo pool). Nenhum dataset público de desafio entra nesse treino; os únicos citados são de
-sub-tasks que o VRmed não usa (`lung_nodules`, `teeth`). O LCTSC **não está no treino**, é
-cinco anos anterior ao modelo, e sua anotação é humana.
+**Independência do ground truth — CORRIGIDO na Fase 9.**
+
+> **A afirmação original desta seção estava errada.** Ela dizia que o task `total` da v2 foi
+> treinado *"exclusivamente em TCs do University Hospital Basel (1082 / 57 / 65)"*. Esses
+> números descrevem o dataset **público da v1**, não o treino real da v2.
+>
+> O repositório oficial declara em `resources/improvements_in_v2.md`: *"We increased the number
+> of training images from 1139 to 1559"*, incluindo *"more images from GE scanners and **other
+> institutions**"*, e *"we did not publish the additional subjects we used for TotalSegmentator
+> v2 training"*. **27 % do treino da v2 (420 imagens) é não declarado e vem de outras
+> instituições.**
+>
+> **Consequência:** não é possível afirmar que o LCTSC está fora do treino. Isso **não prova
+> contaminação** — remove a prova de independência. O Tier 2 continua sendo a melhor avaliação
+> disponível, mas com independência **não verificável** em vez de **estabelecida**. Os números
+> desta coorte permanecem válidos como medida; o que muda é a força da inferência.
+
+O LCTSC é de 2017, cinco anos anterior ao modelo, e sua anotação é humana. Nenhum dataset
+público de desafio é **citado** no treino — mas 27 % dele não é citado de forma nenhuma.
 
 **Descartado por contaminação.** Zenodo `10.5281/zenodo.7975081` anota exatamente heart,
 trachea, aorta e esophagus nas coleções NLST/NSCLC-Radiomics, sob CC BY 4.0 — mas o "ground
