@@ -178,10 +178,43 @@ precision (0,8403 → 0,8029) sem ganhar recall (+0,0007).
 Recomputado por mim de forma independente em `LCTSC-Train-S1-005`: `heart` 0,7560 contra
 `pericardium` 0,9375. Amplitude do recall de `pericardium` entre as três instituições: 0,0294.
 
-**Ressalva que não pode sair do lado deste número:** a escolha de `pericardium` foi feita
-**comparando contra o GT nos mesmos casos do development**. Isso é seleção legítima, mas
-`0,9056` é um número de **seleção**, não de validação. Ele precisa ser confirmado em dado
-retido antes de virar afirmação estabelecida.
+**Ressalva que estava aqui e foi resolvida:** a escolha de `pericardium` foi feita comparando
+contra o GT nos mesmos casos do development, então `0,9056` era número de **seleção**. Ele foi
+levado ao holdout na Fase 7 e **sobreviveu**.
+
+### Validação independente (Fase 7) — SELEÇÃO × VALIDAÇÃO
+
+A comparação foi **congelada na Fase 6** e medida uma única vez em `validation` (15) e `test`
+(15), com diferenças **pareadas por caso**:
+
+| conjunto | | Dice | recall | precision | HD95 | \|erro vol\| |
+|---|---|---|---|---|---|---|
+| validation | `heart` | 0,7472 | 0,6542 | 0,8787 | 28,24 mm | 23,82 % |
+| validation | **`pericardium`** | **0,9093** | **0,9734** | 0,8665 | **14,00 mm** | **13,78 %** |
+| test | `heart` | 0,7488 | 0,6628 | 0,8709 | 27,50 mm | 22,34 % |
+| test | **`pericardium`** | **0,9089** | **0,9697** | 0,8501 | **10,00 mm** | **12,97 %** |
+
+**15 de 15 casos melhoraram em cada conjunto.** Δ Dice pareado: **+0,1418** (validation) e
+**+0,1569** (test). Δ HD95: **−16,99 mm** e **−17,50 mm**. Erro absoluto de volume que não
+cancela: **−164,8 mL** e **−146,6 mL**.
+
+**Custo honesto:** a precision cai 0,0136 e 0,0215. É real e fica registrado. Não estava entre
+os portões de regressão declarados (Dice, HD95, volume) e não foi acrescentada a eles depois de
+ver o resultado.
+
+**Uma leitura que quase enganou:** o Δ de `volume_error_pct` sai **+40,2 pp**, o que pareceria
+regressão enorme. É **troca de sinal**: o `heart` subestima (−23,8 %) e o `pericardium`
+superestima (+13,8 %). Em módulo o erro **cai** 10 pp. O que decide é o \|erro\| e o erro
+absoluto em mL.
+
+> **Estado do mapeamento: `Heart` (GT LCTSC) → `pericardium`, VALIDADO NO HOLDOUT.**
+> Seleção na Fase 6 (development, n=6) · validação na Fase 7 (validation + test, n=15+15).
+
+**O que isto NÃO estabelece.** Que `pericardium` seja anatomicamente o saco pericárdico. O
+holdout mostra que ela representa melhor **o objeto que o LCTSC contorna como `Heart`** — que é
+um contorno de radioterapia incluindo o saco e a gordura. A identidade anatômica da classe
+continua **não determinada**, e depende de uma referência de pericárdio que este dataset não
+tem (o SAROS anota, sob CC BY 4.0, e não foi usado).
 
 ---
 
