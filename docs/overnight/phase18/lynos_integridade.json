@@ -1,0 +1,149 @@
+{
+ "fase": 18,
+ "pergunta": "as mascaras medidas (HuggingFace) sao byte-identicas as do deposito que carrega a licenca CC BY 4.0 (Zenodo)?",
+ "metodo": "Central Directory do LyNoS.zip lido por Range HTTP; CRC-32 por membro comparado ao CRC-32 do arquivo local",
+ "ressalva": "CRC-32 nao e criptografico. Serve para divergencia acidental entre espelhos, que e a pergunta; nao serve contra adversario.",
+ "zip_bytes": 2897541519,
+ "bytes_baixados": 78046,
+ "entradas_no_zip": 107,
+ "identicos": 15,
+ "total": 15,
+ "veredito": "MESMO DADO — a medicao de ontologia vale para o dado licenciado",
+ "casos": [
+  {
+   "caso": "pat1",
+   "caminho_no_zip": "Benchmark/Pat1/pat1_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "0f078bb5",
+   "crc32_local_hf": "0f078bb5",
+   "tamanho_zenodo": 1017058,
+   "tamanho_local_hf": 1017058,
+   "identico": true
+  },
+  {
+   "caso": "pat2",
+   "caminho_no_zip": "Benchmark/Pat2/pat2_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "8c0269e5",
+   "crc32_local_hf": "8c0269e5",
+   "tamanho_zenodo": 873822,
+   "tamanho_local_hf": 873822,
+   "identico": true
+  },
+  {
+   "caso": "pat3",
+   "caminho_no_zip": "Benchmark/Pat3/pat3_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "3ceb5dc5",
+   "crc32_local_hf": "3ceb5dc5",
+   "tamanho_zenodo": 668758,
+   "tamanho_local_hf": 668758,
+   "identico": true
+  },
+  {
+   "caso": "pat4",
+   "caminho_no_zip": "Benchmark/Pat4/pat4_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "9f42ca60",
+   "crc32_local_hf": "9f42ca60",
+   "tamanho_zenodo": 755871,
+   "tamanho_local_hf": 755871,
+   "identico": true
+  },
+  {
+   "caso": "pat5",
+   "caminho_no_zip": "Benchmark/Pat5/pat5_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "039be124",
+   "crc32_local_hf": "039be124",
+   "tamanho_zenodo": 578154,
+   "tamanho_local_hf": 578154,
+   "identico": true
+  },
+  {
+   "caso": "pat6",
+   "caminho_no_zip": "Benchmark/Pat6/pat6_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "34ea29a8",
+   "crc32_local_hf": "34ea29a8",
+   "tamanho_zenodo": 872408,
+   "tamanho_local_hf": 872408,
+   "identico": true
+  },
+  {
+   "caso": "pat7",
+   "caminho_no_zip": "Benchmark/Pat7/pat7_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "9ced7005",
+   "crc32_local_hf": "9ced7005",
+   "tamanho_zenodo": 659525,
+   "tamanho_local_hf": 659525,
+   "identico": true
+  },
+  {
+   "caso": "pat8",
+   "caminho_no_zip": "Benchmark/Pat8/pat8_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "59f13f61",
+   "crc32_local_hf": "59f13f61",
+   "tamanho_zenodo": 877833,
+   "tamanho_local_hf": 877833,
+   "identico": true
+  },
+  {
+   "caso": "pat9",
+   "caminho_no_zip": "Benchmark/Pat9/pat9_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "f4314f69",
+   "crc32_local_hf": "f4314f69",
+   "tamanho_zenodo": 299915,
+   "tamanho_local_hf": 299915,
+   "identico": true
+  },
+  {
+   "caso": "pat10",
+   "caminho_no_zip": "Benchmark/Pat10/pat10_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "3f29650e",
+   "crc32_local_hf": "3f29650e",
+   "tamanho_zenodo": 939107,
+   "tamanho_local_hf": 939107,
+   "identico": true
+  },
+  {
+   "caso": "pat11",
+   "caminho_no_zip": "Benchmark/Pat11/pat11_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "df0ebd95",
+   "crc32_local_hf": "df0ebd95",
+   "tamanho_zenodo": 685477,
+   "tamanho_local_hf": 685477,
+   "identico": true
+  },
+  {
+   "caso": "pat12",
+   "caminho_no_zip": "Benchmark/Pat12/pat12_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "bb3cc079",
+   "crc32_local_hf": "bb3cc079",
+   "tamanho_zenodo": 747968,
+   "tamanho_local_hf": 747968,
+   "identico": true
+  },
+  {
+   "caso": "pat13",
+   "caminho_no_zip": "Benchmark/Pat13/pat13_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "81b0b991",
+   "crc32_local_hf": "81b0b991",
+   "tamanho_zenodo": 765923,
+   "tamanho_local_hf": 765923,
+   "identico": true
+  },
+  {
+   "caso": "pat14",
+   "caminho_no_zip": "Benchmark/Pat14/pat14_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "c0bb6855",
+   "crc32_local_hf": "c0bb6855",
+   "tamanho_zenodo": 720478,
+   "tamanho_local_hf": 720478,
+   "identico": true
+  },
+  {
+   "caso": "pat15",
+   "caminho_no_zip": "Benchmark/Pat15/pat15_labels_Esophagus.nii.gz",
+   "crc32_zenodo": "90487851",
+   "crc32_local_hf": "90487851",
+   "tamanho_zenodo": 693522,
+   "tamanho_local_hf": 693522,
+   "identico": true
+  }
+ ]
+}

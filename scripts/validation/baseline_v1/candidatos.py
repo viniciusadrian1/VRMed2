@@ -7,7 +7,7 @@ preenchido com o que a Fase 18 MEDIU, para responder duas perguntas que so um ca
 real responde:
 
   1. o esquema e preenchivel na pratica, ou tem campo que nenhuma fonte fornece?
-  2. o validador de licenca RECUSA o candidato, como deveria?
+  2. o que, concretamente, impede este candidato de entrar?
 
 Um esquema que so foi testado com dado sintetico e um esquema nao testado.
 
@@ -15,7 +15,8 @@ DE ONDE VEM CADA CAMPO — nada digitado a mao
   shape, spacing, orientation  -> `docs/overnight/phase18/lynos_auditoria.json` (medido)
   image_sha256                 -> nao ha imagem local; a TC nao foi baixada -> UNKNOWN
   mask_sha256                  -> calculado do arquivo em disco
-  license / license_class      -> CONFLITO, com as tres fontes citadas em notes
+  license / license_class      -> CC BY 4.0 (Zenodo), apurado na Fase 18
+  source_doi                   -> o DOI do ARTIGO; o Zenodo nao emitiu DOI proprio
   institution / acquisition    -> o que a Fase 18 apurou; UNKNOWN quando nao apurado
   split                        -> NAO ATRIBUIDO: escrito como o valor que o validador
                                   recusa, porque atribuir particao a um candidato
@@ -47,14 +48,21 @@ U = man.DESCONHECIDO
 
 # As tres fontes oficiais em conflito, citadas por URL. Texto curto de proposito:
 # a apuracao completa mora no relatorio da Fase 18.
-CONFLITO_LICENCA = (
-    "CONFLITO entre tres fontes oficiais do MESMO dado: "
-    "zenodo.org/records/10102261 declara CC BY 4.0; "
-    "huggingface.co/api/datasets/andreped/LyNoS declara license:mit; "
-    "github.com/raidionics/LyNoS declara MIT. "
-    "Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte "
-    "primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md."
+LICENCA = (
+    "CC BY 4.0 — zenodo.org/api/records/10102261, metadata.license.id = 'cc-by-4.0', "
+    "access_right 'open', sem embargo, versao unica. O 'MIT' do GitHub e do card do "
+    "HuggingFace tem escopo de CODIGO: o README diz literalmente 'The code in this "
+    "repository is released under MIT license', o repositorio GitHub nao hospeda "
+    "imagem alguma (23 blobs, ~400 KB), e o loader do HuggingFace baixa o zip DO "
+    "ZENODO. RESSALVA: nenhuma fonte primaria nomeia o titular de direitos sobre as "
+    "imagens de TC. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md."
 )
+
+# O Zenodo NAO emitiu DOI proprio para este deposito: o campo doi do registro e o DOI
+# do ARTIGO na Taylor & Francis, provider 'external', e conceptdoi e null. Escrever
+# '10.5281/zenodo.10102261' seria inventar um identificador que nao existe — e foi
+# exatamente o que esta ficha fez na primeira versao, ate a Fase 18 medir.
+DOI = "10.1080/21681163.2022.2043778"
 
 
 def fichas() -> list:
@@ -86,15 +94,18 @@ def fichas() -> list:
             "annotation_date_known": False,
             "source_dataset": "LyNoS / ct_mediastinal_structures_segmentation",
             "source_case_id": caso,
-            "source_doi": "10.5281/zenodo.10102261",
-            "license": CONFLITO_LICENCA,
-            "license_class": "CONFLITO",
+            "source_doi": DOI,
+            "license": LICENCA,
+            "license_class": "ABERTA_ATRIBUICAO",
             "split": "test",
             "notes": (
-                "CANDIDATO, NAO INGERIDO. Ontologia: %s (medido na Fase 18 — binaria, "
-                "buracos 2D %.4f%%). Sonda geometrica: %s. Independencia INDETERMINADA: "
-                "a sonda nao separa inclusao de acaso abaixo de ~4 casos em 15, e nenhuma "
-                "sonda de imagem enxerga circularidade de anotacao."
+                "CANDIDATO, NAO INGERIDO. Ontologia: %s (Fase 18 — binaria, buracos 2D "
+                "%.4f%%). Sonda geometrica vs treino do Dataset291: %s. "
+                "IMAGEM NAO EXCLUSIVA: byte-identica (SHA-256 de Git-LFS) ao sujeito "
+                "correspondente do AeroPath, e o AeroPath e espelhado em "
+                "MedOtter/AeroPath no HuggingFace. Nenhuma fonte oficial declara esse "
+                "overlap. Anotacao de esofago: anotador unico nao identificado, sem "
+                "medida interobservador. Independencia INDETERMINADA."
                 % (c["ontology_compatible"], c["buracos_2d_pct"], c["classificacao"])
             ),
         })
@@ -118,27 +129,27 @@ def autoteste() -> int:
             falhas.append("%s: campos ausentes %s" % (e["case_id"], faltando))
             break
 
-    # 2. e o validador tem de RECUSAR — este e o ponto do exercicio
+    # 2. e o validador tem de RECUSAR. Depois da Fase 18 a licenca deixou de ser o
+    #    motivo (CC BY 4.0 resolvida); o que barra agora e IDENTIDADE — nao ha TC em
+    #    disco, logo nao ha image_sha256, e o esquema nao aceita identidade UNKNOWN.
     v = man.validar_manifesto(f, publicavel=True)
     if v["valido"]:
-        falhas.append("o candidato com licenca em CONFLITO passou na validacao")
-    if not any("CONFLITO" in e for e in v["erros"]):
+        falhas.append("candidato sem image_sha256 passou na validacao")
+    if not any("image_sha256" in e for e in v["erros"]):
         falhas.append("recusou pelo motivo errado: " + str(v["erros"][:3]))
+    if any("CONFLITO" in e for e in v["erros"]):
+        falhas.append("ainda recusa por CONFLITO de licenca — a Fase 18 resolveu isso")
 
     # 3. controle NEGATIVO: se a licenca fosse resolvida, o que mais barraria?
     #    Sem isto, nao da para saber se a licenca e o UNICO bloqueio ou apenas o primeiro.
-    resolvido = [dict(e, license_class="ABERTA_ATRIBUICAO", license="CC BY 4.0") for e in f]
-    v2 = man.validar_manifesto(resolvido, publicavel=True)
-    # ACHADO, nao defeito: o contrafactual mostra que a licenca e o PRIMEIRO bloqueio,
-    # nao o unico. Sem a TC em disco nao ha image_sha256, e o esquema recusa identidade
-    # UNKNOWN por construcao. Este teste EXIGE que o bloqueio residual continue
-    # aparecendo — se ele sumir, alguem afrouxou a regra de identidade.
-    if v2["valido"]:
-        falhas.append("com a licenca resolvida o candidato passou — mas nao ha "
-                      "image_sha256; a regra de identidade foi afrouxada")
-    if not any("image_sha256" in e for e in v2["erros"]):
-        falhas.append("bloqueio residual esperado (image_sha256 UNKNOWN) nao apareceu: "
-                      + str(v2["erros"][:3]))
+    # 3. contrafactual: e se as TCs fossem baixadas amanha (2,9 GB) e os hashes
+    #    existissem? O que AINDA barraria? Sem isto nao da para saber se o download
+    #    resolve o problema ou apenas troca de bloqueio.
+    baixado = [dict(e, image_sha256=man.sha256_texto("hipotetico-" + e["case_id"]))
+               for e in f]
+    v2 = man.validar_manifesto(baixado, publicavel=True)
+    if not v2["valido"]:
+        falhas.append("bloqueio residual inesperado apos hashes: " + str(v2["erros"][:2]))
 
     # 4. nenhum sha256 pode ter sido inventado: image_sha256 e UNKNOWN de proposito
     if any(e["image_sha256"] != U for e in f):
@@ -175,14 +186,18 @@ def main(argv=None) -> int:
     if len(v["erros"]) > 3:
         print("  ... e mais %d (o mesmo motivo, um por caso)" % (len(v["erros"]) - 3))
 
-    resolvido = [dict(e, license_class="ABERTA_ATRIBUICAO", license="CC BY 4.0") for e in f]
-    v2 = man.validar_manifesto(resolvido, publicavel=True)
-    print("\nCONTRAFACTUAL — se a licenca fosse resolvida amanha:")
+    baixado = [dict(e, image_sha256=man.sha256_texto("hipotetico-" + e["case_id"]))
+               for e in f]
+    v2 = man.validar_manifesto(baixado, publicavel=True)
+    print("")
+    print("CONTRAFACTUAL — se as TCs fossem baixadas e os hashes existissem:")
     print("  validacao estrutural: %s" % ("PASSA" if v2["valido"] else "AINDA RECUSADO"))
     for e in v2["erros"][:3]:
         print("    ", e[:150])
-    print("  campos que continuariam UNKNOWN: study_id, series_id, image_sha256,")
+    print("  campos que continuariam UNKNOWN mesmo assim: study_id, series_id,")
     print("    annotation_source, annotation_protocol  (annotation_date_known=False)")
+    print("  -> duas das quatro identidades anti-vazamento ficam CEGAS por propriedade")
+    print("     do canal NIfTI, e nenhum download resolve isso.")
 
     SAIDA.mkdir(parents=True, exist_ok=True)
     CONFIG.mkdir(parents=True, exist_ok=True)
@@ -194,7 +209,7 @@ def main(argv=None) -> int:
         "natureza": "FICHA DE CANDIDATO — nenhum caso ingerido",
         "n_fichas": len(f),
         "validacao_publicavel": v,
-        "contrafactual_licenca_resolvida": v2,
+        "contrafactual_tcs_baixadas": v2,
         "campos_unknown_persistentes": ["study_id", "series_id", "image_sha256",
                                         "annotation_source", "annotation_protocol"],
     }, indent=1, ensure_ascii=False), encoding="utf-8")

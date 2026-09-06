@@ -110,3 +110,7 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 16:18 | `lynos.calibracao` (permutacao por bloco) | nulo correto 0,931; **p = 0,229** — sem excesso sobre o acaso |
 | 16:24 | `lynos.grade_ct` | premissa mascara=grade da TC **VERIFICADA** 15/15 com 240 KiB |
 | 16:31 | `lynos.adequacao` | IC95 de n=15 tem largura 0,077 de Dice; poder 0,485 para delta=0,05 |
+| 16:50 | workflow fase18 (15 agentes) | 7 arms + 7 ceticos + 1 critico · 0 erros · 493 chamadas de ferramenta |
+| 17:05 | correcao: DOI fabricado na ficha | `10.5281/zenodo.10102261` NAO EXISTE; o registro usa o DOI do artigo |
+| 17:12 | `lynos.integridade` | HuggingFace x Zenodo: **15/15 CRC-32 identicos**, 76,2 KiB de trafego |
+| 17:20 | varredura de docs | 40 documentos, 0 violacoes |
