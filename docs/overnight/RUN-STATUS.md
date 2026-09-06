@@ -38,8 +38,8 @@ substituído automaticamente** · nada de e-mail, conta ou aceite de EULA.
 | 13 — Ontologia do esôfago | 03:1x | 03:4x | ~35 min | **CONCLUÍDA — A** | `ESOPHAGUS_ONTOLOGY_V1` congelada; **K4 RESOLVIDO**; 12 testes de regressão passando |
 | 14 — Prontidão para treino | 03:5x | 04:1x | ~20 min | **CONCLUÍDA — C** | cenário C, nenhum TEST defensável; K1/K2/K3 bloqueados, K4 resolvido |
 | 15 — Teste independente | 03:0x | — | — | **em curso** (workflow `wu8f0od0a`, 7 arms) | — |
-| 16 — Independência do baseline | — | — | — | pendente | — |
-| 17 — Benchmark de reconstrução | — | — | — | pendente | — |
+| 16 — Independência do baseline | 05:0x | — | — | **em curso** (workflow `wgk8req8t`, 5 arms) | — |
+| 17 — Benchmark de reconstrução | 04:2x | 05:1x | ~50 min | **CONCLUÍDA** | **MASTER MANTIDO**; 182 medições; 4 achados de instrumento |
 
 
 ### Fase 13 — detalhe
@@ -61,3 +61,30 @@ o infinitivo. Regex ampliado. **Um varredor que devolve zero por estar quebrado 
 nenhum varredor.**
 
 **Bloqueios:** nenhum. K4 fechado; K1/K2/K3 permanecem fora do alcance desta fase.
+
+
+### Fase 17 — detalhe
+
+**Arquivos criados**
+- `scripts/validation/benchmark_fase17.py` — 14 variantes × 13 fantomas, checkpoint por linha
+- `docs/overnight/reconstruction_benchmark.csv` — 182 linhas, 8/8 métricas congeladas
+- `docs/RELATORIO-FASE17-RECONSTRUCAO.md`
+- `.clinica-dados/overnight/fase17/` — GLB, Draco e JSON de comparação (gitignored)
+
+**Experimentos executados:** 182 reconstruções + 39 decimações + 4 compressões Draco medidas
+com decodificador oficial.
+
+**Resultado principal:** MASTER mantido. `sigma=1` rejeitado **por medição** — funde dois
+cilindros em contato (2 componentes → 1) *e* rompe a ponte fina (1 → 2), as duas falhas
+opostas ao mesmo tempo. Surface Nets perde 71,7 % do volume na esfera de 6 mm.
+
+**Quatro achados de instrumento, todos erro meu:**
+1. `surface_nets` medido duas vezes como se fossem variantes distintas (o método ignora o
+   filtro de malha — vértices byte a byte idênticos).
+2. Três colunas de topologia vazias por chave inventada; `dict.get` devolveu `""` em silêncio.
+3. Duas das oito métricas congeladas ausentes do CSV — a ontologia congelada há três horas
+   não impediu o instrumento de ignorá-la.
+4. **Hausdorff do Draco errado por quatro ordens de grandeza** (10,27 mm contra 0,0009 mm):
+   `trimesh` não decodifica Draco, avisa em `stderr` e termina com código 0.
+
+**Bloqueios:** nenhum. Draco cobriu 4 das 13 malhas — declarado, não omitido.

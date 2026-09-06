@@ -39,3 +39,17 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 - **INFERÊNCIA** cenário C: nenhum TEST defensável. B exigiria conjunto EM MÃOS com ressalvas
   enumeráveis; candidato inacessível não é TEST parcial.
 - **DECISÃO** TREINO permanece BLOQUEADO. Fase 15 em curso pode mexer em K1/K3.
+
+## Fase 17 — benchmark de reconstrução
+
+- **FATO** 182 medições (14 variantes × 13 fantomas) em 24,6 s. Fantomas REUSADOS de
+  `phantom.py`, não reconstruídos.
+- **FATO** erro vs fórmula fechada (mediana |%|): taubin20 1,31 · MASTER 1,58 · sdf 2,88 ·
+  sigma1 6,14 · surface_nets 15,86.
+- **FATO** a troca escondida pela mediana: mais Taubin melhora estrutura grande e piora
+  estrutura fina, monotonicamente. Ganho 0,27 pp na esfera, perda 2,11 pp no tubo de 3 mm.
+- **FATO** sigma=1 funde `dois_cilindros_contato` (2→1) E rompe `ponte_fina_gap4` (1→2).
+- **FATO** LOD: 50 % custa ASSD máx 0,0047 mm; 10 % rompe a ponte e derruba Dice mín a 0,6391.
+- **FATO** Draco 7,74×–13,20× com erro de vértice máx 0,00099–0,00328 mm.
+- **DECISÃO** MASTER MANTIDO. Candidatas registradas, nenhuma promovida.
+- **4 achados de instrumento**, todos erro meu, todos corrigidos e documentados.
