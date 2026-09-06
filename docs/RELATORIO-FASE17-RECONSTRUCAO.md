@@ -179,21 +179,42 @@ tinha. A 10 % o dano é estrutural, não cosmético.
 Abaixo disso, exige verificação de topologia por estrutura. **Nada disso altera o MASTER** —
 são níveis de detalhe derivados, para transporte.
 
-## 6. Compressão Draco
+## 6. Compressão Draco — derivada de transporte
 
-**RESULTADO PARCIAL — registrado como incompleto, não como ausente.**
+**Regra respeitada: aplicada SOBRE o GLB do MASTER, nunca no lugar da geometria em disco.**
 
-`gltf-transform 4.3.0` está disponível e o projeto já tem `scripts/validation/compressao.py`,
-que mede a perda geométrica do `KHR_draco_mesh_compression`. A medição desta fase foi
-disparada sobre 4 malhas do MASTER e **excedeu o tempo alocado sem produzir saída**; a
-política desta execução manda registrar a falha e seguir, em vez de travar o pipeline.
+**FATO**, medido com `gltf-transform 4.3.0` e o decodificador **DracoPy** — o mesmo que o
+`DRACOLoader` roda no navegador:
 
-**FATO já estabelecido em fase anterior** (`compressao.py`, cabeçalho): Draco é **lossy** —
-quantiza posição — e a medição publicada lá dá `hausdorff 0,1871 mm` e `rms 0,0072 mm`.
+| Malha | ratio | KB → KB | erro vértice máx | RMS vértice | Hausdorff | erro área | erro volume | tri/vert preservados |
+|---|---:|---:|---:|---:|---:|---:|---:|:--:|
+| `esfera_d20_iso` | 7,74× | 65,1 → 8,4 | 0,00099 mm | 0,00057 mm | 0,0009 mm | 0,0006 % | 0,0010 % | ✔ |
+| `tubo_fino_d3` | 8,00× | 18,6 → 2,3 | 0,00172 mm | 0,00110 mm | 0,0016 mm | 0,0029 % | 0,0090 % | ✔ |
+| `bifurcacao_d8` | 10,13× | 108,4 → 10,7 | 0,00328 mm | 0,00196 mm | 0,0026 mm | −0,0016 % | −0,0020 % | ✔ |
+| `tubo_oco_20_12` | **13,20×** | 188,6 → 14,3 | 0,00213 mm | 0,00126 mm | 0,0017 mm | 0,0022 % | 0,0020 % | ✔ |
 
-**RECOMENDAÇÃO.** Repetir a medição isoladamente, com o processo externo em segundo plano e
-timeout próprio. Não bloqueia nenhuma conclusão desta fase, porque Draco é **derivada de
-transporte** e não toca a geometria do MASTER em disco.
+**INFERÊNCIA.** Draco é lossy — quantiza posição — mas a perda medida é de **micrômetros**,
+três ordens de grandeza abaixo do piso de resolução da grade (1,953 mm) e do menor detalhe
+anatômico representável. Contagem de vértices e triângulos preservada exatamente em 4/4.
+**Compressão de 7,7× a 13,2× por um custo geométrico que a grade nem representa.**
+
+### 6.1 Quarto achado de instrumento — o número que eu quase publiquei
+
+**FATO.** A primeira medição usou `trimesh.load` no GLB comprimido e devolveu Hausdorff de
+**10,27 a 34,02 mm**. Números plausíveis o bastante para entrar num relatório — e
+**inteiramente falsos**.
+
+Causa, e o próprio trimesh avisa em `stderr`:
+*"`KHR_draco_mesh_compression` GLTF extension has no handler, values are placeholder zeros"*.
+Ele não decodifica Draco; devolveu **zeros de placeholder**, e a "distância" medida era a
+distância entre a malha real e um objeto degenerado.
+
+**A medição correta usa `scripts/validation/compressao.py`**, que já existia no projeto
+exatamente para isso e traz o decodificador oficial. Diferença entre o número falso e o
+verdadeiro: **10,27 mm contra 0,0009 mm — quatro ordens de grandeza.**
+
+**INFERÊNCIA.** O aviso estava em `stderr` e passou despercebido porque o comando terminou com
+código 0. Um erro que não interrompe o processo é o mais caro de todos.
 
 ## 7. Performance
 
@@ -228,7 +249,7 @@ mesmo assim o ganho está dentro do ruído.
 
 - **FATO.** Fantoma sintético não é anatomia. Nada aqui mede acurácia de segmentação.
 - **FATO.** Dice/ASSD/HD95 contra a máscara de origem são tautológicos com σ=0 (§1.1).
-- **FATO.** A medição do Draco ficou incompleta (§6).
+- **FATO.** A medição do Draco cobriu 4 malhas, não as 13.
 - **FATO.** Só uma grade anisotrópica foi testada (a do LCTSC). Outras espessuras de fatia
   não foram varridas.
 - **INFERÊNCIA.** Os fantomas cobrem os modos de falha conhecidos, não os desconhecidos.
@@ -242,7 +263,7 @@ VARIANTES MEDIDAS: 14 × 13 fantomas = 182 linhas
 CANDIDATAS: mc_taubin8/12/20 (troca desfavorável para estrutura fina) — nenhuma promovida
 REJEITADAS POR MEDIÇÃO: mc_sigma1 (funde e rompe topologia), surface_nets (−71,7% em estrutura pequena)
 LOD: 50% aceitável; 25% exige verificação; 10% rompe ponte fina
-DRACO: medição incompleta, registrada como tal
-ACHADOS DE INSTRUMENTO: 3 (surface_nets medido duas vezes; 3 colunas de topologia vazias; 2 metricas congeladas ausentes)
-PRÓXIMO PASSO: repetir a medição do Draco isoladamente, com timeout próprio
+DRACO: 7,7x a 13,2x de compressao por perda de 0,0009-0,0033 mm (micrometros; 3 ordens abaixo do piso da grade)
+ACHADOS DE INSTRUMENTO: 4 (surface_nets medido duas vezes; 3 colunas de topologia vazias; 2 metricas congeladas ausentes; Hausdorff do Draco falso por 4 ordens de grandeza)
+PRÓXIMO PASSO: acrescentar à suíte da ontologia um teste que varre os CSV publicados e falha quando uma métrica congelada não aparece
 ```
