@@ -450,6 +450,18 @@ positivo: multi-observador existe, é público, e não está no esôfago.
 Communications*, NCT05787522), registrando o pedido **e a resposta — qualquer que seja** —
 como ficha de fonte primária em `.clinica-dados/fase11/fichas/`.
 
+> **Executada na Fase 12 — e o resultado foi melhor do que o pedido.** O fio foi até o fim:
+> classe **C, acesso não obtido** (o rascunho está pronto e **não enviado**). Mas duas coisas
+> desta seção precisam de correção. **(1)** A frase "falha só em F4" já estava proibida aqui,
+> e a Fase 12 confirmou o porquê: o padrão-ouro é o contorno de **um** especialista escolhido
+> órgão a órgão por um terceiro, e a fonte é **muda** sobre a retenção das séries de A e B —
+> pelo caminho A/B/C o iCurveE **não** é dataset interobservador utilizável. **(2)** A
+> afirmação desta fase de que a variabilidade humana do esôfago **não é mensurável** ficou
+> **parcialmente superada**: o Source Data **aberto** do mesmo artigo contém a concordância
+> por caso do próprio esôfago contra uma referência que é um contorno humano — mediana
+> **0,7555**, n=493, sob RTOG 1106. Não precisou de acesso nenhum.
+> Ver `docs/RELATORIO-FASE12-ICURVEE-ACESSO.md`.
+
 **Por que esta e não outra:** é o **único** ponto do corpus inteiro em que um filtro pode
 mudar de estado. Todo o resto está decidido por medição em fonte primária; F4 é o único dos
 sete filtros que um pedido pode alterar. Se o acesso for concedido, F6 passa de

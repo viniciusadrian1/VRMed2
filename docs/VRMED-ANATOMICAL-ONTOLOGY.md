@@ -163,6 +163,18 @@ de modelo. Ver §4 para a ressalva sobre a decomposição.
 > declarar a extensão herdada e não avaliável, mas é **objeto diferente** e a régua de Dice
 > comprovadamente não transfere (S/V 0,1444 /mm no GTV contra 0,3251–0,3805 /mm no esôfago).
 > Coincidência de padrão, não evidência.
+>
+> **Fase 12 — a banda humana do esôfago EXISTE, e a Fase 11 estava incompleta ao dizer que
+> não.** Ela não veio de acesso a dado restrito: veio do Source Data **aberto** do ensaio
+> iCurveE (*Nat Commun* 2026, PMC13199442, NCT05787522), cujo padrão-ouro do esôfago é o
+> contorno de **um único especialista sênior** escolhido órgão a órgão — logo o `vDSC` de um
+> médico contra ele é, geometricamente, concordância entre dois humanos sobre o mesmo
+> esôfago, sob **RTOG 1106**, o mesmo atlas desta ontologia.
+> **Banda: mediana 0,7555, P25–P75 0,7052–0,7938, P5–P95 0,5763–0,8364, n=493 (89 %).**
+> É **teto otimista, não piso** — a referência é curada e travada por consenso, então dois
+> observadores arbitrários concordariam ≤ isso. Entra como **faixa de contexto, nunca como
+> limiar**, e nunca como comparação de contabilidade com o baseline: são coortes, padrões-ouro
+> e grades diferentes. Ver `docs/RELATORIO-FASE12-ICURVEE-ACESSO.md` §8.3.
 
 ### 1.3 `Heart` — coração
 

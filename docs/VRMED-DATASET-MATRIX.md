@@ -57,6 +57,14 @@ mesmo arquivo é ZERO**, assim como o de TCs com ≥2 SEG *manual* de esôfago. 
 > especialistas independentes, 500 TCs torácicas, esôfago pelo atlas RTOG 1106) — sob
 > **acesso restrito**. Classificação da fase: **B — existe, mas é inadequado**.
 > Ver `docs/RELATORIO-FASE11-VARIABILIDADE-INTEROBSERVADOR.md`.
+>
+> **Fase 12 — o fio do iCurveE foi até o fim: classe C, acesso não obtido** (nada foi pedido,
+> nada foi negado; o canal continua aberto). O desenho A/B/C **não** serve como dataset
+> interobservador — o padrão-ouro é o contorno de um único especialista escolhido órgão a
+> órgão por um terceiro, e a fonte é muda sobre a retenção das séries de A e de B. Mas o
+> **Source Data aberto** do artigo entregou a banda de concordância do próprio esôfago
+> (mediana 0,7555, n=493), que a Fase 11 tinha declarado não mensurável.
+> Rascunho de pedido pronto e **não enviado** em `docs/ICURVEE-PEDIDO-ACESSO.md`.
 
 Dos quatro torácicos com esôfago verificados — LCTSC, NSCLC-Radiomics,
 StructSeg2019-T3, SegTHOR — todos têm **um** conjunto de contornos por caso. Isso importa
