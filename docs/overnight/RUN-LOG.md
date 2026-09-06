@@ -26,3 +26,16 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
   documento). Termo canônico registrado: `patient-specific 3D model`.
 - **FATO** `tests/test_ontologia_esofago.py` — 12/12.
 - **DECISÃO** K4 = RESOLVIDO. Não desbloqueia treino sozinho.
+
+## Fase 14 — prontidão para treinamento
+
+- **FATO** 30 testes (10+8+12) e 21 guardas com controle positivo, todos ativos.
+  `protocolo_esofago --mutacao`: 10/10 guardas derrubam o autoteste quando desligadas.
+- **FATO** split congelado íntegro: sha256 6e54c02b…, mtime 2026-09-04T21:19:49 (anterior a
+  esta execução), 30/15/15. Nenhum case_id de validation/test lido.
+- **FATO** K4 = RESOLVIDO (Fase 13). K1, K2, K3 = BLOQUEADOS, por razões independentes.
+- **FATO** LCTSC test já foi consumido uma vez, na Fase 7, para a hipótese cardíaca — e a
+  regra 5 do enunciado o veda como novo TEST de qualquer jeito.
+- **INFERÊNCIA** cenário C: nenhum TEST defensável. B exigiria conjunto EM MÃOS com ressalvas
+  enumeráveis; candidato inacessível não é TEST parcial.
+- **DECISÃO** TREINO permanece BLOQUEADO. Fase 15 em curso pode mexer em K1/K3.

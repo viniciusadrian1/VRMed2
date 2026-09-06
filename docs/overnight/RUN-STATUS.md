@@ -36,7 +36,7 @@ substituído automaticamente** · nada de e-mail, conta ou aceite de EULA.
 | Fase | Início | Fim | Duração | Status | Resultado principal |
 |---|---|---|---|---|---|
 | 13 — Ontologia do esôfago | 03:1x | 03:4x | ~35 min | **CONCLUÍDA — A** | `ESOPHAGUS_ONTOLOGY_V1` congelada; **K4 RESOLVIDO**; 12 testes de regressão passando |
-| 14 — Prontidão para treino | — | — | — | pendente | — |
+| 14 — Prontidão para treino | 03:5x | 04:1x | ~20 min | **CONCLUÍDA — C** | cenário C, nenhum TEST defensável; K1/K2/K3 bloqueados, K4 resolvido |
 | 15 — Teste independente | 03:0x | — | — | **em curso** (workflow `wu8f0od0a`, 7 arms) | — |
 | 16 — Independência do baseline | — | — | — | pendente | — |
 | 17 — Benchmark de reconstrução | — | — | — | pendente | — |
