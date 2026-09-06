@@ -125,6 +125,26 @@ Parede vs lúmen **não separados** · extensão longitudinal **herdada / não a
 fossem enumeráveis. Não há conjunto em mãos. Um candidato inacessível não é um TEST parcial —
 é um TEST ausente com um caminho conhecido.
 
+> ### Retorno da Fase 15 — K1 e K3 mudam de motivo, não de estado
+>
+> **FATO.** A Fase 15 (executada depois desta) encontrou o **LyNoS**: 15 TCs mediastinais com
+> esôfago em máscara NIfTI binária, canal não-DICOM, fora do TCIA e de tudo que o VRmed já
+> usou, com GT de 2019 — anterior ao TotalSegmentator. A compatibilidade com a
+> `ESOPHAGUS_ONTOLOGY_V1` foi **medida** (fração de buracos 0,028 %: binária e preenchida),
+> não inferida de documento.
+>
+> **O que muda:** a frase desta seção — *"não existe conjunto que possa servir de TEST"* —
+> passa a ser **imprecisa**. Existe um, e ele é acessível. O cenário da Fase 15 é **B**, não C.
+>
+> **O que NÃO muda:** K1 e K3 continuam **BLOQUEADOS**. O LyNoS é classe **E**, independência
+> indeterminada, pelo mesmo motivo que trava K2 — as 420 imagens não atribuídas do treino do
+> TS v2. Somam-se três ressalvas medidas: n=15, TC **com contraste** e diagnóstica (não de
+> planejamento), e conflito de licença entre três fontes oficiais do mesmo dataset.
+>
+> **INFERÊNCIA.** O bloqueio de K1/K3 deixou de ser *"não há candidato"* e passou a ser
+> *"há um candidato cuja independência não é estabelecível pelo mesmo motivo que trava K2"*.
+> É um bloqueio melhor caracterizado, não um bloqueio menor.
+
 ## 8. Candidatos — ficha por dataset
 
 *(Os cinco que a Fase 11 identificou como tendo esôfago no canal DICOM público, mais o
@@ -175,5 +195,5 @@ K3: BLOQUEADO — o único candidato com objeto e desenho certos (iCurveE) não 
 K4: RESOLVIDO — ESOPHAGUS_ONTOLOGY_V1, 12 testes de regressão
 CENÁRIO: C — nenhum TEST defensável
 TREINO: BLOQUEADO
-PRÓXIMO PASSO: a Fase 15 (em curso) testa se uma busca exaustiva muda K1/K3; se não mudar, o bloqueio é estrutural e não de esforço
+PRÓXIMO PASSO: a Fase 15 rodou e achou o LyNoS — K1/K3 seguem BLOQUEADOS, mas agora por independência não estabelecível (as 420 do TS v2), não por ausência de candidato. O bloqueio é estrutural, e se fecha do lado do MODELO, não do lado do dado
 ```
