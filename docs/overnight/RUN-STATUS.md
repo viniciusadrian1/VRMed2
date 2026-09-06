@@ -189,3 +189,50 @@ development 30 · validation 15 · test 15
 4. **Um bloqueio residual foi confundido com defeito.** O contrafactual "e se a licença
    fosse resolvida?" revelou que o LyNoS **continua** barrado por falta de
    `image_sha256`. Era achado, não bug.
+
+---
+
+## Fases 20–21 — 2026-09-06
+
+| Fase | Estado | Resultado |
+|---|---|---|
+| **20** — dados auditáveis | em curso | canal DICOM resolve identidade; procedência da anotação é o gargalo |
+| **21** — funil de ingestão | **CONCLUÍDA — A** | 14/14 casos, 13/13 mutantes, determinismo OK |
+
+### Medições da Fase 20 (do índice público do IDC, sem baixar imagem)
+
+| Medida | Valor |
+|---|---|
+| RTSTRUCT com esôfago-órgão | **908** em 5 coleções (reproduz a Fase 11) |
+| **sujeitos distintos** com contorno de esôfago | **807** — não 908 |
+| máscara ligada à imagem por `ReferencedSeriesInstanceUID` | **908/908** |
+| `ROIGenerationAlgorithm` declarado para a ROI de esôfago | **UNKNOWN em 908/908** |
+| 4D-Lung | 6.690 séries de **20 sujeitos**; esôfago em **16** |
+| licença das RTSTRUCT de esôfago do NSCLC-Radiomics | **CC BY-NC 3.0** |
+| UIDs de versões anteriores ausentes do índice atual | **13.081 de 58.060 (22,5 %)** |
+| séries derivadas (analysis results) no IDC | **471.946**, das quais 378.153 do TotalSegmentator |
+
+### Instrumentos novos
+
+| Módulo | Verificações | Falhas |
+|---|---:|---:|
+| `fase20/censo_identidade.py` | 10 | 0 |
+| `fase20/proveniencia_roi.py` | 14 | 0 |
+| `fase20/log_de_busca.py` | 11 | 0 |
+| `fase21/funil.py` | 16 | 0 |
+| `fase21/mutacao.py` | 31 | 0 |
+| `fase21/anonimizacao.py` | 11 | 0 |
+
+### Auditoria
+
+`PASS=258 · FAIL=0 · SKIP=0` — 49 de suíte + 168 de autoteste + 41 de mutação.
+Docs: **44 documentos, 0 violações**. Split congelado **INTOCADO**.
+
+### Defeitos de instrumento desta execução
+
+1. **Harness contava `AssertionError` como recusa** — os 14 casos passaram sem provar nada.
+2. **A correção colidiu com `DesalinhamentoGeometrico`**, que já é `AssertionError`.
+3. **Regex de anonimização cego a `_`** — `1957-03-04_prontuario_123456789` não casava.
+4. **`series_revised_idc_version` mal lido** como "foi revisada"; vem em 100 % das séries.
+5. **DOI inexistente** já corrigido na Fase 18, e um mutante sobrevivente (**L4**) virou teste.
+6. **Heredoc converteu `` em byte de backspace** num regex — o `cat -A` mostrou `^H`.
