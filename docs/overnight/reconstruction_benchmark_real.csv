@@ -1,0 +1,4 @@
+variant,structure,volume_ml,surface_area_mm2,dice,iou,assd_mm,hd95_mm,volume_error_pct,components,watertight,boundary_edges,nonmanifold_edges,triangles,vertices,processing_time_s,glb_size_mb,notes
+MASTER_mc_taubin4,esophagus,25.21,9938.357,1.0,1.0,0.0,0.0,-0.45,1,True,0,0,23808,11906,2.8865,0.429352,"anatomia REAL (cta-cardio, fora de todo split congelado)"
+mc_taubin0,esophagus,25.2,10221.482,1.0,1.0,0.0,0.0,-0.491,1,True,0,0,23808,11906,2.4906,0.429356,"anatomia REAL (cta-cardio, fora de todo split congelado)"
+mc_taubin2,esophagus,25.205,10041.566,1.0,1.0,0.0,0.0,-0.472,1,True,0,0,23808,11906,2.6331,0.429356,"anatomia REAL (cta-cardio, fora de todo split congelado)"

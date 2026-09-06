@@ -41,14 +41,14 @@ dano** (decimação, suavização agressiva), **nunca** como prova de acurácia 
 | `mc_taubin20` | **1,31** | 23,26 | melhor mediana, pior extremo |
 | `mc_taubin12` | 1,44 | 22,42 | |
 | `mc_taubin8` | 1,51 | 21,86 | |
-| **`MASTER_mc_taubin4`** | **1,58** | **21,15** | **referência** |
+| **`MASTER_mc_taubin4`** | **1,57** | **21,15** | **referência** |
 | `mc_taubin2` | 1,61 | 20,70 | |
 | `mc_taubin0` | 1,65 | 20,86 | sem suavização |
 | `flying_edges` | 1,67 | 21,74 | |
 | `mc_windowed_sinc` | 1,67 | 21,74 | |
 | `sdf` | 2,88 | 21,15 | |
-| `mc_sigma1_taubin4` | **6,14** | **52,50** | σ>0 é destrutivo |
-| `surface_nets` | **15,86** | **71,70** | pior por uma ordem de grandeza |
+| `mc_sigma1_taubin4` | **6,13** | **52,50** | σ>0 é destrutivo |
+| `surface_nets` | **15,85** | **71,70** | pior por uma ordem de grandeza |
 
 ### 2.1 A troca que a mediana esconde
 
@@ -252,6 +252,10 @@ mesmo assim o ganho está dentro do ruído.
 - **FATO.** A medição do Draco cobriu 4 malhas, não as 13.
 - **FATO.** Só uma grade anisotrópica foi testada (a do LCTSC). Outras espessuras de fatia
   não foram varridas.
+- **FATO.** Os valores de mediana desta seção mudaram na segunda casa decimal
+  (1,58→1,57 · 6,14→6,13 · 15,86→15,85) quando `volume_ml` passou a vir de
+  `volume_mesh_ml` em vez do cálculo de reserva. É deriva de arredondamento, não de método;
+  registrada porque o número publicado tem de bater com o CSV, e ele bate.
 - **INFERÊNCIA.** Os fantomas cobrem os modos de falha conhecidos, não os desconhecidos.
 
 ---
