@@ -1,0 +1,489 @@
+{
+ "gerado_em": "2026-09-06",
+ "fase": 24,
+ "estado": "POOL DE 16 — nenhum split congelado nesta fase",
+ "universo_esperado": 16,
+ "n": 16,
+ "casos": [
+  {
+   "case_id": "4DLUNG-100_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.465205689126985052184293614571",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.103521604337852189272990015277",
+   "image_sha256": "9769dfc3716e8ad12d12c370a64d6595d67c50b236ba621559a1fe1b7dbb223c",
+   "mask_sha256": "c83a55284edba42ebc903d70f0ef0617cec678ffcb1dd613c0174714b2350366",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "100_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 46.57,
+   "extensao_axial_mm": 252.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    142
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-101_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.300895057088920888884721386157",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.107999387007818381915159753289",
+   "image_sha256": "665d0eaeb0260d60bcb278cc64a3a4a70b6a1ceb3abc67024956f5ac4ed9aeeb",
+   "mask_sha256": "47ec65ffbf6a5af75e6ca1f10e3be5e609ab3aa287bcd95a2f07f289566c5ea2",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "101_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 25.997,
+   "extensao_axial_mm": 243.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    149
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-102_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.221578026560021212987853057341",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.126466820295234128972525949755",
+   "image_sha256": "feae6707d0e24edae4726a581e34ac1d6d8df9619bfbaa558f05e1028e8cc109",
+   "mask_sha256": "6198cfa5e8061bb2d1caf1107fe4ae39e962ff8c09efa41555eaba2d47d4faca",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "102_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 38.521,
+   "extensao_axial_mm": 243.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    133
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-103_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.311700934410782751612441043192",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.106176550737084884919948920812",
+   "image_sha256": "3b1ecb4f02c508fe690d39a5dd985cc654ff243a07107ea9aeb418b49a02edb4",
+   "mask_sha256": "84f905c8885e9c7c19c8f6c72de9f4959e0a23de0186f56b42b4d3c5a42c25c1",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "103_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 44.421,
+   "extensao_axial_mm": 267.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    117
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-104_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.799675016747311164654654184934",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.105990235007421341581716106982",
+   "image_sha256": "5275c0d41d395cce2d42fd540a44d4b0655dce2f33ed3f2c363fb56e30d41bec",
+   "mask_sha256": "85b2d0a299b624c689ebc0ebce35e667e3746c7ff4fbcce2321a034bf54d104a",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "104_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 33.651,
+   "extensao_axial_mm": 249.0,
+   "orientation": "LPS",
+   "spacing": [
+    1.0527,
+    1.0527,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    103
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-105_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.113526532014737194609880484518",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.257998059516961589692999769532",
+   "image_sha256": "6ac0cc72d23d96a7bc04312390bc43af5a832758c8428e67517d908cb1a8fde1",
+   "mask_sha256": "5291f0e648235dd8dd8bf8e227b4bb9a691123fee440f569ee7c892547084b3b",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "105_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 23.593,
+   "extensao_axial_mm": 246.0,
+   "orientation": "LPS",
+   "spacing": [
+    1.1113,
+    1.1113,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    113
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-106_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.390464242700021679342380253394",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.328372944077766035835144859846",
+   "image_sha256": "4c5250b9c04d8984a3286368b69a3c1aacfe3d7d24919488907cfab249b1e1bb",
+   "mask_sha256": "44da9a2cf375db652b543b935fc6b0ae60fcfdf548612669f4b6e26b426ca302",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "106_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 27.513,
+   "extensao_axial_mm": 207.0,
+   "orientation": "LPS",
+   "spacing": [
+    1.1621,
+    1.1621,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    103
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-107_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.241379336716076092855966589680",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.198716746890197587891607425027",
+   "image_sha256": "196b3bca91b36436e418662304d933ae07eb542ef6b96485f7b9ecccbd9fb59c",
+   "mask_sha256": "89c4c8e3f29c9fca57f6b162d88468e0d9c9e1fb96be92f17c52e8607031bdaa",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "107_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 26.352,
+   "extensao_axial_mm": 174.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    82
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-108_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.253015518598735752230716007025",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.141105527577846738166968456978",
+   "image_sha256": "97257b6a562beebe77334ddf05c41f1da559b3012d61e3f323d2577c11855474",
+   "mask_sha256": "ca9e4fe52886d2b9ce2d00ef734bc6e019ff2fe21cf31b7907b907c046fd5b43",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "108_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 30.343,
+   "extensao_axial_mm": 246.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    119
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-109_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.666503121462725952253460832263",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.308699735054539077382738982830",
+   "image_sha256": "665ceb7c205e5907e1e04f0b4f94c3db231cb38fe0e78731516657c6f0e3b240",
+   "mask_sha256": "2d957ab3c60bc35606c303d178ae9acb95c46d71b79c643dc350370d16322acc",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "109_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 60.693,
+   "extensao_axial_mm": 198.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    112
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-110_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.193656952519690326919532865942",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.297004112136356381563407447181",
+   "image_sha256": "17e904bbdf7cc397b258956c01e770b162087ac9177cdd40c157323252f8754f",
+   "mask_sha256": "81b5c1d6f7a17cdcc07a365a061037fa4eb932d321371ab65ebce3fbde470094",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "110_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 49.763,
+   "extensao_axial_mm": 252.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    113
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-111_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.698659550371907515622839934158",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.102533678118509892496905762069",
+   "image_sha256": "56dcfa505ea0a178ed7df53270ec855084e7109f5b1a2bf878e97b891f344fa3",
+   "mask_sha256": "53f1f892d172d64765dcabf0139abf371debbf3ec20b3acc742a01641c61cd7d",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "111_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 37.88,
+   "extensao_axial_mm": 219.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    114
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-112_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.227360796846485012938078834722",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.118306396437517675137880556175",
+   "image_sha256": "88540440fd9b5fe22015266cffb524105773b66d80ab508f222e22baebff3274",
+   "mask_sha256": "7d6997fd6118b04ff721d55e8ace2282b15f7d52a6b7b5d49f70ca41cb715017",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "112_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 27.685,
+   "extensao_axial_mm": 243.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    118
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-114_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.766220991362296488028666941182",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.202177079536058633116113826031",
+   "image_sha256": "9ea7668ae3f039d096b028b35e9520c8a1c24c3c016df3b2422b400a91ea0903",
+   "mask_sha256": "b44d97e104b1c8a992ae974580292afef831cd91bc48a031d591d30b28a34e0c",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "114_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 37.179,
+   "extensao_axial_mm": 264.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    131
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-115_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.166709019739254069798374106742",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.240526820918965347880741961243",
+   "image_sha256": "cb4c76c619f837fc166bca829990547cb42e7ea0bae1c861fb5ad2eac490e6e0",
+   "mask_sha256": "4bf1eec0ff9f71c587c0cb43f4e4f3a31c3cfa92effbf19926390af874c20b38",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "115_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 32.887,
+   "extensao_axial_mm": 240.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    104
+   ],
+   "split": "NAO ATRIBUIDO"
+  },
+  {
+   "case_id": "4DLUNG-116_HM10395",
+   "study_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.317512517565032120812799691968",
+   "series_id": "1.3.6.1.4.1.14519.5.2.1.6834.5010.235783795415513575792674751894",
+   "image_sha256": "e4b2d333d8052960aab50bc7fcd41bf1c22352ac71d008ae865e9924fe134892",
+   "mask_sha256": "3b89da80116c8c020c4807ad72e5c364ad8b52b32757a062484d09d59c5b6fbf",
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "116_HM10395",
+   "license": "CC BY 3.0 (declarada POR SERIE no indice do IDC)",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "annotation_source": "contorno clinico de radioterapia; ROIGenerationAlgorithm declarado SEMIAUTOMATIC no proprio RTSTRUCT",
+   "annotation_method_declared": "SEMIAUTOMATIC",
+   "institution": "UNKNOWN",
+   "mascara_origem": "derivada: RTSTRUCT poligonal -> voxel (dcmrtstruct2nii)",
+   "vinculo_confirmado_por": "ReferencedSeriesInstanceUID",
+   "volume_ml": 30.713,
+   "extensao_axial_mm": 249.0,
+   "orientation": "LPS",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    118
+   ],
+   "split": "NAO ATRIBUIDO"
+  }
+ ]
+}

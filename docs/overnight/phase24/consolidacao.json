@@ -1,0 +1,44 @@
+{
+ "fase": 24,
+ "n_processados": 16,
+ "n_elegiveis": 16,
+ "reproducao_fase23": {
+  "verificavel": true,
+  "n_antigos": 5,
+  "reprocessados": 5,
+  "ausentes": [],
+  "divergencias": [],
+  "reproduz": true
+ },
+ "redundancia": {
+  "sujeitos": 16,
+  "sujeitos_com_mais_de_uma_serie": {},
+  "estudos_repetidos": {},
+  "series_repetidas": {},
+  "imagens_repetidas": {},
+  "mascaras_repetidas": {},
+  "um_por_sujeito": true
+ },
+ "anti_leakage": {
+  "LCTSC": {
+   "study": [],
+   "series": [],
+   "case": [],
+   "n_referencia": 120,
+   "estado": "NAO DETECTADO"
+  },
+  "NSCLC_Radiomics": {
+   "series": [],
+   "n_referencia": 25,
+   "estado": "NAO DETECTADO"
+  },
+  "LyNoS": {
+   "hash": [],
+   "n_referencia": 15,
+   "estado": "IDENTIDADE INDISPONIVEL",
+   "limite": "LyNoS e NIfTI e NAO tem StudyInstanceUID nem SeriesInstanceUID. So resta comparar hash de conteudo, e os formatos diferem (NIfTI original x DICOM convertido por nos). Um MESMO exame nos dois canais NAO seria detectado. Isto e INCONCLUSIVO, nunca 'sem overlap'."
+  },
+  "leitura": "'NAO DETECTADO' e o resultado do instrumento, nao uma afirmacao de independencia. Nenhuma destas chaves prova ausencia."
+ },
+ "universo_ok": true
+}

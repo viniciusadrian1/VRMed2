@@ -1,0 +1,502 @@
+{
+ "duplicatas": {
+  "por_identidade": {
+   "image_sha256": {},
+   "mask_sha256": {},
+   "case_id": {},
+   "study_id": {},
+   "series_id": {}
+  },
+  "colisoes_de_identidade": 0,
+  "por_grade": {
+   "((512, 512, 118), (0.9766, 0.9766, 3.0))": [
+    "4DLUNG-112_HM10395",
+    "4DLUNG-116_HM10395"
+   ]
+  },
+  "colisoes_de_grade": 1,
+  "leitura_da_grade": "colisao de (shape, spacing) e FALSO POSITIVO por construcao: dois exames distintos do mesmo protocolo compartilham a grade. Ela entra como triagem para mostrar que as quatro chaves de identidade nao dependem dela."
+ },
+ "anonimizacao": [
+  {
+   "caso": "100_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P100"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "101_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P101"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "102_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P102"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "103_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P103"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "104_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P104"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "105_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P105"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "106_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P106"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "107_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P107"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "108_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P108"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "109_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P109"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "110_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P110"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "111_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P111"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "112_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P112"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "114_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P114"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "115_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P115"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  },
+  {
+   "caso": "116_HM10395",
+   "tags_com_achado": {
+    "PatientName": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "P116"
+     ]
+    },
+    "PatientID": {
+     "estado": "INDETERMINADO",
+     "exemplos": []
+    },
+    "AccessionNumber": {
+     "estado": "ACHADO",
+     "exemplos": [
+      "2819497684894126"
+     ]
+    }
+   },
+   "tags_privadas": 3,
+   "caminho": "OK",
+   "uids": {
+    "StudyInstanceUID": "INDETERMINADO",
+    "SeriesInstanceUID": "INDETERMINADO",
+    "SOPInstanceUID": "INDETERMINADO",
+    "FrameOfReferenceUID": "INDETERMINADO"
+   },
+   "veredito": "ACHADOS: 3"
+  }
+ ]
+}
