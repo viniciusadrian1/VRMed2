@@ -1,4 +1,4 @@
-"""Suite de regressao da ESOPHAGUS_ONTOLOGY_V1 — 12 testes, assert puro.
+"""Suite de regressao da ESOPHAGUS_ONTOLOGY_V1 — 13 testes, assert puro.
 
 Mesma convencao de `test_geometria.py`: nao ha pytest neste ambiente, entao cada
 teste e uma funcao com assert e o `__main__` roda todas.
@@ -14,10 +14,12 @@ definicao congelada que ninguem verifica volta a derreter: a Fase 6 escreveu
 contradicao ficou de pe entre as duas fases ate a Fase 9 remove-la. Esta suite
 existe para que isso nao aconteca de novo em silencio.
 
-O TESTE MAIS IMPORTANTE E O 12. Um varredor que devolve "zero violacoes" pode
-estar zerado por estar quebrado. O teste 12 injeta violacoes conhecidas num
+O TESTE MAIS IMPORTANTE E O 13. Um varredor que devolve "zero violacoes" pode
+estar zerado por estar quebrado. O teste 13 injeta violacoes conhecidas num
 arquivo temporario e exige que o varredor as encontre — sem ele, os testes 9-11
 provariam apenas que o codigo roda, nao que ele ve.
+O teste 12 fecha o outro laco: uma metrica congelada que some de um CSV
+publicado tem que quebrar a suite, e nao passar em silencio.
 
 Nenhuma tolerancia aqui foi afrouxada para passar. Se um teste falhar, a falha e
 o resultado.
@@ -139,9 +141,52 @@ def test_11_ontologia_geral_marca_o_cricoide_como_do_GT():
                 f"linha {i+1} cita o cricoide sem marcar que e do protocolo do GT")
 
 
-# -------------------------------------------------- 12: CONTROLE POSITIVO
+# ------------------------------- 12: as metricas congeladas nos CSV publicados
 
-def test_12_o_varredor_realmente_ve():
+def test_12_csv_publicado_traz_as_metricas_congeladas():
+    """A Fase 17 provou que congelar a lista num documento nao basta.
+
+    O benchmark daquela fase foi escrito DEPOIS da ontologia e mesmo assim
+    entregou 6 das 8 metricas: pediu ao modulo chaves que nao existem, `dict.get`
+    devolveu None em silencio, e o CSV saiu completo sem erro nenhum. Este teste
+    fecha o laco pelo lado do artefato publicado.
+
+    Regra: um CSV de benchmark em docs/ precisa trazer, por nome de coluna, cada
+    metrica congelada — ou declarar no proprio arquivo por que ela nao se aplica.
+    """
+    import csv as _csv
+
+    # nome congelado -> nomes de coluna aceitos no CSV
+    EQUIV = {
+        "dice": ("dice",), "iou": ("iou",),
+        "precision": ("precision", "precisao"), "recall": ("recall", "sensibilidade"),
+        "hd95": ("hd95", "hd95_mm"), "assd": ("assd", "assd_mm"),
+        "erro_volume_absoluto": ("volume_error_abs", "erro_volume_ml", "volume_ml"),
+        "erro_volume_percentual": ("volume_error_pct", "erro_volume_pct"),
+    }
+    # Benchmarks de RECONSTRUCAO nao medem precision/recall: eles comparam malha
+    # contra a mascara que a gerou, e nao ha classificador. A dispensa e nominal
+    # e declarada aqui, nao inferida em silencio pelo teste.
+    DISPENSADAS_EM_RECONSTRUCAO = {"precision", "recall"}
+
+    csvs = sorted(DOCS.rglob("*benchmark*.csv"))
+    assert csvs, "nenhum CSV de benchmark encontrado em docs/ — caminho errado?"
+    for arq in csvs:
+        with arq.open(encoding="utf-8", newline="") as f:
+            colunas = {c.strip().lower() for c in (next(_csv.reader(f), []) or [])}
+        assert colunas, f"{arq.name}: sem cabecalho"
+        eh_reconstrucao = "reconstruction" in arq.name or "variant" in colunas
+        for metrica, aceitos in EQUIV.items():
+            if eh_reconstrucao and metrica in DISPENSADAS_EM_RECONSTRUCAO:
+                continue
+            assert colunas & set(aceitos), (
+                f"{arq.name}: metrica congelada '{metrica}' ausente "
+                f"(aceitos: {aceitos}); colunas presentes: {sorted(colunas)}")
+
+
+# -------------------------------------------------- 13: CONTROLE POSITIVO
+
+def test_13_o_varredor_realmente_ve():
     """Sem este teste, 'zero violacoes' nao prova nada.
 
     Injeta uma violacao de cada tipo num arquivo temporario e exige que o
