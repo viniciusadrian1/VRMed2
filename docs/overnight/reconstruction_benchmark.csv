@@ -1,180 +1,180 @@
-variant,structure,volume_ml,surface_area_mm2,dice,iou,assd_mm,hd95_mm,components,watertight,boundary_edges,nonmanifold_edges,triangles,vertices,processing_time_s,glb_size_mb,notes
-MASTER_mc_taubin4,esfera_d20_iso,4.122715,1295.898,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.0072,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.58%"
-mc_taubin0,esfera_d20_iso,4.119833,1348.001,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.0066,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.65%"
-mc_taubin2,esfera_d20_iso,4.121254,1314.243,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.0074,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.61%"
-mc_taubin8,esfera_d20_iso,4.125577,1277.577,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.0077,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.51%"
-mc_taubin12,esfera_d20_iso,4.128386,1269.162,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.008,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.44%"
-mc_taubin20,esfera_d20_iso,4.134032,1261.997,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.0076,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.31%"
-surface_nets,esfera_d20_iso,3.801762,1180.021,0.9686,,0.2342,1.0,1,True,0,0,3660,1832,0.0092,0.066688,"curvatura alta, formula fechada; erro_vs_formula=-9.24%"
-flying_edges,esfera_d20_iso,4.11887,1260.373,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.0081,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.67%"
-sdf,esfera_d20_iso,4.122715,1295.898,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.011,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.58%"
-mc_windowed_sinc,esfera_d20_iso,4.11887,1260.373,1.0,,0.0,0.0,1,True,0,0,3656,1830,0.0097,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.67%"
-mc_sigma1_taubin4,esfera_d20_iso,3.993863,1222.405,0.9897,,0.0688,1.0,1,True,0,0,3608,1806,0.0085,0.065752,"curvatura alta, formula fechada; erro_vs_formula=-4.65%"
-LOD_decim50,esfera_d20_iso,4.121798,1296.394,1.0,,0.0,0.0,1,True,0,0,1828,916,0.0078,0.033712,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,esfera_d20_iso,4.117667,1288.737,0.9983,,0.0118,0.0,1,True,0,0,914,459,0.0023,0.017256,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,esfera_d20_iso,4.078501,1275.595,0.9915,,0.061,1.0,1,True,0,0,364,184,0.0024,0.007352,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,esfera_d20_aniso,4.133244,1384.953,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0047,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.33%
-mc_taubin0,esfera_d20_aniso,4.12977,1471.328,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0042,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.41%
-mc_taubin2,esfera_d20_aniso,4.131585,1414.507,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0045,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.37%
-mc_taubin8,esfera_d20_aniso,4.13636,1354.326,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.005,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.25%
-mc_taubin12,esfera_d20_aniso,4.139635,1337.183,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0047,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.17%
-mc_taubin20,esfera_d20_aniso,4.147261,1316.984,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0049,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-0.99%
-surface_nets,esfera_d20_aniso,3.524501,1127.145,0.9169,,0.2964,0.977,1,True,0,0,2188,1096,0.0047,0.040192,mesma esfera na grade do LCTSC; erro_vs_formula=-15.86%
-flying_edges,esfera_d20_aniso,4.121336,1318.281,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0053,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.61%
-sdf,esfera_d20_aniso,4.068321,1281.444,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0066,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-2.88%
-mc_windowed_sinc,esfera_d20_aniso,4.12195,1317.952,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.0063,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.60%
-mc_sigma1_taubin4,esfera_d20_aniso,4.01757,1254.168,1.0,,0.0,0.0,1,True,0,0,2184,1094,0.005,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-4.09%
-LOD_decim50,esfera_d20_aniso,4.121069,1393.198,0.9993,,0.0023,0.0,1,True,0,0,1092,548,0.0013,0.02046,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,esfera_d20_aniso,4.110326,1392.383,0.9955,,0.0198,0.0,1,False,0,1,546,275,0.0015,0.010632,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,esfera_d20_aniso,4.061737,1361.091,0.974,,0.0988,0.977,1,True,0,0,218,111,0.0016,0.004724,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,esfera_d6_iso,0.090211,101.656,1.0,,0.0,0.0,1,True,0,0,296,150,0.002,0.006132,estrutura PEQUENA; erro_vs_formula=-20.24%
-mc_taubin0,esfera_d6_iso,0.0895,105.158,1.0,,0.0,0.0,1,True,0,0,296,150,0.0016,0.006136,estrutura PEQUENA; erro_vs_formula=-20.86%
-mc_taubin2,esfera_d6_iso,0.08989,102.747,1.0,,0.0,0.0,1,True,0,0,296,150,0.0019,0.006128,estrutura PEQUENA; erro_vs_formula=-20.52%
-mc_taubin8,esfera_d6_iso,0.090733,100.706,1.0,,0.0,0.0,1,True,0,0,296,150,0.0019,0.006136,estrutura PEQUENA; erro_vs_formula=-19.77%
-mc_taubin12,esfera_d6_iso,0.091177,100.316,1.0,,0.0,0.0,1,True,0,0,296,150,0.002,0.006136,estrutura PEQUENA; erro_vs_formula=-19.38%
-mc_taubin20,esfera_d6_iso,0.091979,100.199,1.0,,0.0,0.0,1,True,0,0,296,150,0.0027,0.006132,estrutura PEQUENA; erro_vs_formula=-18.67%
-surface_nets,esfera_d6_iso,0.032007,49.74,0.45,,1.054,1.4142,1,True,0,0,300,152,0.002,0.006204,estrutura PEQUENA; erro_vs_formula=-71.70%
-flying_edges,esfera_d6_iso,0.089695,98.624,1.0,,0.0,0.0,1,True,0,0,296,150,0.0025,0.006132,estrutura PEQUENA; erro_vs_formula=-20.69%
-sdf,esfera_d6_iso,0.090211,101.656,1.0,,0.0,0.0,1,True,0,0,296,150,0.0027,0.006132,estrutura PEQUENA; erro_vs_formula=-20.24%
-mc_windowed_sinc,esfera_d6_iso,0.089695,98.624,1.0,,0.0,0.0,1,True,0,0,296,150,0.0021,0.006132,estrutura PEQUENA; erro_vs_formula=-20.69%
-mc_sigma1_taubin4,esfera_d6_iso,0.053717,70.338,0.76,,0.4231,1.0,1,True,0,0,248,126,0.0023,0.005268,estrutura PEQUENA; erro_vs_formula=-52.50%
-LOD_decim50,esfera_d6_iso,0.089129,101.771,1.0,,0.0,0.0,1,True,0,0,148,76,0.0004,0.003468,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,esfera_d6_iso,0.087951,101.756,1.0,,0.0,0.0,1,True,0,0,74,39,0.0004,0.002132,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,esfera_d6_iso,0.07869,98.378,0.9195,,0.1452,1.0,1,True,0,0,28,16,0.0005,0.001304,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,cilindro_d10_h40,3.118958,1438.766,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0068,0.059416,formula fechada; erro_vs_formula=-0.72%
-mc_taubin0,cilindro_d10_h40,3.114833,1452.369,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0055,0.05942,formula fechada; erro_vs_formula=-0.85%
-mc_taubin2,cilindro_d10_h40,3.116904,1443.542,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0067,0.059416,formula fechada; erro_vs_formula=-0.79%
-mc_taubin8,cilindro_d10_h40,3.123038,1434.547,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0062,0.059416,formula fechada; erro_vs_formula=-0.59%
-mc_taubin12,cilindro_d10_h40,3.127111,1433.193,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0064,0.059416,formula fechada; erro_vs_formula=-0.46%
-mc_taubin20,cilindro_d10_h40,3.135328,1433.082,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.007,0.059416,formula fechada; erro_vs_formula=-0.20%
-surface_nets,cilindro_d10_h40,2.715888,1271.534,0.9334,,0.2547,1.0,1,True,0,0,3260,1632,0.0061,0.059488,formula fechada; erro_vs_formula=-13.55%
-flying_edges,cilindro_d10_h40,3.114101,1428.153,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0065,0.059416,formula fechada; erro_vs_formula=-0.88%
-sdf,cilindro_d10_h40,3.118958,1438.766,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0093,0.059416,formula fechada; erro_vs_formula=-0.72%
-mc_windowed_sinc,cilindro_d10_h40,3.114173,1428.174,1.0,,0.0,0.0,1,True,0,0,3256,1630,0.0079,0.059416,formula fechada; erro_vs_formula=-0.87%
-mc_sigma1_taubin4,cilindro_d10_h40,2.948694,1352.7,0.9897,,0.03,1.0,1,True,0,0,3224,1614,0.0065,0.058836,formula fechada; erro_vs_formula=-6.14%
-LOD_decim50,cilindro_d10_h40,3.10638,1438.758,1.0,,0.0,0.0,1,True,0,0,1628,816,0.0018,0.030112,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,cilindro_d10_h40,3.068554,1445.594,0.9989,,0.0057,0.0,1,True,0,0,814,409,0.0024,0.015456,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,cilindro_d10_h40,2.977994,1428.62,0.9889,,0.0507,1.0,1,True,0,0,324,164,0.0027,0.006636,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,tubo_fino_d3,0.342539,439.261,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0033,0.019096,estrutura FINA (3 mm); erro_vs_formula=+21.15%
-mc_taubin0,tubo_fino_d3,0.339833,445.997,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0025,0.019092,estrutura FINA (3 mm); erro_vs_formula=+20.19%
-mc_taubin2,tubo_fino_d3,0.341285,441.562,1.0,,0.0,0.0,1,True,0,0,1016,510,0.003,0.019092,estrutura FINA (3 mm); erro_vs_formula=+20.70%
-mc_taubin8,tubo_fino_d3,0.344557,437.195,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0036,0.019096,estrutura FINA (3 mm); erro_vs_formula=+21.86%
-mc_taubin12,tubo_fino_d3,0.346125,436.431,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0037,0.019092,estrutura FINA (3 mm); erro_vs_formula=+22.42%
-mc_taubin20,tubo_fino_d3,0.348512,436.194,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0036,0.019096,estrutura FINA (3 mm); erro_vs_formula=+23.26%
-surface_nets,tubo_fino_d3,0.116209,242.297,0.195,,1.1882,1.4142,1,True,0,0,1020,512,0.003,0.019168,estrutura FINA (3 mm); erro_vs_formula=-58.90%
-flying_edges,tubo_fino_d3,0.344212,433.515,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0035,0.019096,estrutura FINA (3 mm); erro_vs_formula=+21.74%
-sdf,tubo_fino_d3,0.342539,439.261,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0042,0.019096,estrutura FINA (3 mm); erro_vs_formula=+21.15%
-mc_windowed_sinc,tubo_fino_d3,0.344212,433.515,1.0,,0.0,0.0,1,True,0,0,1016,510,0.0038,0.019092,estrutura FINA (3 mm); erro_vs_formula=+21.74%
-mc_sigma1_taubin4,tubo_fino_d3,0.191959,314.936,0.7014,,0.35,1.0,1,True,0,0,952,478,0.0032,0.017944,estrutura FINA (3 mm); erro_vs_formula=-32.11%
-LOD_decim50,tubo_fino_d3,0.308348,440.358,0.9972,,0.0047,0.0,1,True,0,0,508,256,0.001,0.009952,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,tubo_fino_d3,0.269962,417.094,0.97,,0.0383,1.0,1,True,0,0,254,129,0.0008,0.005376,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,tubo_fino_d3,0.13516,333.685,0.6391,,0.5063,1.4142,1,False,0,1,100,53,0.0012,0.002612,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-mc_taubin0,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-mc_taubin2,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-mc_taubin8,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-mc_taubin12,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-mc_taubin20,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-surface_nets,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-flying_edges,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-sdf,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-mc_windowed_sinc,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-mc_sigma1_taubin4,tubo_fino_d2_aniso,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
-MASTER_mc_taubin4,tubo_oco_20_12,8.283405,4489.465,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0194,0.193168,CAVIDADE que nao pode fechar
-mc_taubin0,tubo_oco_20_12,8.28,4559.938,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0167,0.193172,CAVIDADE que nao pode fechar
-mc_taubin2,tubo_oco_20_12,8.281781,4515.158,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0184,0.19316,CAVIDADE que nao pode fechar
-mc_taubin8,tubo_oco_20_12,8.286423,4462.522,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0193,0.193172,CAVIDADE que nao pode fechar
-mc_taubin12,tubo_oco_20_12,8.28932,4449.063,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0186,0.193172,CAVIDADE que nao pode fechar
-mc_taubin20,tubo_oco_20_12,8.295004,4436.514,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0192,0.193172,CAVIDADE que nao pode fechar
-surface_nets,tubo_oco_20_12,7.918473,4145.941,0.9602,,0.1486,1.0,1,True,0,0,10688,5344,0.0175,0.193172,CAVIDADE que nao pode fechar
-flying_edges,tubo_oco_20_12,8.280683,4431.275,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0189,0.193172,CAVIDADE que nao pode fechar
-sdf,tubo_oco_20_12,8.283405,4489.465,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0243,0.193168,CAVIDADE que nao pode fechar
-mc_windowed_sinc,tubo_oco_20_12,8.280742,4431.24,1.0,,0.0,0.0,1,True,0,0,10688,5344,0.0228,0.193172,CAVIDADE que nao pode fechar
-mc_sigma1_taubin4,tubo_oco_20_12,8.115041,4289.345,0.9919,,0.0209,0.0,1,True,0,0,10656,5328,0.0199,0.192592,CAVIDADE que nao pode fechar
-LOD_decim50,tubo_oco_20_12,8.276103,4487.511,1.0,,0.0,0.0,1,True,0,0,5344,2672,0.0063,0.096976,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,tubo_oco_20_12,8.277054,4484.395,0.9999,,0.0003,0.0,1,True,0,0,2672,1336,0.0068,0.04888,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,tubo_oco_20_12,8.108105,4483.185,0.9892,,0.0403,0.0,1,True,0,0,1068,534,0.0078,0.020004,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,esfera_cavidade_20_10,4.65642,1630.15,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0097,0.086656,cavidade interna
-mc_taubin0,esfera_cavidade_20_10,4.652667,1712.119,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0086,0.086656,cavidade interna
-mc_taubin2,esfera_cavidade_20_10,4.654386,1659.029,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0104,0.086652,cavidade interna
-mc_taubin8,esfera_cavidade_20_10,4.660819,1601.822,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0106,0.086656,cavidade interna
-mc_taubin12,esfera_cavidade_20_10,4.66537,1589.496,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0095,0.086656,cavidade interna
-mc_taubin20,esfera_cavidade_20_10,4.674557,1580.169,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0095,0.086656,cavidade interna
-surface_nets,esfera_cavidade_20_10,4.212986,1439.414,0.9398,,0.3487,1.0,2,True,0,0,4776,2392,0.0083,0.0868,cavidade interna
-flying_edges,esfera_cavidade_20_10,4.653224,1575.736,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0095,0.086656,cavidade interna
-sdf,esfera_cavidade_20_10,4.65642,1630.15,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0146,0.086656,cavidade interna
-mc_windowed_sinc,esfera_cavidade_20_10,4.653224,1575.736,1.0,,0.0,0.0,2,True,0,0,4768,2388,0.0113,0.086656,cavidade interna
-mc_sigma1_taubin4,esfera_cavidade_20_10,4.465169,1509.364,0.9785,,0.12,1.0,2,True,0,0,4480,2244,0.01,0.081472,cavidade interna
-LOD_decim50,esfera_cavidade_20_10,4.65571,1627.875,0.9995,,0.0032,0.0,2,False,0,2,2384,1196,0.0026,0.043744,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,esfera_cavidade_20_10,4.647015,1613.477,0.9952,,0.0269,0.0,2,False,0,3,1192,600,0.0028,0.022284,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,esfera_cavidade_20_10,4.590244,1587.159,0.9831,,0.0967,1.0,2,False,0,1,476,242,0.004,0.009392,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,bifurcacao_d8,4.334851,2367.632,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.0162,0.110968,"juncao, alta curvatura"
-mc_taubin0,bifurcacao_d8,4.327833,2437.738,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.011,0.110968,"juncao, alta curvatura"
-mc_taubin2,bifurcacao_d8,4.331318,2392.284,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.0109,0.110968,"juncao, alta curvatura"
-mc_taubin8,bifurcacao_d8,4.342021,2343.884,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.013,0.110968,"juncao, alta curvatura"
-mc_taubin12,bifurcacao_d8,4.349282,2334.138,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.012,0.110972,"juncao, alta curvatura"
-mc_taubin20,bifurcacao_d8,4.363865,2328.396,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.0123,0.110972,"juncao, alta curvatura"
-surface_nets,bifurcacao_d8,3.581114,2051.352,0.9032,,0.3697,1.0,1,True,0,0,6124,3064,0.0107,0.111044,"juncao, alta curvatura"
-flying_edges,bifurcacao_d8,4.32762,2319.206,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.0124,0.110968,"juncao, alta curvatura"
-sdf,bifurcacao_d8,4.334851,2367.632,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.0181,0.110968,"juncao, alta curvatura"
-mc_windowed_sinc,bifurcacao_d8,4.327867,2318.954,1.0,,0.0,0.0,1,True,0,0,6120,3062,0.0138,0.110968,"juncao, alta curvatura"
-mc_sigma1_taubin4,bifurcacao_d8,4.020648,2193.877,0.9788,,0.0803,1.0,1,True,0,0,5992,2998,0.012,0.108668,"juncao, alta curvatura"
-LOD_decim50,bifurcacao_d8,4.317827,2369.519,1.0,,0.0,0.0,1,True,0,0,3060,1532,0.0033,0.055888,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,bifurcacao_d8,4.273885,2376.122,0.9968,,0.0132,0.0,1,False,0,1,1530,767,0.0042,0.028344,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,bifurcacao_d8,4.06135,2365.091,0.9669,,0.1375,1.0,1,True,0,0,612,308,0.004,0.01182,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,dois_cilindros_contato,4.781682,2232.077,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0102,0.096736,FUSAO de estruturas
-mc_taubin0,dois_cilindros_contato,4.775333,2255.702,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0081,0.096736,FUSAO de estruturas
-mc_taubin2,dois_cilindros_contato,4.778473,2240.389,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0104,0.09674,FUSAO de estruturas
-mc_taubin8,dois_cilindros_contato,4.788239,2223.468,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0097,0.096736,FUSAO de estruturas
-mc_taubin12,dois_cilindros_contato,4.794914,2218.848,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0102,0.096736,FUSAO de estruturas
-mc_taubin20,dois_cilindros_contato,4.808427,2213.929,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0099,0.096736,FUSAO de estruturas
-surface_nets,dois_cilindros_contato,4.1342,1959.143,0.9241,,0.3537,1.0,2,True,0,0,5336,2672,0.0091,0.09688,FUSAO de estruturas
-flying_edges,dois_cilindros_contato,4.77551,2207.938,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0109,0.096736,FUSAO de estruturas
-sdf,dois_cilindros_contato,4.781682,2232.077,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0119,0.096736,FUSAO de estruturas
-mc_windowed_sinc,dois_cilindros_contato,4.77551,2207.938,1.0,,0.0,0.0,2,True,0,0,5328,2668,0.0117,0.096736,FUSAO de estruturas
-mc_sigma1_taubin4,dois_cilindros_contato,4.655111,1955.405,0.9814,,0.1019,1.0,1,True,0,0,5064,2534,0.0107,0.09196,FUSAO de estruturas
-LOD_decim50,dois_cilindros_contato,4.769397,2233.063,1.0,,0.0,0.0,2,True,0,0,2664,1336,0.0028,0.048784,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,dois_cilindros_contato,4.749836,2238.241,0.9998,,0.0006,0.0,2,True,0,0,1332,670,0.0034,0.024804,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,dois_cilindros_contato,4.571784,2245.661,0.9851,,0.0762,1.0,2,True,0,0,532,270,0.0043,0.010404,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,duas_estruturas_gap2,1.012217,649.526,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0044,0.03568,"2 componentes, gap 2 mm"
-mc_taubin0,duas_estruturas_gap2,1.009667,680.154,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0047,0.03568,"2 componentes, gap 2 mm"
-mc_taubin2,duas_estruturas_gap2,1.010729,660.45,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0045,0.03568,"2 componentes, gap 2 mm"
-mc_taubin8,duas_estruturas_gap2,1.015558,638.157,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0048,0.035676,"2 componentes, gap 2 mm"
-mc_taubin12,duas_estruturas_gap2,1.018849,632.895,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0054,0.035676,"2 componentes, gap 2 mm"
-mc_taubin20,duas_estruturas_gap2,1.024898,629.227,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0049,0.03568,"2 componentes, gap 2 mm"
-surface_nets,duas_estruturas_gap2,0.743747,503.467,0.8295,,0.6471,1.0,2,True,0,0,1944,976,0.0044,0.035824,"2 componentes, gap 2 mm"
-flying_edges,duas_estruturas_gap2,1.012479,624.344,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0049,0.03568,"2 componentes, gap 2 mm"
-sdf,duas_estruturas_gap2,1.012217,649.526,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0066,0.03568,"2 componentes, gap 2 mm"
-mc_windowed_sinc,duas_estruturas_gap2,1.012479,624.344,1.0,,0.0,0.0,2,True,0,0,1936,972,0.0053,0.03568,"2 componentes, gap 2 mm"
-mc_sigma1_taubin4,duas_estruturas_gap2,0.885328,564.35,0.9447,,0.2222,1.0,2,True,0,0,1648,828,0.0051,0.030488,"2 componentes, gap 2 mm"
-LOD_decim50,duas_estruturas_gap2,1.011465,650.72,0.999,,0.0045,0.0,2,False,0,4,968,488,0.0013,0.018252,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,duas_estruturas_gap2,1.008862,647.624,0.9912,,0.0405,0.0,2,False,0,11,484,246,0.0014,0.009536,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,duas_estruturas_gap2,0.978131,643.696,0.965,,0.1506,1.0,2,False,0,3,192,100,0.0014,0.00428,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,ponte_fina_gap4,0.962746,622.216,1.0,,0.0,0.0,1,True,0,0,1720,862,0.0041,0.031768,ponte fina: preservar ou romper
-mc_taubin0,ponte_fina_gap4,0.961167,633.651,1.0,,0.0,0.0,1,True,0,0,1720,862,0.0038,0.031772,ponte fina: preservar ou romper
-mc_taubin2,ponte_fina_gap4,0.961871,625.987,1.0,,0.0,0.0,1,True,0,0,1720,862,0.0044,0.031772,ponte fina: preservar ou romper
-mc_taubin8,ponte_fina_gap4,0.964767,618.472,1.0,,0.0,0.0,1,True,0,0,1720,862,0.004,0.031764,ponte fina: preservar ou romper
-mc_taubin12,ponte_fina_gap4,0.966991,616.52,1.0,,0.0,0.0,1,True,0,0,1720,862,0.004,0.031768,ponte fina: preservar ou romper
-mc_taubin20,ponte_fina_gap4,0.971738,614.691,1.0,,0.0,0.0,1,True,0,0,1720,862,0.0046,0.031764,ponte fina: preservar ou romper
-surface_nets,ponte_fina_gap4,0.690868,483.9,0.8228,,0.6658,1.0,1,True,0,0,1724,864,0.004,0.03184,ponte fina: preservar ou romper
-flying_edges,ponte_fina_gap4,0.959076,610.083,1.0,,0.0,0.0,1,True,0,0,1720,862,0.005,0.031764,ponte fina: preservar ou romper
-sdf,ponte_fina_gap4,0.962746,622.216,1.0,,0.0,0.0,1,True,0,0,1720,862,0.0054,0.031768,ponte fina: preservar ou romper
-mc_windowed_sinc,ponte_fina_gap4,0.959455,610.642,1.0,,0.0,0.0,1,True,0,0,1720,862,0.0055,0.031768,ponte fina: preservar ou romper
-mc_sigma1_taubin4,ponte_fina_gap4,0.840805,547.134,0.9691,,0.1403,1.0,2,True,0,0,1664,836,0.0048,0.030784,ponte fina: preservar ou romper
-LOD_decim50,ponte_fina_gap4,0.958866,623.405,1.0,,0.0,0.0,1,False,0,1,860,432,0.001,0.016284,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,ponte_fina_gap4,0.954773,623.092,0.9985,,0.0071,0.0,1,False,0,2,430,218,0.0012,0.008556,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,ponte_fina_gap4,0.934219,623.532,0.9747,,0.1114,1.0,2,True,0,0,172,90,0.0013,0.00392,DERIVADA do MASTER (10% das faces) — nao substitui
-MASTER_mc_taubin4,cortada_d20,3.471348,1191.863,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0064,0.058548,superficie ABERTA no corte
-mc_taubin0,cortada_d20,3.468667,1230.777,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0172,0.058552,superficie ABERTA no corte
-mc_taubin2,cortada_d20,3.470022,1205.359,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0065,0.058548,superficie ABERTA no corte
-mc_taubin8,cortada_d20,3.473995,1178.734,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0068,0.058552,superficie ABERTA no corte
-mc_taubin12,cortada_d20,3.476686,1172.896,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0065,0.058552,superficie ABERTA no corte
-mc_taubin20,cortada_d20,3.482205,1168.379,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0074,0.058552,superficie ABERTA no corte
-surface_nets,cortada_d20,3.165658,1074.786,0.9575,,0.2729,1.0,1,True,0,0,3212,1608,0.0061,0.058624,superficie ABERTA no corte
-flying_edges,cortada_d20,3.467805,1166.058,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0066,0.058552,superficie ABERTA no corte
-sdf,cortada_d20,3.471348,1191.863,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0099,0.058548,superficie ABERTA no corte
-mc_windowed_sinc,cortada_d20,3.467875,1165.914,1.0,,0.0,0.0,1,True,0,0,3208,1606,0.0091,0.058548,superficie ABERTA no corte
-mc_sigma1_taubin4,cortada_d20,3.348316,1123.604,0.9926,,0.0381,1.0,1,True,0,0,3176,1590,0.0068,0.057976,superficie ABERTA no corte
-LOD_decim50,cortada_d20,3.470756,1192.004,0.9999,,0.0005,0.0,1,True,0,0,1604,804,0.0017,0.029672,DERIVADA do MASTER (50% das faces) — nao substitui
-LOD_decim25,cortada_d20,3.468374,1191.716,0.9994,,0.0027,0.0,1,True,0,0,802,403,0.002,0.01524,DERIVADA do MASTER (25% das faces) — nao substitui
-LOD_decim10,cortada_d20,3.458564,1186.835,0.9927,,0.0498,0.35,1,True,0,0,320,162,0.0021,0.00656,DERIVADA do MASTER (10% das faces) — nao substitui
+variant,structure,volume_ml,surface_area_mm2,dice,iou,assd_mm,hd95_mm,volume_error_pct,components,watertight,boundary_edges,nonmanifold_edges,triangles,vertices,processing_time_s,glb_size_mb,notes
+MASTER_mc_taubin4,esfera_d20_iso,4.123,1295.898,1.0,1.0,0.0,0.0,-0.393,1,True,0,0,3656,1830,0.0077,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.57%"
+mc_taubin0,esfera_d20_iso,4.12,1348.001,1.0,1.0,0.0,0.0,-0.463,1,True,0,0,3656,1830,0.0108,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.64%"
+mc_taubin2,esfera_d20_iso,4.121,1314.243,1.0,1.0,0.0,0.0,-0.429,1,True,0,0,3656,1830,0.0115,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.62%"
+mc_taubin8,esfera_d20_iso,4.126,1277.577,1.0,1.0,0.0,0.0,-0.324,1,True,0,0,3656,1830,0.014,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.50%"
+mc_taubin12,esfera_d20_iso,4.128,1269.162,1.0,1.0,0.0,0.0,-0.256,1,True,0,0,3656,1830,0.0132,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.45%"
+mc_taubin20,esfera_d20_iso,4.134,1261.997,1.0,1.0,0.0,0.0,-0.12,1,True,0,0,3656,1830,0.0165,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.31%"
+surface_nets,esfera_d20_iso,3.802,1180.021,0.9686,0.939112,0.2342,1.0,-8.148,1,True,0,0,3660,1832,0.0074,0.066688,"curvatura alta, formula fechada; erro_vs_formula=-9.23%"
+flying_edges,esfera_d20_iso,4.119,1260.373,1.0,1.0,0.0,0.0,-0.486,1,True,0,0,3656,1830,0.0207,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.67%"
+sdf,esfera_d20_iso,4.123,1295.898,1.0,1.0,0.0,0.0,-0.393,1,True,0,0,3656,1830,0.0189,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.57%"
+mc_windowed_sinc,esfera_d20_iso,4.119,1260.373,1.0,1.0,0.0,0.0,-0.486,1,True,0,0,3656,1830,0.0169,0.066616,"curvatura alta, formula fechada; erro_vs_formula=-1.67%"
+mc_sigma1_taubin4,esfera_d20_iso,3.994,1222.405,0.9897,0.97961,0.0688,1.0,-3.507,1,True,0,0,3608,1806,0.0101,0.065752,"curvatura alta, formula fechada; erro_vs_formula=-4.65%"
+LOD_decim50,esfera_d20_iso,4.122,1296.394,1.0,1.0,0.0,0.0,-0.416,1,True,0,0,1828,916,0.0735,0.033712,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,esfera_d20_iso,4.118,1288.737,0.9983,0.996606,0.0118,0.0,-0.515,1,True,0,0,914,459,0.0028,0.017256,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,esfera_d20_iso,4.079,1275.595,0.9915,0.983143,0.061,1.0,-1.462,1,True,0,0,364,184,0.0042,0.007352,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,esfera_d20_aniso,4.133,1384.953,1.0,1.0,0.0,0.0,-1.071,1,True,0,0,2184,1094,0.0078,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.33%
+mc_taubin0,esfera_d20_aniso,4.13,1471.328,1.0,1.0,0.0,0.0,-1.154,1,True,0,0,2184,1094,0.0129,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.40%
+mc_taubin2,esfera_d20_aniso,4.132,1414.507,1.0,1.0,0.0,0.0,-1.11,1,True,0,0,2184,1094,0.0085,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.36%
+mc_taubin8,esfera_d20_aniso,4.136,1354.326,1.0,1.0,0.0,0.0,-0.996,1,True,0,0,2184,1094,0.0069,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.26%
+mc_taubin12,esfera_d20_aniso,4.14,1337.183,1.0,1.0,0.0,0.0,-0.918,1,True,0,0,2184,1094,0.0074,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.16%
+mc_taubin20,esfera_d20_aniso,4.147,1316.984,1.0,1.0,0.0,0.0,-0.735,1,True,0,0,2184,1094,0.0087,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.00%
+surface_nets,esfera_d20_aniso,3.525,1127.145,0.9169,0.846552,0.2964,0.977,-15.641,1,True,0,0,2188,1096,0.005,0.040192,mesma esfera na grade do LCTSC; erro_vs_formula=-15.85%
+flying_edges,esfera_d20_aniso,4.121,1318.281,1.0,1.0,0.0,0.0,-1.356,1,True,0,0,2184,1094,0.0055,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.62%
+sdf,esfera_d20_aniso,4.068,1281.444,1.0,1.0,0.0,0.0,-2.625,1,True,0,0,2184,1094,0.0081,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-2.88%
+mc_windowed_sinc,esfera_d20_aniso,4.122,1317.952,1.0,1.0,0.0,0.0,-1.341,1,True,0,0,2184,1094,0.009,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-1.59%
+mc_sigma1_taubin4,esfera_d20_aniso,4.018,1254.168,1.0,1.0,0.0,0.0,-3.839,1,True,0,0,2184,1094,0.0078,0.04012,mesma esfera na grade do LCTSC; erro_vs_formula=-4.08%
+LOD_decim50,esfera_d20_aniso,4.121,1393.198,0.9993,0.998601,0.0023,0.0,-1.362,1,True,0,0,1092,548,0.0021,0.02046,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,esfera_d20_aniso,4.11,1392.383,0.9955,0.99104,0.0198,0.0,-1.619,1,False,0,1,546,275,0.0016,0.010632,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,esfera_d20_aniso,4.062,1361.091,0.974,0.949318,0.0988,0.977,-2.782,1,True,0,0,218,111,0.0022,0.004724,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,esfera_d6_iso,0.09,101.656,1.0,1.0,0.0,0.0,-2.999,1,True,0,0,296,150,0.0026,0.006132,estrutura PEQUENA; erro_vs_formula=-20.42%
+mc_taubin0,esfera_d6_iso,0.089,105.158,1.0,1.0,0.0,0.0,-3.763,1,True,0,0,296,150,0.003,0.006136,estrutura PEQUENA; erro_vs_formula=-21.31%
+mc_taubin2,esfera_d6_iso,0.09,102.747,1.0,1.0,0.0,0.0,-3.345,1,True,0,0,296,150,0.0025,0.006128,estrutura PEQUENA; erro_vs_formula=-20.42%
+mc_taubin8,esfera_d6_iso,0.091,100.706,1.0,1.0,0.0,0.0,-2.437,1,True,0,0,296,150,0.0031,0.006136,estrutura PEQUENA; erro_vs_formula=-19.54%
+mc_taubin12,esfera_d6_iso,0.091,100.316,1.0,1.0,0.0,0.0,-1.96,1,True,0,0,296,150,0.0032,0.006136,estrutura PEQUENA; erro_vs_formula=-19.54%
+mc_taubin20,esfera_d6_iso,0.092,100.199,1.0,1.0,0.0,0.0,-1.098,1,True,0,0,296,150,0.003,0.006132,estrutura PEQUENA; erro_vs_formula=-18.65%
+surface_nets,esfera_d6_iso,0.032,49.74,0.45,0.290323,1.054,1.4142,-65.584,1,True,0,0,300,152,0.0035,0.006204,estrutura PEQUENA; erro_vs_formula=-71.71%
+flying_edges,esfera_d6_iso,0.09,98.624,1.0,1.0,0.0,0.0,-3.554,1,True,0,0,296,150,0.0027,0.006132,estrutura PEQUENA; erro_vs_formula=-20.42%
+sdf,esfera_d6_iso,0.09,101.656,1.0,1.0,0.0,0.0,-2.999,1,True,0,0,296,150,0.004,0.006132,estrutura PEQUENA; erro_vs_formula=-20.42%
+mc_windowed_sinc,esfera_d6_iso,0.09,98.624,1.0,1.0,0.0,0.0,-3.554,1,True,0,0,296,150,0.0039,0.006132,estrutura PEQUENA; erro_vs_formula=-20.42%
+mc_sigma1_taubin4,esfera_d6_iso,0.054,70.338,0.76,0.612903,0.4231,1.0,-42.24,1,True,0,0,248,126,0.0022,0.005268,estrutura PEQUENA; erro_vs_formula=-52.25%
+LOD_decim50,esfera_d6_iso,0.089,101.771,1.0,1.0,0.0,0.0,-4.162,1,True,0,0,148,76,0.0006,0.003468,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,esfera_d6_iso,0.088,101.756,1.0,1.0,0.0,0.0,-5.429,1,True,0,0,74,39,0.0008,0.002132,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,esfera_d6_iso,0.079,98.378,0.9195,0.850995,0.1452,1.0,-15.387,1,True,0,0,28,16,0.0007,0.001304,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,cilindro_d10_h40,3.119,1438.766,1.0,1.0,0.0,0.0,-0.702,1,True,0,0,3256,1630,0.0096,0.059416,formula fechada; erro_vs_formula=-0.72%
+mc_taubin0,cilindro_d10_h40,3.115,1452.369,1.0,1.0,0.0,0.0,-0.833,1,True,0,0,3256,1630,0.0109,0.05942,formula fechada; erro_vs_formula=-0.85%
+mc_taubin2,cilindro_d10_h40,3.117,1443.542,1.0,1.0,0.0,0.0,-0.767,1,True,0,0,3256,1630,0.0102,0.059416,formula fechada; erro_vs_formula=-0.78%
+mc_taubin8,cilindro_d10_h40,3.123,1434.547,1.0,1.0,0.0,0.0,-0.572,1,True,0,0,3256,1630,0.0112,0.059416,formula fechada; erro_vs_formula=-0.59%
+mc_taubin12,cilindro_d10_h40,3.127,1433.193,1.0,1.0,0.0,0.0,-0.442,1,True,0,0,3256,1630,0.0093,0.059416,formula fechada; erro_vs_formula=-0.46%
+mc_taubin20,cilindro_d10_h40,3.135,1433.082,1.0,1.0,0.0,0.0,-0.181,1,True,0,0,3256,1630,0.0098,0.059416,formula fechada; erro_vs_formula=-0.21%
+surface_nets,cilindro_d10_h40,2.716,1271.534,0.9334,0.875117,0.2547,1.0,-13.534,1,True,0,0,3260,1632,0.0075,0.059488,formula fechada; erro_vs_formula=-13.55%
+flying_edges,cilindro_d10_h40,3.114,1428.153,1.0,1.0,0.0,0.0,-0.856,1,True,0,0,3256,1630,0.0101,0.059416,formula fechada; erro_vs_formula=-0.88%
+sdf,cilindro_d10_h40,3.119,1438.766,1.0,1.0,0.0,0.0,-0.702,1,True,0,0,3256,1630,0.0138,0.059416,formula fechada; erro_vs_formula=-0.72%
+mc_windowed_sinc,cilindro_d10_h40,3.114,1428.174,1.0,1.0,0.0,0.0,-0.854,1,True,0,0,3256,1630,0.0099,0.059416,formula fechada; erro_vs_formula=-0.88%
+mc_sigma1_taubin4,cilindro_d10_h40,2.949,1352.7,0.9897,0.97961,0.03,1.0,-6.122,1,True,0,0,3224,1614,0.0131,0.058836,formula fechada; erro_vs_formula=-6.13%
+LOD_decim50,cilindro_d10_h40,3.106,1438.758,1.0,1.0,0.0,0.0,-1.102,1,True,0,0,1628,816,0.002,0.030112,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,cilindro_d10_h40,3.069,1445.594,0.9989,0.997802,0.0057,0.0,-2.306,1,True,0,0,814,409,0.003,0.015456,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,cilindro_d10_h40,2.978,1428.62,0.9889,0.978044,0.0507,1.0,-5.19,1,True,0,0,324,164,0.0035,0.006636,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,tubo_fino_d3,0.343,439.261,1.0,1.0,0.0,0.0,-5.114,1,True,0,0,1016,510,0.0035,0.019096,estrutura FINA (3 mm); erro_vs_formula=+21.31%
+mc_taubin0,tubo_fino_d3,0.34,445.997,1.0,1.0,0.0,0.0,-5.863,1,True,0,0,1016,510,0.0048,0.019092,estrutura FINA (3 mm); erro_vs_formula=+20.25%
+mc_taubin2,tubo_fino_d3,0.341,441.562,1.0,1.0,0.0,0.0,-5.461,1,True,0,0,1016,510,0.0041,0.019092,estrutura FINA (3 mm); erro_vs_formula=+20.60%
+mc_taubin8,tubo_fino_d3,0.345,437.195,1.0,1.0,0.0,0.0,-4.555,1,True,0,0,1016,510,0.0051,0.019096,estrutura FINA (3 mm); erro_vs_formula=+22.02%
+mc_taubin12,tubo_fino_d3,0.346,436.431,1.0,1.0,0.0,0.0,-4.12,1,True,0,0,1016,510,0.0033,0.019092,estrutura FINA (3 mm); erro_vs_formula=+22.37%
+mc_taubin20,tubo_fino_d3,0.349,436.194,1.0,1.0,0.0,0.0,-3.459,1,True,0,0,1016,510,0.0049,0.019096,estrutura FINA (3 mm); erro_vs_formula=+23.43%
+surface_nets,tubo_fino_d3,0.116,242.297,0.195,0.108033,1.1882,1.4142,-67.809,1,True,0,0,1020,512,0.0049,0.019168,estrutura FINA (3 mm); erro_vs_formula=-58.97%
+flying_edges,tubo_fino_d3,0.344,433.515,1.0,1.0,0.0,0.0,-4.65,1,True,0,0,1016,510,0.0033,0.019096,estrutura FINA (3 mm); erro_vs_formula=+21.67%
+sdf,tubo_fino_d3,0.343,439.261,1.0,1.0,0.0,0.0,-5.114,1,True,0,0,1016,510,0.0056,0.019096,estrutura FINA (3 mm); erro_vs_formula=+21.31%
+mc_windowed_sinc,tubo_fino_d3,0.344,433.515,1.0,1.0,0.0,0.0,-4.65,1,True,0,0,1016,510,0.0054,0.019092,estrutura FINA (3 mm); erro_vs_formula=+21.67%
+mc_sigma1_taubin4,tubo_fino_d3,0.192,314.936,0.7014,0.54012,0.35,1.0,-46.826,1,True,0,0,952,478,0.0048,0.017944,estrutura FINA (3 mm); erro_vs_formula=-32.09%
+LOD_decim50,tubo_fino_d3,0.308,440.358,0.9972,0.994416,0.0047,0.0,-14.585,1,True,0,0,508,256,0.0009,0.009952,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,tubo_fino_d3,0.27,417.094,0.97,0.941748,0.0383,1.0,-25.218,1,True,0,0,254,129,0.0009,0.005376,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,tubo_fino_d3,0.135,333.685,0.6391,0.469616,0.5063,1.4142,-62.559,1,False,0,1,100,53,0.001,0.002612,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+mc_taubin0,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+mc_taubin2,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+mc_taubin8,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+mc_taubin12,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+mc_taubin20,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+surface_nets,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+flying_edges,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+sdf,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+mc_windowed_sinc,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+mc_sigma1_taubin4,tubo_fino_d2_aniso,,,,,,,,,,,,,,0.0,,fina + anisotropia; SUPERFICIE VAZIA — extracao nao produziu geometria
+MASTER_mc_taubin4,tubo_oco_20_12,8.283,4489.465,1.0,1.0,0.0,0.0,-0.2,1,True,0,0,10688,5344,0.0218,0.193168,CAVIDADE que nao pode fechar
+mc_taubin0,tubo_oco_20_12,8.28,4559.938,1.0,1.0,0.0,0.0,-0.241,1,True,0,0,10688,5344,0.0295,0.193172,CAVIDADE que nao pode fechar
+mc_taubin2,tubo_oco_20_12,8.282,4515.158,1.0,1.0,0.0,0.0,-0.22,1,True,0,0,10688,5344,0.0264,0.19316,CAVIDADE que nao pode fechar
+mc_taubin8,tubo_oco_20_12,8.286,4462.522,1.0,1.0,0.0,0.0,-0.164,1,True,0,0,10688,5344,0.0256,0.193172,CAVIDADE que nao pode fechar
+mc_taubin12,tubo_oco_20_12,8.289,4449.063,1.0,1.0,0.0,0.0,-0.129,1,True,0,0,10688,5344,0.0235,0.193172,CAVIDADE que nao pode fechar
+mc_taubin20,tubo_oco_20_12,8.295,4436.514,1.0,1.0,0.0,0.0,-0.06,1,True,0,0,10688,5344,0.0273,0.193172,CAVIDADE que nao pode fechar
+surface_nets,tubo_oco_20_12,7.918,4145.941,0.9602,0.923447,0.1486,1.0,-4.597,1,True,0,0,10688,5344,0.0195,0.193172,CAVIDADE que nao pode fechar
+flying_edges,tubo_oco_20_12,8.281,4431.275,1.0,1.0,0.0,0.0,-0.233,1,True,0,0,10688,5344,0.0348,0.193172,CAVIDADE que nao pode fechar
+sdf,tubo_oco_20_12,8.283,4489.465,1.0,1.0,0.0,0.0,-0.2,1,True,0,0,10688,5344,0.0445,0.193168,CAVIDADE que nao pode fechar
+mc_windowed_sinc,tubo_oco_20_12,8.281,4431.24,1.0,1.0,0.0,0.0,-0.232,1,True,0,0,10688,5344,0.0331,0.193172,CAVIDADE que nao pode fechar
+mc_sigma1_taubin4,tubo_oco_20_12,8.115,4289.345,0.9919,0.98393,0.0209,0.0,-2.228,1,True,0,0,10656,5328,0.0251,0.192592,CAVIDADE que nao pode fechar
+LOD_decim50,tubo_oco_20_12,8.276,4487.511,1.0,1.0,0.0,0.0,-0.288,1,True,0,0,5344,2672,0.0101,0.096976,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,tubo_oco_20_12,8.277,4484.395,0.9999,0.9998,0.0003,0.0,-0.276,1,True,0,0,2672,1336,0.0106,0.04888,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,tubo_oco_20_12,8.108,4483.185,0.9892,0.978631,0.0403,0.0,-2.312,1,True,0,0,1068,534,0.0105,0.020004,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,esfera_cavidade_20_10,4.656,1630.15,1.0,1.0,0.0,0.0,27.433,2,True,0,0,4768,2388,0.0189,0.086656,cavidade interna
+mc_taubin0,esfera_cavidade_20_10,4.653,1712.119,1.0,1.0,0.0,0.0,27.331,2,True,0,0,4768,2388,0.0139,0.086656,cavidade interna
+mc_taubin2,esfera_cavidade_20_10,4.654,1659.029,1.0,1.0,0.0,0.0,27.378,2,True,0,0,4768,2388,0.0125,0.086652,cavidade interna
+mc_taubin8,esfera_cavidade_20_10,4.661,1601.822,1.0,1.0,0.0,0.0,27.554,2,True,0,0,4768,2388,0.0147,0.086656,cavidade interna
+mc_taubin12,esfera_cavidade_20_10,4.665,1589.496,1.0,1.0,0.0,0.0,27.678,2,True,0,0,4768,2388,0.0145,0.086656,cavidade interna
+mc_taubin20,esfera_cavidade_20_10,4.675,1580.169,1.0,1.0,0.0,0.0,27.93,2,True,0,0,4768,2388,0.0109,0.086656,cavidade interna
+surface_nets,esfera_cavidade_20_10,4.213,1439.414,0.9398,0.886437,0.3487,1.0,15.298,2,True,0,0,4776,2392,0.0139,0.0868,cavidade interna
+flying_edges,esfera_cavidade_20_10,4.653,1575.736,1.0,1.0,0.0,0.0,27.346,2,True,0,0,4768,2388,0.015,0.086656,cavidade interna
+sdf,esfera_cavidade_20_10,4.656,1630.15,1.0,1.0,0.0,0.0,27.433,2,True,0,0,4768,2388,0.0143,0.086656,cavidade interna
+mc_windowed_sinc,esfera_cavidade_20_10,4.653,1575.736,1.0,1.0,0.0,0.0,27.346,2,True,0,0,4768,2388,0.0137,0.086656,cavidade interna
+mc_sigma1_taubin4,esfera_cavidade_20_10,4.465,1509.364,0.9785,0.957905,0.12,1.0,22.199,2,True,0,0,4480,2244,0.0115,0.081472,cavidade interna
+LOD_decim50,esfera_cavidade_20_10,4.656,1627.875,0.9995,0.999,0.0032,0.0,27.414,2,False,0,2,2384,1196,0.0031,0.043744,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,esfera_cavidade_20_10,4.647,1613.477,0.9952,0.990446,0.0269,0.0,27.176,2,False,0,3,1192,600,0.0036,0.022284,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,esfera_cavidade_20_10,4.59,1587.159,0.9831,0.966762,0.0967,1.0,25.622,2,False,0,1,476,242,0.005,0.009392,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,bifurcacao_d8,4.335,2367.632,1.0,1.0,0.0,0.0,-0.94,1,True,0,0,6120,3062,0.0138,0.110968,"juncao, alta curvatura"
+mc_taubin0,bifurcacao_d8,4.328,2437.738,1.0,1.0,0.0,0.0,-1.101,1,True,0,0,6120,3062,0.0146,0.110968,"juncao, alta curvatura"
+mc_taubin2,bifurcacao_d8,4.331,2392.284,1.0,1.0,0.0,0.0,-1.021,1,True,0,0,6120,3062,0.0165,0.110968,"juncao, alta curvatura"
+mc_taubin8,bifurcacao_d8,4.342,2343.884,1.0,1.0,0.0,0.0,-0.776,1,True,0,0,6120,3062,0.0219,0.110968,"juncao, alta curvatura"
+mc_taubin12,bifurcacao_d8,4.349,2334.138,1.0,1.0,0.0,0.0,-0.611,1,True,0,0,6120,3062,0.0183,0.110972,"juncao, alta curvatura"
+mc_taubin20,bifurcacao_d8,4.364,2328.396,1.0,1.0,0.0,0.0,-0.277,1,True,0,0,6120,3062,0.0206,0.110972,"juncao, alta curvatura"
+surface_nets,bifurcacao_d8,3.581,2051.352,0.9032,0.823487,0.3697,1.0,-18.165,1,True,0,0,6124,3064,0.0164,0.111044,"juncao, alta curvatura"
+flying_edges,bifurcacao_d8,4.328,2319.206,1.0,1.0,0.0,0.0,-1.106,1,True,0,0,6120,3062,0.0152,0.110968,"juncao, alta curvatura"
+sdf,bifurcacao_d8,4.335,2367.632,1.0,1.0,0.0,0.0,-0.94,1,True,0,0,6120,3062,0.0245,0.110968,"juncao, alta curvatura"
+mc_windowed_sinc,bifurcacao_d8,4.328,2318.954,1.0,1.0,0.0,0.0,-1.1,1,True,0,0,6120,3062,0.015,0.110968,"juncao, alta curvatura"
+mc_sigma1_taubin4,bifurcacao_d8,4.021,2193.877,0.9788,0.95848,0.0803,1.0,-8.12,1,True,0,0,5992,2998,0.0235,0.108668,"juncao, alta curvatura"
+LOD_decim50,bifurcacao_d8,4.318,2369.519,1.0,1.0,0.0,0.0,-1.329,1,True,0,0,3060,1532,0.0035,0.055888,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,bifurcacao_d8,4.274,2376.122,0.9968,0.99362,0.0132,0.0,-2.334,1,False,0,1,1530,767,0.0056,0.028344,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,bifurcacao_d8,4.061,2365.091,0.9669,0.935921,0.1375,1.0,-7.19,1,True,0,0,612,308,0.0049,0.01182,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,dois_cilindros_contato,4.782,2232.077,1.0,1.0,0.0,0.0,-0.795,2,True,0,0,5328,2668,0.0131,0.096736,FUSAO de estruturas
+mc_taubin0,dois_cilindros_contato,4.775,2255.702,1.0,1.0,0.0,0.0,-0.927,2,True,0,0,5328,2668,0.0104,0.096736,FUSAO de estruturas
+mc_taubin2,dois_cilindros_contato,4.778,2240.389,1.0,1.0,0.0,0.0,-0.862,2,True,0,0,5328,2668,0.0154,0.09674,FUSAO de estruturas
+mc_taubin8,dois_cilindros_contato,4.788,2223.468,1.0,1.0,0.0,0.0,-0.659,2,True,0,0,5328,2668,0.0154,0.096736,FUSAO de estruturas
+mc_taubin12,dois_cilindros_contato,4.795,2218.848,1.0,1.0,0.0,0.0,-0.52,2,True,0,0,5328,2668,0.0108,0.096736,FUSAO de estruturas
+mc_taubin20,dois_cilindros_contato,4.808,2213.929,1.0,1.0,0.0,0.0,-0.24,2,True,0,0,5328,2668,0.0161,0.096736,FUSAO de estruturas
+surface_nets,dois_cilindros_contato,4.134,1959.143,0.9241,0.858909,0.3537,1.0,-14.228,2,True,0,0,5336,2672,0.015,0.09688,FUSAO de estruturas
+flying_edges,dois_cilindros_contato,4.776,2207.938,1.0,1.0,0.0,0.0,-0.923,2,True,0,0,5328,2668,0.0129,0.096736,FUSAO de estruturas
+sdf,dois_cilindros_contato,4.782,2232.077,1.0,1.0,0.0,0.0,-0.795,2,True,0,0,5328,2668,0.0176,0.096736,FUSAO de estruturas
+mc_windowed_sinc,dois_cilindros_contato,4.776,2207.938,1.0,1.0,0.0,0.0,-0.923,2,True,0,0,5328,2668,0.0129,0.096736,FUSAO de estruturas
+mc_sigma1_taubin4,dois_cilindros_contato,4.655,1955.405,0.9814,0.963479,0.1019,1.0,-3.421,1,True,0,0,5064,2534,0.0113,0.09196,FUSAO de estruturas
+LOD_decim50,dois_cilindros_contato,4.769,2233.063,1.0,1.0,0.0,0.0,-1.05,2,True,0,0,2664,1336,0.0031,0.048784,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,dois_cilindros_contato,4.75,2238.241,0.9998,0.9996,0.0006,0.0,-1.456,2,True,0,0,1332,670,0.0039,0.024804,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,dois_cilindros_contato,4.572,2245.661,0.9851,0.970638,0.0762,1.0,-5.15,2,True,0,0,532,270,0.0051,0.010404,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,duas_estruturas_gap2,1.012,649.526,1.0,1.0,0.0,0.0,-1.726,2,True,0,0,1936,972,0.0051,0.03568,"2 componentes, gap 2 mm"
+mc_taubin0,duas_estruturas_gap2,1.01,680.154,1.0,1.0,0.0,0.0,-1.974,2,True,0,0,1936,972,0.0046,0.03568,"2 componentes, gap 2 mm"
+mc_taubin2,duas_estruturas_gap2,1.011,660.45,1.0,1.0,0.0,0.0,-1.871,2,True,0,0,1936,972,0.0076,0.03568,"2 componentes, gap 2 mm"
+mc_taubin8,duas_estruturas_gap2,1.016,638.157,1.0,1.0,0.0,0.0,-1.402,2,True,0,0,1936,972,0.0074,0.035676,"2 componentes, gap 2 mm"
+mc_taubin12,duas_estruturas_gap2,1.019,632.895,1.0,1.0,0.0,0.0,-1.083,2,True,0,0,1936,972,0.0062,0.035676,"2 componentes, gap 2 mm"
+mc_taubin20,duas_estruturas_gap2,1.025,629.227,1.0,1.0,0.0,0.0,-0.495,2,True,0,0,1936,972,0.0056,0.03568,"2 componentes, gap 2 mm"
+surface_nets,duas_estruturas_gap2,0.744,503.467,0.8295,0.708672,0.6471,1.0,-27.792,2,True,0,0,1944,976,0.0058,0.035824,"2 componentes, gap 2 mm"
+flying_edges,duas_estruturas_gap2,1.012,624.344,1.0,1.0,0.0,0.0,-1.701,2,True,0,0,1936,972,0.0072,0.03568,"2 componentes, gap 2 mm"
+sdf,duas_estruturas_gap2,1.012,649.526,1.0,1.0,0.0,0.0,-1.726,2,True,0,0,1936,972,0.0091,0.03568,"2 componentes, gap 2 mm"
+mc_windowed_sinc,duas_estruturas_gap2,1.012,624.344,1.0,1.0,0.0,0.0,-1.701,2,True,0,0,1936,972,0.0084,0.03568,"2 componentes, gap 2 mm"
+mc_sigma1_taubin4,duas_estruturas_gap2,0.885,564.35,0.9447,0.895196,0.2222,1.0,-14.046,2,True,0,0,1648,828,0.0054,0.030488,"2 componentes, gap 2 mm"
+LOD_decim50,duas_estruturas_gap2,1.011,650.72,0.999,0.998002,0.0045,0.0,-1.799,2,False,0,4,968,488,0.0022,0.018252,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,duas_estruturas_gap2,1.009,647.624,0.9912,0.982554,0.0405,0.0,-2.052,2,False,0,11,484,246,0.0015,0.009536,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,duas_estruturas_gap2,0.978,643.696,0.965,0.932367,0.1506,1.0,-5.036,2,False,0,3,192,100,0.0015,0.00428,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,ponte_fina_gap4,0.963,622.216,1.0,1.0,0.0,0.0,-2.06,1,True,0,0,1720,862,0.0056,0.031768,ponte fina: preservar ou romper
+mc_taubin0,ponte_fina_gap4,0.961,633.651,1.0,1.0,0.0,0.0,-2.221,1,True,0,0,1720,862,0.0058,0.031772,ponte fina: preservar ou romper
+mc_taubin2,ponte_fina_gap4,0.962,625.987,1.0,1.0,0.0,0.0,-2.149,1,True,0,0,1720,862,0.0043,0.031772,ponte fina: preservar ou romper
+mc_taubin8,ponte_fina_gap4,0.965,618.472,1.0,1.0,0.0,0.0,-1.855,1,True,0,0,1720,862,0.0088,0.031764,ponte fina: preservar ou romper
+mc_taubin12,ponte_fina_gap4,0.967,616.52,1.0,1.0,0.0,0.0,-1.629,1,True,0,0,1720,862,0.0049,0.031768,ponte fina: preservar ou romper
+mc_taubin20,ponte_fina_gap4,0.972,614.691,1.0,1.0,0.0,0.0,-1.146,1,True,0,0,1720,862,0.0067,0.031764,ponte fina: preservar ou romper
+surface_nets,ponte_fina_gap4,0.691,483.9,0.8228,0.698947,0.6658,1.0,-29.718,1,True,0,0,1724,864,0.0053,0.03184,ponte fina: preservar ou romper
+flying_edges,ponte_fina_gap4,0.959,610.083,1.0,1.0,0.0,0.0,-2.434,1,True,0,0,1720,862,0.0054,0.031764,ponte fina: preservar ou romper
+sdf,ponte_fina_gap4,0.963,622.216,1.0,1.0,0.0,0.0,-2.06,1,True,0,0,1720,862,0.006,0.031768,ponte fina: preservar ou romper
+mc_windowed_sinc,ponte_fina_gap4,0.959,610.642,1.0,1.0,0.0,0.0,-2.395,1,True,0,0,1720,862,0.0066,0.031768,ponte fina: preservar ou romper
+mc_sigma1_taubin4,ponte_fina_gap4,0.841,547.134,0.9691,0.940052,0.1403,1.0,-14.465,2,True,0,0,1664,836,0.01,0.030784,ponte fina: preservar ou romper
+LOD_decim50,ponte_fina_gap4,0.959,623.405,1.0,1.0,0.0,0.0,-2.455,1,False,0,1,860,432,0.0015,0.016284,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,ponte_fina_gap4,0.955,623.092,0.9985,0.997004,0.0071,0.0,-2.871,1,False,0,2,430,218,0.0017,0.008556,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,ponte_fina_gap4,0.934,623.532,0.9747,0.950649,0.1114,1.0,-4.962,2,True,0,0,172,90,0.0014,0.00392,DERIVADA do MASTER (10% das faces) — nao substitui
+MASTER_mc_taubin4,cortada_d20,3.471,1191.863,1.0,1.0,0.0,0.0,-0.449,1,True,0,0,3208,1606,0.0074,0.058548,superficie ABERTA no corte
+mc_taubin0,cortada_d20,3.469,1230.777,1.0,1.0,0.0,0.0,-0.526,1,True,0,0,3208,1606,0.0088,0.058552,superficie ABERTA no corte
+mc_taubin2,cortada_d20,3.47,1205.359,1.0,1.0,0.0,0.0,-0.487,1,True,0,0,3208,1606,0.0118,0.058548,superficie ABERTA no corte
+mc_taubin8,cortada_d20,3.474,1178.734,1.0,1.0,0.0,0.0,-0.373,1,True,0,0,3208,1606,0.0093,0.058552,superficie ABERTA no corte
+mc_taubin12,cortada_d20,3.477,1172.896,1.0,1.0,0.0,0.0,-0.296,1,True,0,0,3208,1606,0.0119,0.058552,superficie ABERTA no corte
+mc_taubin20,cortada_d20,3.482,1168.379,1.0,1.0,0.0,0.0,-0.138,1,True,0,0,3208,1606,0.0124,0.058552,superficie ABERTA no corte
+surface_nets,cortada_d20,3.166,1074.786,0.9575,0.918465,0.2729,1.0,-9.215,1,True,0,0,3212,1608,0.0089,0.058624,superficie ABERTA no corte
+flying_edges,cortada_d20,3.468,1166.058,1.0,1.0,0.0,0.0,-0.55,1,True,0,0,3208,1606,0.0114,0.058552,superficie ABERTA no corte
+sdf,cortada_d20,3.471,1191.863,1.0,1.0,0.0,0.0,-0.449,1,True,0,0,3208,1606,0.014,0.058548,superficie ABERTA no corte
+mc_windowed_sinc,cortada_d20,3.468,1165.914,1.0,1.0,0.0,0.0,-0.548,1,True,0,0,3208,1606,0.01,0.058548,superficie ABERTA no corte
+mc_sigma1_taubin4,cortada_d20,3.348,1123.604,0.9926,0.985309,0.0381,1.0,-3.977,1,True,0,0,3176,1590,0.0082,0.057976,superficie ABERTA no corte
+LOD_decim50,cortada_d20,3.471,1192.004,0.9999,0.9998,0.0005,0.0,-0.466,1,True,0,0,1604,804,0.002,0.029672,DERIVADA do MASTER (50% das faces) — nao substitui
+LOD_decim25,cortada_d20,3.468,1191.716,0.9994,0.998801,0.0027,0.0,-0.534,1,True,0,0,802,403,0.0022,0.01524,DERIVADA do MASTER (25% das faces) — nao substitui
+LOD_decim10,cortada_d20,3.459,1186.835,0.9927,0.985506,0.0498,0.35,-0.815,1,True,0,0,320,162,0.0033,0.00656,DERIVADA do MASTER (10% das faces) — nao substitui

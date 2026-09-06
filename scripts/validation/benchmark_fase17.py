@@ -45,7 +45,7 @@ BRUTO = Path(".clinica-dados/overnight/fase17")
 
 COLUNAS = [
     "variant", "structure", "volume_ml", "surface_area_mm2", "dice", "iou",
-    "assd_mm", "hd95_mm", "components", "watertight", "boundary_edges",
+    "assd_mm", "hd95_mm", "volume_error_pct", "components", "watertight", "boundary_edges",
     "nonmanifold_edges", "triangles", "vertices", "processing_time_s",
     "glb_size_mb", "notes",
 ]
@@ -161,11 +161,19 @@ def _linha(variante: str, estrutura: str, mesh, mask, affine, dt: float,
 
     try:
         cmp_ = MM.comparar_mascara_malha(mask, mesh, affine)
-        for csv_key, m_key in (("dice", "dice"), ("iou", "iou"),
-                               ("assd_mm", "assd_mm"), ("hd95_mm", "hd95_mm"),
-                               ("volume_ml", "volume_malha_ml")):
+        # Nomes REAIS do modulo. A primeira versao pediu "iou" e "volume_malha_ml",
+        # que nao existem — o `.get` devolveu None em silencio e duas das OITO
+        # metricas congeladas pela ESOPHAGUS_ONTOLOGY_V1 sumiram do CSV sem erro.
+        for csv_key, m_key in (("dice", "dice"), ("assd_mm", "assd_mm"),
+                               ("hd95_mm", "hd95_mm"),
+                               ("volume_error_pct", "volume_error_pct"),
+                               ("volume_ml", "volume_mesh_ml")):
             v2 = cmp_.get(m_key)
             L[csv_key] = round(v2, 6) if isinstance(v2, (int, float)) else ""
+        # IoU nao e devolvido pelo modulo. Para DUAS mascaras binarias sobre a mesma
+        # grade ele e funcao exata do Dice: IoU = D / (2 - D). Nao e aproximacao.
+        if isinstance(L["dice"], float):
+            L["iou"] = round(L["dice"] / (2.0 - L["dice"]), 6)
         if not L["volume_ml"]:
             L["volume_ml"] = round(MM.volume_ml(mesh), 6)
     except Exception as e:
@@ -286,6 +294,12 @@ def _autoteste() -> None:
     L = _linha("teste", "esfera", res.mesh, mask, affine, 0.0, "")
     for c in ("components", "boundary_edges", "watertight"):
         assert L[c] != "", f"coluna {c} saiu vazia — chave de topologia errada?"
+    # CONTROLE DAS METRICAS CONGELADAS: a ESOPHAGUS_ONTOLOGY_V1 congelou oito, e
+    # duas delas (iou, volume_error_pct) sumiram em silencio da primeira versao.
+    for c in ("dice", "iou", "assd_mm", "hd95_mm", "volume_error_pct", "volume_ml"):
+        assert L[c] != "", f"metrica congelada ausente do CSV: {c}"
+    # IoU = D/(2-D) e identidade, nao aproximacao — confere contra o Dice.
+    assert abs(L["iou"] - L["dice"] / (2.0 - L["dice"])) < 1e-9
     # CONTROLE DO SURFACE NETS: ele ignora o filtro de malha; se um dia passar a
     # respeitar, este assert cai e o benchmark precisa de duas variantes de novo.
     s1 = R.reconstruct_surface(mask, affine, method="surface_nets", sigma_mm=0.0,

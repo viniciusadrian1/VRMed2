@@ -1,6 +1,6 @@
 # Fase 17 — benchmark profundo de reconstrução 3D
 
-Data: 2026-09-06 · 182 medições · 14 variantes × 13 fantomas · Nada treinado
+Data: 2026-09-06 · 182 medições · 14 variantes × 13 fantomas · 8/8 métricas congeladas · Nada treinado
 
 > **MASTER: MANTIDO.** Nenhuma variante o supera onde importa. Três variantes ficam
 > **empatadas** dentro do ruído no volume analítico e **perdem** em outra dimensão;
@@ -135,6 +135,26 @@ mesma coisa duas vezes. O autoteste agora tem um controle que falha se o comport
 **INFERÊNCIA.** Toda a §3 desta fase teria sido escrita sobre colunas vazias. O autoteste
 agora exige que essas colunas venham preenchidas num caso conhecido.
 
+### 4.3 Terceiro achado de instrumento — duas métricas congeladas sumiram
+
+**FATO.** O CSV saiu com as colunas `iou` e `volume_error_pct` **vazias**. Causa: pedi ao
+módulo as chaves `iou` e `volume_malha_ml`, que **não existem** — os nomes reais são
+`volume_mesh_ml` e `volume_error_pct`, e **IoU o módulo não fornece**. Outra vez, `dict.get`
+devolveu `None` em silêncio.
+
+**INFERÊNCIA — e é o ponto.** A `ESOPHAGUS_ONTOLOGY_V1`, congelada há três horas na Fase 13,
+lista **oito** métricas. Este benchmark, escrito depois dela, **entregou seis**. Congelar uma
+lista num documento não impede um instrumento de ignorá-la.
+
+**Correção:** `volume_error_pct` lido da chave certa; **IoU calculado por identidade** —
+para duas máscaras binárias na mesma grade, `IoU = D / (2 − D)` exatamente, não por
+aproximação. O autoteste agora exige as seis colunas de fidelidade preenchidas e confere a
+identidade IoU↔Dice.
+
+**RECOMENDAÇÃO.** A suíte da ontologia deveria ganhar um teste que varre os CSV publicados e
+falha quando uma métrica congelada não aparece. Não foi feito nesta execução — fica
+registrado como dívida.
+
 ## 5. Derivadas — LOD (decimação sobre o MASTER)
 
 **Regra respeitada: aplicadas SOBRE a malha do MASTER, nunca no lugar dela.**
@@ -223,6 +243,6 @@ CANDIDATAS: mc_taubin8/12/20 (troca desfavorável para estrutura fina) — nenhu
 REJEITADAS POR MEDIÇÃO: mc_sigma1 (funde e rompe topologia), surface_nets (−71,7% em estrutura pequena)
 LOD: 50% aceitável; 25% exige verificação; 10% rompe ponte fina
 DRACO: medição incompleta, registrada como tal
-ACHADOS DE INSTRUMENTO: 2 (surface_nets medido duas vezes; 3 colunas de topologia vazias por chave errada)
+ACHADOS DE INSTRUMENTO: 3 (surface_nets medido duas vezes; 3 colunas de topologia vazias; 2 metricas congeladas ausentes)
 PRÓXIMO PASSO: repetir a medição do Draco isoladamente, com timeout próprio
 ```
