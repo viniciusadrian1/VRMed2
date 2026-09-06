@@ -141,3 +141,51 @@ poder, ao contrário do que o arm concluiu).
 
 **Bloqueios:** K2 e K3 permanecem. K3 passa a ser registrado como **estrutural**, não pendência
 de busca.
+
+---
+
+## Fases 18–19 — 2026-09-06
+
+| Fase | Estado | Resultado |
+|---|---|---|
+| **18** — auditoria do LyNoS | em curso | ontologia 15/15 · sonda calibrada · licença em apuração |
+| **19** — baseline próprio auditável | infraestrutura CONCLUÍDA | esquema, travas e pré-registro escritos; **dados BLOQUEADOS** |
+
+### Instrumentos novos
+
+| Módulo | Verificações | Falhas |
+|---|---:|---:|
+| `lynos/auditoria.py` | 10 | 0 |
+| `lynos/calibracao.py` | 8 | 0 |
+| `lynos/grade_ct.py` | 5 | 0 |
+| `lynos/adequacao.py` | 6 | 0 |
+| `baseline_v1/manifesto.py` | 24 | 0 |
+| `baseline_v1/plano.py` | 14 | 0 |
+| `baseline_v1/candidatos.py` | 7 | 0 |
+| `tests/test_baseline_v1.py` | 17 | 0 |
+
+### Suítes anteriores — sem regressão
+
+`test_geometria` 10/10 · `test_controles_positivos` 8/8 · `test_ontologia_esofago` 13/13
+`interobservador --mutacao` 21/21 · `estilo_esofago --mutacao` 7/7
+varredura de docs: 39 documentos, **0 violações**
+
+### Split congelado
+
+`sha256` `6e54c02b58bbb9b3a1667d4672eddef6…` · mtime 2026-09-04T21:19:49 · **INTOCADO**
+development 30 · validation 15 · test 15
+
+### Achados de instrumento desta execução
+
+1. **O nulo da sonda geométrica estava deflacionado.** Embaralhava `y` e `x` de casos
+   diferentes, gerando alvos retangulares contra um pool 75 % quadrado. Dava 0,041
+   esperado em 15 e transformava 2 acertos em "sinal de 50×". O nulo por bloco dá
+   **0,931** e **p = 0,229** — sem excesso sobre o acaso.
+2. **Uma premissa não verificada virou verificação.** A sonda lê o cabeçalho da máscara
+   em vez do da TC; isso só vale se as duas moram na mesma grade. Confirmado 15/15 por
+   Range HTTP, 240 KiB em vez de ~3 GB.
+3. **Guarda olhando o campo errado.** O teste que proíbe ler TEST fora de `avaliacao`
+   procurava a declaração em `nota`; ela mora em `cmd`.
+4. **Um bloqueio residual foi confundido com defeito.** O contrafactual "e se a licença
+   fosse resolvida?" revelou que o LyNoS **continua** barrado por falta de
+   `image_sha256`. Era achado, não bug.
