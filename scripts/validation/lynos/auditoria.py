@@ -107,7 +107,14 @@ def medir_mascara(caminho: Path) -> dict:
         "spacing_mm": [round(v, 4) for v in zoom],
         "orientacao": "".join(nib.aff2axcodes(img.affine)),
         "valores_unicos": [float(v) for v in vals.tolist()],
-        "binaria": bool(set(vals.tolist()) <= {0, 1}),
+        # BINARIA = no maximo DOIS valores distintos, um deles 0. NAO exige {0,1}.
+        # A primeira versao exigia {0,1} e reprovava as 60 mascaras do LCTSC — que
+        # usam {0,255}, a convencao de foreground DO PROPRIO PROJETO
+        # (dataset_esofago.FOREGROUND = 255, herdada do dcmrtstruct2nii, lida com
+        # limiar > 0.5). Ou seja: o validador do funil rejeitaria o dado que o
+        # projeto ja usa. Achado ao medir o GT do split congelado, nao por revisao.
+        "binaria": bool(len(vals) <= 2 and 0 in set(vals.tolist())),
+        "valor_de_foreground": (float(max(vals.tolist())) if len(vals) else 0.0),
         "voxels_positivos": n_pos,
         "mascara_vazia": n_pos == 0,
         "volume_mm3": round(n_pos * vox_mm3, 1),
@@ -350,13 +357,32 @@ def autoteste() -> int:
     finally:
         tmp2.unlink(missing_ok=True)
 
-    # 6. a ontologia usada aqui e a congelada, nao uma copia divergente
+    # 6. CONVENCAO DE FOREGROUND: 0/255 e a do projeto (dataset_esofago.FOREGROUND)
+    #    e TEM de passar. 0/1 tambem. Tres valores distintos NAO.
+    import numpy as _np
+    for valores, esperado, rotulo in (((0, 1), True, "0/1"),
+                                      ((0, 255), True, "0/255 — convencao do projeto"),
+                                      ((0, 1, 2), False, "tres rotulos"),
+                                      ((0,), True, "so fundo")):
+        arr = _np.zeros((8, 8, 4), dtype=_np.uint8)
+        for i, v in enumerate(valores[1:], start=1):
+            arr[i, i, :] = v
+        t = Path(__file__).parent / "_autoteste_bin.nii.gz"
+        nib.save(nib.Nifti1Image(arr, _np.eye(4)), str(t))
+        try:
+            got = medir_mascara(t)["binaria"]
+            if got != esperado:
+                falhas.append("binaria(%s) deu %s, esperado %s" % (rotulo, got, esperado))
+        finally:
+            t.unlink(missing_ok=True)
+
+    # 7. a ontologia usada aqui e a congelada, nao uma copia divergente
     if onto.VERSAO != "ESOPHAGUS_ONTOLOGY_V1":
         falhas.append("ontologia importada nao e a V1: " + onto.VERSAO)
 
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste: %d verificacoes, %d falhas" % (10, len(falhas)))
+    print("autoteste: %d verificacoes, %d falhas" % (14, len(falhas)))
     return 1 if falhas else 0
 
 
@@ -421,7 +447,10 @@ def main(argv=None) -> int:
     print("ONTOLOGIA:  %d/%d compativeis (SIM)" % (compat, len(linhas)))
     print("SONDA:      match exato %d/%d  |  match tol+-2 %d/%d"
           % (n_exato, len(linhas), n_tol, len(linhas)))
-    print("NULO:       esperado por acaso  exato %.3f  tol+-2 %.3f  (%d sorteios)"
+    print("NULO:       [SUPERADO — ver lynos/calibracao.py] este nulo embaralha y e x de")
+    print("            casos DIFERENTES e sai deflacionado. O correto (permutacao por")
+    print("            bloco) da 0,931 esperado e p = 0,229. Use aquele, nao este.")
+    print("NULO(velho):esperado por acaso  exato %.3f  tol+-2 %.3f  (%d sorteios)"
           % (cal["esperado_exato_em_n"], cal["esperado_tol2_em_n"], cal["n_sorteios"]))
     print("PODER:      %.2f por membro (limite declarado da Fase 16)"
           % cal["poder_por_membro_declarado"])

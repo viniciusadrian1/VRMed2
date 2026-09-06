@@ -137,3 +137,5 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 20:10 | `fase20.stopstorm` | **arm REFUTADO**: `ROIGenerationAlgorithm` VAZIO em 93/93 ROIs; label `AutoSS`, fabricante `Plastimatch`; `case_id`='NOID' nos tres |
 | 20:25 | PDF do benchmark STOPSTORM (0,96 MB) | *"delete our temporary contours from the templates"* |
 | 20:30 | fatias por ROI | **1 fatia em 31/31 ROIs, 3/3 casos** — sao templates, nao segmentacoes. STOPSTORM cai para **F** |
+| 20:50 | ontologia no GT do split congelado | **60/60 LCTSC preenchidas, buracos 0,0000 %** — lacuna que o critico nomeou, fechada |
+| 20:55 | bug proprio | `binaria` exigia {0,1} e reprovava as 60 do LCTSC, que usam {0,255} — a convencao do PROPRIO projeto |

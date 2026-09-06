@@ -1,0 +1,482 @@
+[
+ {
+  "caso": "LCTSC-Test-S1-101",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 27.669,
+  "extensao_axial_mm": 222.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S1-102",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 32.189,
+  "extensao_axial_mm": 231.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S1-103",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 46.638,
+  "extensao_axial_mm": 249.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S1-104",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 34.155,
+  "extensao_axial_mm": 249.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S1-201",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 27.351,
+  "extensao_axial_mm": 201.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S1-202",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 42.043,
+  "extensao_axial_mm": 243.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S1-203",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 43.073,
+  "extensao_axial_mm": 216.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S1-204",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 27.789,
+  "extensao_axial_mm": 150.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-101",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 60.921,
+  "extensao_axial_mm": 252.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-102",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 37.467,
+  "extensao_axial_mm": 242.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-103",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 45.636,
+  "extensao_axial_mm": 212.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-104",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 39.551,
+  "extensao_axial_mm": 212.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-201",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 41.079,
+  "extensao_axial_mm": 200.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-202",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 26.169,
+  "extensao_axial_mm": 220.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-203",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 39.792,
+  "extensao_axial_mm": 197.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S2-204",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 30.999,
+  "extensao_axial_mm": 210.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-101",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 62.106,
+  "extensao_axial_mm": 212.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-102",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 55.246,
+  "extensao_axial_mm": 240.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-103",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 46.567,
+  "extensao_axial_mm": 207.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-104",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 56.26,
+  "extensao_axial_mm": 260.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-201",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 44.89,
+  "extensao_axial_mm": 200.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-202",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 40.152,
+  "extensao_axial_mm": 219.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-203",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 54.996,
+  "extensao_axial_mm": 230.0,
+  "n_componentes_3d": 2,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Test-S3-204",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 54.295,
+  "extensao_axial_mm": 237.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-001",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 44.835,
+  "extensao_axial_mm": 231.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-002",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 24.548,
+  "extensao_axial_mm": 255.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-003",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 61.938,
+  "extensao_axial_mm": 270.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-004",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 43.539,
+  "extensao_axial_mm": 264.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-005",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 26.808,
+  "extensao_axial_mm": 225.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-006",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 34.721,
+  "extensao_axial_mm": 222.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-007",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 24.199,
+  "extensao_axial_mm": 231.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-008",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 33.188,
+  "extensao_axial_mm": 219.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-009",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 49.284,
+  "extensao_axial_mm": 246.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-010",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 30.988,
+  "extensao_axial_mm": 180.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-011",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 55.361,
+  "extensao_axial_mm": 228.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S1-012",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 37.56,
+  "extensao_axial_mm": 186.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-001",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 51.005,
+  "extensao_axial_mm": 232.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-002",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 35.97,
+  "extensao_axial_mm": 207.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-003",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 51.1,
+  "extensao_axial_mm": 245.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-004",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 45.28,
+  "extensao_axial_mm": 260.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-005",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 33.867,
+  "extensao_axial_mm": 210.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-006",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 46.012,
+  "extensao_axial_mm": 217.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-007",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 37.632,
+  "extensao_axial_mm": 222.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-008",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 57.979,
+  "extensao_axial_mm": 232.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-009",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 40.2,
+  "extensao_axial_mm": 232.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-010",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 32.165,
+  "extensao_axial_mm": 212.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-011",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 35.036,
+  "extensao_axial_mm": 252.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S2-012",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 29.736,
+  "extensao_axial_mm": 217.5,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-001",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 30.762,
+  "extensao_axial_mm": 230.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-002",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 55.897,
+  "extensao_axial_mm": 247.5,
+  "n_componentes_3d": 2,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-003",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 90.574,
+  "extensao_axial_mm": 238.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-004",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 43.261,
+  "extensao_axial_mm": 248.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-005",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 32.693,
+  "extensao_axial_mm": 216.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-006",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 41.133,
+  "extensao_axial_mm": 198.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-007",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 34.209,
+  "extensao_axial_mm": 231.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-008",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 48.256,
+  "extensao_axial_mm": 244.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-009",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 39.518,
+  "extensao_axial_mm": 216.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-010",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 45.879,
+  "extensao_axial_mm": 228.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-011",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 57.04,
+  "extensao_axial_mm": 219.0,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ },
+ {
+  "caso": "LCTSC-Train-S3-012",
+  "buracos_2d_pct": 0.0,
+  "volume_ml": 29.204,
+  "extensao_axial_mm": 198.8,
+  "n_componentes_3d": 1,
+  "ontology_compatible": "PARCIAL"
+ }
+]
