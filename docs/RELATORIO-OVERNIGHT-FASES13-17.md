@@ -18,7 +18,7 @@ medição — e continua com o treino bloqueado, agora por um motivo mais bem ca
 | **14** — Prontidão | **C** | cenário C · K1, K2, K3 bloqueados por razões independentes |
 | **15** — Teste independente | **B** (parcial) | **LyNoS** — 79 candidatos, 230 consultas · classe E |
 | **16** — Independência | *em curso* | auditoria do TotalSegmentator v2 dataset a dataset |
-| **17** — Reconstrução | **A** | **MASTER MANTIDO** · 182 medições · 4 achados de instrumento |
+| **17** — Reconstrução | **A** | **MASTER MANTIDO** · 182 medições em fantoma + 44 em anatomia real · 4 achados de instrumento |
 
 **Nove achados de instrumento** ao longo da noite — sete deles erro do próprio trabalho desta
 execução, todos encontrados por controle positivo e todos corrigidos. É o número que melhor
@@ -171,6 +171,27 @@ introduz arestas não-manifold que a extração não tinha; LOD 10 % rompe a pon
 **Draco: 7,74×–13,20× de compressão por erro de vértice de 0,00099–0,00328 mm** — micrômetros,
 três ordens de grandeza abaixo do piso de resolução da grade.
 
+## Anatomia real — 44 medições em quatro calibres
+
+**FATO.** O caso `cta-cardio` está **fora de todo split congelado**. Quatro calibres:
+esôfago 25,3 · traqueia 46,6 · aorta 132,3 · coração 494,5 mL.
+
+**O achado.** O erro de volume é **monotônico no tamanho da estrutura, em 11 de 11 variantes,
+sem uma única inversão**, e sempre **negativo** — toda extração subestima.
+
+| MASTER | esôfago | traqueia | aorta | coração |
+|---|---:|---:|---:|---:|
+| erro de volume | **−0,450 %** | −0,199 % | −0,160 % | −0,040 % |
+
+**INFERÊNCIA.** É função da razão superfície/volume, não do método: objeto pequeno tem mais
+fronteira por unidade de volume, e é na fronteira que a discretização cobra. **O esôfago é o
+pior caso entre as estruturas reais do projeto — 11× o erro do coração.**
+
+**E Surface Nets quebra watertight nas quatro estruturas, sem exceção** (8/8/4/4 arestas
+não-manifold), com −0,78 % a −7,05 % de volume. Nos fantomas ele só perdia volume; em anatomia
+real quebra a topologia. Uma malha não-watertight **não tem volume definido** — e o VRmed
+publica volume.
+
 # O que mudou no VRmed
 
 1. **`ESOPHAGUS_ONTOLOGY_V1` existe e é normativa** — em duas formas que a suíte obriga a
@@ -179,7 +200,7 @@ três ordens de grandeza abaixo do piso de resolução da grade.
    com a ontologia foi **medida**.
 3. **O MASTER de reconstrução ganhou justificativa quantitativa** — antes era decisão
    congelada; agora `σ=0` e `Taubin=4` têm o número que os sustenta e o número que rejeita as
-   alternativas.
+   alternativas, **em fantoma com resposta fechada e em anatomia real**.
 4. **Draco passou de "lossy, não medido nesta escala" para 7,7×–13,2× com perda em
    micrômetros.**
 5. **Cinco instrumentos novos** com autoteste: `ontologia_esofago.py`, `benchmark_fase17.py`,
@@ -205,6 +226,8 @@ três ordens de grandeza abaixo do piso de resolução da grade.
 | Surface Nets perde 71,7 % do volume em estrutura de 6 mm | Fase 17 §4 |
 | Draco: 7,7×–13,2× por 0,0009–0,0033 mm | Fase 17 §6 |
 | Mais Taubin melhora o grande e piora o fino, monotonicamente | Fase 17 §2.1 |
+| **O erro de volume escala com o tamanho da estrutura em 11/11 variantes** — o esôfago é o pior caso real | Fase 17 §6-bis |
+| Surface Nets quebra watertight nas 4 estruturas reais | Fase 17 §6-bis |
 | `tubo_fino_d2_aniso` não fecha em 14/14 variantes — limite sub-voxel | Fase 17 §3.3 |
 | 230 consultas com fonte, string e data | Fase 15 §4 |
 | 17ª coleção do TCIA fora da API anônima (`OPC-Radiomics`) | Fase 15 §4 |
