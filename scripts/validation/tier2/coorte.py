@@ -151,12 +151,30 @@ def enumerar(raiz: Path = RAIZ, baixar_rtstruct: bool = True, log=print) -> dict
         "bloco_da_decomposicao": "A (segmentacao). Nunca somado a B/C/D.",
         "n_casos": len(casos),
         "instituicoes": sorted({c["instituicao_origem"] for c in casos}),
+        # CORRIGIDO na Fase 16. A versao anterior afirmava que o task `total` foi
+        # treinado "exclusivamente em TCs clinicas do University Hospital Basel, sem
+        # datasets publicos de desafio — o LCTSC nao esta no treino". As tres partes
+        # eram falsas ou indemonstraveis, e o campo se chama PROVENIENCIA: era o
+        # ultimo lugar do repositorio que ainda EMITIA a afirmacao, por maquina.
+        # A correcao fica no GERADOR, e nao so no manifest, porque a correcao
+        # equivalente da Fase 9 foi feita so no documento e a regeneracao a desfaria.
         "proveniencia_gt": (
             "RTSTRUCT de contorno de radioterapia do LCTSC (2017), anotacao humana de "
             "tres instituicoes. NAO e saida de TotalSegmentator, de nnU-Net nem de "
-            "pseudo-rotulagem. O task `total` do TotalSegmentator v2 foi treinado "
-            "exclusivamente em TCs clinicas do University Hospital Basel, sem datasets "
-            "publicos de desafio — o LCTSC nao esta no treino."
+            "pseudo-rotulagem. INDEPENDENCIA EM RELACAO AO TREINO DO BASELINE: "
+            "INDETERMINADA. O TotalSegmentator v2 declara 1.559 imagens de treino e o "
+            "autor afirma verbatim que nao publicou os sujeitos adicionais: 420 (26,9%) "
+            "sao nao atribuidos. Nao existe splits_final.json nem lista de casos no "
+            "pacote distribuido, e o modelo publicado e fold=0, entao nem as 1.139 "
+            "imagens publicas sao atribuiveis ao treino efetivo. Sonda geometrica "
+            "calibrada (Fase 16): 3/60 acertos contra nulo de 2,40 (p=0,502) — sem "
+            "excesso sobre o acaso, teto <=4/60 num unico canal. ISSO NAO E PROVA DE "
+            "INDEPENDENCIA: e um teto medido num canal, cego ao canal documental."
+        ),
+        "independencia_gt_vs_treino_do_baseline": "INDETERMINADA",
+        "independencia_teto_medido": (
+            "<=4 de 60 series no canal de forma geometrica; ver "
+            "docs/RELATORIO-FASE16-INDEPENDENCIA-BASELINE.md"
         ),
         "casos": casos,
     }
