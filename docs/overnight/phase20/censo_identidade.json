@@ -20,6 +20,63 @@
   "fracao_que_sumiu": 0.2253,
   "leitura": "UID do IDC NAO e persistente entre versoes: 13081 de 58060 series de versoes anteriores (22.5 %) tem UID ausente do indice corrente. Logo `series_id` e identidade util para detectar vazamento HOJE, e nao e ancora duravel entre releases — o sha256 do conteudo e."
  },
+ "demografia": [
+  {
+   "colecao": "pediatric_ct_seg",
+   "sujeitos": 359,
+   "idade_legivel": 117,
+   "idade_zerada": 0,
+   "fracao_legivel": 0.326,
+   "idade_min": 1.0,
+   "idade_mediana": 6.0,
+   "idade_max": 16.0,
+   "menores_de_18_pct": 100.0,
+   "pediatrica": true
+  },
+  {
+   "colecao": "nsclc_radiomics",
+   "sujeitos": 422,
+   "idade_legivel": 325,
+   "idade_zerada": 0,
+   "fracao_legivel": 0.77,
+   "idade_min": 34.0,
+   "idade_mediana": 67.0,
+   "idade_max": 88.0,
+   "menores_de_18_pct": 0.0,
+   "pediatrica": false
+  },
+  {
+   "colecao": "4d_lung",
+   "sujeitos": 20,
+   "idade_legivel": 0,
+   "idade_zerada": 16,
+   "nota": "PatientAge ausente ou zerado em 16 de 20 sujeitos — artefato de anonimizacao, idade NAO avaliavel nesta colecao"
+  },
+  {
+   "colecao": "lctsc",
+   "sujeitos": 60,
+   "idade_legivel": 19,
+   "idade_zerada": 1,
+   "fracao_legivel": 0.317,
+   "idade_min": 47.0,
+   "idade_mediana": 67.0,
+   "idade_max": 80.0,
+   "menores_de_18_pct": 0.0,
+   "pediatrica": false
+  },
+  {
+   "colecao": "eay131",
+   "sujeitos": 2813,
+   "idade_legivel": 2414,
+   "idade_zerada": 40,
+   "fracao_legivel": 0.858,
+   "idade_min": 5.0,
+   "idade_mediana": 63.0,
+   "idade_max": 89.0,
+   "menores_de_18_pct": 0.2,
+   "pediatrica": false
+  }
+ ],
  "colecoes_esofago": [
   {
    "colecao": "pediatric_ct_seg",

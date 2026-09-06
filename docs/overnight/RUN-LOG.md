@@ -131,3 +131,5 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 18:50 | `fase21.anonimizacao` | 4 eixos; regex de caminho estava cego a `_`; corrigido |
 | 19:05 | verificacao de afirmacao de arm | `nsclc_radiomics_interobserver1`: 5 observadores, **0 esofago** (so GTV) |
 | 19:10 | `estabilidade_de_uid` | **13.081 de 58.060 UIDs (22,5 %) de versoes anteriores sumiram do indice** |
+| 19:40 | `censo_identidade` + demografia | `pediatric_ct_seg` mediana **6 anos, 100 % < 18** — reprovacao por definicao, medida |
+| 19:45 | falso positivo proprio | `000Y` do 4D-Lung marcava a colecao como PEDIATRICA; e artefato de anonimizacao, nao lactente |

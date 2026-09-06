@@ -31,9 +31,11 @@ import argparse
 import csv
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 if __package__ in (None, ""):
@@ -112,6 +114,56 @@ def medir_colecao(ix: pd.DataFrame, col: str) -> dict:
         "versao_corrente_max": int(sub["series_revised_idc_version"].max()),
         "versao_inicial_min": int(sub["series_init_idc_version"].min()),
         "versao_inicial_max": int(sub["series_init_idc_version"].max()),
+    }
+
+
+def _anos(v):
+    """PatientAge do DICOM vem como '006Y', '018M', '003W', '021D'. Nao adivinha."""
+    m = re.match(r"^(\d{1,3})([YMWD])$", str(v).strip().upper())
+    if not m:
+        return None
+    n, u = int(m.group(1)), m.group(2)
+    return {"Y": n, "M": n / 12.0, "W": n / 52.0, "D": n / 365.0}[u]
+
+
+def demografia(ix: pd.DataFrame, col: str) -> dict:
+    """Idade por SUJEITO. Existe para transformar 'e pediatrico' em medida.
+
+    Sob a ESOPHAGUS_ONTOLOGY_V1 o alvo e o esofago TORACICO adulto: os pisos de
+    resolucao da V1 foram calibrados na grade do LCTSC (0,977-1,270 mm no plano,
+    parede de 3-4 mm). Um esofago de crianca de 6 anos nao e o mesmo objeto nessa
+    grade — e isso e reprovacao por DEFINICAO, nao por acesso nem por licenca.
+
+    RESSALVA MEDIDA: PatientAge vem vazio ou zerado em boa parte das colecoes; e
+    artefato de anonimizacao. Onde vier, a fracao legivel entra no resultado.
+    """
+    sub = ix[ix["collection_id"] == col].drop_duplicates("PatientID")
+    brutas = [a for a in (_anos(v) for v in sub["PatientAge"]) if a is not None]
+    # '000Y' NAO e um recem-nascido: e artefato de anonimizacao. Um lactente real
+    # viria em dias, semanas ou meses ('021D', '003W', '006M'), nunca em zero anos.
+    # Sem esta linha o 4D-Lung — 16 sujeitos, todos 000Y, coorte de NSCLC ADULTO —
+    # saia marcado PEDIATRICA, que foi exatamente o falso positivo que apareceu.
+    zerados = sum(1 for a in brutas if a == 0.0)
+    idades = [a for a in brutas if a > 0.0]
+    if not idades:
+        return {"colecao": col, "sujeitos": int(len(sub)), "idade_legivel": 0,
+                "idade_zerada": int(zerados),
+                "nota": ("PatientAge ausente ou zerado em %d de %d sujeitos — artefato "
+                         "de anonimizacao, idade NAO avaliavel nesta colecao"
+                         % (zerados, len(sub)))}
+    a = np.array(idades)
+    return {
+        "colecao": col, "sujeitos": int(len(sub)), "idade_legivel": int(len(a)),
+        "idade_zerada": int(zerados),
+        "fracao_legivel": round(len(a) / max(1, len(sub)), 3),
+        "idade_min": round(float(a.min()), 1),
+        "idade_mediana": round(float(np.median(a)), 1),
+        "idade_max": round(float(a.max()), 1),
+        "menores_de_18_pct": round(100.0 * float((a < 18).mean()), 1),
+        # exige tambem massa de idade utilizavel: uma colecao com 3 idades legiveis
+        # de 300 sujeitos nao sustenta a afirmacao "e pediatrica"
+        "pediatrica": bool((a < 18).mean() > 0.9 and len(a) >= 10
+                           and len(a) / max(1, len(sub)) >= 0.2),
     }
 
 
@@ -204,6 +256,15 @@ def autoteste() -> int:
         falhas.append("tamanho errado: " + str(m["tamanho_GB"]))
 
     # controle NEGATIVO: licenca nao-atribuicao NAO pode ser aceita como aberta
+    # demografia: a fixture tem PatientAge? o autoteste do parser cobre os 4 sufixos
+    for v, esperado in (("006Y", 6.0), ("018M", 1.5), ("052W", 1.0), ("365D", 1.0),
+                        ("000Y", 0.0), ("", None), ("6", None), ("ABC", None)):
+        got = _anos(v)
+        if esperado is None and got is not None:
+            falhas.append("_anos(%r) deveria ser None, deu %r" % (v, got))
+        elif esperado is not None and (got is None or abs(got - esperado) > 0.01):
+            falhas.append("_anos(%r) deu %r, esperado %r" % (v, got, esperado))
+
     m2 = medir_colecao(df, "y")
     if m2["licenca_aberta_atribuicao"]:
         falhas.append("CC BY-NC foi classificada como aberta com atribuicao")
@@ -226,7 +287,7 @@ def autoteste() -> int:
 
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste censo_identidade: %d verificacoes, %d falhas" % (10, len(falhas)))
+    print("autoteste censo_identidade: %d verificacoes, %d falhas" % (17, len(falhas)))
     return 1 if falhas else 0
 
 
@@ -282,6 +343,22 @@ def main(argv=None) -> int:
                  i["series_id"]["presente_em"], i["series_id"]["de"],
                  "UNICO" if i["series_id"]["unico"] else "COM DUPLICATA"))
 
+    print()
+    print("DEMOGRAFIA POR SUJEITO — 'e pediatrico' vira medida")
+    demo = []
+    for col in ESOFAGO:
+        dm = demografia(ix, col)
+        demo.append(dm)
+        if dm.get("idade_legivel"):
+            print("  %-20s n=%-4d idade legivel %3d (%.0f%%)  min %.0f mediana %.0f max %.0f"
+                  "  |  <18 anos: %.0f%%  %s"
+                  % (col, dm["sujeitos"], dm["idade_legivel"], 100 * dm["fracao_legivel"],
+                     dm["idade_min"], dm["idade_mediana"], dm["idade_max"],
+                     dm["menores_de_18_pct"],
+                     "PEDIATRICA" if dm["pediatrica"] else ""))
+        else:
+            print("  %-20s n=%-4d %s" % (col, dm["sujeitos"], dm["nota"]))
+
     est = estabilidade_de_uid()
     print()
     print("ESTABILIDADE DE IDENTIDADE ENTRE VERSOES DO IDC")
@@ -323,6 +400,7 @@ def main(argv=None) -> int:
         "n_colecoes": int(ix["collection_id"].nunique()),
         "licencas_globais": {str(k): int(v) for k, v in tot.items()},
         "estabilidade_de_uid": est,
+        "demografia": demo,
         "colecoes_esofago": medidas,
         "analysis_results": [
             {"analysis_result_id": str(k), "series": int(r["series"]),
