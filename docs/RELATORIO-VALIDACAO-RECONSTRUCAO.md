@@ -663,12 +663,38 @@ Licença: **Creative Commons Attribution 3.0 Unported**,
 registro de série devolvido pela API do TCIA**, não digitados a mão, e ficam gravados no
 manifesto do caso e no marcador de cache de cada série.
 
-**Validade da independência**, que é a única coisa que faz um Tier 2 significar alguma coisa:
-o task `total` do TotalSegmentator v2 foi treinado **exclusivamente em TCs clínicas de rotina
-do University Hospital Basel** (1082 treino / 57 validação / 65 teste, todos do mesmo pool).
-Nenhum dataset público de desafio entra nesse treino — os únicos citados são de sub-tasks que o
-VRmed não usa (`lung_nodules`, `teeth`). O LCTSC **não está no treino**, é cinco anos anterior
-ao modelo, e sua anotação é humana.
+**Validade da independência — CORRIGIDO na Fase 16. O parágrafo original tinha TRÊS erros.**
+
+> A versão anterior dizia: *"o task `total` do TotalSegmentator v2 foi treinado exclusivamente
+> em TCs clínicas de rotina do University Hospital Basel (1082 / 57 / 65). Nenhum dataset
+> público de desafio entra nesse treino — os únicos citados são de sub-tasks que o VRmed não
+> usa (`lung_nodules`, `teeth`). O LCTSC **não está no treino**, é cinco anos anterior ao
+> modelo, e sua anotação é humana."*
+>
+> **Erro 1 — os números são da v1, não da v2.** 1082/57/65 descrevem o dataset **público da
+> v1**. A v2 declara **1.559 imagens de treino**, e o repositório oficial diz verbatim: *"we
+> did not publish the additional subjects we used for TotalSegmentator v2 training"*. **420
+> imagens (27 %) não são atribuídas.** *(A mesma correção foi feita em
+> `RELATORIO-TIER2-COORTE.md` na Fase 9; esta passagem escapou.)*
+>
+> **Erro 2 — a lista de sub-tasks estava incompleta.** Não são duas: pelo menos **quatro**
+> sub-tasks citam dataset público (`lung_nodules`/LIDC-IDRI, `teeth`/ToothFairy3,
+> `lung_vessels`, `liver_vessels`). E o mais grave: *"nenhum dataset público entra nesse
+> treino"* era **inferência a partir do que o artigo cita**, não leitura de uma lista de
+> treino — que **não existe publicada**.
+>
+> **Erro 3 — a anterioridade estava argumentando ao contrário.** *"É cinco anos anterior ao
+> modelo"* foi escrito como evidência **contra** contaminação. É o oposto: **anterioridade é a
+> pré-condição da contaminação.** Um dataset público de 2017 está **mais** disponível para um
+> treino executado em 2023, não menos. Os logs dos pesos em disco datam o treino do
+> `Dataset291` em **2023-05-13** — seis anos **depois** do LCTSC.
+>
+> **Consequência:** a independência do LCTSC em relação ao baseline é **INDETERMINADA**, não
+> estabelecida. Isso **não prova contaminação** — remove a prova de independência. Os números
+> desta seção permanecem válidos como medida; o que muda é a força da inferência.
+> Ver `docs/RELATORIO-FASE16-INDEPENDENCIA-BASELINE.md`.
+
+A anotação do LCTSC é humana, e isso continua valendo.
 
 **Descartado por contaminação:** Zenodo `10.5281/zenodo.7975081` anota exatamente heart,
 trachea, aorta e esophagus nas coleções NLST/NSCLC-Radiomics, sob CC BY 4.0 — mas o "ground
