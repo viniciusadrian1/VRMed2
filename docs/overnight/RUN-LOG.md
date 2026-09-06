@@ -114,3 +114,5 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 17:05 | correcao: DOI fabricado na ficha | `10.5281/zenodo.10102261` NAO EXISTE; o registro usa o DOI do artigo |
 | 17:12 | `lynos.integridade` | HuggingFace x Zenodo: **15/15 CRC-32 identicos**, 76,2 KiB de trafego |
 | 17:20 | varredura de docs | 40 documentos, 0 violacoes |
+| 17:40 | relatorios das fases 18, 19 e consolidado | escritos; varredura: 42 documentos, 0 violacoes |
+| 17:45 | auditoria final | PASS=157 FAIL=0 SKIP=0 · split INTOCADO |
