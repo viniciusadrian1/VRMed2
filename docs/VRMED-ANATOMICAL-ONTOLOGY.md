@@ -152,6 +152,17 @@ de modelo. Ver §4 para a ressalva sobre a decomposição.
 > **resistiu**: medida por caso, a diferença de extensão entre os dois estilos é **0,00 mm**
 > (Cliff −0,112, p 0,6213). Os 10,5 mm que apareciam entre as marginais têm IC95 `[-3,0; +18,0]`.
 > Ver `docs/RELATORIO-FASE10-EFEITO-ESTILO-ESOFAGO.md`.
+>
+> **Fase 11 — a decisão de herdar a extensão ganhou apoio indireto, e ele NÃO é sobre o
+> esôfago.** Não foi identificado, no canal DICOM público inteiro (19.358 RTSTRUCT pelo
+> índice do IDC), nenhum exame com dois contornos humanos de esôfago — logo **não há piso
+> humano medido para esta estrutura**, e nenhuma métrica desta ontologia pode ser comparada
+> a um. O que existe é comissionamento do instrumento em desacordo humano real de **GTV**
+> (5 observadores, 210 pares): ali a discordância é **dominada pela extensão** — A 5,00 mm
+> de mediana e 15,00 mm de p90, contra 1,03 mm de largura. É *consistente* com a decisão de
+> declarar a extensão herdada e não avaliável, mas é **objeto diferente** e a régua de Dice
+> comprovadamente não transfere (S/V 0,1444 /mm no GTV contra 0,3251–0,3805 /mm no esôfago).
+> Coincidência de padrão, não evidência.
 
 ### 1.3 `Heart` — coração
 

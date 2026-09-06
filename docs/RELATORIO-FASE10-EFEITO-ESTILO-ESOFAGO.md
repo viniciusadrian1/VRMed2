@@ -612,6 +612,17 @@ coleção inteira, e oito casos com prefixo `Test` caem no `development`.
 **Uma única ação: adquirir um conjunto com múltiplos anotadores independentes sobre os mesmos
 casos, ou concluir que ele não existe publicamente.**
 
+> **Executada na Fase 11 — resultado B.** A busca foi feita e é reproduzível: 156 coleções da
+> API do TCIA, o catálogo DICOM público inteiro pelo índice do IDC v24 (19.358 RTSTRUCT),
+> 60 Analysis Results enumerados, Zenodo/Grand Challenge/PubMed/GitHub/Synapse/PhysioNet/
+> Kaggle/HuggingFace/MIDRC/Stanford AIMI, e 32 candidatos abertos em fonte primária.
+> **Nenhum exame do canal público tem dois contornos humanos de esôfago.** Mas a conclusão
+> não é "não existe": multi-observador humano é abundante e licenciado (até 7 leitores
+> nomeados), só nunca no esôfago — e o **iCurveE** tem o objeto e o desenho certos sob acesso
+> restrito. A previsão desta seção — de que o conjunto de anotador único é a regra — foi
+> confirmada, e a alternativa que ela sugeria não existe publicamente.
+> Ver `docs/RELATORIO-FASE11-VARIABILIDADE-INTEROBSERVADOR.md`.
+
 Justificativa: dos 10 bloqueios de §12, **quatro** (1, 3, 8, 9) existem porque esta fase tentou
 medir estilo **entre coleções**, comparando duas populações que diferem em muito mais que estilo.
 Um conjunto com contornos repetidos sobre os **mesmos** casos mede estilo **dentro** do caso —

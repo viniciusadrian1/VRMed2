@@ -41,8 +41,24 @@ especializado. Os dois usos são registrados separadamente.
 
 ## 2. Os três achados que decidem
 
-**Não existe dataset público de esôfago torácico com múltiplos anotadores independentes ou
-consenso.** Dos quatro torácicos com esôfago verificados — LCTSC, NSCLC-Radiomics,
+**Não foi identificado dataset público de esôfago torácico com múltiplos anotadores
+independentes — agora medido em escala de catálogo, não inferido.** A Fase 11 enumerou o
+canal DICOM público inteiro pelo índice do IDC v24: dos **19.358 RTSTRUCT**, apenas **908**
+têm esôfago como órgão, em **5** coleções (`pediatric_ct_seg` 359, `nsclc_radiomics` 355,
+`4d_lung` 101, `lctsc` 60, `eay131` 33) — e o número de séries com **≥2 nomes de esôfago no
+mesmo arquivo é ZERO**, assim como o de TCs com ≥2 SEG *manual* de esôfago. Reproduzível em
+~10 s: `python -m scripts.validation.tier2.idc_esofago`.
+
+> **O que a Fase 11 descobriu e esta matriz não registrava:** multi-observador humano
+> **existe e é abundante** em dado público licenciado — QIBA CT-1C (7 leitores), LIDC-IDRI e
+> NLST (4), NSCLC-Radiomics-Interobserver1 e RIDER (5), Gold Atlas (5), CURVAS (3),
+> Pancreatic-CT-CBCT-SEG (2). **Todos morrem em F5: nenhum é esôfago.** E existe um conjunto
+> com o objeto e o desenho certos — **iCurveE** (NCT05787522, *Nat Commun* 2026: dois
+> especialistas independentes, 500 TCs torácicas, esôfago pelo atlas RTOG 1106) — sob
+> **acesso restrito**. Classificação da fase: **B — existe, mas é inadequado**.
+> Ver `docs/RELATORIO-FASE11-VARIABILIDADE-INTEROBSERVADOR.md`.
+
+Dos quatro torácicos com esôfago verificados — LCTSC, NSCLC-Radiomics,
 StructSeg2019-T3, SegTHOR — todos têm **um** conjunto de contornos por caso. Isso importa
 diretamente: a Fase 5 mediu que o **sentido** do erro do esôfago inverte entre instituições
 (S3 mais estreita, S1 mais larga, amplitude 0,428). Um dataset de anotador único ensina o
@@ -108,8 +124,13 @@ de contorno por instituição.
 - A licença do **RAOS** não foi lida na fonte oficial.
 - O conflito de licença do **AMOS22** (CC BY 4.0 no Zenodo contra CC BY-NC-SA no artigo
   NeurIPS) não foi resolvido — na dúvida, vale a mais restritiva.
-- **Nenhum dataset foi baixado** nesta fase. Todos os números de N casos e anotadores vêm de
-  páginas e artigos, não de inspeção do dado.
+- **Nenhum dataset foi baixado** nesta fase (Fase 6). Todos os números de N casos e
+  anotadores vêm de páginas e artigos, não de inspeção do dado. **A Fase 11 corrigiu isso
+  para o que importa:** 11.439 structure sets abertos e lidos, e o catálogo DICOM público
+  inteiro varrido por nome pelo índice do IDC.
+- **Ainda não verificado (Fase 11):** o conteúdo das **16 coleções fora da API** do TCIA
+  (0 séries na API anônima; F4 medido, conteúdo **não** verificado) e das coleções de acesso
+  restrito (NSCLC-Cetuximab/RTOG-0617, NRG-1308, iCurveE). Não se afirma ausência sobre elas.
 - Não foi verificado se **NSCLC-Radiomics** ou **RAOS** estão no treino do TotalSegmentator
   além do que o artigo declara (só Basel).
 - A definição de esôfago de cada dataset **não foi comparada estrutura a estrutura** com a do
