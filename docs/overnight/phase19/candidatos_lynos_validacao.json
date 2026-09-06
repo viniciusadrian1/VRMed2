@@ -1,0 +1,79 @@
+{
+ "fase": 19,
+ "natureza": "FICHA DE CANDIDATO — nenhum caso ingerido",
+ "n_fichas": 15,
+ "validacao_publicavel": {
+  "valido": false,
+  "n_entradas": 15,
+  "erros": [
+   "LYNOS-PAT1: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT1: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT2: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT2: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT3: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT3: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT4: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT4: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT5: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT5: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT6: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT6: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT7: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT7: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT8: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT8: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT9: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT9: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT10: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT10: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT11: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT11: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT12: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT12: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT13: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT13: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT14: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT14: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'",
+   "LYNOS-PAT15: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT15: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CONFLITO entre tres fontes oficiais do MESMO dado: zenodo.org/records/10102261 declara CC BY 4.0; huggingface.co/api/datasets/andreped/LyNoS declara license:mit; github.com/raidionics/LyNoS declara MIT. Na duvida vale a mais restritiva, e o conflito precisa ser resolvido em fonte primaria antes de qualquer uso. Ver docs/RELATORIO-FASE18-AUDITORIA-LYNOS.md.'"
+  ],
+  "por_split": {
+   "train": 0,
+   "validation": 0,
+   "test": 15
+  }
+ },
+ "contrafactual_licenca_resolvida": {
+  "valido": false,
+  "n_entradas": 15,
+  "erros": [
+   "LYNOS-PAT1: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT2: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT3: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT4: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT5: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT6: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT7: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT8: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT9: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT10: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT11: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT12: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT13: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT14: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado",
+   "LYNOS-PAT15: image_sha256 nao pode ser vazio nem UNKNOWN — e identidade, nao metadado"
+  ],
+  "por_split": {
+   "train": 0,
+   "validation": 0,
+   "test": 15
+  }
+ },
+ "campos_unknown_persistentes": [
+  "study_id",
+  "series_id",
+  "image_sha256",
+  "annotation_source",
+  "annotation_protocol"
+ ]
+}
