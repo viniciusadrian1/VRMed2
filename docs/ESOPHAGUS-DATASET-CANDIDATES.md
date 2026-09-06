@@ -156,3 +156,57 @@ Grand Challenge, Europe PMC, arXiv/medRxiv, repositórios institucionais.
 - **FATO.** Os 14 candidatos de classe D **não tiveram conteúdo verificado**.
 - **INFERÊNCIA.** A cobertura de repositórios é ampla mas não exaustiva; um dataset publicado
   depois de 2026-09-06 não está aqui.
+
+---
+
+# Adendo da Fase 20 — 2026-09-06
+
+> **A matriz acima permanece como está.** Ela foi escrita na Fase 15 com outra pergunta em
+> mente (teste independente) e continua correta para aquela pergunta. Este adendo registra
+> o que a Fase 20 acrescentou e o que ela **corrigiu**, sem apagar o histórico.
+> Matriz completa da Fase 20: [`FASE20-CANDIDATOS-DADOS.md`](FASE20-CANDIDATOS-DADOS.md).
+
+## O que mudou de pergunta
+
+A Fase 15 procurava **TEST independente** — exigia independência do TotalSegmentator.
+A Fase 20 procura dados para **TRAIN/VALIDATION próprios e auditáveis**, e TRAIN **não
+precisa** ser independente do TotalSegmentator: o VRmed não vai usá-lo. O que TRAIN exige
+é **identidade, procedência, licença e GT humano**.
+
+## Achados novos, todos medidos
+
+| Achado | Medida |
+|---|---|
+| máscara ligada à imagem por identificador no canal DICOM | **908/908** via `ReferencedSeriesInstanceUID` |
+| **`ROIGenerationAlgorithm` para a ROI de esôfago** | **UNKNOWN em 908/908** — a tag que responderia "humano ou modelo" não está preenchida em nenhum |
+| sujeitos distintos com contorno de esôfago no canal público | **807** (não 908 arquivos) |
+| **4D-Lung** | 6.690 séries de **20 sujeitos**; esôfago em **16** |
+| **Pediatric-CT-SEG** | idade **mediana 6 anos, 100 % < 18** — reprovação por ontologia, medida |
+| licença das RTSTRUCT de esôfago do **NSCLC-Radiomics** | **CC BY-NC 3.0**, mais restritiva que a manchete da coleção |
+| estabilidade de UID no IDC | **13.081 de 58.060 (22,5 %)** de versões anteriores ausentes do índice atual |
+| séries derivadas no IDC | **471.946**, das quais **378.153** são saída do TotalSegmentator |
+
+## Correções e refinamentos a esta matriz
+
+| Item | Antes | Agora |
+|---|---|---|
+| **STOPSTORM** | não estava na matriz (publicado 2026-08-27) | **F** — os 3 RTSTRUCT são **templates de nomenclatura**: 1 fatia por ROI em 31/31, e o PDF manda *"delete our temporary contours"* |
+| **NSCLC-Radiomics-Interobserver1** | não constava | **F** — 5 observadores em 22 sujeitos e **zero esôfago**: todas as ROIs são GTV. Reforça a negativa da Fase 11: o padrão multi-observador **existe** no canal DICOM e **não cobre o esôfago** |
+| **SegTHOR** | classe D (acesso) | **E/F** — dois céticos divergiram: um reprova por ontologia (esôfago desde a **4ª vértebra cervical**), outro chama isso de critério inconsistente frente ao próprio LCTSC. **Não resolvido**, registrado |
+| **EAY131** | classe C ("sítio de lesão, não OAR") | **F**, e refinado: dos 33 aceitos pelo crivo, **5 são sítio de lesão** (`PARAESOPHAGEAL`, `GASTRO ESOPHAGEAL`) |
+| **Crivo da Fase 11** | 908, sem ressalva | **908 mantido.** Medidos dois vãos latentes: aceita `Esophagus_PRV` (**0 casos**) e sítio de lesão (**5 casos**). Instrumento **não alterado** — é auditado e o número está publicado |
+
+## Regra de contorno encontrada (não altera a ontologia)
+
+O PDF do STOPSTORM traz a definição operacional de extensão do esôfago atribuída a **Kong
+et al.**: *"mucosa, submucosa, and all muscular layers out to the fatty adventitia"*,
+cranial **no arco aórtico**, caudal *"until it ends at the stomach"*.
+
+O atlas **Kong et al. 2011** (RTOG/EORTC/SWOG), segundo verificação de um cético, põe o
+limite cranial no **cricoide**. São **duas regras publicadas diferentes** para a mesma
+estrutura — a terceira convenção que o projeto encontra.
+
+**Isso não altera a `ESOPHAGUS_ONTOLOGY_V1`.** A Fase 9 mediu que as duas pontas do GT
+**não são localizáveis** na imagem, e por isso a extensão permanece **herdada do GT e não
+avaliável anatomicamente**. Existir regra publicada e o projeto **poder verificá-la** são
+coisas diferentes — e a divergência entre as regras reforça a decisão de herdar.
