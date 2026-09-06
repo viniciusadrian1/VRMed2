@@ -143,6 +143,81 @@ A compatibilidade com a ontologia vem de **medição**: as 60 máscaras do LCTSC
 **0,0000 % de buracos 2D** (Fase 21). Contorno planar fechado de RTSTRUCT é preenchido por
 construção — **propriedade do formato, não declaração de protocolo**, e assim fica escrito.
 
+## 9. Adendo — o juiz-sintetizador e o quinto arm (chegaram depois)
+
+> Este adendo entra **depois** do relatório acima, que foi escrito com 4 de 5 arms. O
+> workflow fechou 11/11 e o juiz refinou quatro pontos. **O texto acima é preservado.**
+
+### 9.1 A verificação da linha 82 é **PARCIAL**, não plena
+
+O juiz classificou `afirmacao_do_repo_verificada` como **PARCIALMENTE**: o **conteúdo** se
+sustenta quase palavra por palavra; a **atribuição** tem ressalva — *"RTOG 1106"* nomeia
+coisas diferentes conforme quem escreve (o ensaio `NCT01507428`, o artigo-atlas de Kong
+2011, e um *deck* da NRG com slides *"RTOG 1106 Required OARs"*).
+
+Onde o relatório acima diz "VERIFICADA", leia-se **"conteúdo verificado, atribuição
+ambígua"**.
+
+### 9.2 São **três** redações do limite cranial, não duas — e uma contradição interna
+
+| Fonte | Cranial |
+|---|---|
+| Kong et al. 2011 | *"begin **at the level of** cricoid cartilage"* |
+| LCTSC · deck NRG · TCIA | *"at the level **just below** the cricoid"* |
+| **Yang et al. 2020** (descrição de dados) | *"edited to be **in the first slice of** cricoid cartilage"* |
+
+E **dentro do próprio deck RTOG 1106** o texto da regra diz *"just below the cricoid"*
+enquanto uma legenda de slide do **mesmo arquivo** diz *"Esophagus starts at the level of
+cricoid"*.
+
+### 9.3 Protocolo prescrito ≠ execução descrita
+
+O protocolo publica tolerância de **±1 fatia** e o critério de **≥10 cm² de estômago**.
+A descrição do que foi **efetivamente feito** (Yang 2020) **não menciona nenhum dos dois**
+e diz que as pontas foram **editadas aos marcos**.
+
+### 9.4 O corte de 1 cm — e a assimetria que um cético impôs
+
+**FATO, citação literal:** *"both ground truth and submitted contours were cropped 1 cm
+superior to the inferior border"*. O desafio **cortou 1 cm de cada extremidade**, do GT e
+das submissões, **antes de pontuar**.
+
+**Mas a frase seguinte do mesmo parágrafo, que um cético trouxe, corta metade da
+conclusão:** *"participants would not be penalized for contouring too great an extent of
+these structures in the inferior-superior direction, but would be penalized for a
+substantial undersegmentation."*
+
+**A extensão é excluída ASSIMETRICAMENTE:** sobre-extensão não penaliza; **sub-segmentação
+longitudinal continua penalizando**. Não é "a extensão não é avaliável" — é "a extensão
+excessiva é tolerada".
+
+> **Consequência para o VRmed, registrada e NÃO executada nesta fase.** O projeto computa
+> Dice contra fatias do GT do LCTSC que **os próprios autores do dataset cortaram antes de
+> pontuar**. Isso é **limitação declarada** do `A_BASELINE_V1`, não erro dele.
+> **Nenhuma métrica foi recalculada** — a regra desta execução proíbe, e o split é
+> histórico e congelado. Fica como recomendação para uma fase dedicada.
+
+### 9.5 A taxa de edição do QA é UNKNOWN — e isso atinge o split congelado
+
+Sabe-se que *"in some cases"* as extremidades foram estendidas no QA. **Não há registro por
+caso.** Portanto **é impossível saber se um dado RTSTRUCT do split congelado é contorno
+clínico puro ou editado pelo organizador.**
+
+### 9.6 "expert" nunca é substanciado
+
+A palavra **"expert"** aparece no **título** do artigo de descrição de dados e **nunca é
+substanciada no método**. O único qualificador de pessoa em toda a cadeia é o do QA:
+*"one experienced clinical medical physicist (GS)"*.
+
+### 9.7 Corroboração interna que o juiz recuperou
+
+A **Fase 9** já havia medido, e ninguém tinha ligado a este ponto: a ponta cranial do GT do
+LCTSC está em mediana **+120,0 mm acima da carina**, com corte no limite de campo em apenas
+**1/30** casos. O contorno sobe muito, e **não** porque a imagem acabou.
+
+Terceira via independente concordando com o documento e com a medição de ápice pulmonar.
+
+
 ## 8. Decisão
 
 ```
@@ -156,7 +231,8 @@ LCTSC_REVIEW: UMA revisao, por UMA pessoa (organizador do desafio, fisico medico
   clinico, identificado por iniciais), com edicao quando necessaria. Sem consenso,
   sem adjudicacao
 LCTSC_HUMAN_GT: SIM — manual, confirmado no artigo E na tag do arquivo (MANUAL 59/60)
-LCTSC_VS_RTOG: COMPATIVEL na parede, na janela e no caudal; PARCIALMENTE no cranial
+LCTSC_VS_RTOG: TRES redacoes publicadas do limite cranial, e o deck da
+  NRG se contradiz internamente. COMPATIVEL na parede, na janela e no caudal; PARCIALMENTE no cranial
   (Kong diz "at the level of", o deck da NRG diz "just below the"); e "RTOG 1106" e
   um ENSAIO, nao um atlas — a string aparece ZERO vezes em Kong et al. 2011
 LCTSC_VS_VRMED: COMPATIVEL no alvo preenchido (medido: 0,0000 % de buracos em 60/60);

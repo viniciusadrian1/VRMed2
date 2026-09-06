@@ -114,3 +114,26 @@ Ao contrário: a fase **vindica** a posição dela. A ontologia diz que a extens
 o GT **usa** esses dois marcos, as duas fontes do atlas **divergem** sobre o cranial, o
 desafio **tolera** sobre-extensão, e o próprio Kong 2011 registra a variabilidade de
 extensão como problema conhecido e sem consenso.
+
+
+---
+
+## Adendo do juiz — 2026-09-06 (o workflow fechou 11/11)
+
+1. **Verificação da linha 82: PARCIAL.** Conteúdo sustentado; **atribuição** ambígua —
+   *"RTOG 1106"* nomeia o ensaio `NCT01507428`, o artigo-atlas de Kong 2011 **e** um deck
+   da NRG, conforme quem escreve.
+2. **Três redações do limite cranial** em fonte primária — Yang 2020 acrescenta *"edited to
+   be in the first slice of cricoid cartilage"* — mais **uma contradição interna dentro do
+   próprio deck RTOG 1106**.
+3. **Protocolo prescrito ≠ execução descrita:** a tolerância de ±1 fatia e o critério de
+   ≥10 cm² **não aparecem** na descrição do que foi feito.
+4. **O desafio cortou 1 cm de cada extremidade** do GT e das submissões antes de pontuar —
+   *"both ground truth and submitted contours were cropped 1 cm superior to the inferior
+   border"* — mas **assimetricamente**: sobre-extensão não penaliza, **sub-segmentação
+   continua penalizando**.
+5. **Taxa de edição do QA: UNKNOWN.** Impossível saber se um RTSTRUCT do split congelado é
+   contorno clínico puro ou editado.
+6. **"expert" aparece no título** do artigo de dados e **nunca é substanciado no método**.
+7. **Fase 9 corrobora:** ponta cranial em mediana **+120,0 mm acima da carina**, com
+   truncamento de campo em apenas 1/30.
