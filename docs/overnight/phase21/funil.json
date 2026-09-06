@@ -1,0 +1,208 @@
+{
+ "fase": 21,
+ "identidade_dicom": {
+  "canal": "DICOM",
+  "case_id": "FIX-DICOM-1",
+  "study_id": "2.25.100000000000000000000000000000001",
+  "series_id": "2.25.100000000000000000000000000000002",
+  "sop_instance_uids": [
+   "2.25.10000000000000000000000000000100000",
+   "2.25.10000000000000000000000000000100001",
+   "2.25.10000000000000000000000000000100002",
+   "2.25.10000000000000000000000000000100003",
+   "2.25.10000000000000000000000000000100004",
+   "2.25.10000000000000000000000000000100005",
+   "2.25.10000000000000000000000000000100006",
+   "2.25.10000000000000000000000000000100007"
+  ],
+  "sop_unicos": true,
+  "n_instancias": 8,
+  "pixel_spacing_mm": [
+   1.0,
+   1.0
+  ],
+  "slice_thickness_mm": 2.5,
+  "espacamento_z_mediano_mm": 2.5,
+  "espacamento_z_uniforme": true,
+  "image_orientation_patient": [
+   1.0,
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   0.0
+  ],
+  "rescale_slope": 1.0,
+  "rescale_intercept": -1024.0,
+  "identidades_entregues": 4,
+  "quais": [
+   "case_id",
+   "study_id",
+   "series_id",
+   "sop_instance_uid"
+  ]
+ },
+ "identidade_nifti": {
+  "canal": "NIfTI",
+  "case_id": "derivavel do nome do arquivo ou do manifesto da fonte, NUNCA do cabecalho",
+  "study_id": "UNKNOWN",
+  "series_id": "UNKNOWN",
+  "sop_instance_uids": [],
+  "motivo_unknown": "o cabecalho NIfTI-1 nao tem campo de StudyInstanceUID nem de SeriesInstanceUID; o formato nao os carrega",
+  "shape": [
+   64,
+   64,
+   40
+  ],
+  "spacing_mm": [
+   1.0,
+   1.0,
+   2.5
+  ],
+  "orientacao": "RAS",
+  "identidades_entregues": 2,
+  "quais": [
+   "case_id (externo)",
+   "sha256 do conteudo"
+  ],
+  "regras_impossiveis_de_verificar": [
+   "mesmo estudo em duas particoes (validar_vazamento por study_id)",
+   "mesma serie em duas particoes (validar_vazamento por series_id)"
+  ]
+ },
+ "manifesto_sha256": "30a252d64898b018293447b5b45c949889554bb81aef6928bbec8698191a199d",
+ "snapshot": {
+  "esquema": "VRMED-ESOPHAGUS-DATASET-V1",
+  "versao": "V1",
+  "congelado_em": "2026-09-06T00:00:00Z",
+  "ontologia": "ESOPHAGUS_ONTOLOGY_V1",
+  "ontologia_congelada_em": "2026-09-06",
+  "n_entradas": 4,
+  "por_split": {
+   "train": 2,
+   "validation": 1,
+   "test": 1
+  },
+  "sha256_manifesto": "30a252d64898b018293447b5b45c949889554bb81aef6928bbec8698191a199d",
+  "sha256_por_caso": {
+   "FIX-001": {
+    "imagem": "048e0aa4d53cf618e14a8da1c43351b05a0588da06622f5ba398ba0e57bff9ce",
+    "mascara": "1d6ecdf1a6d5423dc7efd2b96eb62cf851f50d52a0e06d62b647d64e36b14125"
+   },
+   "FIX-002": {
+    "imagem": "cfe50dd518a749c6ff2d656b845dcd7d44e8484908881a6dd8d2e457dcc80861",
+    "mascara": "e62331f3412d54a45223a1fc1ec6aab10cfe1ebc15676404130396c5233f792c"
+   },
+   "FIX-003": {
+    "imagem": "ea51c5610fa7b97e0689219a9d9f2e9bf39acd5fb7a5b78e437774ff5e1b3120",
+    "mascara": "b3d1575698a1b05acf04974bf374ef7ade39ae4a2ad1d9905b94c06c4ffc0b93"
+   },
+   "FIX-004": {
+    "imagem": "0bd26e24288ab91a783106d704c4d7d397d2783f8222a8c026d9db24646e8927",
+    "mascara": "4084f302960affcb68c2286ca2209db55135cbcf2336061f935e605046085b18"
+   }
+  }
+ },
+ "casos_controlados": [
+  {
+   "caso": "01 caso valido",
+   "esperado": "ACEITA",
+   "obtido": "ACEITA",
+   "passou": true,
+   "erro": ""
+  },
+  {
+   "caso": "02 mascara vazia",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: alvo reprovado na ontologia: ['nao_vazia', 'objeto_unico_dominante', 'calibre_compativel_com_esofago', 'mascara_vazia', 'volume_fora_da_faixa (0.00 mL"
+  },
+  {
+   "caso": "03 spacing incompativel",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "DesalinhamentoGeometrico: mascara x imagem: zooms (1.0, 1.0, 3.0) != (1.0, 1.0, 2.5); affine difere (max |delta| = 0.5) — comparacao invalida"
+  },
+  {
+   "caso": "04 orientacao incompativel",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "DesalinhamentoGeometrico: mascara x imagem: affine difere (max |delta| = 2); orientacao LAS != RAS — comparacao invalida"
+  },
+  {
+   "caso": "05 imagem e mascara com shapes diferentes",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "DesalinhamentoGeometrico: mascara x imagem: shape (64, 64, 30) != (64, 64, 40) — comparacao invalida"
+  },
+  {
+   "caso": "06 hash alterado apos congelamento",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: congelamento quebrado: ['conteudo alterado: C06']"
+  },
+  {
+   "caso": "07 licenca UNKNOWN",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: entrada invalida: licenca UNKNOWN bloqueia publicacao (nenhuma licenca localizada em fonte primaria); declarado: 'UNKNOWN'"
+  },
+  {
+   "caso": "08 licenca CONFLITO",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: entrada invalida: licenca CONFLITO bloqueia publicacao (fontes oficiais do MESMO dado declaram licencas diferentes); declarado: 'CC BY 4.0 / MIT'"
+  },
+  {
+   "caso": "09 mesmo case_id em dois splits",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: vazamento: caso 'C09' aparece em ['test', 'train']; conteudo de imagem 'cfe50dd518a749c6ff2d656b845dcd7d44e8484908881a6dd8d2e457dcc80861' aparece em ["
+  },
+  {
+   "caso": "10 mesmo study_id, case_id diferente",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: vazamento: estudo '2.25.100000000000000000000000000000001' aparece em ['test', 'train']"
+  },
+  {
+   "caso": "11 mesma series_id, case_id diferente",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: vazamento: serie '2.25.100000000000000000000000000000002' aparece em ['test', 'train']"
+  },
+  {
+   "caso": "12 mesmo CONTEUDO com ids diferentes",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: vazamento: conteudo de imagem 'cfe50dd518a749c6ff2d656b845dcd7d44e8484908881a6dd8d2e457dcc80861' aparece em ['test', 'train']; conteudo de mascara 'e6"
+  },
+  {
+   "caso": "13 ontologia errada (anel oco, so parede)",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "ValueError: alvo reprovado na ontologia: ['preenchida_parede_mais_lumen']"
+  },
+  {
+   "caso": "14 TEST acessado em contexto de treino",
+   "esperado": "RECUSA",
+   "obtido": "RECUSA",
+   "passou": true,
+   "erro": "AcessoIndevido: contexto 'treino' nao pode ler a particao 'test' (pode ler: ['train']). Se isto apareceu durante treino, o vazamento estava prestes a acontecer."
+  }
+ ],
+ "casos_ok": 14,
+ "casos_total": 14
+}

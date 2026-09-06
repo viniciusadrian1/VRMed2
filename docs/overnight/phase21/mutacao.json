@@ -1,0 +1,186 @@
+{
+ "fase": 21.14,
+ "mortos": 13,
+ "total": 13,
+ "por_grupo": {
+  "validators": {
+   "total": 5,
+   "mortos": 5
+  },
+  "loader": {
+   "total": 5,
+   "mortos": 5
+  },
+  "hashing": {
+   "total": 3,
+   "mortos": 3
+  }
+ },
+ "controle_negativo_antes": {
+  "funil": {
+   "returncode": 0,
+   "ok": true,
+   "saida": "autoteste funil: 16 verificacoes, 0 falhas\n"
+  },
+  "manifesto": {
+   "returncode": 0,
+   "ok": true,
+   "saida": "autoteste manifesto: 29 verificacoes, 0 falhas\n"
+  },
+  "suite": {
+   "returncode": 0,
+   "ok": true,
+   "saida": "_16_o_desenho_do_split_nao_contem_caso_inventado\nautoteste manifesto: 29 verificacoes, 0 falhas\nautoteste plano: 14 verificacoes, 0 falhas\n  OK   test_17_autotestes_dos_modulos_passam\n\n17/17 passaram\n"
+  }
+ },
+ "controle_negativo_depois": {
+  "funil": true,
+  "manifesto": true,
+  "suite": true
+ },
+ "mutantes": [
+  {
+   "id": "V1",
+   "grupo": "validators",
+   "o_que": "validar_vazamento devolve lista vazia",
+   "alvo": "funil",
+   "deveria_derrubar": "casos 9, 10, 11 e 12",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: casos controlados falharam: ['09 mesmo case_id em dois splits', '10 mesmo study_id, case_id diferente', '11 mesma series_id, case_id diferente', '12 mesmo CONTEUDO com ids diferentes']\nautoteste funil: 16 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "V2",
+   "grupo": "validators",
+   "o_que": "validar_licenca devolve lista vazia",
+   "alvo": "funil",
+   "deveria_derrubar": "casos 7 e 8",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: casos controlados falharam: ['07 licenca UNKNOWN', '08 licenca CONFLITO']\nautoteste funil: 16 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "V3",
+   "grupo": "validators",
+   "o_que": "campos obrigatorios ausentes deixam de ser detectados",
+   "alvo": "manifesto",
+   "deveria_derrubar": "campo obrigatorio ausente",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: NAO DETECTOU: campo obrigatorio ausente\nautoteste manifesto: 29 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "V4",
+   "grupo": "validators",
+   "o_que": "sha256 malformado passa",
+   "alvo": "manifesto",
+   "deveria_derrubar": "sha256 invalido",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: NAO DETECTOU: sha256 invalido\nautoteste manifesto: 29 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "V5",
+   "grupo": "validators",
+   "o_que": "validar_alvo aprova qualquer coisa (ontologia desligada)",
+   "alvo": "funil",
+   "deveria_derrubar": "casos 2 e 13",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: casos controlados falharam: ['02 mascara vazia', '13 ontologia errada (anel oco, so parede)']\nautoteste funil: 16 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "L1",
+   "grupo": "loader",
+   "o_que": "carregar_particao sem a checagem de permissao",
+   "alvo": "funil",
+   "deveria_derrubar": "caso 14",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: casos controlados falharam: ['14 TEST acessado em contexto de treino']\nautoteste funil: 16 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "L2",
+   "grupo": "loader",
+   "o_que": "treino passa a poder ler test",
+   "alvo": "manifesto",
+   "deveria_derrubar": "AcessoIndevido do contexto treino",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: AcessoIndevido nao levantado: contexto treino leu test\nFALHA: AcessoIndevido nao levantado: contexto treino leu validation\nautoteste manifesto: 29 verificacoes, 2 falhas\n"
+  },
+  {
+   "id": "L3",
+   "grupo": "loader",
+   "o_que": "validacao passa a poder ler test",
+   "alvo": "manifesto",
+   "deveria_derrubar": "AcessoIndevido do contexto validacao",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: AcessoIndevido nao levantado: contexto validacao leu test\nautoteste manifesto: 29 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "L4",
+   "grupo": "loader",
+   "o_que": "contexto desconhecido deixa de ser recusado",
+   "alvo": "manifesto",
+   "deveria_derrubar": "contexto invalido",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "afewk9so\\arvore\\scripts\\validation\\baseline_v1\\manifesto.py\", line 325, in carregar_particao\n    if split not in PERMISSOES[contexto]:\n                    ~~~~~~~~~~^^^^^^^^^^\nKeyError: 'treinamento'\n"
+  },
+  {
+   "id": "L5",
+   "grupo": "loader",
+   "o_que": "carregar_particao devolve TUDO, ignorando o split pedido",
+   "alvo": "manifesto",
+   "deveria_derrubar": "contagem por particao",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: acesso legitimo devolveu numero errado de casos\nFALHA: avaliacao nao conseguiu ler o test\nautoteste manifesto: 29 verificacoes, 2 falhas\n"
+  },
+  {
+   "id": "H1",
+   "grupo": "hashing",
+   "o_que": "verificar_congelamento sempre diz INTACTO",
+   "alvo": "funil",
+   "deveria_derrubar": "caso 6",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: casos controlados falharam: ['06 hash alterado apos congelamento']\nautoteste funil: 16 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "H2",
+   "grupo": "hashing",
+   "o_que": "a serializacao canonica deixa de ordenar por case_id",
+   "alvo": "manifesto",
+   "deveria_derrubar": "hash independente da ordem de insercao",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: hash canonico depende da ordem de insercao\nautoteste manifesto: 29 verificacoes, 1 falhas\n"
+  },
+  {
+   "id": "H3",
+   "grupo": "hashing",
+   "o_que": "congelar aceita manifesto invalido",
+   "alvo": "manifesto",
+   "deveria_derrubar": "recusa de congelar manifesto com vazamento",
+   "aplicado": true,
+   "derrubou": true,
+   "returncode": 1,
+   "saida": "FALHA: congelou um manifesto com vazamento\nautoteste manifesto: 29 verificacoes, 1 falhas\n"
+  }
+ ]
+}

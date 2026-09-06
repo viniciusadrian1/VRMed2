@@ -444,6 +444,20 @@ def autoteste() -> int:
     except AcessoIndevido as ex:
         falhas.append("acesso legitimo foi bloqueado: " + str(ex))
 
+    # Contexto ou particao que NAO existem tem de ser recusados, e nao cair no
+    # `in` seguinte devolvendo lista vazia em silencio. Um contexto digitado errado
+    # ("treinamento", "eval") viraria "nenhum caso" em vez de erro, e um laco de
+    # treino que le zero casos falha longe daqui, com outra mensagem.
+    # ESTE TESTE NASCEU DE UM MUTANTE SOBREVIVENTE (L4 da Fase 21.14): a guarda
+    # existia e nada a exercitava.
+    for ctx, split in (("treinamento", "train"), ("eval", "test"),
+                       ("", "train"), ("treino", "TRAIN"), ("treino", "dev")):
+        try:
+            carregar_particao(base, split, ctx)
+            falhas.append("contexto/particao invalido aceito: %r / %r" % (ctx, split))
+        except AcessoIndevido:
+            pass
+
     # 19.14.3 e 19.5 — mover caso de validation para test tem de quebrar o congelamento
     snap = congelar(base, PADRAO / "_autoteste_snapshot.json", "V1", "2026-09-06T00:00:00Z")
     intacto = verificar_congelamento(base, snap)
@@ -485,7 +499,7 @@ def autoteste() -> int:
 
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste manifesto: %d verificacoes, %d falhas" % (24, len(falhas)))
+    print("autoteste manifesto: %d verificacoes, %d falhas" % (29, len(falhas)))
     return 1 if falhas else 0
 
 
