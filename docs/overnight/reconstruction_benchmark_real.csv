@@ -9,3 +9,8 @@ surface_nets,esophagus,23.539,8838.4,0.9563,0.916259,0.2413,0.9336,-7.049,1,Fals
 flying_edges,esophagus,25.191,9692.643,0.9995,0.999,0.0023,0.0,-0.528,1,True,0,0,23808,11906,1.8437,0.429356,"anatomia REAL (cta-cardio, fora de todo split congelado)"
 sdf,esophagus,25.205,9925.254,1.0,1.0,0.0,0.0,-0.47,1,True,0,0,23808,11906,20.5334,0.429356,"anatomia REAL (cta-cardio, fora de todo split congelado)"
 mc_windowed_sinc,esophagus,25.19,9690.298,0.9996,0.9992,0.0028,0.0,-0.531,1,True,0,0,23808,11906,2.6493,0.42936,"anatomia REAL (cta-cardio, fora de todo split congelado)"
+mc_sigma1_taubin4,esophagus,24.367,9137.74,0.984,0.968504,0.0805,0.9336,-3.779,1,True,0,0,23300,11652,4.443,0.420212,"anatomia REAL (cta-cardio, fora de todo split congelado)"
+MASTER_mc_taubin4,trachea,46.467,11487.419,1.0,1.0,0.0,0.0,-0.199,1,True,0,0,28404,14202,2.4177,0.51206,"anatomia REAL (cta-cardio, fora de todo split congelado)"
+mc_taubin0,trachea,46.453,11849.327,1.0,1.0,0.0,0.0,-0.23,1,True,0,0,28404,14202,2.3542,0.512056,"anatomia REAL (cta-cardio, fora de todo split congelado)"
+mc_taubin2,trachea,46.46,11619.646,1.0,1.0,0.0,0.0,-0.215,1,True,0,0,28404,14202,2.4123,0.51206,"anatomia REAL (cta-cardio, fora de todo split congelado)"
+mc_taubin8,trachea,46.481,11337.444,1.0,1.0,0.0,0.0,-0.168,1,True,0,0,28404,14202,2.418,0.512056,"anatomia REAL (cta-cardio, fora de todo split congelado)"
