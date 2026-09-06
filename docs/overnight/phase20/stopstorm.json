@@ -1,0 +1,94 @@
+{
+ "dataset": "STOPSTORM Benchmark Data — Critical Structures Contouring",
+ "doi": "10.5281/zenodo.22127731",
+ "doi_conceito": "10.5281/zenodo.22127730",
+ "licenca": "CC BY 4.0",
+ "publicado_em": "2026-08-27",
+ "zip_url": "https://zenodo.org/records/22127731/files/STOPSTORM_Contouring_Benchmark_Data_06032024.zip",
+ "zip_bytes": 169465385,
+ "baixado_bytes": 353160,
+ "n_casos": 3,
+ "todos_com_esofago": true,
+ "case_id_unico": false,
+ "case_id_valores": [
+  "NOID"
+ ],
+ "algoritmo_do_esofago_declarado": {
+  "VAZIO": 3
+ },
+ "algum_sinal_auto": true,
+ "ct_ligada_por_uid": 3,
+ "casos": [
+  {
+   "arquivo": "rtss_1.2.826.0.1.3680043.8.274.1.1.4279065771.51721.9935204604.118.dcm",
+   "case_id": "NOID",
+   "study_id": "1.3.6.1.4.1.5962.99.1.1109681313.1174348593.1787816109217.152.0",
+   "series_id": "1.2.826.0.1.3680043.8.274.1.1.4279065771.51721.9935204604.118",
+   "structure_set_label": "AutoSS",
+   "manufacturer": "Plastimatch",
+   "structure_set_date": "20181128",
+   "n_rois": 31,
+   "esofago": [
+    "Esophagus"
+   ],
+   "algoritmo_do_esofago": [
+    "VAZIO"
+   ],
+   "algoritmos_todos": {
+    "VAZIO": 31
+   },
+   "ct_referenciada": "1.2.826.0.1.3680043.8.274.1.1.5321500591.51441.7988807655.962",
+   "ct_instancias": 149,
+   "sinal_auto_no_rotulo": true,
+   "ferramenta_auto": true
+  },
+  {
+   "arquivo": "rtss_1.2.826.0.1.3680043.8.274.1.1.9034734488.76002.3747641193.611.dcm",
+   "case_id": "NOID",
+   "study_id": "1.3.6.1.4.1.5962.99.1.1110574755.768820514.1787817002659.243.0",
+   "series_id": "1.2.826.0.1.3680043.8.274.1.1.9034734488.76002.3747641193.611",
+   "structure_set_label": "AutoSS",
+   "manufacturer": "Plastimatch",
+   "structure_set_date": "20200227",
+   "n_rois": 31,
+   "esofago": [
+    "Esophagus"
+   ],
+   "algoritmo_do_esofago": [
+    "VAZIO"
+   ],
+   "algoritmos_todos": {
+    "VAZIO": 31
+   },
+   "ct_referenciada": "1.2.826.0.1.3680043.8.274.1.1.9116409394.26315.8140662131.577",
+   "ct_instancias": 240,
+   "sinal_auto_no_rotulo": true,
+   "ferramenta_auto": true
+  },
+  {
+   "arquivo": "rtss_1.2.826.0.1.3680043.8.274.1.1.9311182371.31840.6745117197.514.dcm",
+   "case_id": "NOID",
+   "study_id": "1.3.6.1.4.1.5962.99.1.1111561031.698378690.1787817988935.165.0",
+   "series_id": "1.2.826.0.1.3680043.8.274.1.1.9311182371.31840.6745117197.514",
+   "structure_set_label": "AutoSS",
+   "manufacturer": "Plastimatch",
+   "structure_set_date": "20190415",
+   "n_rois": 31,
+   "esofago": [
+    "Esophagus"
+   ],
+   "algoritmo_do_esofago": [
+    "VAZIO"
+   ],
+   "algoritmos_todos": {
+    "VAZIO": 31
+   },
+   "ct_referenciada": "1.2.826.0.1.3680043.8.274.1.1.3743220660.12021.5448875757.490",
+   "ct_instancias": 162,
+   "sinal_auto_no_rotulo": true,
+   "ferramenta_auto": true
+  }
+ ],
+ "veredito_gt": "UNKNOWN, com sinal de automacao. A tag ROIGenerationAlgorithm esta VAZIA em todos os ROIs; StructureSetLabel e 'AutoSS' e Manufacturer e 'Plastimatch'. Ausencia da tag e UNKNOWN, nunca MANUAL por omissao — e os dois sinais existentes apontam para geracao automatica. Nao entra como ground truth humano sem apuracao documental.",
+ "veredito_identidade": "PARCIAL. study_id e series_id presentes e distintos; a CT e referenciada por UID. Mas case_id = 'NOID' nos tres casos: o identificador entregue e degenerado e um split por case_id juntaria os tres."
+}

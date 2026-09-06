@@ -133,3 +133,5 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 19:10 | `estabilidade_de_uid` | **13.081 de 58.060 UIDs (22,5 %) de versoes anteriores sumiram do indice** |
 | 19:40 | `censo_identidade` + demografia | `pediatric_ct_seg` mediana **6 anos, 100 % < 18** — reprovacao por definicao, medida |
 | 19:45 | falso positivo proprio | `000Y` do 4D-Lung marcava a colecao como PEDIATRICA; e artefato de anonimizacao, nao lactente |
+| 20:05 | `zip_remoto` no STOPSTORM | 3 RTSTRUCT em **344,9 KiB de um zip de 169,5 MB (0,21 %)**, CRC conferido |
+| 20:10 | `fase20.stopstorm` | **arm REFUTADO**: `ROIGenerationAlgorithm` VAZIO em 93/93 ROIs; label `AutoSS`, fabricante `Plastimatch`; `case_id`='NOID' nos tres |
