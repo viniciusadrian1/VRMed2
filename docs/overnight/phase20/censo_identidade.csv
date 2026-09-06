@@ -1,0 +1,6 @@
+colecao,series,estudos,sujeitos,series_por_sujeito,series_ct,sujeitos_ct,tamanho_ct_GB,licenca_unica,licenca_aberta_atribuicao,series_revisadas,ja_usada_pelo_vrmed
+pediatric_ct_seg,718,359,359,2.0,359,359,56.63,True,True,718,False
+nsclc_radiomics,4926,422,422,11.67,422,422,26.32,False,False,4926,True
+4d_lung,6690,589,20,334.5,5890,20,178.57,True,True,6690,False
+lctsc,120,60,60,2.0,60,60,4.91,True,True,120,True
+eay131,30293,3124,2813,10.77,13166,2653,760.04,True,True,30293,False

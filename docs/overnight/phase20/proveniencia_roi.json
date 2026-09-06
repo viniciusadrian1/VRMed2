@@ -1,0 +1,87 @@
+{
+ "fase": 20,
+ "fonte": "C:\\Users\\vinic\\AppData\\Local\\IDC\\idc_index_data\\24.2.2\\rtstruct_index.parquet",
+ "pergunta": "a ROI de esofago foi declarada MANUAL, AUTOMATIC ou SEMIAUTOMATIC?",
+ "tag_dicom": "(3006,0036) ROIGenerationAlgorithm",
+ "limites_declarados": [
+  "a tag e DECLARATIVA: diz o que o autor escreveu, nao o que ele fez",
+  "ausencia da tag e UNKNOWN, nunca MANUAL por omissao",
+  "MANUAL declarado NAO exclui pre-anotacao por modelo corrigida a mao — foi exatamente essa a circularidade que a Fase 16 encontrou no TotalSegmentator, e ela seria invisivel aqui tambem",
+  "o crivo de nome de esofago e o MESMO da Fase 11 (idc_esofago._nomes_de_esofago)"
+ ],
+ "agregado": {
+  "total_rtstruct_com_esofago": 908,
+  "sujeitos_distintos_total": 807,
+  "algoritmo_global": {
+   "UNKNOWN": 908
+  },
+  "rtstruct_com_prv": 0,
+  "por_colecao": {
+   "4d_lung": {
+    "rtstruct_com_esofago": 101,
+    "sujeitos_distintos": 16,
+    "estudos_distintos": 20,
+    "algoritmo": {
+     "UNKNOWN": 101
+    },
+    "licencas": {
+     "CC BY 3.0": 101
+    },
+    "ct_referenciada_resolvida": 101,
+    "ct_referenciada_de": 101
+   },
+   "eay131": {
+    "rtstruct_com_esofago": 33,
+    "sujeitos_distintos": 17,
+    "estudos_distintos": 17,
+    "algoritmo": {
+     "UNKNOWN": 33
+    },
+    "licencas": {
+     "CC BY 4.0": 33
+    },
+    "ct_referenciada_resolvida": 33,
+    "ct_referenciada_de": 33
+   },
+   "lctsc": {
+    "rtstruct_com_esofago": 60,
+    "sujeitos_distintos": 60,
+    "estudos_distintos": 60,
+    "algoritmo": {
+     "UNKNOWN": 60
+    },
+    "licencas": {
+     "CC BY 3.0": 60
+    },
+    "ct_referenciada_resolvida": 60,
+    "ct_referenciada_de": 60
+   },
+   "nsclc_radiomics": {
+    "rtstruct_com_esofago": 355,
+    "sujeitos_distintos": 355,
+    "estudos_distintos": 355,
+    "algoritmo": {
+     "UNKNOWN": 355
+    },
+    "licencas": {
+     "CC BY-NC 3.0": 355
+    },
+    "ct_referenciada_resolvida": 355,
+    "ct_referenciada_de": 355
+   },
+   "pediatric_ct_seg": {
+    "rtstruct_com_esofago": 359,
+    "sujeitos_distintos": 359,
+    "estudos_distintos": 359,
+    "algoritmo": {
+     "UNKNOWN": 359
+    },
+    "licencas": {
+     "CC BY 4.0": 359
+    },
+    "ct_referenciada_resolvida": 359,
+    "ct_referenciada_de": 359
+   }
+  }
+ }
+}

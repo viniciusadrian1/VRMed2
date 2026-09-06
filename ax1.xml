@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/XDAP2h7AdzM1XY9NVg6B5AhD3IY</id>
+  <title>arXiv Query: search_query=all:"esophagus segmentation"&amp;id_list=&amp;start=0&amp;max_results=40</title>
+  <updated>2026-09-06T17:36:38Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22esophagus+segmentation%22&amp;start=0&amp;max_results=40&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>40</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2006.15713v2</id>
+    <title>Generalizable Cone Beam CT Esophagus Segmentation Using Physics-Based Data Augmentation</title>
+    <updated>2021-01-30T22:33:15Z</updated>
+    <link href="https://arxiv.org/abs/2006.15713v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2006.15713v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Automated segmentation of esophagus is critical in image guided/adaptive radiotherapy of lung cancer to minimize radiation-induced toxicities such as acute esophagitis. We developed a semantic physics-based data augmentation method for segmenting esophagus in both planning CT (pCT) and cone-beam CT (CBCT) using 3D convolutional neural networks. 191 cases with their pCT and CBCTs from four independent datasets were used to train a modified 3D-Unet architecture with a multi-objective loss function specifically designed for soft-tissue organs such as esophagus. Scatter artifacts and noise were extracted from week 1 CBCTs using power law adaptive histogram equalization method and induced to the corresponding pCT followed by reconstruction using CBCT reconstruction parameters. Moreover, we leverage physics-based artifact induced pCTs to drive the esophagus segmentation in real weekly CBCTs. Segmentations were evaluated using geometric Dice and Hausdorff distance as well as dosimetrically using mean esophagus dose and D5cc. Due to the physics-based data augmentation, our model trained just on the synthetic CBCTs was robust and generalizable enough to also produce state-of-the-art results on the pCTs and CBCTs, achieving 0.81 and 0.74 Dice overlap. Our physics-based data augmentation spans the realistic noise/artifact spectrum across patient CBCT/pCT data and can generalize well across modalities with the potential to improve the accuracy of treatment setup and response analysis.</summary>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-06-28T21:12:09Z</published>
+    <arxiv:comment>Accepted to Physics in Medicine &amp; Biology 2021</arxiv:comment>
+    <arxiv:primary_category term="eess.IV"/>
+    <author>
+      <name>Sadegh R Alam</name>
+    </author>
+    <author>
+      <name>Tianfang Li</name>
+    </author>
+    <author>
+      <name>Pengpeng Zhang</name>
+    </author>
+    <author>
+      <name>Si-Yuan Zhang</name>
+    </author>
+    <author>
+      <name>Saad Nadeem</name>
+    </author>
+  </entry>
+</feed>

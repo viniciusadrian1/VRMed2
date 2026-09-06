@@ -116,3 +116,13 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 17:20 | varredura de docs | 40 documentos, 0 violacoes |
 | 17:40 | relatorios das fases 18, 19 e consolidado | escritos; varredura: 42 documentos, 0 violacoes |
 | 17:45 | auditoria final | PASS=157 FAIL=0 SKIP=0 · split INTOCADO |
+
+## 2026-09-06 — Fases 20-21
+
+| hora (UTC) | comando | resultado |
+|---|---|---|
+| 17:30 | `git rev-parse HEAD` | `98e806c`, working tree limpo |
+| 17:32 | `idc_esofago` (reexecucao do censo) | 908 em 5 colecoes — bate com a Fase 11 |
+| 17:40 | `fase20.censo_identidade` | **4D-Lung: 6.690 series de 20 SUJEITOS** (334,5 s/suj); NSCLC com DUAS licencas |
+| 17:52 | `fase20.proveniencia_roi` | **ROIGenerationAlgorithm UNKNOWN em 908/908**; CT ligada por UID em **908/908**; 807 sujeitos |
+| 17:55 | defeito de instrumento | heredoc converteu `\b` em byte de backspace no regex de PRV; corrigido, 0 PRV entre os 908 |

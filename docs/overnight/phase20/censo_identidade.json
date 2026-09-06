@@ -1,0 +1,480 @@
+{
+ "fase": 20,
+ "fonte": "idc_index_data 24.2.2 — idc_index.parquet e analysis_results_index.parquet",
+ "pergunta": "onde o esofago existe COM identidade DICOM e COM licenca verificavel, e quantos SUJEITOS (nao series) cada colecao tem",
+ "limite_declarado": "licenca aberta e identidade presente sao NECESSARIAS, nunca suficientes. A procedencia da anotacao (humana x saida de modelo) NAO esta no indice.",
+ "n_series_indice": 1032911,
+ "n_colecoes": 176,
+ "licencas_globais": {
+  "CC BY 4.0": 865935,
+  "CC BY 3.0": 132303,
+  "CC BY-NC 4.0": 28783,
+  "CC BY-NC 3.0": 5851,
+  "National Library of Medicine Terms and Conditions; May 21, 2019": 39
+ },
+ "colecoes_esofago": [
+  {
+   "colecao": "pediatric_ct_seg",
+   "series": 718,
+   "estudos": 359,
+   "sujeitos": 359,
+   "series_por_sujeito": 2.0,
+   "series_ct": 359,
+   "sujeitos_ct": 359,
+   "series_ct_por_sujeito": 1.0,
+   "modalidades": {
+    "RTSTRUCT": 359,
+    "CT": 359
+   },
+   "licencas": {
+    "CC BY 4.0": 718
+   },
+   "licenca_unica": true,
+   "licenca_aberta_atribuicao": true,
+   "tamanho_GB": 64.15,
+   "tamanho_ct_GB": 56.63,
+   "source_DOI": [
+    "10.7937/tcia.x0h0-1706"
+   ],
+   "derivada": false,
+   "body_part": {
+    "ABDOMEN": 200
+   },
+   "fabricantes": 3,
+   "series_revisadas": 718,
+   "versao_inicial_min": 7,
+   "versao_inicial_max": 9,
+   "ja_usada_pelo_vrmed": false,
+   "nota_fase11": "359 RTSTRUCT com esofago-orgao",
+   "identidade": {
+    "colecao": "pediatric_ct_seg",
+    "case_id": {
+     "presente_em": 718,
+     "de": 718,
+     "distintos": 359,
+     "completo": true
+    },
+    "study_id": {
+     "presente_em": 718,
+     "de": 718,
+     "distintos": 359,
+     "completo": true
+    },
+    "series_id": {
+     "presente_em": 718,
+     "de": 718,
+     "distintos": 718,
+     "completo": true,
+     "unico": true
+    }
+   }
+  },
+  {
+   "colecao": "nsclc_radiomics",
+   "series": 4926,
+   "estudos": 422,
+   "sujeitos": 422,
+   "series_por_sujeito": 11.67,
+   "series_ct": 422,
+   "sujeitos_ct": 422,
+   "series_ct_por_sujeito": 1.0,
+   "modalidades": {
+    "SR": 2419,
+    "SEG": 1663,
+    "RTSTRUCT": 422,
+    "CT": 422
+   },
+   "licencas": {
+    "CC BY 4.0": 3661,
+    "CC BY-NC 3.0": 1265
+   },
+   "licenca_unica": false,
+   "licenca_aberta_atribuicao": false,
+   "tamanho_GB": 44.24,
+   "tamanho_ct_GB": 26.32,
+   "source_DOI": [
+    "10.5281/zenodo.7473970",
+    "10.7937/k9/tcia.2015.pf0m9rei"
+   ],
+   "derivada": true,
+   "body_part": {
+    "LUNG": 2085
+   },
+   "fabricantes": 6,
+   "series_revisadas": 4926,
+   "versao_inicial_min": 1,
+   "versao_inicial_max": 15,
+   "ja_usada_pelo_vrmed": true,
+   "nota_fase11": "355 — JA USADA pelo VRmed (Fase 10)",
+   "identidade": {
+    "colecao": "nsclc_radiomics",
+    "case_id": {
+     "presente_em": 4926,
+     "de": 4926,
+     "distintos": 422,
+     "completo": true
+    },
+    "study_id": {
+     "presente_em": 4926,
+     "de": 4926,
+     "distintos": 422,
+     "completo": true
+    },
+    "series_id": {
+     "presente_em": 4926,
+     "de": 4926,
+     "distintos": 4926,
+     "completo": true,
+     "unico": true
+    }
+   }
+  },
+  {
+   "colecao": "4d_lung",
+   "series": 6690,
+   "estudos": 589,
+   "sujeitos": 20,
+   "series_por_sujeito": 334.5,
+   "series_ct": 5890,
+   "sujeitos_ct": 20,
+   "series_ct_por_sujeito": 294.5,
+   "modalidades": {
+    "CT": 5890,
+    "RTSTRUCT": 800
+   },
+   "licencas": {
+    "CC BY 3.0": 6690
+   },
+   "licenca_unica": true,
+   "licenca_aberta_atribuicao": true,
+   "tamanho_GB": 178.75,
+   "tamanho_ct_GB": 178.57,
+   "source_DOI": [
+    "10.7937/k9/tcia.2016.eln8ygle"
+   ],
+   "derivada": false,
+   "body_part": {
+    "LUNG": 6690
+   },
+   "fabricantes": 2,
+   "series_revisadas": 6690,
+   "versao_inicial_min": 2,
+   "versao_inicial_max": 2,
+   "ja_usada_pelo_vrmed": false,
+   "nota_fase11": "101",
+   "identidade": {
+    "colecao": "4d_lung",
+    "case_id": {
+     "presente_em": 6690,
+     "de": 6690,
+     "distintos": 20,
+     "completo": true
+    },
+    "study_id": {
+     "presente_em": 6690,
+     "de": 6690,
+     "distintos": 589,
+     "completo": true
+    },
+    "series_id": {
+     "presente_em": 6690,
+     "de": 6690,
+     "distintos": 6690,
+     "completo": true,
+     "unico": true
+    }
+   }
+  },
+  {
+   "colecao": "lctsc",
+   "series": 120,
+   "estudos": 60,
+   "sujeitos": 60,
+   "series_por_sujeito": 2.0,
+   "series_ct": 60,
+   "sujeitos_ct": 60,
+   "series_ct_por_sujeito": 1.0,
+   "modalidades": {
+    "CT": 60,
+    "RTSTRUCT": 60
+   },
+   "licencas": {
+    "CC BY 3.0": 120
+   },
+   "licenca_unica": true,
+   "licenca_aberta_atribuicao": true,
+   "tamanho_GB": 5.03,
+   "tamanho_ct_GB": 4.91,
+   "source_DOI": [
+    "10.7937/k9/tcia.2017.3r3fvz08"
+   ],
+   "derivada": false,
+   "body_part": {
+    "LUNG": 120
+   },
+   "fabricantes": 5,
+   "series_revisadas": 120,
+   "versao_inicial_min": 2,
+   "versao_inicial_max": 2,
+   "ja_usada_pelo_vrmed": true,
+   "nota_fase11": "60 — JA USADA pelo VRmed (split congelado)",
+   "identidade": {
+    "colecao": "lctsc",
+    "case_id": {
+     "presente_em": 120,
+     "de": 120,
+     "distintos": 60,
+     "completo": true
+    },
+    "study_id": {
+     "presente_em": 120,
+     "de": 120,
+     "distintos": 60,
+     "completo": true
+    },
+    "series_id": {
+     "presente_em": 120,
+     "de": 120,
+     "distintos": 120,
+     "completo": true,
+     "unico": true
+    }
+   }
+  },
+  {
+   "colecao": "eay131",
+   "series": 30293,
+   "estudos": 3124,
+   "sujeitos": 2813,
+   "series_por_sujeito": 10.77,
+   "series_ct": 13166,
+   "sujeitos_ct": 2653,
+   "series_ct_por_sujeito": 4.96,
+   "modalidades": {
+    "RTSTRUCT": 14395,
+    "CT": 13166,
+    "SEG": 1404,
+    "MR": 1100,
+    "PT": 222,
+    "NM": 5,
+    "XA": 1
+   },
+   "licencas": {
+    "CC BY 4.0": 30293
+   },
+   "licenca_unica": true,
+   "licenca_aberta_atribuicao": true,
+   "tamanho_GB": 778.58,
+   "tamanho_ct_GB": 760.04,
+   "source_DOI": [
+    "10.7937/c5ke-yx42",
+    "10.7937/q9rn-m510"
+   ],
+   "derivada": true,
+   "body_part": {
+    "ABDOMEN": 10964,
+    "CHEST": 8662,
+    "PELVIS": 1259,
+    "CHESTABDPELVIS": 682
+   },
+   "fabricantes": 18,
+   "series_revisadas": 30293,
+   "versao_inicial_min": 24,
+   "versao_inicial_max": 24,
+   "ja_usada_pelo_vrmed": false,
+   "nota_fase11": "33 (17 CT) — catalogo de lesao, nao OAR",
+   "identidade": {
+    "colecao": "eay131",
+    "case_id": {
+     "presente_em": 30293,
+     "de": 30293,
+     "distintos": 2813,
+     "completo": true
+    },
+    "study_id": {
+     "presente_em": 30293,
+     "de": 30293,
+     "distintos": 3124,
+     "completo": true
+    },
+    "series_id": {
+     "presente_em": 30293,
+     "de": 30293,
+     "distintos": 30293,
+     "completo": true,
+     "unico": true
+    }
+   }
+  }
+ ],
+ "analysis_results": [
+  {
+   "analysis_result_id": "totalsegmentator_ct_segmentations",
+   "series": 378153,
+   "sujeitos": 26194,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "tcga_sbu_til_maps",
+   "series": 21030,
+   "sujeitos": 7600,
+   "colecoes": 23,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "eay131_tumor_annotations",
+   "series": 15799,
+   "sujeitos": 2487,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "dicom_lidc_idri_nodules",
+   "series": 13718,
+   "sujeitos": 875,
+   "colecoes": 1,
+   "licenca": "CC BY 3.0"
+  },
+  {
+   "analysis_result_id": "pan_cancer_nuclei_seg_dicom",
+   "series": 12149,
+   "sujeitos": 5185,
+   "colecoes": 14,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "bamf_aimi_annotations",
+   "series": 8202,
+   "sujeitos": 4226,
+   "colecoes": 22,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "nnu_net_bpr_annotations",
+   "series": 7817,
+   "sujeitos": 985,
+   "colecoes": 2,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "prostate_mri_us_biopsy_dicom_annotations",
+   "series": 4656,
+   "sujeitos": 842,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "nlstseg",
+   "series": 1803,
+   "sujeitos": 601,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "qiba_volct_1b",
+   "series": 1508,
+   "sujeitos": 40,
+   "colecoes": 2,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "dicom_sr_breast_clinical",
+   "series": 1292,
+   "sujeitos": 474,
+   "colecoes": 4,
+   "licenca": "CC BY 3.0"
+  },
+  {
+   "analysis_result_id": "lung_pet_ct_dx_annotations",
+   "series": 1091,
+   "sujeitos": 354,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "nlst_sybil",
+   "series": 970,
+   "sujeitos": 581,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "tcga_gbm360",
+   "series": 691,
+   "sujeitos": 336,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "cptac_ccrcc_tumor_annotations",
+   "series": 636,
+   "sujeitos": 60,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "cptac_ucec_tumor_annotations",
+   "series": 617,
+   "sujeitos": 72,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "cptac_pda_tumor_annotations",
+   "series": 536,
+   "sujeitos": 103,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "qin_lungct_seg",
+   "series": 378,
+   "sujeitos": 31,
+   "colecoes": 4,
+   "licenca": "CC BY 3.0"
+  },
+  {
+   "analysis_result_id": "prostatex_targets",
+   "series": 345,
+   "sujeitos": 345,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "rms_mutation_prediction_expert_annotations",
+   "series": 193,
+   "sujeitos": 96,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "rider_lungct_seg",
+   "series": 118,
+   "sujeitos": 31,
+   "colecoes": 1,
+   "licenca": "CC BY 3.0"
+  },
+  {
+   "analysis_result_id": "prostatex_seg_zones",
+   "series": 98,
+   "sujeitos": 98,
+   "colecoes": 1,
+   "licenca": "CC BY 3.0"
+  },
+  {
+   "analysis_result_id": "pancreas_ct_seg",
+   "series": 80,
+   "sujeitos": 80,
+   "colecoes": 1,
+   "licenca": "CC BY 4.0"
+  },
+  {
+   "analysis_result_id": "prostatex_seg_hires",
+   "series": 66,
+   "sujeitos": 66,
+   "colecoes": 1,
+   "licenca": "CC BY 3.0"
+  }
+ ]
+}
