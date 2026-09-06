@@ -17,10 +17,10 @@ Execução autônoma · 2026-09-06 · **Nada treinado · Split histórico intoca
 
 ## Definição LCTSC
 
-**Documentada e verificada em fonte primária.** A afirmação que o repositório já fazia —
-*"do nível abaixo do cricoide à junção gastroesofágica (atlas RTOG 1106)"* — está
-**correta**, confirmada por três céticos independentes que abriram Yang et al. 2018 e a
-página do TCIA.
+**Documentada, e a afirmação do repositório verifica-se PARCIALMENTE** — o **conteúdo**
+sustenta-se quase palavra por palavra em Yang et al. 2018 e na página do TCIA; a
+**atribuição** é ambígua, porque *"RTOG 1106"* nomeia coisas diferentes conforme quem
+escreve (o ensaio `NCT01507428`, o artigo-atlas de Kong 2011, e um *deck* da NRG).
 
 | | LCTSC declara |
 |---|---|
@@ -37,7 +37,11 @@ serviços, reaproveitados: *"The manual contours that were used in clinic for tr
 planning were used as ground 'truth.'"*
 
 - **quantos anotadores:** UNKNOWN · **especialidade:** UNKNOWN
-- **revisão:** **uma**, por **uma** pessoa — organizador do desafio, físico médico clínico
+- **revisão:** **uma**, por **uma** pessoa — organizador do desafio, físico médico clínico.
+  **Taxa de edição: UNKNOWN** — *"in some cases"* as pontas foram estendidas, sem registro
+  por caso. **É impossível saber se um RTSTRUCT do split congelado é contorno clínico puro
+  ou editado pelo organizador.**
+- **"expert"** aparece no **título** do artigo de dados e **nunca é substanciado no método**
 - **consenso · adjudicação:** não houve
 
 **Confirmado no arquivo:** `ROIGenerationAlgorithm` = **`MANUAL` em 59/60**;
@@ -54,13 +58,16 @@ circulam de forma intercambiável, e o LCTSC cita *"the RTOG 1106 contouring atl
 
 ## RTOG 1106 · Kong 2011 · VRMed
 
-**Três convenções publicadas para o mesmo limite cranial:**
+**Três redações do limite cranial só entre LCTSC e atlas** — e o *deck* da NRG **se
+contradiz internamente**:
 
 | Fonte | Cranial |
 |---|---|
 | Kong et al. 2011 (artigo) | *"at the level of cricoid cartilage"* |
-| *Deck* oficial da NRG | *"just below the"* |
-| STOPSTORM (Fase 20) | **arco aórtico** |
+| LCTSC · *deck* NRG · TCIA | *"just below the cricoid"* |
+| **Yang et al. 2020** (descrição de dados) | *"edited to be **in the first slice of** cricoid cartilage"* |
+| *deck* NRG, legenda de slide do **mesmo arquivo** | *"Esophagus starts at the level of cricoid"* |
+| STOPSTORM (Fase 20) | **arco aórtico** — quarta convenção |
 
 O próprio Kong 2011 registra a variabilidade de extensão como problema **sem consenso**.
 
@@ -84,8 +91,20 @@ também cobre o esôfago cervical.**
 coorte declara e que a Fase 9 mediu como **não localizável**. A medida mostra que sobe;
 **não prova** onde cruza.
 
-**E o desafio tolera sobre-extensão:** *"participants would not be penalized for contouring
-too great an extent of these structures"*.
+**E o desafio cortou 1 cm de cada extremidade antes de pontuar** — *"both ground truth and
+submitted contours were cropped 1 cm superior to the inferior border"* — mas
+**assimetricamente**: *"participants would not be penalized for contouring too great an
+extent … but would be penalized for a substantial undersegmentation"*. Sobre-extensão é
+tolerada; **sub-segmentação continua penalizando**.
+
+> **Consequência registrada e NÃO executada:** o VRmed computa Dice contra fatias que os
+> autores do dataset **cortaram antes de pontuar**. É **limitação declarada** do
+> `A_BASELINE_V1`, não erro dele. **Nenhuma métrica foi recalculada** — a regra desta
+> execução proíbe e o split é histórico e congelado.
+
+**E a Fase 9 já tinha a terceira via, sem ninguém ter ligado:** ponta cranial do GT em
+mediana **+120,0 mm acima da carina**, com truncamento de campo em apenas **1/30** — o
+contorno sobe, e **não** porque a imagem acabou.
 
 **`ONTOLOGY_CHANGE: NÃO`.** A fase **vindica** a posição da ontologia — extensão herdada do
 GT, marcos não localizáveis — e agora com razão documentada.
@@ -235,3 +254,4 @@ validation 15 · test 15 · **INTOCADO**.
 | 2 | `Manufacturer = Plastimatch` e `StructureSetLabel = AutoSS` usados como sinal de automação na Fase 20 | **aparecem no LCTSC**, contorno clínico humano — a tag nomeia quem escreveu o arquivo |
 | 3 | harness de mutação abortou | **o controle negativo** detectou que a árvore copiada não tinha `docs/` |
 | 4 | linha malformada em `pool.py` | `SyntaxError` na primeira execução |
+| 5 | relatórios da Fase 22 escritos com **4 de 5 arms** | o workflow fechou **11/11** depois, e o juiz refinou quatro pontos — adendo acrescido, texto original preservado |

@@ -283,3 +283,15 @@ a tratava como lista paralela. Detectado ao abrir os 60 RTSTRUCT do LCTSC.
 
 `PASS=340 · FAIL=0 · SKIP=0` — 49 de suíte + 250 de autoteste + 41 de mutação.
 Docs: **54 documentos, 0 violações**. Split congelado **INTOCADO**.
+
+### Adendo do juiz (Fase 22) — workflow fechou 11/11
+
+| Refinamento | Efeito |
+|---|---|
+| verificação da linha 82 | **PARCIAL**, não plena — conteúdo sim, atribuição ambígua |
+| redações do limite cranial | **três**, mais contradição interna no próprio *deck* da NRG |
+| protocolo × execução | tolerância ±1 fatia e critério ≥10 cm² **não aparecem** no que foi feito |
+| corte de 1 cm no *scoring* | **real**, mas **assimétrico**: sobre-extensão tolerada, sub-segmentação penalizada |
+| taxa de edição do QA | **UNKNOWN** — atinge o próprio split congelado |
+| "expert" | aparece no **título**, nunca substanciado no método |
+| Fase 9 | ponta cranial **+120,0 mm acima da carina**, truncamento em 1/30 |
