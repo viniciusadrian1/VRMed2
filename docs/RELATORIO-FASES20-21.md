@@ -209,6 +209,14 @@ Nem a Fase 20 nem a Fase 21 o desbloqueiam, e nenhuma tentou.
 - **O split congelado** segue `INTOCADO` (`sha256` `6e54c02b58bbb9b3a1667d4672eddef6…`).
 - **Nada foi treinado, avaliado, ou solicitado a terceiros.**
 
+## Auditoria final
+
+**PASS = 307 · FAIL = 0 · SKIP = 0** — 49 de suíte + 217 de autoteste de módulo +
+41 de mutação (13 da Fase 21, 21 do `interobservador`, 7 do `estilo_esofago`).
+Varredura de docs: **48 documentos, 0 violações**.
+Split congelado: `sha256` `6e54c02b58bbb9b3a1667d4672eddef6…` · development 30 ·
+validation 15 · test 15 · **INTOCADO**.
+
 ## Contradição declarada e não resolvida
 
 Sobre a **extensão cervical**: dois céticos reprovaram o SegTHOR porque seu esôfago começa

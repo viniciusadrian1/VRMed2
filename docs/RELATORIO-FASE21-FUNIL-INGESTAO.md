@@ -162,17 +162,17 @@ documento da V2 deixar de se declarar proposta.
    `_` **é** caractere de palavra: `1957-03-04_prontuario_123456789` não casava — o
    separador mais comum em nome de arquivo médico. Trocado por *lookaround* de dígito.
 
-## 10. Auditoria (21.15) — **PASS = 258 · FAIL = 0 · SKIP = 0**
+## 10. Auditoria (21.15) — **PASS = 307 · FAIL = 0 · SKIP = 0**
 
 | Categoria | N |
 |---|---:|
 | testes de suíte (`test_geometria` 10, `controles_positivos` 8, `ontologia_esofago` 13, `baseline_v1` 18) | **49** |
-| verificações de autoteste de módulo (13 módulos) | **168** |
+| verificações de autoteste de módulo (16 módulos) | **217** |
 | guardas derrubadas por mutação (fase21 13, interobservador 21, estilo_esofago 7) | **41** |
-| **total** | **258** |
+| **total** | **307** |
 
 Casos controlados do 21.2: **14/14** (contados dentro do autoteste do funil).
-Varredura de docs: **44 documentos, 0 violações**.
+Varredura de docs: **48 documentos, 0 violações**.
 Split congelado: `sha256` `6e54c02b58bbb9b3a1667d4672eddef6…` — **INTOCADO**.
 
 **Nenhum SKIP silencioso.** O único `SKIP` possível é o de `candidatos.py` quando o JSON
@@ -204,6 +204,6 @@ TEST_ISOLATION: PASS (excecao real, nao convencao de nome)
 NIFTI_LIMITATIONS: 2 de 4 identidades — study_id e series_id nao existem no formato;
   duas regras anti-vazamento ficam inverificaveis por caso NIfTI
 MUTATION: PASS=13 FAIL=0 (12/13 na primeira rodada; L4 virou teste)
-TESTES: PASS=258 FAIL=0 SKIP=0
+TESTES: PASS=307 FAIL=0 SKIP=0
 TREINAMENTO: BLOQUEADO
 ```
