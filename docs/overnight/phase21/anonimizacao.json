@@ -1,23 +1,25 @@
 {
- "diretorio": "C:\\Users\\vinic\\AppData\\Local\\Temp\\vrmed_anon_z_bpvjnf\\fixture",
- "arquivos": 4,
- "lidos": 4,
+ "diretorio": ".clinica-dados\\fase23\\4dlung\\104_HM10395\\ct",
+ "arquivos": 103,
+ "lidos": 50,
  "eixo1_tags_identificadoras": [
   {
    "tag": "0010,0010",
    "nome": "PatientName",
    "acao_esperada": "REMOVER_OU_SUBSTITUIR",
-   "presente_em": 0,
-   "de": 4,
-   "estado": "OK",
-   "exemplos": []
+   "presente_em": 50,
+   "de": 50,
+   "estado": "ACHADO",
+   "exemplos": [
+    "P104"
+   ]
   },
   {
    "tag": "0010,0020",
    "nome": "PatientID",
    "acao_esperada": "SUBSTITUIR",
-   "presente_em": 4,
-   "de": 4,
+   "presente_em": 50,
+   "de": 50,
    "estado": "INDETERMINADO",
    "exemplos": []
   },
@@ -26,7 +28,7 @@
    "nome": "PatientBirthDate",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -34,8 +36,8 @@
    "tag": "0010,0040",
    "nome": "PatientSex",
    "acao_esperada": "MANTER",
-   "presente_em": 0,
-   "de": 4,
+   "presente_em": 50,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -44,7 +46,7 @@
    "nome": "PatientAge",
    "acao_esperada": "MANTER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -53,7 +55,7 @@
    "nome": "PatientAddress",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -62,7 +64,7 @@
    "nome": "PatientTelephoneNumbers",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -71,7 +73,7 @@
    "nome": "OtherPatientIDs",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -80,7 +82,7 @@
    "nome": "OtherPatientNames",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -89,7 +91,7 @@
    "nome": "EthnicGroup",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -98,7 +100,7 @@
    "nome": "PatientComments",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -107,7 +109,7 @@
    "nome": "ReferringPhysicianName",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -116,7 +118,7 @@
    "nome": "PerformingPhysicianName",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -125,7 +127,7 @@
    "nome": "OperatorsName",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -134,7 +136,7 @@
    "nome": "PhysiciansOfRecord",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -143,7 +145,7 @@
    "nome": "InstitutionName",
    "acao_esperada": "REMOVER_OU_SUBSTITUIR",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -152,7 +154,7 @@
    "nome": "InstitutionAddress",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -161,7 +163,7 @@
    "nome": "InstitutionalDepartmentName",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -170,7 +172,7 @@
    "nome": "StationName",
    "acao_esperada": "REMOVER_OU_SUBSTITUIR",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -178,17 +180,19 @@
    "tag": "0008,0050",
    "nome": "AccessionNumber",
    "acao_esperada": "REMOVER_OU_SUBSTITUIR",
-   "presente_em": 0,
-   "de": 4,
-   "estado": "OK",
-   "exemplos": []
+   "presente_em": 50,
+   "de": 50,
+   "estado": "ACHADO",
+   "exemplos": [
+    "2819497684894126"
+   ]
   },
   {
    "tag": "0020,0010",
    "nome": "StudyID",
    "acao_esperada": "REMOVER_OU_SUBSTITUIR",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -197,7 +201,7 @@
    "nome": "DeviceSerialNumber",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -206,7 +210,7 @@
    "nome": "RequestingPhysician",
    "acao_esperada": "REMOVER",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   },
@@ -215,7 +219,7 @@
    "nome": "ContentCreatorName",
    "acao_esperada": "REMOVER_OU_SUBSTITUIR",
    "presente_em": 0,
-   "de": 4,
+   "de": 50,
    "estado": "OK",
    "exemplos": []
   }
@@ -224,46 +228,50 @@
   {
    "uid": "StudyInstanceUID",
    "presente": true,
-   "prefixo": "2.25",
+   "prefixo": "1.3.6.1.4.1.14519.5.2.1.6834.501",
    "estado": "INDETERMINADO",
    "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
   },
   {
    "uid": "SeriesInstanceUID",
    "presente": true,
-   "prefixo": "2.25",
+   "prefixo": "1.3.6.1.4.1.14519.5.2.1.6834.501",
    "estado": "INDETERMINADO",
    "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
   },
   {
    "uid": "SOPInstanceUID",
    "presente": true,
-   "prefixo": "2.25",
+   "prefixo": "1.3.6.1.4.1.14519.5.2.1.6834.501",
    "estado": "INDETERMINADO",
    "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
   },
   {
    "uid": "FrameOfReferenceUID",
-   "presente": false,
-   "prefixo": null,
-   "estado": "AUSENTE",
+   "presente": true,
+   "prefixo": "1.3.6.1.4.1.14519.5.2.1.6834.501",
+   "estado": "INDETERMINADO",
    "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
   }
  ],
  "eixo3_tags_privadas": {
-  "n_tags_privadas_distintas": 0,
-  "tags": [],
-  "estado": "OK",
+  "n_tags_privadas_distintas": 3,
+  "tags": [
+   "(0013,0010)",
+   "(0013,1010)",
+   "(0013,1013)"
+  ],
+  "estado": "ACHADO",
   "nota": "grupo impar e espaco livre do fabricante; ja se encontrou nome e prontuario ali. Presenca nao prova vazamento, mas exige inspecao caso a caso."
  },
  "eixo4_caminho": {
-  "arquivos": 4,
+  "arquivos": 103,
   "suspeitos": [],
   "n_suspeitos": 0,
   "estado": "OK"
  },
- "n_achados": 0,
- "veredito": "SEM ACHADO NAS 4 VARREDURAS",
+ "n_achados": 3,
+ "veredito": "ACHADOS: 3",
  "o_que_este_veredito_NAO_significa": [
   "nao significa 'anonimizado' — significa que estas quatro varreduras nao acharam",
   "pixel nao foi lido: texto queimado na imagem e invisivel aqui",

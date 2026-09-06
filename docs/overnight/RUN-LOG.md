@@ -149,3 +149,7 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 19:30 | comparacao indice x arquivo | a coluna do indice e **DEDUPLICADA** (0, 1 ou 2 valores, nunca por ROI) |
 | 19:35 | **correcao da Fase 20** | `proveniencia_roi` alinhava por indice; TUDO caia em UNKNOWN. Era artefato do leitor |
 | 19:40 | remedicao dos 908 | **MANUAL 731 · SEMIAUTOMATIC 101 · INDETERMINADO 42 · UNKNOWN 34** |
+| 19:55 | `fase23.aquisicao --plano` | 5 sujeitos DISTINTOS do 4D-Lung, 265,3 MB previstos, teto 400 MB |
+| 20:05 | `fase23.aquisicao --baixar` | **108,2 MB** baixados (NBIA anonimo, CC BY 3.0 por serie) |
+| 20:15 | `fase23.ingerir_real` | **5/5 ELEGIVEIS** — vinculo por UID, ontologia aprovada, buracos 0,0000 % |
+| 20:20 | `fase23.pool` | 0 colisoes de identidade; anonimizacao: `AccessionNumber` **identico nos 5** (placeholder) |

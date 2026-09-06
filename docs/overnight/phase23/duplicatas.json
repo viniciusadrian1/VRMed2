@@ -1,0 +1,13 @@
+{
+ "por_identidade": {
+  "image_sha256": {},
+  "mask_sha256": {},
+  "case_id": {},
+  "study_id": {},
+  "series_id": {}
+ },
+ "colisoes_de_identidade": 0,
+ "por_grade": {},
+ "colisoes_de_grade": 0,
+ "leitura_da_grade": "colisao de (shape, spacing) e FALSO POSITIVO por construcao: dois exames distintos do mesmo protocolo compartilham a grade. Ela entra como triagem para mostrar que as quatro chaves de identidade nao dependem dela."
+}
