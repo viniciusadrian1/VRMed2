@@ -59,9 +59,17 @@ NBIA = "https://services.cancerimagingarchive.net/nbia-api/services/v1/getImage"
 COLECAO = "4d_lung"
 N_SUJEITOS = 5
 
-# Teto de download desta fase. Um numero escrito ANTES de olhar os tamanhos —
-# depois vira justificativa.
+# Teto de download. Um numero escrito ANTES de olhar os tamanhos — depois vira
+# justificativa.
+#
+# FASE 23: 400 MB para uma AMOSTRA de 5 sujeitos (previsto 265,3; baixado 108,2).
+# FASE 24: o escopo mudou de amostra para COMPLETAR O UNIVERSO — os 11 sujeitos
+#   restantes, que nao sao escolhiveis: ou entram todos ou o universo fica
+#   incompleto. O tamanho e conhecido do indice ANTES do download (719,5 MB) e o
+#   teto e declarado em 1000 MB, com a justificativa registrada aqui e no relatorio.
+#   O teto continua existindo: ele nao virou infinito, virou outro numero, escrito.
 TETO_MB = 400.0
+TETO_MB_FASE24 = 1000.0
 
 
 def _indice():
@@ -71,7 +79,7 @@ def _indice():
     return pd.read_parquet(d / "idc_index.parquet")
 
 
-def planejar(n_sujeitos: int = N_SUJEITOS) -> dict:
+def planejar(n_sujeitos=N_SUJEITOS, excluir=None, teto=None) -> dict:
     """Escolhe a amostra e REGISTRA O TAMANHO antes de qualquer byte."""
     ix = _indice().drop_duplicates("SeriesInstanceUID").set_index("SeriesInstanceUID")
     linhas = [r for r in csv.DictReader(PROV_CSV.open(encoding="utf-8"))
@@ -87,21 +95,53 @@ def planejar(n_sujeitos: int = N_SUJEITOS) -> dict:
             continue
         mb = float(ix.loc[u, "series_size_MB"])
         p = r["PatientID"]
-        if p not in porsuj or mb < porsuj[p]["ct_mb"]:
-            porsuj[p] = {
-                "case_id": p, "rtstruct_uid": r["SeriesInstanceUID"],
-                "ct_uid": u, "ct_mb": mb,
-                "study_uid": r["StudyInstanceUID"],
-                "algoritmo": r["algoritmo"], "licenca": r["licenca"],
-                "n_rois": r["n_rois"],
-            }
-    escolhidos = sorted(porsuj.values(), key=lambda x: x["ct_mb"])[:n_sujeitos]
+        porsuj.setdefault(p, []).append({
+            "case_id": p, "rtstruct_uid": r["SeriesInstanceUID"],
+            "ct_uid": u, "ct_mb": mb,
+            "study_uid": r["StudyInstanceUID"],
+            "algoritmo": r["algoritmo"], "licenca": r["licenca"],
+            "n_rois": r["n_rois"],
+        })
+
+    # REGRA DE SELECAO CANONICA — uma serie por SUJEITO.
+    #
+    # A primeira versao usava `mb < melhor_ate_agora`, o que faz o PRIMEIRO da
+    # ordem de iteracao vencer os empates. A Fase 24 mediu que isso nao e
+    # reproduzivel: no 4D-Lung, 5 dos 16 sujeitos tem 10 fases respiratorias com
+    # tamanho de CT IDENTICO (43,158 MB no 107, e o mesmo padrao em 100-103), ou
+    # seja 10 empates exatos. A escolha dependia da ordem do parquet, nao do dado.
+    #
+    # A regra agora ordena por (tamanho da CT, UID da CT). O UID e o desempate
+    # canonico: e imutavel, unico e independente de qualquer ordem de leitura.
+    #
+    # VERIFICADO: esta regra reproduz EXATAMENTE as 5 selecoes ja ingeridas e
+    # auditadas na Fase 23 — inclusive a do 107, que tinha empate de 10. Logo a
+    # correcao nao invalida trabalho anterior (ver `_autoteste_reproduz_fase23`).
+    #
+    # POR QUE "menor CT" e nao outro criterio: e arbitrario em relacao a anatomia,
+    # e de proposito. Qualquer criterio que olhasse o CONTEUDO da mascara (volume,
+    # extensao, qualidade) seria selecao por propriedade do alvo, e isso contamina
+    # o dataset. Tamanho de arquivo nao sabe nada sobre o esofago.
+    escolhidos_por_suj = {p: sorted(v, key=lambda x: (x["ct_mb"], x["ct_uid"]))[0]
+                          for p, v in porsuj.items()}
+
+    if excluir:
+        escolhidos_por_suj = {p: v for p, v in escolhidos_por_suj.items()
+                              if p not in set(excluir)}
+
+    # ordem canonica de saida: por case_id, nunca por tamanho
+    ordenados = [escolhidos_por_suj[p] for p in sorted(escolhidos_por_suj)]
+    escolhidos = ordenados if n_sujeitos is None else ordenados[:n_sujeitos]
     total = sum(e["ct_mb"] for e in escolhidos)
     return {
         "colecao": COLECAO, "n_sujeitos": len(escolhidos),
-        "total_ct_MB": round(total, 1), "teto_MB": TETO_MB,
-        "dentro_do_teto": total <= TETO_MB,
+        "total_ct_MB": round(total, 1), "teto_MB": (TETO_MB if teto is None else float(teto)),
+        "dentro_do_teto": total <= (TETO_MB if teto is None else float(teto)),
         "sujeitos_distintos": len({e["case_id"] for e in escolhidos}),
+        "sujeitos_no_universo": len(porsuj),
+        "excluidos": sorted(set(excluir or [])),
+        "regra_de_selecao": ("uma serie por SUJEITO; menor (ct_mb, ct_uid); "
+                             "ordem de saida por case_id"),
         "escolhidos": escolhidos,
     }
 
@@ -160,9 +200,52 @@ def autoteste() -> int:
             falhas.append("planejamento inventou sujeitos: %d (o 4D-Lung tem 16 com "
                           "esofago)" % p2["n_sujeitos"])
 
+        # O UNIVERSO E 16 SUJEITOS. Se este numero mudar, a Fase 24 inteira muda,
+        # e a mudanca tem de ser vista aqui e nao descoberta no meio da ingestao.
+        todos = planejar(None)
+        if todos["sujeitos_no_universo"] != 16:
+            falhas.append("universo deixou de ser 16 sujeitos: %d"
+                          % todos["sujeitos_no_universo"])
+        if todos["n_sujeitos"] != 16:
+            falhas.append("planejar(None) devolveu %d, esperado os 16"
+                          % todos["n_sujeitos"])
+
+        # REGRA 14 — a regra canonica NAO pode mudar as 5 selecoes ja auditadas.
+        # Este e o teste que autoriza ter trocado o desempate: sem ele, a correcao
+        # da regra invalidaria trabalho anterior em silencio.
+        pool = RAIZ / "docs" / "FASE23-POOL-CANDIDATO.json"
+        if pool.exists():
+            ja = {c["source_case_id"]: c["study_id"]
+                  for c in json.loads(pool.read_text(encoding="utf-8"))["casos"]}
+            sel = {e["case_id"]: e["study_uid"] for e in todos["escolhidos"]}
+            for caso, study in sorted(ja.items()):
+                if sel.get(caso) != study:
+                    falhas.append("a regra canonica mudou a selecao ja auditada de %s "
+                                  "(era ...%s, virou ...%s) — isso invalidaria a Fase 23"
+                                  % (caso, study[-8:], str(sel.get(caso))[-8:]))
+            # e a exclusao tem de devolver exatamente os 11 restantes
+            rest = planejar(None, excluir=sorted(ja))
+            if rest["n_sujeitos"] != 11:
+                falhas.append("excluir os 5 ingeridos deveria deixar 11, deixou %d"
+                              % rest["n_sujeitos"])
+            if set(rest["escolhidos"][0].keys()) and any(
+                    e["case_id"] in ja for e in rest["escolhidos"]):
+                falhas.append("um sujeito ja ingerido reapareceu na lista de restantes")
+
+        # DESEMPATE CANONICO: com tamanhos iguais, o UID decide, e o resultado nao
+        # pode depender da ordem de entrada.
+        amostra = [{"case_id": "x", "ct_mb": 10.0, "ct_uid": "b", "rtstruct_uid": "1",
+                    "study_uid": "s", "algoritmo": "", "licenca": "", "n_rois": "1"},
+                   {"case_id": "x", "ct_mb": 10.0, "ct_uid": "a", "rtstruct_uid": "2",
+                    "study_uid": "s", "algoritmo": "", "licenca": "", "n_rois": "1"}]
+        e1 = sorted(amostra, key=lambda x: (x["ct_mb"], x["ct_uid"]))[0]
+        e2 = sorted(list(reversed(amostra)), key=lambda x: (x["ct_mb"], x["ct_uid"]))[0]
+        if e1["ct_uid"] != "a" or e1["ct_uid"] != e2["ct_uid"]:
+            falhas.append("desempate por UID nao e canonico: depende da ordem de entrada")
+
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste aquisicao: %d verificacoes, %d falhas" % (7, len(falhas)))
+    print("autoteste aquisicao: %d verificacoes, %d falhas" % (14, len(falhas)))
     return 1 if falhas else 0
 
 
@@ -171,7 +254,13 @@ def main(argv=None) -> int:
     ap.add_argument("--autoteste", action="store_true")
     ap.add_argument("--plano", action="store_true")
     ap.add_argument("--baixar", action="store_true")
-    ap.add_argument("-n", type=int, default=N_SUJEITOS)
+    ap.add_argument("-n", type=int, default=N_SUJEITOS,
+                    help="quantos sujeitos; -1 = todos os restantes")
+    ap.add_argument("--excluir-ingeridos", action="store_true",
+                    help="exclui os sujeitos ja presentes no pool da Fase 23")
+    ap.add_argument("--teto", type=float, default=None,
+                    help="teto de download em MB; deve ser declarado explicitamente "
+                         "quando o escopo muda (Fase 24 usa %.0f)" % TETO_MB_FASE24)
     a = ap.parse_args(argv)
     if a.autoteste:
         return autoteste()
@@ -179,8 +268,17 @@ def main(argv=None) -> int:
         return 1
     print()
 
-    p = planejar(a.n)
+    excluir = []
+    if a.excluir_ingeridos:
+        pool = RAIZ / "docs" / "FASE23-POOL-CANDIDATO.json"
+        if pool.exists():
+            excluir = sorted({c["source_case_id"]
+                              for c in json.loads(pool.read_text(encoding="utf-8"))["casos"]})
+    p = planejar(None if a.n < 0 else a.n, excluir=excluir, teto=a.teto)
     print("PLANO DE AQUISICAO — %s" % p["colecao"])
+    print("  universo (sujeitos com esofago): %d  |  ja ingeridos e excluidos: %d %s"
+          % (p["sujeitos_no_universo"], len(p["excluidos"]), p["excluidos"] or ""))
+    print("  regra: %s" % p["regra_de_selecao"])
     print("  sujeitos DISTINTOS: %d  |  total de CT: %.1f MB  |  teto: %.0f MB  -> %s"
           % (p["sujeitos_distintos"], p["total_ct_MB"], p["teto_MB"],
              "DENTRO" if p["dentro_do_teto"] else "ESTOUROU"))
