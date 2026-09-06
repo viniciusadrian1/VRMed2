@@ -1,0 +1,617 @@
+{
+ "fase": 22,
+ "pergunta": "o contorno de esofago sobe acima do apice pulmonar?",
+ "por_que": "o LCTSC declara limite cranial LOGO ABAIXO DA CRICOIDE. Se a declaracao se realiza no dado, o contorno tem de subir acima do apice do pulmao — e sobe. Medida e documento convergem, em duas coortes independentes.",
+ "limite": "acima do apice pulmonar NAO e o mesmo que cervical: os apices sobem acima da primeira costela. A fronteira cervical/toracica e o opercuo toracico, marco que nenhuma das duas coortes declara e que a Fase 9 mediu como NAO localizavel.",
+ "coortes": [
+  {
+   "coorte": "LCTSC (60)",
+   "n": 60,
+   "eso_acima_do_apice_mm": {
+    "min": -21.0,
+    "mediana": 17.5,
+    "max": 39.0
+   },
+   "casos_acima_do_apice": 54,
+   "casos": [
+    {
+     "caso": "LCTSC-Test-S1-101",
+     "eso_top": -331.2,
+     "eso_base": -550.2,
+     "pulmao_top": -337.2,
+     "pulmao_base": -571.2,
+     "eso_acima_do_apice_mm": 6.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S1-102",
+     "eso_top": -330.5,
+     "eso_base": -558.5,
+     "pulmao_top": -369.5,
+     "pulmao_base": -579.5,
+     "eso_acima_do_apice_mm": 39.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S1-103",
+     "eso_top": -256.0,
+     "eso_base": -502.0,
+     "pulmao_top": -271.0,
+     "pulmao_base": -508.0,
+     "eso_acima_do_apice_mm": 15.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S1-104",
+     "eso_top": -307.5,
+     "eso_base": -553.5,
+     "pulmao_top": -334.5,
+     "pulmao_base": -562.5,
+     "eso_acima_do_apice_mm": 27.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S1-201",
+     "eso_top": -357.5,
+     "eso_base": -555.5,
+     "pulmao_top": -378.5,
+     "pulmao_base": -585.5,
+     "eso_acima_do_apice_mm": 21.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S1-202",
+     "eso_top": -335.0,
+     "eso_base": -575.0,
+     "pulmao_top": -371.0,
+     "pulmao_base": -590.0,
+     "eso_acima_do_apice_mm": 36.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S1-203",
+     "eso_top": -393.0,
+     "eso_base": -606.0,
+     "pulmao_top": -402.0,
+     "pulmao_base": -633.0,
+     "eso_acima_do_apice_mm": 9.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S1-204",
+     "eso_top": -338.0,
+     "eso_base": -485.0,
+     "pulmao_top": -329.0,
+     "pulmao_base": -572.0,
+     "eso_acima_do_apice_mm": -9.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-101",
+     "eso_top": 92.5,
+     "eso_base": -157.5,
+     "pulmao_top": 57.5,
+     "pulmao_base": -160.0,
+     "eso_acima_do_apice_mm": 35.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-102",
+     "eso_top": 90.0,
+     "eso_base": -150.0,
+     "pulmao_top": 72.5,
+     "pulmao_base": -187.5,
+     "eso_acima_do_apice_mm": 17.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-103",
+     "eso_top": 82.5,
+     "eso_base": -127.5,
+     "pulmao_top": 70.0,
+     "pulmao_base": -165.0,
+     "eso_acima_do_apice_mm": 12.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-104",
+     "eso_top": 80.0,
+     "eso_base": -130.0,
+     "pulmao_top": 80.0,
+     "pulmao_base": -162.5,
+     "eso_acima_do_apice_mm": 0.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-201",
+     "eso_top": 62.5,
+     "eso_base": -135.0,
+     "pulmao_top": 57.5,
+     "pulmao_base": -137.5,
+     "eso_acima_do_apice_mm": 5.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-202",
+     "eso_top": 60.0,
+     "eso_base": -157.5,
+     "pulmao_top": 47.5,
+     "pulmao_base": -202.5,
+     "eso_acima_do_apice_mm": 12.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-203",
+     "eso_top": 67.5,
+     "eso_base": -127.5,
+     "pulmao_top": 55.0,
+     "pulmao_base": -150.0,
+     "eso_acima_do_apice_mm": 12.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S2-204",
+     "eso_top": 22.5,
+     "eso_base": -185.0,
+     "pulmao_top": 2.5,
+     "pulmao_base": -220.0,
+     "eso_acima_do_apice_mm": 20.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-101",
+     "eso_top": 494.0,
+     "eso_base": 284.0,
+     "pulmao_top": 476.0,
+     "pulmao_base": 276.0,
+     "eso_acima_do_apice_mm": 18.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-102",
+     "eso_top": 215.25,
+     "eso_base": -22.25,
+     "pulmao_top": 195.25,
+     "pulmao_base": -49.75,
+     "eso_acima_do_apice_mm": 20.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-103",
+     "eso_top": 501.0,
+     "eso_base": 297.0,
+     "pulmao_top": 468.0,
+     "pulmao_base": 267.0,
+     "eso_acima_do_apice_mm": 33.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-104",
+     "eso_top": 247.25,
+     "eso_base": -10.25,
+     "pulmao_top": 214.75,
+     "pulmao_base": -17.75,
+     "eso_acima_do_apice_mm": 32.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-201",
+     "eso_top": 438.0,
+     "eso_base": 240.0,
+     "pulmao_top": 404.0,
+     "pulmao_base": 234.0,
+     "eso_acima_do_apice_mm": 34.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-202",
+     "eso_top": 337.0,
+     "eso_base": 121.0,
+     "pulmao_top": 322.0,
+     "pulmao_base": 94.0,
+     "eso_acima_do_apice_mm": 15.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-203",
+     "eso_top": 233.5,
+     "eso_base": 6.0,
+     "pulmao_top": 208.5,
+     "pulmao_base": -14.0,
+     "eso_acima_do_apice_mm": 25.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Test-S3-204",
+     "eso_top": 213.25,
+     "eso_base": -21.75,
+     "pulmao_top": 185.75,
+     "pulmao_base": -56.75,
+     "eso_acima_do_apice_mm": 27.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-001",
+     "eso_top": -322.0,
+     "eso_base": -550.0,
+     "pulmao_top": -328.0,
+     "pulmao_base": -568.0,
+     "eso_acima_do_apice_mm": 6.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-002",
+     "eso_top": -364.0,
+     "eso_base": -616.0,
+     "pulmao_top": -388.0,
+     "pulmao_base": -643.0,
+     "eso_acima_do_apice_mm": 24.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-003",
+     "eso_top": -362.0,
+     "eso_base": -629.0,
+     "pulmao_top": -371.0,
+     "pulmao_base": -689.0,
+     "eso_acima_do_apice_mm": 9.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-004",
+     "eso_top": -303.5,
+     "eso_base": -564.5,
+     "pulmao_top": -324.5,
+     "pulmao_base": -600.5,
+     "eso_acima_do_apice_mm": 21.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-005",
+     "eso_top": -306.5,
+     "eso_base": -528.5,
+     "pulmao_top": -330.5,
+     "pulmao_base": -555.5,
+     "eso_acima_do_apice_mm": 24.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-006",
+     "eso_top": -315.0,
+     "eso_base": -534.0,
+     "pulmao_top": -342.0,
+     "pulmao_base": -564.0,
+     "eso_acima_do_apice_mm": 27.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-007",
+     "eso_top": -333.5,
+     "eso_base": -561.5,
+     "pulmao_top": -360.5,
+     "pulmao_base": -576.5,
+     "eso_acima_do_apice_mm": 27.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-008",
+     "eso_top": -371.0,
+     "eso_base": -587.0,
+     "pulmao_top": -377.0,
+     "pulmao_base": -605.0,
+     "eso_acima_do_apice_mm": 6.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-009",
+     "eso_top": -188.0,
+     "eso_base": -431.0,
+     "pulmao_top": -185.0,
+     "pulmao_base": -494.0,
+     "eso_acima_do_apice_mm": -3.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-010",
+     "eso_top": -358.0,
+     "eso_base": -535.0,
+     "pulmao_top": -373.0,
+     "pulmao_base": -565.0,
+     "eso_acima_do_apice_mm": 15.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-011",
+     "eso_top": -376.5,
+     "eso_base": -601.5,
+     "pulmao_top": -391.5,
+     "pulmao_base": -634.5,
+     "eso_acima_do_apice_mm": 15.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S1-012",
+     "eso_top": -331.5,
+     "eso_base": -514.5,
+     "pulmao_top": -328.5,
+     "pulmao_base": -568.5,
+     "eso_acima_do_apice_mm": -3.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-001",
+     "eso_top": 57.5,
+     "eso_base": -172.5,
+     "pulmao_top": 45.0,
+     "pulmao_base": -202.5,
+     "eso_acima_do_apice_mm": 12.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-002",
+     "eso_top": 110.0,
+     "eso_base": -95.0,
+     "pulmao_top": 110.0,
+     "pulmao_base": -122.5,
+     "eso_acima_do_apice_mm": 0.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-003",
+     "eso_top": 67.5,
+     "eso_base": -175.0,
+     "pulmao_top": 60.0,
+     "pulmao_base": -230.0,
+     "eso_acima_do_apice_mm": 7.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-004",
+     "eso_top": 100.0,
+     "eso_base": -157.5,
+     "pulmao_top": 77.5,
+     "pulmao_base": -180.0,
+     "eso_acima_do_apice_mm": 22.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-005",
+     "eso_top": 115.0,
+     "eso_base": -92.5,
+     "pulmao_top": 87.5,
+     "pulmao_base": -110.0,
+     "eso_acima_do_apice_mm": 27.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-006",
+     "eso_top": 95.0,
+     "eso_base": -120.0,
+     "pulmao_top": 67.5,
+     "pulmao_base": -135.0,
+     "eso_acima_do_apice_mm": 27.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-007",
+     "eso_top": 102.5,
+     "eso_base": -117.5,
+     "pulmao_top": 82.5,
+     "pulmao_base": -152.5,
+     "eso_acima_do_apice_mm": 20.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-008",
+     "eso_top": 90.0,
+     "eso_base": -140.0,
+     "pulmao_top": 70.0,
+     "pulmao_base": -162.5,
+     "eso_acima_do_apice_mm": 20.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-009",
+     "eso_top": 85.0,
+     "eso_base": -145.0,
+     "pulmao_top": 75.0,
+     "pulmao_base": -170.0,
+     "eso_acima_do_apice_mm": 10.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-010",
+     "eso_top": 115.0,
+     "eso_base": -95.0,
+     "pulmao_top": 97.5,
+     "pulmao_base": -115.0,
+     "eso_acima_do_apice_mm": 17.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-011",
+     "eso_top": 100.0,
+     "eso_base": -150.0,
+     "pulmao_top": 82.5,
+     "pulmao_base": -150.0,
+     "eso_acima_do_apice_mm": 17.5,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S2-012",
+     "eso_top": 115.0,
+     "eso_base": -100.0,
+     "pulmao_top": 95.0,
+     "pulmao_base": -122.5,
+     "eso_acima_do_apice_mm": 20.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-001",
+     "eso_top": 323.0,
+     "eso_base": 95.0,
+     "pulmao_top": 315.0,
+     "pulmao_base": 93.0,
+     "eso_acima_do_apice_mm": 8.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-002",
+     "eso_top": 310.25,
+     "eso_base": 65.25,
+     "pulmao_top": 285.25,
+     "pulmao_base": 47.75,
+     "eso_acima_do_apice_mm": 25.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-003",
+     "eso_top": 568.0,
+     "eso_base": 332.0,
+     "pulmao_top": 532.0,
+     "pulmao_base": 302.0,
+     "eso_acima_do_apice_mm": 36.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-004",
+     "eso_top": 469.5,
+     "eso_base": 223.5,
+     "pulmao_top": 439.5,
+     "pulmao_base": 203.5,
+     "eso_acima_do_apice_mm": 30.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-005",
+     "eso_top": 448.0,
+     "eso_base": 234.0,
+     "pulmao_top": 438.0,
+     "pulmao_base": 206.0,
+     "eso_acima_do_apice_mm": 10.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-006",
+     "eso_top": 390.0,
+     "eso_base": 195.0,
+     "pulmao_top": 411.0,
+     "pulmao_base": 183.0,
+     "eso_acima_do_apice_mm": -21.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-007",
+     "eso_top": 469.5,
+     "eso_base": 241.5,
+     "pulmao_top": 439.5,
+     "pulmao_base": 217.5,
+     "eso_acima_do_apice_mm": 30.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-008",
+     "eso_top": 475.5,
+     "eso_base": 233.5,
+     "pulmao_top": 463.5,
+     "pulmao_base": 223.5,
+     "eso_acima_do_apice_mm": 12.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-009",
+     "eso_top": 372.0,
+     "eso_base": 159.0,
+     "pulmao_top": 360.0,
+     "pulmao_base": 123.0,
+     "eso_acima_do_apice_mm": 12.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-010",
+     "eso_top": 472.5,
+     "eso_base": 247.5,
+     "pulmao_top": 451.5,
+     "pulmao_base": 196.5,
+     "eso_acima_do_apice_mm": 21.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-011",
+     "eso_top": -414.0,
+     "eso_base": -630.0,
+     "pulmao_top": -423.0,
+     "pulmao_base": -651.0,
+     "eso_acima_do_apice_mm": 9.0,
+     "carina_z": null
+    },
+    {
+     "caso": "LCTSC-Train-S3-012",
+     "eso_top": 182.25,
+     "eso_base": -15.25,
+     "pulmao_top": 167.25,
+     "pulmao_base": -61.5,
+     "eso_acima_do_apice_mm": 15.0,
+     "carina_z": null
+    }
+   ]
+  },
+  {
+   "coorte": "4D-Lung (amostra 5)",
+   "n": 5,
+   "eso_acima_do_apice_mm": {
+    "min": 12.0,
+    "mediana": 21.0,
+    "max": 27.0
+   },
+   "casos_acima_do_apice": 5,
+   "casos": [
+    {
+     "caso": "104_HM10395",
+     "eso_top": 127.5,
+     "eso_base": -118.5,
+     "pulmao_top": 100.5,
+     "pulmao_base": -133.5,
+     "eso_acima_do_apice_mm": 27.0,
+     "carina_z": 16.5
+    },
+    {
+     "caso": "106_HM10395",
+     "eso_top": 60.5,
+     "eso_base": -143.5,
+     "pulmao_top": 39.5,
+     "pulmao_base": -164.5,
+     "eso_acima_do_apice_mm": 21.0,
+     "carina_z": -50.5
+    },
+    {
+     "caso": "107_HM10395",
+     "eso_top": 63.3,
+     "eso_base": -107.7,
+     "pulmao_top": 51.3,
+     "pulmao_base": -140.7,
+     "eso_acima_do_apice_mm": 12.0,
+     "carina_z": -17.7
+    },
+    {
+     "caso": "109_HM10395",
+     "eso_top": 125.5,
+     "eso_base": -69.5,
+     "pulmao_top": 107.5,
+     "pulmao_base": -111.5,
+     "eso_acima_do_apice_mm": 18.0,
+     "carina_z": 29.5
+    },
+    {
+     "caso": "115_HM10395",
+     "eso_top": 91.5,
+     "eso_base": -145.5,
+     "pulmao_top": 67.5,
+     "pulmao_base": -166.5,
+     "eso_acima_do_apice_mm": 24.0,
+     "carina_z": -7.5
+    }
+   ]
+  }
+ ]
+}
