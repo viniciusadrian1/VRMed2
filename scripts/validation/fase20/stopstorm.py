@@ -9,11 +9,26 @@ Os dois sinais que EXISTEM no arquivo apontam para o outro lado:
   StructureSetLabel = 'AutoSS'      (AutoSS = automatic structure set)
   Manufacturer      = 'Plastimatch' (ferramenta de registro/segmentacao automatica)
 
-Pela regra do projeto — ausencia da tag e UNKNOWN, nunca MANUAL por omissao — a
-autoria e UNKNOWN, e o rotulo AutoSS a empurra para "provavelmente automatica ou
-semi-automatica". Isso NAO prova que a mascara e ruim: num benchmark de contorno,
-o structure set distribuido costuma ser o PONTO DE PARTIDA dado aos centros, nao a
-referencia. Prova que ela nao pode entrar como ground truth humano sem apuracao.
+Isso ja bastaria para UNKNOWN. Mas a medicao seguinte fechou o caso de vez:
+
+  CADA UM dos 31 ROIs, nos 3 casos, tem contorno em EXATAMENTE UMA FATIA.
+  O esofago tem 1 contorno, em 1 fatia.
+
+Um contorno de orgao cobre dezenas de fatias. Um TEMPLATE DE NOMENCLATURA cobre uma.
+E o PDF do proprio benchmark (baixado, 0,96 MB) confirma em texto:
+
+  "we provided the above-mentioned contour templates. There is one slice where you
+   can find all the contours. Please delete our temporary contours from the templates
+   and start contouring according to the guidelines presented in this document."
+
+CLASSE F. O pacote distribui a TAREFA, nao a referencia. Nao ha ground truth de
+esofago aqui — e isso e medido, nao inferido.
+
+O QUE O PACOTE ENTREGA DE VALOR: a REGRA. O PDF traz a definicao operacional de
+extensao do esofago atribuida a Kong et al., com limite cranial no ARCO AORTICO
+(nao no cricoide) e caudal "until it ends at the stomach". Mais uma convencao de
+extensao diferente — o que reforca, e nao contradiz, a decisao da ONTOLOGY_V1 de
+HERDAR a extensao do GT em vez de fixa-la.
 
 E UM SEGUNDO ACHADO, DE IDENTIDADE
 PatientID = 'NOID' nos TRES casos. O `case_id` entregue e degenerado: tres estudos
@@ -76,6 +91,22 @@ def medir(diretorio: Path = DADOS) -> dict:
         eso = ie._nomes_de_esofago(rois)
         idx = [i for i, r in enumerate(rois) if r in eso]
 
+        # A MEDICAO QUE FECHOU O CASO: quantas FATIAS distintas cada ROI cobre.
+        # Um contorno de orgao cobre dezenas de fatias. Um template de nomenclatura
+        # cobre UMA. O PDF do proprio benchmark diz: "we provided the contour
+        # templates. There is one slice where you can find all the contours. Please
+        # delete our temporary contours from the templates and start contouring".
+        fatias_por_roi = {}
+        try:
+            n2n = {r.ROINumber: str(r.ROIName) for r in ds.StructureSetROISequence}
+            for c in ds.ROIContourSequence:
+                seq = getattr(c, "ContourSequence", [])
+                zs = {round(float(x.ContourData[2]), 2) for x in seq
+                      if len(getattr(x, "ContourData", [])) >= 3}
+                fatias_por_roi[n2n.get(c.ReferencedROINumber, "?")] = len(zs)
+        except Exception:  # noqa: BLE001
+            pass
+
         ct_uid, n_inst = None, None
         try:
             s = (ds.ReferencedFrameOfReferenceSequence[0]
@@ -98,6 +129,10 @@ def medir(diretorio: Path = DADOS) -> dict:
             "algoritmos_todos": dict(Counter(a or "VAZIO" for a in algos)),
             "ct_referenciada": ct_uid,
             "ct_instancias": n_inst,
+            "fatias_por_roi": fatias_por_roi,
+            "fatias_do_esofago": fatias_por_roi.get("Esophagus"),
+            "todos_rois_em_uma_fatia": bool(fatias_por_roi
+                                            and set(fatias_por_roi.values()) == {1}),
             "sinal_auto_no_rotulo": any(s in rotulo.lower() for s in SINAIS_AUTO),
             "ferramenta_auto": any(t in fabricante.lower() for t in FERRAMENTAS_AUTO),
         })
@@ -119,12 +154,28 @@ def medir(diretorio: Path = DADOS) -> dict:
                                 for c in casos),
         "ct_ligada_por_uid": sum(1 for c in casos if c["ct_referenciada"]),
         "casos": casos,
+        "todos_em_uma_fatia": all(c["todos_rois_em_uma_fatia"] for c in casos),
+        "classificacao": "F",
         "veredito_gt": (
-            "UNKNOWN, com sinal de automacao. A tag ROIGenerationAlgorithm esta VAZIA "
-            "em todos os ROIs; StructureSetLabel e 'AutoSS' e Manufacturer e "
-            "'Plastimatch'. Ausencia da tag e UNKNOWN, nunca MANUAL por omissao — e "
-            "os dois sinais existentes apontam para geracao automatica. Nao entra como "
-            "ground truth humano sem apuracao documental."
+            "NAO HA GROUND TRUTH AQUI — e isso e medido, nao inferido. Cada um dos 31 "
+            "ROIs, nos 3 casos, tem contorno em EXATAMENTE UMA fatia; o esofago tem 1 "
+            "contorno em 1 fatia. Sao TEMPLATES DE NOMENCLATURA, nao segmentacoes. O "
+            "PDF do proprio benchmark confirma: 'we provided the contour templates. "
+            "There is one slice where you can find all the contours. Please delete our "
+            "temporary contours from the templates and start contouring'. "
+            "Os sinais anteriores (tag vazia, StructureSetLabel 'AutoSS', Manufacturer "
+            "'Plastimatch') apontavam na direcao certa; a medicao de fatias fechou. "
+            "CLASSE F: o pacote distribui a TAREFA, nao a referencia."
+        ),
+        "regra_de_contorno_publicada": (
+            "O PDF traz a regra operacional de extensao do esofago, atribuida a Kong "
+            "et al.: 'contoured using mediastinal windowing... to correspond to the "
+            "mucosa, submucosa, and all muscular layers out to the fatty adventitia. "
+            "Cranial the esophagus contour should begin at the level of aortic arch "
+            "and continue including the gastroesophageal junction (GEJ) until it ends "
+            "at the stomach.' NOTA: o limite cranial aqui e o ARCO AORTICO, nao o "
+            "cricoide — mais uma convencao de extensao diferente, o que reforca a "
+            "decisao da ONTOLOGY_V1 de herdar a extensao do GT em vez de fixa-la."
         ),
         "veredito_identidade": (
             "PARCIAL. study_id e series_id presentes e distintos; a CT e referenciada "
@@ -164,6 +215,12 @@ def autoteste() -> int:
                           "relatorio precisa ser refeito")
         if not r["algum_sinal_auto"]:
             falhas.append("os sinais AutoSS/Plastimatch sumiram — remedir")
+        # o achado que fecha o caso: se deixar de ser 1 fatia por ROI, o veredito muda
+        if not r["todos_em_uma_fatia"]:
+            falhas.append("os ROIs deixaram de estar em UMA fatia — o veredito F "
+                          "depende disso e o relatorio precisa ser refeito")
+        if r["classificacao"] != "F":
+            falhas.append("classificacao mudou sem revisao")
         if r["case_id_unico"]:
             falhas.append("case_id passou a ser unico — o achado 'NOID' mudou")
     else:
@@ -199,6 +256,10 @@ def main(argv=None) -> int:
               % (c["structure_set_date"], c["case_id"], c["structure_set_label"],
                  c["manufacturer"], c["n_rois"], ",".join(c["esofago"]),
                  ",".join(c["algoritmo_do_esofago"])))
+    print()
+    print("fatias por ROI: %s  |  esofago: %s fatia(s)"
+          % (sorted({v for c in r["casos"] for v in c["fatias_por_roi"].values()}),
+             {c["fatias_do_esofago"] for c in r["casos"]}))
     print()
     print("GT:        ", r["veredito_gt"])
     print()

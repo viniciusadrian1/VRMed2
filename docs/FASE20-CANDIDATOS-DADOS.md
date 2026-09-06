@@ -32,11 +32,11 @@ A tag DICOM que responderia *"humano ou modelo?"* existe no padrão, está no í
 | Classe | N | Significado |
 |---|---:|---|
 | **A** | **3** | não são datasets — são **canais** (TCIA, IDC) e um **documento normativo** (atlas Kong 2011) |
-| **B** | **3** | potencialmente elegível com ressalvas |
+| **B** | **2** | potencialmente elegível com ressalvas (o STOPSTORM caiu para F por medição) |
 | **C** | **4** | inadequado |
 | **D** | **14** | inacessível dentro das travas |
 | **E** | **6** | independência ou definição indeterminada |
-| **F** | **17** | reprovado por procedência, alvo ou vazamento |
+| **F** | **18** | reprovado por procedência, alvo ou vazamento |
 
 **Nenhum candidato classe A é um dataset.** Os três A são infraestrutura e regra.
 
@@ -64,7 +64,7 @@ distintos, e o segundo está vazio.
 **Próximo passo.** Nenhum — o canal já está caracterizado e instrumentado
 (`fase20/censo_identidade.py`, `fase20/proveniencia_roi.py`).
 
-### 3.2 STOPSTORM Benchmark Data — **B, e o mais instrutivo**
+### 3.2 STOPSTORM Benchmark Data — **F**, e o mais instrutivo de todos
 
 `10.5281/zenodo.22127731` · concept DOI `10.5281/zenodo.22127730` · **CC BY 4.0** ·
 publicado **2026-08-27**.
@@ -91,16 +91,33 @@ existem apontam para o outro lado. **Isso não prova que a máscara é ruim:** n
 de contorno, o structure set distribuído costuma ser o **ponto de partida** dado aos
 centros, não a referência. Prova que **não entra como GT humano sem apuração documental**.
 
-**Que dado falta.** (a) ler o `STOPSTORM_OAR_Contouring_Benchmark.pdf` do próprio pacote
-para saber se o `AutoSS` é semente ou referência; (b) `n = 3` — insuficiente para
-qualquer partição sozinho.
+**E aí a medição seguinte fechou o caso.** Baixei o PDF do benchmark (0,96 MB) e medi as
+fatias por ROI:
+
+> **Cada um dos 31 ROIs, nos 3 casos, tem contorno em EXATAMENTE UMA FATIA.**
+> O esôfago tem **1 contorno em 1 fatia**.
+
+O PDF confirma em texto: *"we provided the above-mentioned contour **templates**. There is
+**one slice** where you can find all the contours. **Please delete our temporary contours
+from the templates** and start contouring according to the guidelines."*
+
+**São templates de nomenclatura, não segmentações.** O pacote distribui a **tarefa**, não a
+referência. **Classe F** — não há ground truth de esôfago ali, e isso é **medido**.
+
+**O que o pacote entrega de valor: a regra.** O PDF traz a definição operacional de
+extensão do esôfago atribuída a Kong et al. — *"mucosa, submucosa, and all muscular layers
+out to the fatty adventitia"*, cranial **no arco aórtico** (não no cricoide) e caudal
+*"until it ends at the stomach"*. **Mais uma convenção de extensão diferente** — o que
+reforça, e não contradiz, a decisão da `ESOPHAGUS_ONTOLOGY_V1` de **herdar** a extensão do
+GT em vez de fixá-la.
 
 **Risco.** É o risco de sempre, na forma mais sedutora: licença impecável, identidade
 impecável, formato impecável, e a procedência da anotação vazia. Foi assim que
 `totalsegmentator_ct_segmentations` (**378.153 séries, CC BY 4.0, DICOM completo**) chegou
 a parecer candidato.
 
-**Próximo passo.** Baixar apenas o PDF de benchmark (0,96 MB) e ler a seção de método.
+**Próximo passo.** Nenhum, como fonte de dado. Como fonte de **regra**, o PDF já foi lido
+e a citação está registrada.
 
 ### 3.3 Atlas Kong et al. 2011 — **A, e não é dataset**
 

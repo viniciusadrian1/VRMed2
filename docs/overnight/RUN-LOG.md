@@ -135,3 +135,5 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 19:45 | falso positivo proprio | `000Y` do 4D-Lung marcava a colecao como PEDIATRICA; e artefato de anonimizacao, nao lactente |
 | 20:05 | `zip_remoto` no STOPSTORM | 3 RTSTRUCT em **344,9 KiB de um zip de 169,5 MB (0,21 %)**, CRC conferido |
 | 20:10 | `fase20.stopstorm` | **arm REFUTADO**: `ROIGenerationAlgorithm` VAZIO em 93/93 ROIs; label `AutoSS`, fabricante `Plastimatch`; `case_id`='NOID' nos tres |
+| 20:25 | PDF do benchmark STOPSTORM (0,96 MB) | *"delete our temporary contours from the templates"* |
+| 20:30 | fatias por ROI | **1 fatia em 31/31 ROIs, 3/3 casos** — sao templates, nao segmentacoes. STOPSTORM cai para **F** |
