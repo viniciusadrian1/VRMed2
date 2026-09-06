@@ -1,5 +1,13 @@
 """Fase 20 — a anotacao de esofago e HUMANA? Medido, nao pesquisado.
 
+CORRECAO DA FASE 22 — LEIA ANTES DE CITAR QUALQUER NUMERO DAQUI
+A primeira versao deste modulo publicou "ROIGenerationAlgorithm UNKNOWN em 908/908"
+e isso era ARTEFATO DO LEITOR, nao propriedade do dado. A coluna
+`ROIGenerationAlgorithms` do indice e um conjunto DEDUPLICADO por serie (0, 1 ou 2
+valores — nunca um por ROI), e o alinhamento por indice que este modulo fazia nunca
+podia valer. Abrir os 60 arquivos do LCTSC na Fase 22 mostrou MANUAL em 59/60,
+contra "UNKNOWN" que o indice supostamente dizia. Corrigido; ver `algoritmo_do_esofago`.
+
 O QUE ESTE MODULO DESCOBRIU QUE MUDA A FASE
 O `rtstruct_index` do IDC nao traz so `ROINames`. Ele traz tambem:
 
@@ -77,19 +85,38 @@ def _lista(v) -> list:
 
 
 def algoritmo_do_esofago(nomes, algos) -> list:
-    """Algoritmos declarados APENAS para as ROIs que sao esofago-orgao.
+    """Algoritmo declarado para a ROI de esofago, lido de uma coluna DEDUPLICADA.
 
-    Alinhar por indice e o ponto delicado: `ROINames` e `ROIGenerationAlgorithms` sao
-    listas paralelas. Se os comprimentos divergirem, nao ha alinhamento confiavel e o
-    caso vira DESALINHADO em vez de um palpite.
+    CORRECAO DA FASE 22, e ela derruba o achado principal da Fase 20.
+    A primeira versao supunha que `ROINames` e `ROIGenerationAlgorithms` fossem
+    listas PARALELAS e alinhava por indice, marcando DESALINHADO quando os
+    comprimentos divergiam. Medido no indice inteiro (19.358 RTSTRUCT):
+
+        len(algos) e sempre 0, 1 ou 2 — NUNCA o numero de ROIs.
+        14.476 series tem 0; 4.840 tem 1; 42 tem 2.
+
+    A coluna e um conjunto DISTINCT por serie, exatamente como `ROINames` ja era
+    (o proprio `idc_esofago.py` documenta isso para os nomes). Como quase toda
+    serie tem varias ROIs com o MESMO algoritmo, o DISTINCT colapsa para 1 valor,
+    o alinhamento por indice nunca valia, e TUDO caia em DESALINHADO -> UNKNOWN.
+    Foi assim que a Fase 20 publicou "UNKNOWN em 908/908": era artefato do leitor.
+
+    A leitura correta de um conjunto deduplicado:
+      0 valores  -> a tag nao esta no indice para esta serie      -> UNKNOWN
+      1 valor    -> TODAS as ROIs da serie tem esse algoritmo     -> vale para o esofago
+      2+ valores -> ha algoritmos diferentes na serie e o indice
+                    nao diz qual e de qual ROI                    -> INDETERMINADO
     """
     nomes, algos = _lista(nomes), _lista(algos)
     idx = [i for i, n in enumerate(nomes) if ie._nomes_de_esofago([n])]
     if not idx:
         return []
-    if len(algos) != len(nomes):
-        return ["DESALINHADO"] * len(idx)
-    return [(algos[i].strip().upper() or "VAZIO") for i in idx]
+    limpos = [a.strip().upper() for a in algos if str(a).strip()]
+    if not limpos:
+        return ["VAZIO"] * len(idx)
+    if len(set(limpos)) == 1:
+        return [limpos[0]] * len(idx)
+    return ["AMBIGUO"] * len(idx)
 
 
 # PRV = Planning Risk Volume: o orgao dilatado por uma margem de incerteza. Sob a
@@ -124,6 +151,8 @@ def classificar(a: str) -> str:
         return "MANUAL"
     if a in ("AUTOMATIC", "SEMIAUTOMATIC"):
         return a
+    if a == "AMBIGUO":
+        return "INDETERMINADO"
     if a in ("VAZIO", "DESALINHADO", "NAN", "NONE"):
         return "UNKNOWN"
     return "OUTRO"
@@ -192,12 +221,16 @@ def agregar(linhas) -> dict:
 def autoteste() -> int:
     falhas = []
 
-    # alinhamento normal
+    # ESTE TESTE MUDOU NA FASE 22, e a mudanca e o achado.
+    # Antes ele exigia ["AUTOMATIC"], supondo que a lista fosse PARALELA a de nomes
+    # e que a 2a posicao fosse a do esofago. A coluna e DEDUPLICADA: com dois valores
+    # distintos nao ha como saber qual pertence a qual ROI, e a resposta honesta e
+    # AMBIGUO. Foi a suposicao de paralelismo que produziu o falso "908/908 UNKNOWN".
     nomes = ["Lung_L", "Esophagus", "Heart"]
     algos = ["MANUAL", "AUTOMATIC", "MANUAL"]
     got = algoritmo_do_esofago(nomes, algos)
-    if got != ["AUTOMATIC"]:
-        falhas.append("nao pegou o algoritmo da ROI certa: " + str(got))
+    if got != ["AMBIGUO"]:
+        falhas.append("dois algoritmos distintos deveriam dar AMBIGUO, deu " + str(got))
 
     # O crivo de esofago e o MESMO da Fase 11 — nao uma segunda copia. Isso inclui
     # herdar os limites dele, e este teste DOCUMENTA um que o autoteste descobriu:
@@ -231,15 +264,23 @@ def autoteste() -> int:
     if ie._nomes_de_esofago(["1 - PARAESOPHAGEAL LYMPH NODE - 1"]):
         falhas.append("linfonodo passou pelo crivo de tumor")
 
-    # CONTROLE: listas de comprimento diferente nao podem virar palpite
-    d = algoritmo_do_esofago(["A", "Esophagus"], ["MANUAL"])
-    if d != ["DESALINHADO"]:
-        falhas.append("desalinhamento virou palpite: " + str(d))
+    # A COLUNA E DEDUPLICADA: um unico valor vale para TODAS as ROIs da serie.
+    # Este e o teste que a Fase 20 nao tinha e que fez ela publicar 908/908 UNKNOWN.
+    if algoritmo_do_esofago(["Lung_L", "Esophagus", "Heart"], ["MANUAL"]) != ["MANUAL"]:
+        falhas.append("valor unico deduplicado nao foi propagado para a ROI de esofago")
+    # nenhum valor -> UNKNOWN, nunca palpite
+    if algoritmo_do_esofago(["Esophagus"], []) != ["VAZIO"]:
+        falhas.append("coluna vazia deixou de virar VAZIO")
+    # dois valores distintos -> nao da para saber qual e de qual ROI
+    if algoritmo_do_esofago(["Lung_L", "Esophagus"], ["MANUAL", "AUTOMATIC"]) != ["AMBIGUO"]:
+        falhas.append("dois algoritmos distintos deveriam dar AMBIGUO")
+    if classificar("AMBIGUO") != "INDETERMINADO":
+        falhas.append("AMBIGUO deveria classificar como INDETERMINADO")
 
     # classificacao: so MANUAL e MANUAL; vazio e UNKNOWN, nunca manual por omissao
     for v, esp in (("MANUAL", "MANUAL"), ("AUTOMATIC", "AUTOMATIC"),
                    ("SEMIAUTOMATIC", "SEMIAUTOMATIC"), ("VAZIO", "UNKNOWN"),
-                   ("DESALINHADO", "UNKNOWN"), ("EclipseSmartSegmentation", "OUTRO")):
+                   ("AMBIGUO", "INDETERMINADO"), ("EclipseSmartSegmentation", "OUTRO")):
         if classificar(v) != esp:
             falhas.append("classificar(%r) deu %r, esperado %r" % (v, classificar(v), esp))
 
@@ -266,7 +307,7 @@ def autoteste() -> int:
 
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste proveniencia_roi: %d verificacoes, %d falhas" % (18, len(falhas)))
+    print("autoteste proveniencia_roi: %d verificacoes, %d falhas" % (22, len(falhas)))
     return 1 if falhas else 0
 
 

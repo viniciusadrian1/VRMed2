@@ -139,3 +139,13 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 20:30 | fatias por ROI | **1 fatia em 31/31 ROIs, 3/3 casos** — sao templates, nao segmentacoes. STOPSTORM cai para **F** |
 | 20:50 | ontologia no GT do split congelado | **60/60 LCTSC preenchidas, buracos 0,0000 %** — lacuna que o critico nomeou, fechada |
 | 20:55 | bug proprio | `binaria` exigia {0,1} e reprovava as 60 do LCTSC, que usam {0,255} — a convencao do PROPRIO projeto |
+
+## 2026-09-06 — Fases 22-23
+
+| hora (UTC) | comando | resultado |
+|---|---|---|
+| 19:05 | `git rev-parse HEAD` | `b0dcb2e`, working tree limpo |
+| 19:20 | `fase22.rtstruct_lctsc` | **60 RTSTRUCT abertos pela primeira vez** — `ROIGenerationAlgorithm` = **MANUAL em 59/60** |
+| 19:30 | comparacao indice x arquivo | a coluna do indice e **DEDUPLICADA** (0, 1 ou 2 valores, nunca por ROI) |
+| 19:35 | **correcao da Fase 20** | `proveniencia_roi` alinhava por indice; TUDO caia em UNKNOWN. Era artefato do leitor |
+| 19:40 | remedicao dos 908 | **MANUAL 731 · SEMIAUTOMATIC 101 · INDETERMINADO 42 · UNKNOWN 34** |

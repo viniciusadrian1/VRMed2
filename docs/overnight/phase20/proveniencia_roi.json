@@ -13,7 +13,10 @@
   "total_rtstruct_com_esofago": 908,
   "sujeitos_distintos_total": 807,
   "algoritmo_global": {
-   "UNKNOWN": 908
+   "MANUAL": 731,
+   "SEMIAUTOMATIC": 101,
+   "INDETERMINADO": 42,
+   "UNKNOWN": 34
   },
   "rtstruct_com_prv": 0,
   "rtstruct_so_sitio_lesao": 5,
@@ -23,7 +26,7 @@
     "sujeitos_distintos": 16,
     "estudos_distintos": 20,
     "algoritmo": {
-     "UNKNOWN": 101
+     "SEMIAUTOMATIC": 101
     },
     "licencas": {
      "CC BY 3.0": 101
@@ -49,7 +52,8 @@
     "sujeitos_distintos": 60,
     "estudos_distintos": 60,
     "algoritmo": {
-     "UNKNOWN": 60
+     "MANUAL": 59,
+     "UNKNOWN": 1
     },
     "licencas": {
      "CC BY 3.0": 60
@@ -62,7 +66,7 @@
     "sujeitos_distintos": 355,
     "estudos_distintos": 355,
     "algoritmo": {
-     "UNKNOWN": 355
+     "MANUAL": 355
     },
     "licencas": {
      "CC BY-NC 3.0": 355
@@ -75,7 +79,8 @@
     "sujeitos_distintos": 359,
     "estudos_distintos": 359,
     "algoritmo": {
-     "UNKNOWN": 359
+     "MANUAL": 317,
+     "INDETERMINADO": 42
     },
     "licencas": {
      "CC BY 4.0": 359
