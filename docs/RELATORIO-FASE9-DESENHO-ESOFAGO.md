@@ -236,6 +236,20 @@ então nem a pergunta (i) é respondível.
 
 ## 14. Próximo experimento
 
+> **Executado na Fase 10 — e o bloqueio permanece.** O experimento proposto abaixo foi feito:
+> par MAASTRO, LCTSC-S1 (n=10) contra NSCLC-Radiomics (n=25), sem treinar, sem tocar em
+> `validation` nem em `test`. **Resultado: classe D — INCONCLUSIVO.** O par fixa instituição e
+> geometria de voxel e **não** fixa protocolo de aquisição; a convenção de contorno do lado NSCLC
+> **não existe documentada**; e nenhuma das 29 medidas de forma ou 25 associações sobrevive à
+> correção de multiplicidade, com efeito abaixo do MDE em 29/29.
+>
+> A pergunta que este parágrafo formulou — *"se o efeito de estilo for da ordem do erro que se
+> quer corrigir, o bloqueio deixa de ser logístico e passa a ser conceitual"* — **continua sem
+> resposta**, porque o efeito de estilo não foi medido: ele foi **não-medível** neste par. Isso
+> acrescenta um motivo de bloqueio de natureza nova (não se sabe a composição do erro que um
+> treino tentaria reduzir), sem remover nenhum dos 9 desta fase.
+> Ver `docs/RELATORIO-FASE10-EFEITO-ESTILO-ESOFAGO.md`.
+
 **Usar o par LCTSC-S1 × NSCLC-Radiomics para medir o efeito de estilo de anotação, sem treinar
 nada.**
 

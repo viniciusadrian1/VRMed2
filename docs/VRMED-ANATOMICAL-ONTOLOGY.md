@@ -135,6 +135,24 @@ deixa de fora é mais gorduroso que o que ele acrescenta.
 **Portanto o erro do esôfago não é explicado por definição** — é o candidato legítimo a erro
 de modelo. Ver §4 para a ressalva sobre a decomposição.
 
+> **Fase 10 — o quanto disso é convenção continua NÃO MEDIDO.** A frase acima diz que a
+> definição do VRmed e a do GT LCTSC coincidem; ela **não** diz que o erro é do modelo. A Fase 10
+> tentou medir a fração atribuível a convenção de contorno com o par MAASTRO
+> (LCTSC-S1 × NSCLC-Radiomics) e concluiu **D — INCONCLUSIVO**: nenhuma das 29 medidas de forma e
+> nenhuma das 25 associações sobrevive à correção de multiplicidade, o efeito observado fica
+> abaixo do MDE em 29/29, e a diferença de largura entre os dois estilos é **menor que o piso de
+> resolução da grade** (1,953 mm).
+>
+> **Achado que pertence a esta ontologia:** a convenção de contorno do esôfago no
+> **NSCLC-Radiomics não existe documentada**. A fonte declara *quem* contornou e *o quê*, e
+> nenhuma regra de *como*. Não há atlas, janela, limites, lúmen nem revisão. Comparar a definição
+> do VRmed com a dele é **assimétrico por construção** — só um dos dois lados tem regra publicada.
+>
+> A decisão da Fase 9 de deixar a **extensão longitudinal herdada e não avaliável** foi usada e
+> **resistiu**: medida por caso, a diferença de extensão entre os dois estilos é **0,00 mm**
+> (Cliff −0,112, p 0,6213). Os 10,5 mm que apareciam entre as marginais têm IC95 `[-3,0; +18,0]`.
+> Ver `docs/RELATORIO-FASE10-EFEITO-ESTILO-ESOFAGO.md`.
+
 ### 1.3 `Heart` — coração
 
 | | |

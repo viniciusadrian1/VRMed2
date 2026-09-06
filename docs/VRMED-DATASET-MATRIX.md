@@ -23,7 +23,7 @@ especializado. Os dois usos são registrados separadamente.
 | Dataset | Esôfago | N casos | N anotadores | Instituições | GT humano | Licença | Acesso | Serve para |
 |---|---|---|---|---|---|---|---|---|
 | **LCTSC** (TCIA) | sim | 60 | 1/caso | 3 (MDACC, MSKCC, MAASTRO) | sim, contorno de RT | **CC BY 3.0** (lida na API) | REST, sem cadastro | **validação** — já em uso |
-| **NSCLC-Radiomics** (TCIA) | sim | 422 | 1 ("a radiation oncologist") | MAASTRO | sim, manual | **CC BY-NC 3.0** | download sem aprovação | treino, com ressalva |
+| **NSCLC-Radiomics** (TCIA) | sim | 422 | 1 ("a radiation oncologist") | MAASTRO | sim, manual — **convenção NÃO documentada** (Fase 10) | **CC BY-NC 3.0** (lida na API) | download sem aprovação | treino, com ressalva; **não serve para medir estilo** |
 | **TotalSegmentator dataset** (Zenodo 6802613) | sim | 1228 | equipe do Basel | 1 (Basel) | **model-in-the-loop** | **CC BY 4.0** | direto, sem cadastro | **treino** — não valida |
 | **AMOS22** (Zenodo 7262581) | sim | 500 CT + 100 MRI | 5 juniores + 3 sêniores | 2 (mesmo distrito) | **model-in-the-loop** | **conflitante**: CC BY 4.0 no Zenodo, CC BY-NC-SA no artigo | direto | treino, com ressalva |
 | **SegTHOR** | sim | 60 | 1 radioterapeuta | 1 (CHB Rouen) | sim, manual | **DUA proíbe redistribuição** | cadastro + termo assinado + aprovação humana | **bloqueado** |
@@ -52,6 +52,21 @@ estilo desse anotador, e não há como medir quanto disso é estilo sem contorno
 é *"made available from three different institutions: MD Anderson, Memorial Sloan-Kettering,
 and the MAASTRO clinic, with 20 cases from each"*. Usar um para treinar e o outro para validar
 compartilharia origem em um terço da coorte.
+
+> **Fase 10 — a procedência foi confirmada por DICOM, e "mesma instituição" não bastou.**
+> Dois canais diretos: `ProtocolName = "MAASTRO_PETCT_WholeBodyC"` em `LUNG1-110`, e casamento de
+> `RCCTPET_THORAX_8F` com `LCTSC-Train-S1-008` (**por substring**, após remover a decoração
+> Siemens `Specials^…(Adult)`). As duas ressalvas obrigatórias: o caso com a string MAASTRO é o
+> **menos comparável** do conjunto (PET/CT de corpo inteiro, sem gating), e os dois exames casados
+> distam **5 anos** e 3× de corrente de tubo.
+>
+> **O que a Fase 10 mediu e importa para quem for usar este par:** mesma instituição **não** é
+> mesmo protocolo. Concordam apenas os campos de **geometria** (dz 3,0 mm, `PixelSpacing`,
+> `ReconstructionDiameter`); divergem **todos** os de aquisição (`ConvolutionKernel`, `KVP`,
+> `Manufacturer`). O lado NSCLC é **quatro populações**: 15 casos 4DCT fase 50 %, 3 helicoidais
+> sem gating, 6 re-exportações CMS XiO com o cabeçalho de aquisição apagado, 1 PET/CT de corpo
+> inteiro. E as eras **não se cruzam**: LCTSC-S1 em 4 meses de 2003–2004, NSCLC ao longo de
+> 8 anos de 2005–2014, sem um único dia em comum.
 
 **O maior dataset disponível é o de treino do próprio modelo que queremos superar.** O
 TotalSegmentator dataset tem 1228 TCs sob CC BY 4.0, download direto — e é exatamente o
@@ -98,4 +113,12 @@ de contorno por instituição.
 - Não foi verificado se **NSCLC-Radiomics** ou **RAOS** estão no treino do TotalSegmentator
   além do que o artigo declara (só Basel).
 - A definição de esôfago de cada dataset **não foi comparada estrutura a estrutura** com a do
-  VRmed — só a do LCTSC foi, e ela coincide.
+  VRmed — só a do LCTSC foi, e ela coincide. **Fase 10:** a do NSCLC-Radiomics não pode ser
+  comparada — ela **não existe publicada**.
+- **Sobreposição de pessoas entre LCTSC-S1 e NSCLC-Radiomics: não medida e não mensurável** com as
+  tags disponíveis (`PatientBirthDate` vazio nos dois lados, `PatientAge` ausente no lado LCTSC).
+  As datas não se cruzam, o que exclui reuso do **mesmo exame** — não exclui a mesma pessoa.
+- **Armadilha registrada:** `AccessionNumber = 2819497684894126` aparece em 18/25 casos NSCLC e
+  também em `LCTSC-Test-S1-101`. É constante de desidentificação, **não** é canal institucional.
+- **Nenhum dos quatro conjuntos torácicos com esôfago tem mais de um contorno por caso** — a Fase
+  10 fechou com essa lacuna como próxima ação.
