@@ -30,7 +30,7 @@
   "suite": {
    "returncode": 0,
    "ok": true,
-   "saida": "_16_o_desenho_do_split_nao_contem_caso_inventado\nautoteste manifesto: 29 verificacoes, 0 falhas\nautoteste plano: 14 verificacoes, 0 falhas\n  OK   test_17_autotestes_dos_modulos_passam\n\n17/17 passaram\n"
+   "saida": "_continua_com_22_campos_e_a_v2_nao_foi_promovida\nautoteste manifesto: 29 verificacoes, 0 falhas\nautoteste plano: 14 verificacoes, 0 falhas\n  OK   test_18_autotestes_dos_modulos_passam\n\n18/18 passaram\n"
   }
  },
  "controle_negativo_depois": {
@@ -136,7 +136,7 @@
    "aplicado": true,
    "derrubou": true,
    "returncode": 1,
-   "saida": "afewk9so\\arvore\\scripts\\validation\\baseline_v1\\manifesto.py\", line 325, in carregar_particao\n    if split not in PERMISSOES[contexto]:\n                    ~~~~~~~~~~^^^^^^^^^^\nKeyError: 'treinamento'\n"
+   "saida": "gmkae4zr\\arvore\\scripts\\validation\\baseline_v1\\manifesto.py\", line 325, in carregar_particao\n    if split not in PERMISSOES[contexto]:\n                    ~~~~~~~~~~^^^^^^^^^^\nKeyError: 'treinamento'\n"
   },
   {
    "id": "L5",

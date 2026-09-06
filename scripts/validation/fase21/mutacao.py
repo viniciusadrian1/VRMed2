@@ -132,12 +132,27 @@ def _rodar(arvore: Path, alvo: str) -> tuple:
 
 
 def _preparar(base: Path) -> Path:
+    """Copia o que a suite PRECISA LER, nao so o que ela executa.
+
+    A primeira versao copiava so `scripts/` e `tests/`. O controle negativo pegou:
+    `test_17` (acrescentado na Fase 21) le
+    `docs/VRMED-ESOPHAGUS-DATASET-V2-PROPOSTA.md` para garantir que a V2 nao foi
+    promovida em silencio — e numa arvore sem `docs/` ele falha por ausencia de
+    arquivo, nao por mutacao. O controle recusou-se a interpretar os mutantes contra
+    uma arvore quebrada, que e exatamente para isso que ele existe.
+
+    `docs/` entra apenas com os .md (os .json e .csv de medicao sao grandes e a suite
+    nao os le).
+    """
     arvore = base / "arvore"
     arvore.mkdir(parents=True, exist_ok=True)
     shutil.copytree(RAIZ / "scripts", arvore / "scripts",
                     ignore=shutil.ignore_patterns("__pycache__"))
     shutil.copytree(RAIZ / "tests", arvore / "tests",
                     ignore=shutil.ignore_patterns("__pycache__"))
+    (arvore / "docs").mkdir(exist_ok=True)
+    for md in (RAIZ / "docs").glob("*.md"):
+        shutil.copy2(md, arvore / "docs" / md.name)
     return arvore
 
 

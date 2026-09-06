@@ -155,3 +155,6 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 20:20 | `fase23.pool` | 0 colisoes de identidade; anonimizacao: `AccessionNumber` **identico nos 5** (placeholder) |
 | 20:30 | overlap cruzado | pool novo x LCTSC/NSCLC/LyNoS: **0 colisoes** nas chaves disponiveis |
 | 20:35 | `extensao_cranial` | LCTSC **17,5 mm acima do apice pulmonar (54/60)**; 4D-Lung **21,0 mm (5/5)** |
+| 21:00 | `fase21.mutacao` | **ABORTOU no controle negativo** — a arvore copiada nao tinha `docs/`, e `test_17` le a proposta de V2 |
+| 21:05 | correcao do harness | `_preparar` passa a copiar os `.md` de `docs/`; **13/13 mutantes mortos** |
+| 21:10 | auditoria final | suites 49 · autotestes 250 · mutacao 41 = **340 PASS, 0 FAIL, 0 SKIP** |
