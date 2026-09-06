@@ -35,8 +35,29 @@ substituído automaticamente** · nada de e-mail, conta ou aceite de EULA.
 
 | Fase | Início | Fim | Duração | Status | Resultado principal |
 |---|---|---|---|---|---|
-| 13 — Ontologia do esôfago | — | — | — | em curso | — |
+| 13 — Ontologia do esôfago | 03:1x | 03:4x | ~35 min | **CONCLUÍDA — A** | `ESOPHAGUS_ONTOLOGY_V1` congelada; **K4 RESOLVIDO**; 12 testes de regressão passando |
 | 14 — Prontidão para treino | — | — | — | pendente | — |
-| 15 — Teste independente | — | — | — | pendente | — |
+| 15 — Teste independente | 03:0x | — | — | **em curso** (workflow `wu8f0od0a`, 7 arms) | — |
 | 16 — Independência do baseline | — | — | — | pendente | — |
 | 17 — Benchmark de reconstrução | — | — | — | pendente | — |
+
+
+### Fase 13 — detalhe
+
+**Arquivos criados**
+- `docs/ESOPHAGUS-ONTOLOGY-V1.md` — especificação normativa congelada
+- `scripts/validation/tier2/ontologia_esofago.py` — fonte da verdade legível por máquina + varredor
+- `tests/test_ontologia_esofago.py` — 12 testes de regressão
+- `docs/RELATORIO-FASE13-ONTOLOGIA-ESOFAGO.md`
+
+**Arquivos modificados** (histórico preservado, nada apagado)
+- `docs/VRMED-ANATOMICAL-ONTOLOGY.md` — 3 qualificações: linha do GT §1.2, traqueia §1.7, ponteiro para a V1
+
+**Experimentos executados:** varredura lexical de 30 documentos (0 violações) · suíte de 12 testes.
+
+**Achado de instrumento:** o controle positivo (teste 12) reprovou a primeira versão do
+varredor — ele achava 3 de 4 violações injetadas, porque o padrão de parede/lúmen só casava
+o infinitivo. Regex ampliado. **Um varredor que devolve zero por estar quebrado é pior que
+nenhum varredor.**
+
+**Bloqueios:** nenhum. K4 fechado; K1/K2/K3 permanecem fora do alcance desta fase.

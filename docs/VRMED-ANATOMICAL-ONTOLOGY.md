@@ -71,10 +71,15 @@ convenção de contorno, não fidelidade anatômica.
 
 ### 1.2 `Esophagus` — esôfago
 
+> **Congelado na Fase 13 como [`ESOPHAGUS_ONTOLOGY_V1`](ESOPHAGUS-ONTOLOGY-V1.md).**
+> Aquele documento é a especificação normativa do alvo; esta seção permanece como o
+> registro histórico de como se chegou lá. Em caso de divergência, **vale a V1**, e a
+> suíte `tests/test_ontologia_esofago.py` falha se os dois textos discordarem.
+
 | | |
 |---|---|
 | **TS** | `esophagus` |
-| **GT LCTSC** | `Esophagus`, do nível abaixo do cricoide à junção gastroesofágica (atlas RTOG 1106) |
+| **GT LCTSC** | `Esophagus`, do nível abaixo do cricoide à junção gastroesofágica (atlas RTOG 1106). **Isto é descrição do PROTOCOLO de contornagem do GT — não é capacidade do VRmed**, que não localiza nenhum dos dois marcos (§ESOPHAGUS_ONTOLOGY_V1) |
 | **entra** | parede e lúmen esofágicos |
 | **não entra** | conteúdo alimentar, gordura periesofágica, traqueia adjacente |
 | **extensão longitudinal** | **HERDADA do GT. Não é critério do VRmed e não é avaliável** — ver a caixa abaixo |
@@ -228,7 +233,7 @@ hilo **por especificação**, e parte da discordância ali não é erro de ningu
 |---|---|
 | **TS** | `trachea` |
 | **GT** | **nenhum disponível.** O LCTSC não a anota |
-| **entra (VRmed)** | lúmen e parede traqueal, da cricoide à carina |
+| **entra (VRmed)** | lúmen e parede traqueal. A faixa "da cricoide à carina" é a **descrição anatômica do protocolo**, não capacidade medida: o VRmed **localiza a carina** (extremo caudal da `trachea` predita, 30/30 casos, desvio mediano 0,00 mm) e **não localiza o cricoide** |
 | **não entra** | brônquios principais além da carina, laringe |
 | **estado de validação** | **não medido** |
 
