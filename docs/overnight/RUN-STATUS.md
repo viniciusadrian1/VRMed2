@@ -37,8 +37,8 @@ substituído automaticamente** · nada de e-mail, conta ou aceite de EULA.
 |---|---|---|---|---|---|
 | 13 — Ontologia do esôfago | 03:1x | 03:4x | ~35 min | **CONCLUÍDA — A** | `ESOPHAGUS_ONTOLOGY_V1` congelada; **K4 RESOLVIDO**; 12 testes de regressão passando |
 | 14 — Prontidão para treino | 03:5x | 04:1x | ~20 min | **CONCLUÍDA — C** | cenário C, nenhum TEST defensável; K1/K2/K3 bloqueados, K4 resolvido |
-| 15 — Teste independente | 03:0x | — | — | **em curso** (workflow `wu8f0od0a`, 7 arms) | — |
-| 16 — Independência do baseline | 05:0x | — | — | **em curso** (workflow `wgk8req8t`, 5 arms) | — |
+| 15 — Teste independente | 03:0x | 07:5x | ~4 h (interrompida) | **PARCIAL — B** | **LyNoS** encontrado; 79 candidatos, 230 consultas; sem passe cético |
+| 16 — Independência do baseline | 07:4x | — | — | **em curso** (relançada: `wqo33i814`) | — |
 | 17 — Benchmark de reconstrução | 04:2x | 05:1x | ~50 min | **CONCLUÍDA** | **MASTER MANTIDO**; 182 medições; 4 achados de instrumento |
 
 
@@ -88,3 +88,36 @@ opostas ao mesmo tempo. Surface Nets perde 71,7 % do volume na esfera de 6 mm.
    `trimesh` não decodifica Draco, avisa em `stderr` e termina com código 0.
 
 **Bloqueios:** nenhum. Draco cobriu 4 das 13 malhas — declarado, não omitido.
+
+
+---
+
+## Interrupção da sessão — 2026-09-06, ~07:30
+
+**FATO.** A sessão anterior encerrou e derrubou três processos de fundo: o workflow da Fase 15,
+o da Fase 16 e o braço de anatomia real da Fase 17.
+
+**O que sobreviveu, e como:**
+
+| Processo | Estado | Recuperação |
+|---|---|---|
+| Fases 13, 14, 17 | **commitadas** | nada a fazer |
+| Fase 15 (workflow) | 13 resultados de agente no journal | **recuperados** — os 7 arms completos + 6 fichas; o relatório foi escrito a partir deles e a lacuna declarada |
+| Fase 16 (workflow) | **0 resultados** | **relançada do zero** |
+| Anatomia real (Fase 17) | 8 de 48 linhas no CSV | **retomada** por script que lê o CSV e pula o que já está lá |
+
+**INFERÊNCIA.** O checkpoint por linha do benchmark e o journal do workflow foram o que
+permitiu não perder trabalho. O único custo real foi o passe cético da Fase 15, que não chegou
+a rodar — e isso está declarado no relatório dela, não escondido.
+
+### Fase 15 — detalhe
+
+**Arquivos criados:** `docs/RELATORIO-FASE15-TESTE-INDEPENDENTE.md` ·
+`docs/ESOPHAGUS-DATASET-CANDIDATES.md` · `.clinica-dados/overnight/fase15_recuperado.json`
+
+**Resultado principal:** **LyNoS** — 15 TCs mediastinais, esôfago em NIfTI binário
+**preenchido** (fração de buracos 0,028 %), canal não-DICOM, GT de 2019 anterior ao
+TotalSegmentator. Classe **E**: independência indeterminada pelas 420 imagens não atribuídas.
+
+**Bloqueios:** sem passe cético; conflito de licença entre três fontes oficiais; 14 candidatos
+de classe D não verificados.

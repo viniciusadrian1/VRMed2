@@ -53,3 +53,28 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 - **FATO** Draco 7,74×–13,20× com erro de vértice máx 0,00099–0,00328 mm.
 - **DECISÃO** MASTER MANTIDO. Candidatas registradas, nenhuma promovida.
 - **4 achados de instrumento**, todos erro meu, todos corrigidos e documentados.
+
+## Interrupção e retomada — ~07:30
+
+- **FATO** a sessão caiu e derrubou 3 processos de fundo.
+- **FATO** Fase 15: 13 resultados recuperados do journal (7 arms + 6 fichas). Relatório escrito
+  a partir deles, com a lacuna (sem passe cético) declarada.
+- **FATO** Fase 16: journal vazio, relançada do zero (`wqo33i814`).
+- **FATO** anatomia real: retomada de 8/48 por script que pula o já gravado.
+- **DECISÃO** o relatório consolidado foi publicado com a Fase 16 em aberto, para não deixar
+  relatório incompleto se a sessão cair de novo.
+
+## Fase 15 — busca de teste independente (parcial)
+
+- **FATO** 79 candidatos, 230 consultas com fonte/string/data. A=0 B=1 C=57 D=14 E=7.
+- **FATO** LyNoS: máscara de esôfago binária {0,1}, buracos 0,028 % e 0,001 % — compatível com
+  a ONTOLOGY_V1 por MEDIÇÃO. 1,80 MiB baixados, tamanho conferido por HEAD antes.
+- **FATO** classe E, não A: anterioridade da ANOTAÇÃO (2019) não é anterioridade da IMAGEM.
+- **DECISÃO** cenário B. K1/K3 seguem bloqueados, com motivo melhor caracterizado.
+
+## Fase 17 — braço de anatomia real
+
+- **FATO** surface_nets é a única variante que quebra watertight em anatomia real, nas 3
+  estruturas prontas (8/8/4 arestas não-manifold), com −2,8 % a −7,0 % de volume.
+- **FATO** a ordenação de erro de volume é idêntica à dos fantomas nas 3 estruturas.
+- **FATO** sdf é 8× mais lento que o MASTER pelo mesmo resultado geométrico.
