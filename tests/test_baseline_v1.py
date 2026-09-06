@@ -263,7 +263,30 @@ def test_16_o_desenho_do_split_nao_contem_caso_inventado():
     assert "DESENHO" in plano.DESENHO_SPLIT["estado"]
 
 
-def test_17_autotestes_dos_modulos_passam():
+def test_17_a_v1_continua_com_22_campos_e_a_v2_nao_foi_promovida():
+    """A Fase 21.13 escreveu uma PROPOSTA de V2 com 10 campos novos. Proposta nao e
+    promocao: enquanto este teste existir, a V1 tem exatamente 22 campos e o
+    documento da V2 tem de continuar se declarando proposta.
+
+    Sem isto, promover a V2 seria uma edicao silenciosa — exatamente o que a regra
+    de mudanca da ontologia e do esquema proibe."""
+    assert len(man.CAMPOS) == 22, "a V1 mudou de tamanho: %d campos" % len(man.CAMPOS)
+    assert man.VERSAO_ESQUEMA == "VRMED-ESOPHAGUS-DATASET-V1", man.VERSAO_ESQUEMA
+
+    # os campos propostos para a V2 NAO podem ter entrado na V1 por descuido
+    propostos = {"identity_channel", "identity_keys_verifiable", "sop_instance_count",
+                 "annotation_is_human", "annotation_algorithm_declared", "derived_from",
+                 "ethics_approval", "consent_basis", "secondary_use_declared"}
+    invadiram = propostos & set(man.CAMPOS)
+    assert not invadiram, "campos da proposta de V2 entraram na V1: " + str(sorted(invadiram))
+
+    doc = Path(__file__).resolve().parents[1] / "docs" / "VRMED-ESOPHAGUS-DATASET-V2-PROPOSTA.md"
+    assert doc.exists(), "a proposta de V2 sumiu"
+    txt = doc.read_text(encoding="utf-8")
+    assert "PROPOSTA, NÃO PROMOVIDA" in txt, "o documento da V2 deixou de se declarar proposta"
+
+
+def test_18_autotestes_dos_modulos_passam():
     """A suite nao substitui os autotestes — ela exige que eles continuem verdes."""
     assert man.autoteste() == 0, "autoteste do manifesto falhou"
     assert plano.autoteste() == 0, "autoteste do plano falhou"
