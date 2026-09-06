@@ -1,0 +1,401 @@
+{
+ "fase": 18,
+ "pergunta": "a mascara de esofago mora na mesma grade da TC?",
+ "metodo": "Range HTTP de 16 KiB por TC + descompressao incremental do cabecalho NIfTI-1",
+ "veredito": "PREMISSA VERIFICADA",
+ "casos_iguais": 15,
+ "casos_totais": 15,
+ "bytes_baixados": 245760,
+ "casos": [
+  {
+   "caso": "pat1",
+   "ct_shape": [
+    512,
+    512,
+    829
+   ],
+   "ct_spacing": [
+    0.742,
+    0.742,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    829
+   ],
+   "mascara_spacing": [
+    0.742,
+    0.742,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat2",
+   "ct_shape": [
+    512,
+    512,
+    714
+   ],
+   "ct_spacing": [
+    0.688,
+    0.688,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    714
+   ],
+   "mascara_spacing": [
+    0.688,
+    0.688,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat3",
+   "ct_shape": [
+    487,
+    487,
+    598
+   ],
+   "ct_spacing": [
+    0.676,
+    0.676,
+    0.5
+   ],
+   "mascara_shape": [
+    487,
+    487,
+    598
+   ],
+   "mascara_spacing": [
+    0.676,
+    0.676,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat4",
+   "ct_shape": [
+    512,
+    512,
+    619
+   ],
+   "ct_spacing": [
+    0.648,
+    0.648,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    619
+   ],
+   "mascara_spacing": [
+    0.648,
+    0.648,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat5",
+   "ct_shape": [
+    487,
+    441,
+    575
+   ],
+   "ct_spacing": [
+    0.664,
+    0.664,
+    0.5
+   ],
+   "mascara_shape": [
+    487,
+    441,
+    575
+   ],
+   "mascara_spacing": [
+    0.664,
+    0.664,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat6",
+   "ct_shape": [
+    512,
+    512,
+    723
+   ],
+   "ct_spacing": [
+    0.756,
+    0.756,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    723
+   ],
+   "mascara_spacing": [
+    0.756,
+    0.756,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat7",
+   "ct_shape": [
+    512,
+    512,
+    533
+   ],
+   "ct_spacing": [
+    0.734,
+    0.734,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    533
+   ],
+   "mascara_spacing": [
+    0.734,
+    0.734,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat8",
+   "ct_shape": [
+    512,
+    512,
+    727
+   ],
+   "ct_spacing": [
+    0.752,
+    0.752,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    727
+   ],
+   "mascara_spacing": [
+    0.752,
+    0.752,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat9",
+   "ct_shape": [
+    512,
+    512,
+    241
+   ],
+   "ct_spacing": [
+    0.703,
+    0.703,
+    1.25
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    241
+   ],
+   "mascara_spacing": [
+    0.703,
+    0.703,
+    1.25
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat10",
+   "ct_shape": [
+    512,
+    512,
+    767
+   ],
+   "ct_spacing": [
+    0.684,
+    0.684,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    767
+   ],
+   "mascara_spacing": [
+    0.684,
+    0.684,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat11",
+   "ct_shape": [
+    512,
+    512,
+    553
+   ],
+   "ct_spacing": [
+    0.68,
+    0.68,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    553
+   ],
+   "mascara_spacing": [
+    0.68,
+    0.68,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat12",
+   "ct_shape": [
+    512,
+    512,
+    602
+   ],
+   "ct_spacing": [
+    0.674,
+    0.674,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    602
+   ],
+   "mascara_spacing": [
+    0.674,
+    0.674,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat13",
+   "ct_shape": [
+    512,
+    512,
+    620
+   ],
+   "ct_spacing": [
+    0.676,
+    0.676,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    620
+   ],
+   "mascara_spacing": [
+    0.676,
+    0.676,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat14",
+   "ct_shape": [
+    512,
+    512,
+    584
+   ],
+   "ct_spacing": [
+    0.76,
+    0.76,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    584
+   ],
+   "mascara_spacing": [
+    0.76,
+    0.76,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  },
+  {
+   "caso": "pat15",
+   "ct_shape": [
+    512,
+    512,
+    556
+   ],
+   "ct_spacing": [
+    0.824,
+    0.824,
+    0.5
+   ],
+   "mascara_shape": [
+    512,
+    512,
+    556
+   ],
+   "mascara_spacing": [
+    0.824,
+    0.824,
+    0.5
+   ],
+   "mesmo_shape": true,
+   "mesmo_spacing": true,
+   "bytes_baixados": 16384
+  }
+ ]
+}

@@ -1,0 +1,1147 @@
+{
+ "fase": 18,
+ "ontologia": "ESOPHAGUS_ONTOLOGY_V1",
+ "fingerprint": "C:\\Users\\vinic\\.totalsegmentator\\nnunet\\results\\Dataset291_TotalSegmentator_part1_organs_1559subj\\nnUNetTrainerNoMirroring__nnUNetPlans__3d_fullres\\dataset_fingerprint.json",
+ "n_shapes_treino": 1559,
+ "tolerancia_voxels": 2,
+ "spacing_alvo_mm": 1.5,
+ "controles": {
+  "positivo": {
+   "grade": {
+    "shape": [
+     171,
+     171,
+     228
+    ],
+    "spacing": [
+     1.5,
+     1.5,
+     1.5
+    ]
+   },
+   "esperado": "DETECTADO",
+   "obtido": "DETECTADO",
+   "passou": true,
+   "detalhe": {
+    "shape_15mm": [
+     228,
+     171,
+     171
+    ],
+    "match_exato": true,
+    "match_tol2": 1,
+    "match_so_plano": 13
+   }
+  },
+  "negativo": {
+   "grade": {
+    "shape": [
+     4001,
+     4003,
+     4007
+    ],
+    "spacing": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "esperado": "NAO DETECTADO",
+   "obtido": "NAO DETECTADO",
+   "passou": true,
+   "detalhe": {
+    "shape_15mm": [
+     2671,
+     2669,
+     2667
+    ],
+    "match_exato": false,
+    "match_tol2": 0,
+    "match_so_plano": 0
+   }
+  }
+ },
+ "calibracao": {
+  "n_sorteios": 4000,
+  "semente": 20260906,
+  "p_match_exato_por_caso": 0.00275,
+  "p_match_tol2_por_caso": 0.07125,
+  "esperado_exato_em_n": 0.041,
+  "esperado_tol2_em_n": 1.069,
+  "poder_por_membro_declarado": 0.75,
+  "poder_origem": "Fase 16 \u2014 fracao do pool NAO recortada in-plane; nao remedido aqui"
+ },
+ "resumo": {
+  "n_casos": 15,
+  "ontology_compatible_sim": 15,
+  "match_exato": 2,
+  "match_tol2": 7
+ },
+ "casos": [
+  {
+   "arquivo": "pat1_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    829
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.742,
+    0.742,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 163849,
+   "mascara_vazia": false,
+   "volume_mm3": 45104.7,
+   "volume_ml": 45.105,
+   "fatias_com_alvo": 650,
+   "z_min": 162,
+   "z_max": 811,
+   "extensao_axial_mm": 325.0,
+   "n_componentes_3d": 13,
+   "maior_componente_fracao": 0.9997,
+   "fatias_com_buraco": 22,
+   "buracos_2d_voxels": 46,
+   "buracos_2d_pct": 0.0281,
+   "buracos_3d_voxels": 24,
+   "buracos_3d_pct": 0.0146,
+   "diametro_eq_mediano_mm": 13.29,
+   "diametro_eq_p5_mm": 9.94,
+   "diametro_eq_p95_mm": 16.45,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "163849 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0281% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 0.9997 do total em 13 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 13.29 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    276,
+    253,
+    253
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 51,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  },
+  {
+   "arquivo": "pat2_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    714
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.688,
+    0.688,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 134977,
+   "mascara_vazia": false,
+   "volume_mm3": 31945.3,
+   "volume_ml": 31.945,
+   "fatias_com_alvo": 476,
+   "z_min": 199,
+   "z_max": 674,
+   "extensao_axial_mm": 238.0,
+   "n_componentes_3d": 4,
+   "maior_componente_fracao": 0.9999,
+   "fatias_com_buraco": 2,
+   "buracos_2d_voxels": 2,
+   "buracos_2d_pct": 0.0015,
+   "buracos_3d_voxels": 2,
+   "buracos_3d_pct": 0.0015,
+   "diametro_eq_mediano_mm": 13.13,
+   "diametro_eq_p5_mm": 8.17,
+   "diametro_eq_p95_mm": 16.73,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "134977 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0015% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 0.9999 do total em 4 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 13.13 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    238,
+    235,
+    235
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 49,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  },
+  {
+   "arquivo": "pat3_labels_Esophagus.nii.gz",
+   "shape": [
+    487,
+    487,
+    598
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.676,
+    0.676,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 152203,
+   "mascara_vazia": false,
+   "volume_mm3": 34776.6,
+   "volume_ml": 34.777,
+   "fatias_com_alvo": 488,
+   "z_min": 105,
+   "z_max": 592,
+   "extensao_axial_mm": 244.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 18,
+   "buracos_2d_voxels": 64,
+   "buracos_2d_pct": 0.042,
+   "buracos_3d_voxels": 0,
+   "buracos_3d_pct": 0.0,
+   "diametro_eq_mediano_mm": 11.84,
+   "diametro_eq_p5_mm": 10.55,
+   "diametro_eq_p95_mm": 20.39,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "152203 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0420% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 11.84 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    199,
+    219,
+    219
+   ],
+   "match_exato": false,
+   "match_tol2": 2,
+   "match_so_plano": 62,
+   "classificacao": "INDETERMINADO"
+  },
+  {
+   "arquivo": "pat4_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    619
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.648,
+    0.648,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 144116,
+   "mascara_vazia": false,
+   "volume_mm3": 30257.4,
+   "volume_ml": 30.257,
+   "fatias_com_alvo": 446,
+   "z_min": 126,
+   "z_max": 571,
+   "extensao_axial_mm": 223.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 0,
+   "buracos_2d_voxels": 0,
+   "buracos_2d_pct": 0.0,
+   "buracos_3d_voxels": 0,
+   "buracos_3d_pct": 0.0,
+   "diametro_eq_mediano_mm": 13.26,
+   "diametro_eq_p5_mm": 10.14,
+   "diametro_eq_p95_mm": 15.3,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "144116 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0000% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 13.26 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    206,
+    221,
+    221
+   ],
+   "match_exato": true,
+   "match_tol2": 3,
+   "match_so_plano": 74,
+   "classificacao": "OVERLAP_IDENTIFICADO"
+  },
+  {
+   "arquivo": "pat5_labels_Esophagus.nii.gz",
+   "shape": [
+    487,
+    441,
+    575
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.664,
+    0.664,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 119991,
+   "mascara_vazia": false,
+   "volume_mm3": 26451.8,
+   "volume_ml": 26.452,
+   "fatias_com_alvo": 340,
+   "z_min": 121,
+   "z_max": 462,
+   "extensao_axial_mm": 171.0,
+   "n_componentes_3d": 2,
+   "maior_componente_fracao": 0.9989,
+   "fatias_com_buraco": 0,
+   "buracos_2d_voxels": 0,
+   "buracos_2d_pct": 0.0,
+   "buracos_3d_voxels": 0,
+   "buracos_3d_pct": 0.0,
+   "diametro_eq_mediano_mm": 13.8,
+   "diametro_eq_p5_mm": 12.4,
+   "diametro_eq_p95_mm": 16.23,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "119991 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0000% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 0.9989 do total em 2 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 13.80 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    192,
+    195,
+    216
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 0,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  },
+  {
+   "arquivo": "pat6_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    723
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.756,
+    0.756,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 94231,
+   "mascara_vazia": false,
+   "volume_mm3": 26928.2,
+   "volume_ml": 26.928,
+   "fatias_com_alvo": 482,
+   "z_min": 194,
+   "z_max": 675,
+   "extensao_axial_mm": 241.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 0,
+   "buracos_2d_voxels": 0,
+   "buracos_2d_pct": 0.0,
+   "buracos_3d_voxels": 0,
+   "buracos_3d_pct": 0.0,
+   "diametro_eq_mediano_mm": 10.86,
+   "diametro_eq_p5_mm": 7.96,
+   "diametro_eq_p95_mm": 16.93,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "94231 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0000% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 10.86 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    241,
+    258,
+    258
+   ],
+   "match_exato": false,
+   "match_tol2": 1,
+   "match_so_plano": 35,
+   "classificacao": "INDETERMINADO"
+  },
+  {
+   "arquivo": "pat7_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    533
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.734,
+    0.734,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 173654,
+   "mascara_vazia": false,
+   "volume_mm3": 46778.6,
+   "volume_ml": 46.779,
+   "fatias_com_alvo": 378,
+   "z_min": 149,
+   "z_max": 526,
+   "extensao_axial_mm": 189.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 2,
+   "buracos_2d_voxels": 2,
+   "buracos_2d_pct": 0.0012,
+   "buracos_3d_voxels": 2,
+   "buracos_3d_pct": 0.0012,
+   "diametro_eq_mediano_mm": 16.59,
+   "diametro_eq_p5_mm": 13.12,
+   "diametro_eq_p95_mm": 25.07,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "173654 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0012% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 16.59 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    178,
+    251,
+    251
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 52,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  },
+  {
+   "arquivo": "pat8_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    727
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.752,
+    0.752,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 108468,
+   "mascara_vazia": false,
+   "volume_mm3": 30669.5,
+   "volume_ml": 30.67,
+   "fatias_com_alvo": 480,
+   "z_min": 234,
+   "z_max": 713,
+   "extensao_axial_mm": 240.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 7,
+   "buracos_2d_voxels": 8,
+   "buracos_2d_pct": 0.0074,
+   "buracos_3d_voxels": 7,
+   "buracos_3d_pct": 0.0065,
+   "diametro_eq_mediano_mm": 12.5,
+   "diametro_eq_p5_mm": 10.9,
+   "diametro_eq_p95_mm": 15.46,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "108468 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0074% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 12.50 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    242,
+    257,
+    257
+   ],
+   "match_exato": false,
+   "match_tol2": 1,
+   "match_so_plano": 43,
+   "classificacao": "INDETERMINADO"
+  },
+  {
+   "arquivo": "pat9_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    241
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.703,
+    0.703,
+    1.25
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 78642,
+   "mascara_vazia": false,
+   "volume_mm3": 48582.0,
+   "volume_ml": 48.582,
+   "fatias_com_alvo": 187,
+   "z_min": 22,
+   "z_max": 208,
+   "extensao_axial_mm": 233.8,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 1,
+   "buracos_2d_voxels": 1,
+   "buracos_2d_pct": 0.0013,
+   "buracos_3d_voxels": 1,
+   "buracos_3d_pct": 0.0013,
+   "diametro_eq_mediano_mm": 15.85,
+   "diametro_eq_p5_mm": 14.2,
+   "diametro_eq_p95_mm": 19.89,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "78642 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0013% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 15.85 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    201,
+    240,
+    240
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 45,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  },
+  {
+   "arquivo": "pat10_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    767
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.684,
+    0.684,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 152701,
+   "mascara_vazia": false,
+   "volume_mm3": 35721.0,
+   "volume_ml": 35.721,
+   "fatias_com_alvo": 504,
+   "z_min": 173,
+   "z_max": 676,
+   "extensao_axial_mm": 252.0,
+   "n_componentes_3d": 4,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 2,
+   "buracos_2d_voxels": 2,
+   "buracos_2d_pct": 0.0013,
+   "buracos_3d_voxels": 1,
+   "buracos_3d_pct": 0.0007,
+   "diametro_eq_mediano_mm": 13.37,
+   "diametro_eq_p5_mm": 10.35,
+   "diametro_eq_p95_mm": 16.32,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "152701 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0013% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 4 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 13.37 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    256,
+    233,
+    233
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 56,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  },
+  {
+   "arquivo": "pat11_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    553
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.68,
+    0.68,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 119733,
+   "mascara_vazia": false,
+   "volume_mm3": 27682.3,
+   "volume_ml": 27.682,
+   "fatias_com_alvo": 418,
+   "z_min": 117,
+   "z_max": 534,
+   "extensao_axial_mm": 209.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 2,
+   "buracos_2d_voxels": 3,
+   "buracos_2d_pct": 0.0025,
+   "buracos_3d_voxels": 3,
+   "buracos_3d_pct": 0.0025,
+   "diametro_eq_mediano_mm": 12.68,
+   "diametro_eq_p5_mm": 10.15,
+   "diametro_eq_p95_mm": 16.85,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "119733 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0025% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 12.68 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    184,
+    232,
+    232
+   ],
+   "match_exato": false,
+   "match_tol2": 1,
+   "match_so_plano": 50,
+   "classificacao": "INDETERMINADO"
+  },
+  {
+   "arquivo": "pat12_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    602
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.674,
+    0.674,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 154596,
+   "mascara_vazia": false,
+   "volume_mm3": 35114.6,
+   "volume_ml": 35.115,
+   "fatias_com_alvo": 490,
+   "z_min": 97,
+   "z_max": 586,
+   "extensao_axial_mm": 245.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 2,
+   "buracos_2d_voxels": 3,
+   "buracos_2d_pct": 0.0019,
+   "buracos_3d_voxels": 3,
+   "buracos_3d_pct": 0.0019,
+   "diametro_eq_mediano_mm": 13.42,
+   "diametro_eq_p5_mm": 9.96,
+   "diametro_eq_p95_mm": 16.85,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "154596 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0019% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 13.42 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    201,
+    230,
+    230
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 30,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  },
+  {
+   "arquivo": "pat13_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    620
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.676,
+    0.676,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 133953,
+   "mascara_vazia": false,
+   "volume_mm3": 30606.7,
+   "volume_ml": 30.607,
+   "fatias_com_alvo": 464,
+   "z_min": 61,
+   "z_max": 524,
+   "extensao_axial_mm": 232.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 0,
+   "buracos_2d_voxels": 0,
+   "buracos_2d_pct": 0.0,
+   "buracos_3d_voxels": 0,
+   "buracos_3d_pct": 0.0,
+   "diametro_eq_mediano_mm": 12.32,
+   "diametro_eq_p5_mm": 10.44,
+   "diametro_eq_p95_mm": 16.04,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "133953 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0000% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 12.32 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    207,
+    231,
+    231
+   ],
+   "match_exato": true,
+   "match_tol2": 2,
+   "match_so_plano": 49,
+   "classificacao": "OVERLAP_IDENTIFICADO"
+  },
+  {
+   "arquivo": "pat14_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    584
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.76,
+    0.76,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 133414,
+   "mascara_vazia": false,
+   "volume_mm3": 38530.0,
+   "volume_ml": 38.53,
+   "fatias_com_alvo": 458,
+   "z_min": 121,
+   "z_max": 578,
+   "extensao_axial_mm": 229.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 0,
+   "buracos_2d_voxels": 0,
+   "buracos_2d_pct": 0.0,
+   "buracos_3d_voxels": 0,
+   "buracos_3d_pct": 0.0,
+   "diametro_eq_mediano_mm": 14.35,
+   "diametro_eq_p5_mm": 10.49,
+   "diametro_eq_p95_mm": 17.6,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "133414 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0000% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 14.35 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    195,
+    259,
+    259
+   ],
+   "match_exato": false,
+   "match_tol2": 2,
+   "match_so_plano": 47,
+   "classificacao": "INDETERMINADO"
+  },
+  {
+   "arquivo": "pat15_labels_Esophagus.nii.gz",
+   "shape": [
+    512,
+    512,
+    556
+   ],
+   "dtype": "int8",
+   "spacing_mm": [
+    0.824,
+    0.824,
+    0.5
+   ],
+   "orientacao": "LPS",
+   "valores_unicos": [
+    0.0,
+    1.0
+   ],
+   "binaria": true,
+   "voxels_positivos": 184571,
+   "mascara_vazia": false,
+   "volume_mm3": 62659.6,
+   "volume_ml": 62.66,
+   "fatias_com_alvo": 504,
+   "z_min": 47,
+   "z_max": 550,
+   "extensao_axial_mm": 252.0,
+   "n_componentes_3d": 1,
+   "maior_componente_fracao": 1.0,
+   "fatias_com_buraco": 11,
+   "buracos_2d_voxels": 11,
+   "buracos_2d_pct": 0.006,
+   "buracos_3d_voxels": 7,
+   "buracos_3d_pct": 0.0038,
+   "diametro_eq_mediano_mm": 16.3,
+   "diametro_eq_p5_mm": 13.95,
+   "diametro_eq_p95_mm": 24.82,
+   "criterios": {
+    "binaria": {
+     "passou": true,
+     "medida": "valores unicos = [0.0, 1.0]"
+    },
+    "nao_vazia": {
+     "passou": true,
+     "medida": "184571 voxels positivos"
+    },
+    "preenchida_parede_mais_lumen": {
+     "passou": true,
+     "medida": "buracos 2D = 0.0060% (limiar 1.0%)"
+    },
+    "objeto_unico_dominante": {
+     "passou": true,
+     "medida": "maior componente = 1.0000 do total em 1 componentes"
+    },
+    "calibre_compativel_com_esofago": {
+     "passou": true,
+     "medida": "diametro equivalente mediano = 16.30 mm"
+    }
+   },
+   "extensao_longitudinal": "HERDADA DO GT / NAO AVALIAVEL ANATOMICAMENTE",
+   "ontology_compatible": "SIM",
+   "shape_15mm": [
+    185,
+    281,
+    281
+   ],
+   "match_exato": false,
+   "match_tol2": 0,
+   "match_so_plano": 35,
+   "classificacao": "SEM_OVERLAP_DETECTADO"
+  }
+ ]
+}

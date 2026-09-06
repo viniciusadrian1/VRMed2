@@ -1,0 +1,219 @@
+{
+ "fase": 18,
+ "metodo": "teste de permutacao exato por BLOCO (axial x in-plane), 15x15",
+ "defeito_corrigido": "a primeira calibracao embaralhava y e x separadamente, gerando alvos retangulares contra um pool majoritariamente quadrado; o nulo saia deflacionado (0,041 em 15) e inflava o sinal medido contra ele",
+ "perfil_do_pool": {
+  "n": 1559,
+  "distintos": 1514,
+  "in_plane_quadrado": 1169,
+  "in_plane_quadrado_pct": 75.0,
+  "z": {
+   "min": 29,
+   "p25": 134,
+   "mediana": 227,
+   "p75": 353,
+   "max": 1266
+  },
+  "y": {
+   "min": 48,
+   "p25": 160,
+   "mediana": 227,
+   "p75": 269,
+   "max": 466
+  },
+  "moda_in_plane": [
+   [
+    333,
+    333,
+    68
+   ],
+   [
+    221,
+    221,
+    48
+   ],
+   [
+    233,
+    233,
+    28
+   ],
+   [
+    247,
+    247,
+    27
+   ],
+   [
+    253,
+    253,
+    23
+   ]
+  ]
+ },
+ "matriz": {
+  "celulas_match_exato": 14,
+  "celulas_match_tol": 101,
+  "celulas_total": 225
+ },
+ "match_exato": {
+  "observado": 2,
+  "esperado_sob_nula": 0.9311,
+  "p_unilateral": 0.228999,
+  "n_permutacoes": 200000,
+  "distribuicao": {
+   "0": 69187,
+   "1": 85014,
+   "2": 37139,
+   "3": 7760,
+   "4": 855,
+   "5": 43,
+   "6": 2
+  },
+  "razao_obs_esperado": 2.15
+ },
+ "match_tol2": {
+  "observado": 7,
+  "esperado_sob_nula": 6.7372,
+  "p_unilateral": 0.554722,
+  "n_permutacoes": 200000,
+  "distribuicao": {
+   "0": 1,
+   "1": 62,
+   "2": 585,
+   "3": 3738,
+   "4": 12643,
+   "5": 28377,
+   "6": 43650,
+   "7": 46906,
+   "8": 35671,
+   "9": 19137,
+   "10": 7188,
+   "11": 1721,
+   "12": 293,
+   "13": 27,
+   "14": 1
+  },
+  "razao_obs_esperado": 1.04
+ },
+ "alvos": [
+  {
+   "caso": "pat1",
+   "z": 276,
+   "plano": [
+    253,
+    253
+   ]
+  },
+  {
+   "caso": "pat2",
+   "z": 238,
+   "plano": [
+    235,
+    235
+   ]
+  },
+  {
+   "caso": "pat3",
+   "z": 199,
+   "plano": [
+    219,
+    219
+   ]
+  },
+  {
+   "caso": "pat4",
+   "z": 206,
+   "plano": [
+    221,
+    221
+   ]
+  },
+  {
+   "caso": "pat5",
+   "z": 192,
+   "plano": [
+    195,
+    216
+   ]
+  },
+  {
+   "caso": "pat6",
+   "z": 241,
+   "plano": [
+    258,
+    258
+   ]
+  },
+  {
+   "caso": "pat7",
+   "z": 178,
+   "plano": [
+    251,
+    251
+   ]
+  },
+  {
+   "caso": "pat8",
+   "z": 242,
+   "plano": [
+    257,
+    257
+   ]
+  },
+  {
+   "caso": "pat9",
+   "z": 201,
+   "plano": [
+    240,
+    240
+   ]
+  },
+  {
+   "caso": "pat10",
+   "z": 256,
+   "plano": [
+    233,
+    233
+   ]
+  },
+  {
+   "caso": "pat11",
+   "z": 184,
+   "plano": [
+    232,
+    232
+   ]
+  },
+  {
+   "caso": "pat12",
+   "z": 201,
+   "plano": [
+    230,
+    230
+   ]
+  },
+  {
+   "caso": "pat13",
+   "z": 207,
+   "plano": [
+    231,
+    231
+   ]
+  },
+  {
+   "caso": "pat14",
+   "z": 195,
+   "plano": [
+    259,
+    259
+   ]
+  },
+  {
+   "caso": "pat15",
+   "z": 185,
+   "plano": [
+    281,
+    281
+   ]
+  }
+ ]
+}

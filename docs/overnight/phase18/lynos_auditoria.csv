@@ -1,0 +1,16 @@
+arquivo,shape,spacing_mm,orientacao,dtype,binaria,voxels_positivos,volume_ml,extensao_axial_mm,fatias_com_alvo,n_componentes_3d,maior_componente_fracao,buracos_2d_pct,buracos_3d_pct,diametro_eq_mediano_mm,ontology_compatible,shape_15mm,match_exato,match_tol2,match_so_plano,classificacao
+pat1_labels_Esophagus.nii.gz,"[512, 512, 829]","[0.742, 0.742, 0.5]",LPS,int8,True,163849,45.105,325.0,650,13,0.9997,0.0281,0.0146,13.29,SIM,"[276, 253, 253]",False,0,51,SEM_OVERLAP_DETECTADO
+pat2_labels_Esophagus.nii.gz,"[512, 512, 714]","[0.688, 0.688, 0.5]",LPS,int8,True,134977,31.945,238.0,476,4,0.9999,0.0015,0.0015,13.13,SIM,"[238, 235, 235]",False,0,49,SEM_OVERLAP_DETECTADO
+pat3_labels_Esophagus.nii.gz,"[487, 487, 598]","[0.676, 0.676, 0.5]",LPS,int8,True,152203,34.777,244.0,488,1,1.0,0.042,0.0,11.84,SIM,"[199, 219, 219]",False,2,62,INDETERMINADO
+pat4_labels_Esophagus.nii.gz,"[512, 512, 619]","[0.648, 0.648, 0.5]",LPS,int8,True,144116,30.257,223.0,446,1,1.0,0.0,0.0,13.26,SIM,"[206, 221, 221]",True,3,74,OVERLAP_IDENTIFICADO
+pat5_labels_Esophagus.nii.gz,"[487, 441, 575]","[0.664, 0.664, 0.5]",LPS,int8,True,119991,26.452,171.0,340,2,0.9989,0.0,0.0,13.8,SIM,"[192, 195, 216]",False,0,0,SEM_OVERLAP_DETECTADO
+pat6_labels_Esophagus.nii.gz,"[512, 512, 723]","[0.756, 0.756, 0.5]",LPS,int8,True,94231,26.928,241.0,482,1,1.0,0.0,0.0,10.86,SIM,"[241, 258, 258]",False,1,35,INDETERMINADO
+pat7_labels_Esophagus.nii.gz,"[512, 512, 533]","[0.734, 0.734, 0.5]",LPS,int8,True,173654,46.779,189.0,378,1,1.0,0.0012,0.0012,16.59,SIM,"[178, 251, 251]",False,0,52,SEM_OVERLAP_DETECTADO
+pat8_labels_Esophagus.nii.gz,"[512, 512, 727]","[0.752, 0.752, 0.5]",LPS,int8,True,108468,30.67,240.0,480,1,1.0,0.0074,0.0065,12.5,SIM,"[242, 257, 257]",False,1,43,INDETERMINADO
+pat9_labels_Esophagus.nii.gz,"[512, 512, 241]","[0.703, 0.703, 1.25]",LPS,int8,True,78642,48.582,233.8,187,1,1.0,0.0013,0.0013,15.85,SIM,"[201, 240, 240]",False,0,45,SEM_OVERLAP_DETECTADO
+pat10_labels_Esophagus.nii.gz,"[512, 512, 767]","[0.684, 0.684, 0.5]",LPS,int8,True,152701,35.721,252.0,504,4,1.0,0.0013,0.0007,13.37,SIM,"[256, 233, 233]",False,0,56,SEM_OVERLAP_DETECTADO
+pat11_labels_Esophagus.nii.gz,"[512, 512, 553]","[0.68, 0.68, 0.5]",LPS,int8,True,119733,27.682,209.0,418,1,1.0,0.0025,0.0025,12.68,SIM,"[184, 232, 232]",False,1,50,INDETERMINADO
+pat12_labels_Esophagus.nii.gz,"[512, 512, 602]","[0.674, 0.674, 0.5]",LPS,int8,True,154596,35.115,245.0,490,1,1.0,0.0019,0.0019,13.42,SIM,"[201, 230, 230]",False,0,30,SEM_OVERLAP_DETECTADO
+pat13_labels_Esophagus.nii.gz,"[512, 512, 620]","[0.676, 0.676, 0.5]",LPS,int8,True,133953,30.607,232.0,464,1,1.0,0.0,0.0,12.32,SIM,"[207, 231, 231]",True,2,49,OVERLAP_IDENTIFICADO
+pat14_labels_Esophagus.nii.gz,"[512, 512, 584]","[0.76, 0.76, 0.5]",LPS,int8,True,133414,38.53,229.0,458,1,1.0,0.0,0.0,14.35,SIM,"[195, 259, 259]",False,2,47,INDETERMINADO
+pat15_labels_Esophagus.nii.gz,"[512, 512, 556]","[0.824, 0.824, 0.5]",LPS,int8,True,184571,62.66,252.0,504,1,1.0,0.006,0.0038,16.3,SIM,"[185, 281, 281]",False,0,35,SEM_OVERLAP_DETECTADO

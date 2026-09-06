@@ -96,3 +96,17 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 - **FATO** defeito ATIVO corrigido: a correção da Fase 9 era só documental; manifest.json e o
   GERADOR coorte.py ainda emitiam a afirmação falsa. Corrigidos os dois juntos.
 - **DECISÃO** K2 BLOQUEADO; K3 BLOQUEADO e registrado como ESTRUTURAL.
+
+## 2026-09-06 — Fase 18 (auditoria do LyNoS)
+
+| hora (UTC) | comando | resultado |
+|---|---|---|
+| 15:47 | `git rev-parse HEAD` | `c1f4441`, working tree limpo |
+| 15:50 | HEAD nas 15 mascaras do LyNoS (HuggingFace) | 15/15, 10,2 MiB no total |
+| 15:54 | download das 15 mascaras | `.clinica-dados/fase18/lynos/`, 11 MiB |
+| 16:02 | `lynos.auditoria --autoteste` | 10 verificacoes, 0 falhas |
+| 16:03 | `lynos.auditoria` | 15/15 ONTOLOGY_COMPATIBLE=SIM; sonda 2/15 exato, 7/15 tol |
+| 16:10 | **defeito de instrumento encontrado** | o nulo de `auditoria.py` embaralhava y e x separadamente contra um pool 75 % quadrado; nulo deflacionado (0,041) inflava o sinal |
+| 16:18 | `lynos.calibracao` (permutacao por bloco) | nulo correto 0,931; **p = 0,229** — sem excesso sobre o acaso |
+| 16:24 | `lynos.grade_ct` | premissa mascara=grade da TC **VERIFICADA** 15/15 com 240 KiB |
+| 16:31 | `lynos.adequacao` | IC95 de n=15 tem largura 0,077 de Dice; poder 0,485 para delta=0,05 |

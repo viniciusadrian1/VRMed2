@@ -1,0 +1,188 @@
+{
+ "fase": 18.5,
+ "decisao": "NAO MEDIDO NO LyNoS \u2014 de proposito",
+ "motivo": "medir agora gastaria o candidato a TEST: um conjunto olhado antes de o protocolo ser congelado deixa de poder servir de TEST. Alem disso a regra 20 desta fase proibe tratar o LyNoS como TEST enquanto a independencia do baseline estiver indeterminada, e ela esta.",
+ "dispersao_de_referencia": {
+  "fonte": "Dice do esofago por caso, split development (n=30), A_BASELINE_V1, LCTSC",
+  "ressalva": "e a dispersao do LCTSC (TC de planejamento, sem contraste). O LyNoS e TC diagnostica COM contraste; a dispersao dele quase certamente e MAIOR. Estes ICs sao portanto um PISO otimista de largura.",
+  "n": 30,
+  "media": 0.7759,
+  "mediana": 0.788,
+  "desvio_padrao": 0.079,
+  "min": 0.4849,
+  "max": 0.8761,
+  "p25": 0.757,
+  "p75": 0.8213,
+  "por_caso": [
+   {
+    "caso": "LCTSC-Test-S1-101",
+    "dice": 0.7625346703648389
+   },
+   {
+    "caso": "LCTSC-Test-S1-102",
+    "dice": 0.8016807421891251
+   },
+   {
+    "caso": "LCTSC-Test-S1-203",
+    "dice": 0.8393065835605765
+   },
+   {
+    "caso": "LCTSC-Test-S2-101",
+    "dice": 0.7518268803746618
+   },
+   {
+    "caso": "LCTSC-Test-S2-104",
+    "dice": 0.8174683679461855
+   },
+   {
+    "caso": "LCTSC-Test-S2-201",
+    "dice": 0.7565197841726619
+   },
+   {
+    "caso": "LCTSC-Test-S3-103",
+    "dice": 0.7396937573616019
+   },
+   {
+    "caso": "LCTSC-Test-S3-104",
+    "dice": 0.758376592732421
+   },
+   {
+    "caso": "LCTSC-Train-S1-002",
+    "dice": 0.79472464407902
+   },
+   {
+    "caso": "LCTSC-Train-S1-003",
+    "dice": 0.8552307655536701
+   },
+   {
+    "caso": "LCTSC-Train-S1-004",
+    "dice": 0.8518652423993427
+   },
+   {
+    "caso": "LCTSC-Train-S1-005",
+    "dice": 0.7499090672902052
+   },
+   {
+    "caso": "LCTSC-Train-S1-008",
+    "dice": 0.7974002689376961
+   },
+   {
+    "caso": "LCTSC-Train-S1-009",
+    "dice": 0.8164299637983848
+   },
+   {
+    "caso": "LCTSC-Train-S1-012",
+    "dice": 0.5819111737383227
+   },
+   {
+    "caso": "LCTSC-Train-S2-002",
+    "dice": 0.7813908171964438
+   },
+   {
+    "caso": "LCTSC-Train-S2-003",
+    "dice": 0.8425782390869673
+   },
+   {
+    "caso": "LCTSC-Train-S2-007",
+    "dice": 0.8441332050973792
+   },
+   {
+    "caso": "LCTSC-Train-S2-008",
+    "dice": 0.828070021111893
+   },
+   {
+    "caso": "LCTSC-Train-S2-009",
+    "dice": 0.7592733665397011
+   },
+   {
+    "caso": "LCTSC-Train-S2-010",
+    "dice": 0.7899377173825123
+   },
+   {
+    "caso": "LCTSC-Train-S2-011",
+    "dice": 0.8225269092772937
+   },
+   {
+    "caso": "LCTSC-Train-S3-001",
+    "dice": 0.8155676283252155
+   },
+   {
+    "caso": "LCTSC-Train-S3-002",
+    "dice": 0.7002181199127521
+   },
+   {
+    "caso": "LCTSC-Train-S3-003",
+    "dice": 0.7302372034956305
+   },
+   {
+    "caso": "LCTSC-Train-S3-005",
+    "dice": 0.7860311882275423
+   },
+   {
+    "caso": "LCTSC-Train-S3-006",
+    "dice": 0.48487101330756077
+   },
+   {
+    "caso": "LCTSC-Train-S3-008",
+    "dice": 0.8761287911814162
+   },
+   {
+    "caso": "LCTSC-Train-S3-010",
+    "dice": 0.7647726711753962
+   },
+   {
+    "caso": "LCTSC-Train-S3-012",
+    "dice": 0.776146747994727
+   }
+  ]
+ },
+ "ic_por_n": {
+  "15": {
+   "n": 15,
+   "media_pontual": 0.7759,
+   "ic95_baixo": 0.732,
+   "ic95_alto": 0.8091,
+   "largura_ic95": 0.0772,
+   "erro_padrao": 0.02,
+   "n_boot": 20000
+  },
+  "30": {
+   "n": 30,
+   "media_pontual": 0.7759,
+   "ic95_baixo": 0.7455,
+   "ic95_alto": 0.8005,
+   "largura_ic95": 0.055,
+   "erro_padrao": 0.0141,
+   "n_boot": 20000
+  },
+  "60": {
+   "n": 60,
+   "media_pontual": 0.7759,
+   "ic95_baixo": 0.7553,
+   "ic95_alto": 0.7942,
+   "largura_ic95": 0.0388,
+   "erro_padrao": 0.01,
+   "n_boot": 20000
+  },
+  "100": {
+   "n": 100,
+   "media_pontual": 0.7759,
+   "ic95_baixo": 0.7603,
+   "ic95_alto": 0.7903,
+   "largura_ic95": 0.03,
+   "erro_padrao": 0.0077,
+   "n_boot": 20000
+  }
+ },
+ "sensibilidade_outlier_n15": {
+  "pior_caso_observado": 0.4849,
+  "caso_mediano": 0.7899,
+  "deslocamento_da_media_por_um_caso": -0.0203,
+  "leitura": "com n=15, trocar UM caso mediano pelo pior observado move a media em 0.0203 de Dice"
+ },
+ "poder_n15": {
+  "delta_0.02": 0.156,
+  "delta_0.05": 0.485,
+  "delta_0.10": 0.921
+ }
+}
