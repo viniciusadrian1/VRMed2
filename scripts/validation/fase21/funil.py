@@ -197,8 +197,18 @@ def identidade_dicom(dicom_dir: Path) -> dict:
         "image_orientation_patient": geo["image_orientation_patient"],
         "rescale_slope": float(getattr(ds0, "RescaleSlope", 1.0)),
         "rescale_intercept": float(getattr(ds0, "RescaleIntercept", 0.0)),
-        "identidades_entregues": 4,
-        "quais": ["case_id", "study_id", "series_id", "sop_instance_uid"],
+        # COMPOSICAO CORRIGIDA. A primeira versao contava SOPInstanceUID como a
+        # quarta identidade do esquema e o sha256 como identidade do NIfTI — misturando
+        # dois esquemas diferentes. As quatro chaves anti-vazamento do
+        # VRMED-ESOPHAGUS-DATASET-V1 sao case_id, study_id, series_id e sha256 DO
+        # CONTEUDO; o sha256 e calculado localmente e existe IGUALMENTE nos dois canais.
+        # Logo o ganho real do DICOM sobre o NIfTI e +2 (study_id e series_id), e o
+        # SOPInstanceUID e um extra do DICOM, nao uma das quatro.
+        "identidades_do_arquivo": 3,
+        "quais_do_arquivo": ["case_id", "study_id", "series_id"],
+        "sha256_computavel": True,
+        "identidades_verificaveis_das_4": 4,
+        "extras_do_canal": ["SOPInstanceUID (por instancia)"],
     }
 
 
@@ -221,8 +231,12 @@ def identidade_nifti(imagem: Path) -> dict:
         "shape": list(d["shape"]),
         "spacing_mm": list(d["zooms_mm"]),
         "orientacao": d["orientacao"],
-        "identidades_entregues": 2,
-        "quais": ["case_id (externo)", "sha256 do conteudo"],
+        "identidades_do_arquivo": 0,
+        "quais_do_arquivo": [],
+        "case_id_origem": "nome de arquivo ou manifesto da fonte — externo ao cabecalho",
+        "sha256_computavel": True,
+        "identidades_verificaveis_das_4": 2,
+        "extras_do_canal": [],
         "regras_impossiveis_de_verificar": [
             "mesmo estudo em duas particoes (validar_vazamento por study_id)",
             "mesma serie em duas particoes (validar_vazamento por series_id)",
@@ -480,8 +494,10 @@ def autoteste() -> int:
             falhas.append("identidade DICOM lida errado: " + str(i)[:200])
         if len(i["sop_instance_uids"]) != 5 or not i["sop_unicos"]:
             falhas.append("SOPInstanceUID nao unico ou incompleto")
-        if i["identidades_entregues"] != 4:
-            falhas.append("DICOM deveria entregar 4 identidades")
+        if i["identidades_verificaveis_das_4"] != 4 or i["identidades_do_arquivo"] != 3:
+            falhas.append("composicao de identidade do DICOM errada: 3 do arquivo + sha256")
+        if "sha256" in " ".join(i["quais_do_arquivo"]):
+            falhas.append("sha256 listado como identidade DICOM — ele e computado localmente")
         if i["rescale_intercept"] != -1024.0 or i["rescale_slope"] != 1.0:
             falhas.append("rescale lido errado")
         if not i["espacamento_z_uniforme"]:
@@ -492,8 +508,12 @@ def autoteste() -> int:
         n = identidade_nifti(f["imagem"])
         if n["study_id"] != U or n["series_id"] != U:
             falhas.append("NIfTI declarou identidade que o formato nao carrega")
-        if n["identidades_entregues"] != 2:
-            falhas.append("NIfTI deveria entregar 2 identidades")
+        if n["identidades_verificaveis_das_4"] != 2 or n["identidades_do_arquivo"] != 0:
+            falhas.append("composicao de identidade do NIfTI errada")
+        # o ganho do DICOM sobre o NIfTI e exatamente +2, e nao +2 por acaso:
+        # sao study_id e series_id, os dois que o formato NIfTI nao carrega
+        if i["identidades_verificaveis_das_4"] - n["identidades_verificaveis_das_4"] != 2:
+            falhas.append("o ganho do DICOM sobre o NIfTI deixou de ser +2")
 
         # funil ponta a ponta
         r = rodar_funil(base / "funil")
@@ -552,14 +572,18 @@ def main(argv=None) -> int:
     try:
         r = rodar_funil(base / "funil")
         print("IDENTIDADE POR CANAL")
-        print("  DICOM : %d identidades — %s" % (r["identidade_dicom"]["identidades_entregues"],
-                                                 ", ".join(r["identidade_dicom"]["quais"])))
+        print("  DICOM : %d das 4 chaves verificaveis — %d vem do arquivo (%s) + sha256 computado"
+              % (r["identidade_dicom"]["identidades_verificaveis_das_4"],
+                 r["identidade_dicom"]["identidades_do_arquivo"],
+                 ", ".join(r["identidade_dicom"]["quais_do_arquivo"])))
+        print("          extra do canal: %s"
+              % ", ".join(r["identidade_dicom"]["extras_do_canal"]))
         print("          case=%s study=%s series=%s  SOP: %d unicos"
               % (r["identidade_dicom"]["case_id"], r["identidade_dicom"]["study_id"][:24] + "...",
                  r["identidade_dicom"]["series_id"][:24] + "...",
                  len(r["identidade_dicom"]["sop_instance_uids"])))
-        print("  NIfTI : %d identidades — %s" % (r["identidade_nifti"]["identidades_entregues"],
-                                                 ", ".join(r["identidade_nifti"]["quais"])))
+        print("  NIfTI : %d das 4 chaves verificaveis — 0 do arquivo, case_id externo + sha256"
+              % r["identidade_nifti"]["identidades_verificaveis_das_4"])
         print("          study_id=%s  series_id=%s" % (r["identidade_nifti"]["study_id"],
                                                        r["identidade_nifti"]["series_id"]))
         print("          motivo: " + r["identidade_nifti"]["motivo_unknown"])

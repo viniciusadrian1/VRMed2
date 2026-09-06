@@ -34,12 +34,16 @@
   ],
   "rescale_slope": 1.0,
   "rescale_intercept": -1024.0,
-  "identidades_entregues": 4,
-  "quais": [
+  "identidades_do_arquivo": 3,
+  "quais_do_arquivo": [
    "case_id",
    "study_id",
-   "series_id",
-   "sop_instance_uid"
+   "series_id"
+  ],
+  "sha256_computavel": true,
+  "identidades_verificaveis_das_4": 4,
+  "extras_do_canal": [
+   "SOPInstanceUID (por instancia)"
   ]
  },
  "identidade_nifti": {
@@ -60,17 +64,18 @@
    2.5
   ],
   "orientacao": "RAS",
-  "identidades_entregues": 2,
-  "quais": [
-   "case_id (externo)",
-   "sha256 do conteudo"
-  ],
+  "identidades_do_arquivo": 0,
+  "quais_do_arquivo": [],
+  "case_id_origem": "nome de arquivo ou manifesto da fonte — externo ao cabecalho",
+  "sha256_computavel": true,
+  "identidades_verificaveis_das_4": 2,
+  "extras_do_canal": [],
   "regras_impossiveis_de_verificar": [
    "mesmo estudo em duas particoes (validar_vazamento por study_id)",
    "mesma serie em duas particoes (validar_vazamento por series_id)"
   ]
  },
- "manifesto_sha256": "30a252d64898b018293447b5b45c949889554bb81aef6928bbec8698191a199d",
+ "manifesto_sha256": "d61719d04afd84ec656ddcfd2d01eb6bd3f8cc9a1f9a183768f02d266ecbf442",
  "snapshot": {
   "esquema": "VRMED-ESOPHAGUS-DATASET-V1",
   "versao": "V1",
@@ -83,7 +88,7 @@
    "validation": 1,
    "test": 1
   },
-  "sha256_manifesto": "30a252d64898b018293447b5b45c949889554bb81aef6928bbec8698191a199d",
+  "sha256_manifesto": "d61719d04afd84ec656ddcfd2d01eb6bd3f8cc9a1f9a183768f02d266ecbf442",
   "sha256_por_caso": {
    "FIX-001": {
     "imagem": "048e0aa4d53cf618e14a8da1c43351b05a0588da06622f5ba398ba0e57bff9ce",

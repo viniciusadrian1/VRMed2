@@ -49,9 +49,17 @@ e a divergência apareceria como diferença de desempenho.
 | `case_id` | **SIM** (`PatientID`) | externo ao arquivo |
 | `study_id` | **SIM** (`StudyInstanceUID`) | **UNKNOWN** |
 | `series_id` | **SIM** (`SeriesInstanceUID`) | **UNKNOWN** |
-| `SOPInstanceUID` | **SIM**, 8/8 únicos na fixture | não existe |
-| `sha256` do conteúdo | computável | computável |
-| **identidades entregues** | **4** | **2** |
+| `sha256` do conteúdo | **computável** | **computável** |
+| **das 4 chaves do esquema, verificáveis** | **4** (3 do arquivo + hash) | **2** (case_id externo + hash) |
+| `SOPInstanceUID` | extra do canal, 8/8 únicos na fixture | não existe |
+
+**Correção imposta por um cético desta fase, e ela importa.** A primeira versão contou
+`SOPInstanceUID` como a quarta chave do DICOM e o `sha256` como identidade do NIfTI —
+misturando dois esquemas. As quatro chaves anti-vazamento são `case_id`, `study_id`,
+`series_id` e o **`sha256` do conteúdo**; o hash é **calculado localmente e existe
+igualmente nos dois canais**. O ganho real do DICOM é **+2** (`study_id` e `series_id`),
+e o `SOPInstanceUID` é um extra, não uma das quatro. O número final não mudou; a
+composição estava errada, e uma composição errada contamina o esquema.
 
 **O motivo do `UNKNOWN` não é limitação nossa:** o cabeçalho NIfTI-1 **não tem campo**
 para `StudyInstanceUID` nem `SeriesInstanceUID`. Falsificá-los seria inventar procedência.

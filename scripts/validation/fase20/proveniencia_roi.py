@@ -97,6 +97,22 @@ def algoritmo_do_esofago(nomes, algos) -> list:
 PADRAO_PRV = re.compile(r"\bprv\b|_prv|prv_|planning\s*risk", re.IGNORECASE)
 
 
+# Sitios de LESAO cujo nome contem "esophageal" e que o CRIVO_ESOFAGO aceita como
+# orgao. "paraesophageal" e "gastroesophageal" nomeiam REGIOES onde uma lesao esta,
+# nao o esofago. O crivo publicado exclui "lymph node" mas nao a forma nua.
+# Como no caso do PRV: NAO corrigimos o crivo (instrumento auditado, numero 908
+# publicado). Medimos e reportamos.
+PADRAO_SITIO_LESAO = re.compile(
+    r"paraesophageal|paraoesophageal|gastro\s*esophageal|gastroesophageal",
+    re.IGNORECASE)
+
+
+def contar_sitio_lesao(nomes) -> int:
+    """Nomes aceitos pelo crivo que sao SITIO de lesao, nao o orgao."""
+    return sum(1 for n in _lista(nomes)
+               if ie._nomes_de_esofago([n]) and PADRAO_SITIO_LESAO.search(str(n)))
+
+
 def contar_prv(nomes) -> int:
     """Quantos nomes que o crivo aceita como esofago sao, na verdade, PRV."""
     return sum(1 for n in _lista(nomes)
@@ -142,6 +158,10 @@ def medir() -> dict:
             "algoritmo": (Counter(algos).most_common(1)[0][0] if algos else "SEM_ROI"),
             "tipos_interpretados": _lista(r["RTROIInterpretedTypes"])[:8],
             "n_prv": contar_prv(r["ROINames"]),
+            "n_sitio_lesao": contar_sitio_lesao(r["ROINames"]),
+            "so_sitio_lesao": bool(contar_sitio_lesao(r["ROINames"])
+                                   and contar_sitio_lesao(r["ROINames"])
+                                   == len(ie._nomes_de_esofago(_lista(r["ROINames"])))),
         })
     return {"linhas": linhas, "n_rtstruct_total": int(len(rt))}
 
@@ -164,6 +184,7 @@ def agregar(linhas) -> dict:
         "sujeitos_distintos_total": int(df["PatientID"].nunique()),
         "algoritmo_global": df["algoritmo"].value_counts().to_dict(),
         "rtstruct_com_prv": int((df["n_prv"] > 0).sum()) if "n_prv" in df else 0,
+        "rtstruct_so_sitio_lesao": int(df["so_sitio_lesao"].sum()) if "so_sitio_lesao" in df else 0,
         "por_colecao": por_col,
     }
 
@@ -197,6 +218,18 @@ def autoteste() -> int:
         falhas.append("contagem de PRV errada: " + str(contar_prv(["Esophagus_PRV"])))
     if contar_prv(["Esophagus"]) != 0:
         falhas.append("orgao puro foi contado como PRV")
+
+    # sitio de lesao: o crivo aceita, e a medicao tem de saber separar
+    if not ie._nomes_de_esofago(["1 - PARAESOPHAGEAL - 1"]):
+        falhas.append("o crivo deixou de aceitar PARAESOPHAGEAL — o 908 mudou")
+    if contar_sitio_lesao(["1 - PARAESOPHAGEAL - 1", "1 - GASTRO ESOPHAGEAL - 1",
+                           "Esophagus"]) != 2:
+        falhas.append("contagem de sitio de lesao errada")
+    if contar_sitio_lesao(["Esophagus"]) != 0:
+        falhas.append("orgao puro contado como sitio de lesao")
+    # e o linfonodo NAO pode nem chegar aqui: o crivo de tumor ja o barra
+    if ie._nomes_de_esofago(["1 - PARAESOPHAGEAL LYMPH NODE - 1"]):
+        falhas.append("linfonodo passou pelo crivo de tumor")
 
     # CONTROLE: listas de comprimento diferente nao podem virar palpite
     d = algoritmo_do_esofago(["A", "Esophagus"], ["MANUAL"])
@@ -233,7 +266,7 @@ def autoteste() -> int:
 
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste proveniencia_roi: %d verificacoes, %d falhas" % (14, len(falhas)))
+    print("autoteste proveniencia_roi: %d verificacoes, %d falhas" % (18, len(falhas)))
     return 1 if falhas else 0
 
 
@@ -261,6 +294,8 @@ def main(argv=None) -> int:
           % ag["sujeitos_distintos_total"])
     print("dos quais com nome de PRV (margem de planejamento, NAO o orgao): %d"
           % ag["rtstruct_com_prv"])
+    print("dos quais SO com sitio de lesao (paraesophageal/gastroesophageal): %d"
+          % ag["rtstruct_so_sitio_lesao"])
     print()
     print("ROIGenerationAlgorithm DECLARADO para a ROI de esofago — global:")
     for k, v in sorted(ag["algoritmo_global"].items(), key=lambda x: -x[1]):
