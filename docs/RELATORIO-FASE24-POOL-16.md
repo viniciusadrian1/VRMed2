@@ -284,3 +284,63 @@ vínculo confirmado por `ReferencedSeriesInstanceUID`.
 | 16 | `4DLUNG-116_HM10395` | **F24** | …2799691968 | …2674751894 | 512x512x118 | 0.9766, 0.9766, 3 | `Esophagus_c00` | SEMIAUTOMATIC | LPS | 30.71 | 249.0 | 1 | 0.0000 % | `e4b2d333` | `3b89da80` |
 
 **F23** = já auditado na Fase 23 e reproduzido campo a campo aqui · **F24** = ingerido nesta fase.
+
+---
+
+## Adendo (Fase 25) — a desidentificação **é declarada em fonte primária**, e a seção 7 estava incompleta
+
+**O texto acima está preservado como foi escrito.** Esta correção segue a regra 16: registrar,
+corrigir a documentação quando a evidência justificar, e manter o histórico da correção.
+
+A seção 7 concluiu **"método de desidentificação UNKNOWN"** porque a Fase 24 só inspecionou as
+tags de PHI (`PatientName`, `AccessionNumber`, tags privadas). Ao montar o manifesto, a Fase 25
+abriu as tags do **grupo 0012** — o grupo em que o DICOM registra a própria desidentificação — e
+elas **não estão vazias**:
+
+| Tag | Valor, em 16/16 |
+|---|---|
+| `PatientIdentityRemoved` (0012,0062) | **`YES`** |
+| `DeidentificationMethod` (0012,0063) | `Per DICOM PS 3.15 AnnexE. Details in 0012,0064` |
+| `LongitudinalTemporalInformationModified` (0028,0303) | **`MODIFIED`** |
+| `InstitutionName` | **ausente** |
+| `PatientBirthDate` | vazio · `PatientAge` ausente · `PatientSex` retido (9 M / 7 F) |
+
+`DeidentificationMethodCodeSequence` (0012,0064), em 16/16:
+
+```
+113100  Basic Application Confidentiality Profile
+113101  Clean Pixel Data Option
+113105  Clean Descriptors Option
+113107  Retain Longitudinal With Modified Dates Option
+113108  Retain Patient Characteristics Option
+113109  Retain Device Identity Option
+113111  Retain Safe Private Option
+```
+
+**O que muda.** Existe **declaração explícita e estruturada** do perfil de desidentificação
+aplicado, em fonte primária (o próprio arquivo). A frase da seção 7 — *"método de
+desidentificação UNKNOWN"* — **estava errada**, e o certo é: **perfil declarado, `PS 3.15 Annex E`,
+Basic Application Confidentiality Profile com cinco opções de retenção nomeadas.**
+
+**O que NÃO muda (regra 13).** O projeto continua **não declarando o dataset anonimizado**.
+Uma declaração do produtor é evidência do que ele afirma ter feito, não verificação independente
+de que foi feito. Não auditamos pixel data em busca de *burned-in*, e `Retain Device Identity` e
+`Retain Safe Private` são retenções deliberadas. O estado correto é: **desidentificação declarada
+em fonte primária, com perfil nomeado; conformidade não verificada de forma independente por
+este projeto.**
+
+**E três achados da Fase 24 deixam de ser mistério:**
+
+1. `AccessionNumber` idêntico nos 16 e `PatientName` = `P100`…`P116` são **o efeito esperado** do
+   *Basic Application Confidentiality Profile*, que substitui em vez de remover.
+2. `institution` = **UNKNOWN em 16/16** não é desleixo nosso: a tag `InstitutionName` foi
+   **removida na origem**. UNKNOWN é a resposta correta, e agora com causa conhecida.
+3. `annotation_date_known` = **False** é confirmado por `Retain Longitudinal With Modified Dates`
+   e `LongitudinalTemporalInformationModified = MODIFIED`: as datas **existem mas foram
+   deslocadas**. Há data no arquivo; a data verdadeira não é conhecida. Isso também explica os
+   `StudyDate` de 1997–2003 numa coleção publicada muito depois.
+
+**Fato adicional registrado:** `Manufacturer` / `ManufacturerModelName` = **`ADAC` / `Pinnacle3`**
+em 16/16 — um sistema de **planejamento de radioterapia**, não um tomógrafo. **INFERÊNCIA:** as
+séries foram exportadas pelo TPS, o que é coerente com um fluxo de planejamento de RT e com o
+`SEMIAUTOMATIC` do RTSTRUCT. **Não se conclui** daí qual foi o equipamento de aquisição.

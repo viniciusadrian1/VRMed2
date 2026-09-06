@@ -295,3 +295,39 @@ Docs: **54 documentos, 0 violações**. Split congelado **INTOCADO**.
 | taxa de edição do QA | **UNKNOWN** — atinge o próprio split congelado |
 | "expert" | aparece no **título**, nunca substanciado no método |
 | Fase 9 | ponta cranial **+120,0 mm acima da carina**, truncamento em 1/30 |
+
+---
+
+## Fases 24 e 25 — universo de 16 fechado e congelado (2026-09-06)
+
+**`VRMED-ESOPHAGUS-POOL16-V1` — TRAIN 10 · VALIDATION 6 · TEST 0**
+`sha256_manifesto` (conteúdo canônico) `9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192`
+
+| Portão | Fase 24 | Fase 25 |
+|---|---|---|
+| universo 16 = 5 + 11 | OK | — |
+| reprodução dos 5 (regra 14) | OK, campo a campo | — |
+| um por sujeito · sem bloqueados | OK | — |
+| esquema 22 campos, 16/16 | — | OK, 0 erros |
+| banda `[2, 8]` declarada antes | — | 6 → DENTRO |
+| sujeito em dois splits | — | nenhum |
+| licença bloqueante | — | nenhuma |
+| TEST vazio e inalcançável | — | OK, por `AcessoIndevido` |
+
+### Correções que estas fases impuseram a fases anteriores
+
+| Alvo | Correção | Onde ficou registrada |
+|---|---|---|
+| Fase 23 · regra de seleção de série | **não era reproduzível** — o `<` estrito deixava a ordem de iteração decidir empates; corrigido com `(ct_mb, ct_uid)`; reproduz as 5 seleções originais | `RELATORIO-FASE24-POOL-16.md` §2 |
+| Fase 24 · desidentificação | *"método UNKNOWN"* **estava errado** — há declaração explícita no grupo 0012 em 16/16 | adendo em `RELATORIO-FASE24-POOL-16.md` |
+| identidade do congelamento | hash de **bytes** é dependente de plataforma (CRLF); vale o hash de **conteúdo canônico** | `RELATORIO-FASE25-CONGELAMENTO.md` §7.1 |
+
+### Auditoria
+
+`60` de suíte + `168` de autoteste + `13/13` mutantes mortos, com controle negativo antes e depois.
+`ESOPHAGUS_ONTOLOGY_V1` **não tocada**. Split histórico do LCTSC **intocado**.
+Não treinou, não mediu Dice, não rodou benchmark, não encostou no TEST.
+
+**O que continua UNKNOWN:** `institution` (tag removida na origem), `annotation_protocol`,
+data de anotação (deslocada na origem), conformidade da desidentificação, e a independência do
+LyNoS — **INCONCLUSIVA por construção**, nunca "sem overlap".

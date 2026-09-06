@@ -239,6 +239,10 @@ def autoteste() -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--autoteste", action="store_true")
+    # A saida e parametro porque re-rodar a suite numa fase posterior NAO pode
+    # sobrescrever o resultado historico da Fase 21 (regra 6). O caminho padrao
+    # continua sendo o da Fase 21, entao nada muda para quem ja usava.
+    ap.add_argument("--saida", default=str(SAIDA / "mutacao.json"))
     a = ap.parse_args(argv)
     if a.autoteste:
         return autoteste()
@@ -275,8 +279,9 @@ def main(argv=None) -> int:
           ", ".join("%s=%s" % (k, "OK" if v else "FALHOU")
                     for k, v in r["controle_negativo_depois"].items()))
 
-    SAIDA.mkdir(parents=True, exist_ok=True)
-    (SAIDA / "mutacao.json").write_text(json.dumps({
+    destino = Path(a.saida)
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(json.dumps({
         "fase": 21.14,
         "mortos": mortos, "total": len(r["mutantes"]),
         "por_grupo": {g: {"total": sum(1 for m in r["mutantes"] if m["grupo"] == g),
@@ -285,7 +290,7 @@ def main(argv=None) -> int:
                       for g in ("validators", "loader", "hashing")},
         **r,
     }, indent=1, ensure_ascii=False), encoding="utf-8")
-    print("escrito:", SAIDA / "mutacao.json")
+    print("escrito:", destino)
     return 0 if mortos == len(r["mutantes"]) else 1
 
 

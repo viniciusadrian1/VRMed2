@@ -1,0 +1,137 @@
+{
+ "regra": "VRMED-SPLIT-RULE-V1",
+ "formula": "validation se sha256(case_id) mod 100 < 25",
+ "limiar": 25,
+ "seed": null,
+ "banda_aceitacao": [
+  2,
+  8
+ ],
+ "ordem_canonica": [
+  "4DLUNG-100_HM10395",
+  "4DLUNG-101_HM10395",
+  "4DLUNG-102_HM10395",
+  "4DLUNG-103_HM10395",
+  "4DLUNG-104_HM10395",
+  "4DLUNG-105_HM10395",
+  "4DLUNG-106_HM10395",
+  "4DLUNG-107_HM10395",
+  "4DLUNG-108_HM10395",
+  "4DLUNG-109_HM10395",
+  "4DLUNG-110_HM10395",
+  "4DLUNG-111_HM10395",
+  "4DLUNG-112_HM10395",
+  "4DLUNG-114_HM10395",
+  "4DLUNG-115_HM10395",
+  "4DLUNG-116_HM10395"
+ ],
+ "n_total": 16,
+ "n_train": 10,
+ "n_validation": 6,
+ "n_test": 0,
+ "dentro_da_banda": true,
+ "atribuicoes": [
+  {
+   "case_id": "4DLUNG-100_HM10395",
+   "source_case_id": "100_HM10395",
+   "bucket": 34,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-101_HM10395",
+   "source_case_id": "101_HM10395",
+   "bucket": 22,
+   "split": "validation"
+  },
+  {
+   "case_id": "4DLUNG-102_HM10395",
+   "source_case_id": "102_HM10395",
+   "bucket": 86,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-103_HM10395",
+   "source_case_id": "103_HM10395",
+   "bucket": 20,
+   "split": "validation"
+  },
+  {
+   "case_id": "4DLUNG-104_HM10395",
+   "source_case_id": "104_HM10395",
+   "bucket": 20,
+   "split": "validation"
+  },
+  {
+   "case_id": "4DLUNG-105_HM10395",
+   "source_case_id": "105_HM10395",
+   "bucket": 43,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-106_HM10395",
+   "source_case_id": "106_HM10395",
+   "bucket": 56,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-107_HM10395",
+   "source_case_id": "107_HM10395",
+   "bucket": 5,
+   "split": "validation"
+  },
+  {
+   "case_id": "4DLUNG-108_HM10395",
+   "source_case_id": "108_HM10395",
+   "bucket": 48,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-109_HM10395",
+   "source_case_id": "109_HM10395",
+   "bucket": 99,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-110_HM10395",
+   "source_case_id": "110_HM10395",
+   "bucket": 98,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-111_HM10395",
+   "source_case_id": "111_HM10395",
+   "bucket": 44,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-112_HM10395",
+   "source_case_id": "112_HM10395",
+   "bucket": 53,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-114_HM10395",
+   "source_case_id": "114_HM10395",
+   "bucket": 99,
+   "split": "train"
+  },
+  {
+   "case_id": "4DLUNG-115_HM10395",
+   "source_case_id": "115_HM10395",
+   "bucket": 7,
+   "split": "validation"
+  },
+  {
+   "case_id": "4DLUNG-116_HM10395",
+   "source_case_id": "116_HM10395",
+   "bucket": 7,
+   "split": "validation"
+  }
+ ],
+ "isolamento": {
+  "intersecao_train_validation": [],
+  "test_vazio": true,
+  "cobertura": true,
+  "sem_sobra": true
+ }
+}

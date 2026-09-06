@@ -1,0 +1,486 @@
+{
+ "validacao": {
+  "valido": true,
+  "n_entradas": 16,
+  "erros": [],
+  "por_split": {
+   "train": 10,
+   "validation": 6,
+   "test": 0
+  }
+ },
+ "identidade": {
+  "case_id": {
+   "distintos": 16,
+   "repetidos": []
+  },
+  "study_id": {
+   "distintos": 16,
+   "repetidos": []
+  },
+  "series_id": {
+   "distintos": 16,
+   "repetidos": []
+  },
+  "image_sha256": {
+   "distintos": 16,
+   "repetidos": []
+  },
+  "mask_sha256": {
+   "distintos": 16,
+   "repetidos": []
+  },
+  "sujeitos_em_dois_splits": [],
+  "n_sujeitos": 16
+ },
+ "procedencia": {
+  "source_dataset": {
+   "4D-Lung (TCIA)": 16
+  },
+  "source_doi": {
+   "10.7937/K9/TCIA.2016.ELN8YGLE": 16
+  },
+  "license": {
+   "CC BY 3.0 (declarada POR SERIE no indice do IDC)": 16
+  },
+  "license_class": {
+   "ABERTA_ATRIBUICAO": 16
+  },
+  "institution": {
+   "UNKNOWN": 16
+  },
+  "annotation_protocol": {
+   "UNKNOWN": 16
+  },
+  "annotation_date_known": {
+   "False": 16
+  },
+  "bloqueantes": []
+ },
+ "distribuicao": {
+  "linhas": [
+   {
+    "case_id": "4DLUNG-100_HM10395",
+    "split": "train",
+    "volume_ml": 46.57,
+    "extensao_axial_mm": 252.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 142,
+    "fase_respiratoria": "c80"
+   },
+   {
+    "case_id": "4DLUNG-101_HM10395",
+    "split": "validation",
+    "volume_ml": 25.997,
+    "extensao_axial_mm": 243.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 149,
+    "fase_respiratoria": "c80"
+   },
+   {
+    "case_id": "4DLUNG-102_HM10395",
+    "split": "train",
+    "volume_ml": 38.521,
+    "extensao_axial_mm": 243.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 133,
+    "fase_respiratoria": "c10"
+   },
+   {
+    "case_id": "4DLUNG-103_HM10395",
+    "split": "validation",
+    "volume_ml": 44.421,
+    "extensao_axial_mm": 267.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 117,
+    "fase_respiratoria": "c40"
+   },
+   {
+    "case_id": "4DLUNG-104_HM10395",
+    "split": "validation",
+    "volume_ml": 33.651,
+    "extensao_axial_mm": 249.0,
+    "spacing": [
+     1.0527,
+     1.0527,
+     3.0
+    ],
+    "shape_z": 103,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-105_HM10395",
+    "split": "train",
+    "volume_ml": 23.593,
+    "extensao_axial_mm": 246.0,
+    "spacing": [
+     1.1113,
+     1.1113,
+     3.0
+    ],
+    "shape_z": 113,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-106_HM10395",
+    "split": "train",
+    "volume_ml": 27.513,
+    "extensao_axial_mm": 207.0,
+    "spacing": [
+     1.1621,
+     1.1621,
+     3.0
+    ],
+    "shape_z": 103,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-107_HM10395",
+    "split": "validation",
+    "volume_ml": 26.352,
+    "extensao_axial_mm": 174.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 82,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-108_HM10395",
+    "split": "train",
+    "volume_ml": 30.343,
+    "extensao_axial_mm": 246.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 119,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-109_HM10395",
+    "split": "train",
+    "volume_ml": 60.693,
+    "extensao_axial_mm": 198.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 112,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-110_HM10395",
+    "split": "train",
+    "volume_ml": 49.763,
+    "extensao_axial_mm": 252.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 113,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-111_HM10395",
+    "split": "train",
+    "volume_ml": 37.88,
+    "extensao_axial_mm": 219.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 114,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-112_HM10395",
+    "split": "train",
+    "volume_ml": 27.685,
+    "extensao_axial_mm": 243.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 118,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-114_HM10395",
+    "split": "train",
+    "volume_ml": 37.179,
+    "extensao_axial_mm": 264.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 131,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-115_HM10395",
+    "split": "validation",
+    "volume_ml": 32.887,
+    "extensao_axial_mm": 240.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 104,
+    "fase_respiratoria": "c00"
+   },
+   {
+    "case_id": "4DLUNG-116_HM10395",
+    "split": "validation",
+    "volume_ml": 30.713,
+    "extensao_axial_mm": 249.0,
+    "spacing": [
+     0.9766,
+     0.9766,
+     3.0
+    ],
+    "shape_z": 118,
+    "fase_respiratoria": "c00"
+   }
+  ],
+  "por_split": {
+   "train": {
+    "n": 10,
+    "volume_ml": {
+     "n": 10,
+     "min": 23.593,
+     "mediana": 37.53,
+     "max": 60.693
+    },
+    "extensao_axial_mm": {
+     "n": 10,
+     "min": 198.0,
+     "mediana": 244.5,
+     "max": 264.0
+    },
+    "shape_z": {
+     "n": 10,
+     "min": 103,
+     "mediana": 116.0,
+     "max": 142
+    },
+    "spacing": {
+     "(0.9766, 0.9766, 3.0)": 8,
+     "(1.1113, 1.1113, 3.0)": 1,
+     "(1.1621, 1.1621, 3.0)": 1
+    },
+    "fase_respiratoria": {
+     "c80": 1,
+     "c10": 1,
+     "c00": 8
+    }
+   },
+   "validation": {
+    "n": 6,
+    "volume_ml": {
+     "n": 6,
+     "min": 25.997,
+     "mediana": 31.8,
+     "max": 44.421
+    },
+    "extensao_axial_mm": {
+     "n": 6,
+     "min": 174.0,
+     "mediana": 246.0,
+     "max": 267.0
+    },
+    "shape_z": {
+     "n": 6,
+     "min": 82,
+     "mediana": 110.5,
+     "max": 149
+    },
+    "spacing": {
+     "(0.9766, 0.9766, 3.0)": 5,
+     "(1.0527, 1.0527, 3.0)": 1
+    },
+    "fase_respiratoria": {
+     "c80": 1,
+     "c40": 1,
+     "c00": 4
+    }
+   }
+  },
+  "aviso": "DIAGNOSTICO. Nenhuma destas medidas realimenta a regra de split. Ajustar o split para melhorar qualquer uma delas seria escolher o split depois de ver o split."
+ },
+ "test_protegido": {
+  "n_test_no_manifesto": 0,
+  "treino": {
+   "bloqueado": true,
+   "erro": "contexto 'treino' nao pode ler a particao 'test' (pode ler: ['train']). Se isto apareceu durante treino, o vazamento est",
+   "conforme_esperado": true
+  },
+  "validacao": {
+   "bloqueado": true,
+   "erro": "contexto 'validacao' nao pode ler a particao 'test' (pode ler: ['train', 'validation']). Se isto apareceu durante treino",
+   "conforme_esperado": true
+  },
+  "avaliacao": {
+   "bloqueado": false,
+   "n_lidos": 0,
+   "conforme_esperado": true
+  },
+  "treino_le_train": 10
+ },
+ "split": {
+  "regra": "VRMED-SPLIT-RULE-V1",
+  "formula": "validation se sha256(case_id) mod 100 < 25",
+  "limiar": 25,
+  "seed": null,
+  "banda_aceitacao": [
+   2,
+   8
+  ],
+  "ordem_canonica": [
+   "4DLUNG-100_HM10395",
+   "4DLUNG-101_HM10395",
+   "4DLUNG-102_HM10395",
+   "4DLUNG-103_HM10395",
+   "4DLUNG-104_HM10395",
+   "4DLUNG-105_HM10395",
+   "4DLUNG-106_HM10395",
+   "4DLUNG-107_HM10395",
+   "4DLUNG-108_HM10395",
+   "4DLUNG-109_HM10395",
+   "4DLUNG-110_HM10395",
+   "4DLUNG-111_HM10395",
+   "4DLUNG-112_HM10395",
+   "4DLUNG-114_HM10395",
+   "4DLUNG-115_HM10395",
+   "4DLUNG-116_HM10395"
+  ],
+  "n_total": 16,
+  "n_train": 10,
+  "n_validation": 6,
+  "n_test": 0,
+  "dentro_da_banda": true,
+  "atribuicoes": [
+   {
+    "case_id": "4DLUNG-100_HM10395",
+    "source_case_id": "100_HM10395",
+    "bucket": 34,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-101_HM10395",
+    "source_case_id": "101_HM10395",
+    "bucket": 22,
+    "split": "validation"
+   },
+   {
+    "case_id": "4DLUNG-102_HM10395",
+    "source_case_id": "102_HM10395",
+    "bucket": 86,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-103_HM10395",
+    "source_case_id": "103_HM10395",
+    "bucket": 20,
+    "split": "validation"
+   },
+   {
+    "case_id": "4DLUNG-104_HM10395",
+    "source_case_id": "104_HM10395",
+    "bucket": 20,
+    "split": "validation"
+   },
+   {
+    "case_id": "4DLUNG-105_HM10395",
+    "source_case_id": "105_HM10395",
+    "bucket": 43,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-106_HM10395",
+    "source_case_id": "106_HM10395",
+    "bucket": 56,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-107_HM10395",
+    "source_case_id": "107_HM10395",
+    "bucket": 5,
+    "split": "validation"
+   },
+   {
+    "case_id": "4DLUNG-108_HM10395",
+    "source_case_id": "108_HM10395",
+    "bucket": 48,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-109_HM10395",
+    "source_case_id": "109_HM10395",
+    "bucket": 99,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-110_HM10395",
+    "source_case_id": "110_HM10395",
+    "bucket": 98,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-111_HM10395",
+    "source_case_id": "111_HM10395",
+    "bucket": 44,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-112_HM10395",
+    "source_case_id": "112_HM10395",
+    "bucket": 53,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-114_HM10395",
+    "source_case_id": "114_HM10395",
+    "bucket": 99,
+    "split": "train"
+   },
+   {
+    "case_id": "4DLUNG-115_HM10395",
+    "source_case_id": "115_HM10395",
+    "bucket": 7,
+    "split": "validation"
+   },
+   {
+    "case_id": "4DLUNG-116_HM10395",
+    "source_case_id": "116_HM10395",
+    "bucket": 7,
+    "split": "validation"
+   }
+  ]
+ }
+}
