@@ -177,6 +177,23 @@ def test_12_o_varredor_realmente_ve():
         falsos = ont.varrer_documento(raiz / "banidor.md")
         assert not falsos, f"varredor acusou uma lista de proibicoes: {falsos}"
 
+        # A ISENCAO META NAO PODE VIRAR PORTA DE FUGA. Ela exige DUAS coisas:
+        # vocabulario de instrumento E a frase entre aspas. Vocabulario sozinho,
+        # com a afirmacao solta, tem que continuar sendo acusado — senao bastaria
+        # escrever "varredor" numa linha para afirmar qualquer coisa nela.
+        (raiz / "meta_legitimo.md").write_text(
+            'O varredor acusou a linha que dizia "o modelo esta dentro da '
+            'variabilidade humana", e esse foi um falso positivo.\n',
+            encoding="utf-8")
+        assert not ont.varrer_documento(raiz / "meta_legitimo.md"), (
+            "citacao entre aspas num texto sobre o varredor foi acusada")
+
+        (raiz / "meta_fuga.md").write_text(
+            "Segundo o varredor, o modelo esta dentro da variabilidade humana.\n",
+            encoding="utf-8")
+        assert ont.varrer_documento(raiz / "meta_fuga.md"), (
+            "PORTA DE FUGA: bastou a palavra 'varredor' para a afirmacao passar")
+
         # CONTROLE DE TERMO: digital twin sozinho acusa; acompanhado passa.
         (raiz / "twin_sozinho.md").write_text("O VRmed e um digital twin.\n", encoding="utf-8")
         assert ont.checar_termo(raiz / "twin_sozinho.md")

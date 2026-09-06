@@ -215,14 +215,25 @@ def varrer_documento(caminho: Path) -> list[str]:
         # de frases proibidas, que eram os dois falsos positivos da primeira versao.
         sem_enfase = n.replace("*", "").replace("_", "").replace("`", "")
         negando = ("❌" in linha) or any(
-            m in sem_enfase for m in ("nao ", "nunca", "proibid", "~~", "jamais",
+            m in sem_enfase for m in ("nao ", "nunca", "proib", "~~", "jamais",
                                       "evite", "nao e", "nao pode", "nao dizer",
                                       "sem sugerir", "frases proibidas"))
+        # META: um documento que DESCREVE este varredor precisa poder CITAR o que
+        # ele detecta — foi assim que o relatorio da propria Fase 13 tropecou nele.
+        # A isencao e estreita de proposito e exige as DUAS coisas: vocabulario de
+        # instrumento na linha E a frase entre aspas. Vocabulario sozinho seria uma
+        # porta de fuga (bastaria escrever "varredor" para afirmar o que quisesse).
+        meta = any(m in sem_enfase for m in (
+            "varredor", "crivo", "regex", "padrao", "injeta", "controle positivo",
+            "falso positivo", "falso negativo", "acusou", "detecta", "violaca",
+            "violacoes", "teste 12"))
+        citando = ('"' in linha) or ("“" in linha) or ("«" in linha)
+        isento = negando or (meta and citando)
         for frase in FRASES_PROIBIDAS:
-            if _normalizar(frase) in n and not negando:
+            if _normalizar(frase) in n and not isento:
                 achados.append(f"{caminho.name}:{i} frase proibida: '{frase}'")
         for padrao, motivo in PADROES_DE_REGRESSAO:
-            if re.search(padrao, n) and not negando:
+            if re.search(padrao, n) and not isento:
                 achados.append(f"{caminho.name}:{i} regressao: {motivo}")
     return achados
 

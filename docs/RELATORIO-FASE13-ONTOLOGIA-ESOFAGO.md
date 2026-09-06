@@ -142,6 +142,31 @@ fisiológico nem simulação. Um documento que use o termo precisa também menci
 *patient-specific*, senão está usando-o como se fosse o que o projeto é. **Resultado da
 varredura: 30 documentos, 0 violações.**
 
+### 6.4 O varredor reprovou o relatório desta própria fase — duas vezes
+
+**FATO.** Depois de escrito, este documento foi varrido e **acusado**, em duas rodadas:
+
+1. **Linha 119** — a frase que descreve o conserto do regex cita o texto do próprio
+   fixture (*"separamos parede e lumen em duas classes"*). O varredor leu a citação como
+   proposta.
+2. **Linha 128** — a frase que explica o falso positivo cita *"validado clinicamente"* e
+   diz que as duas linhas originais **proíbem** a frase. O marcador de negação era
+   `proibid`, sufixo que não casa `proíbem`.
+
+**As duas correções, e por que são diferentes:**
+
+- **Isenção meta+citação.** Um documento que descreve o detector precisa poder citar o que
+  ele detecta. A isenção exige **as duas coisas**: vocabulário de instrumento na linha
+  (*varredor, crivo, regex, controle positivo, falso positivo…*) **e** a frase entre aspas.
+  Vocabulário sozinho seria porta de fuga — bastaria escrever "varredor" para afirmar
+  qualquer coisa. **O teste 12 agora cobre exatamente isso**: uma linha com vocabulário de
+  instrumento e a afirmação *solta* continua sendo acusada.
+- **Radical em vez de sufixo.** `proibid` → `proib`, cobrindo *proíbem / proibida /
+  proibir*.
+
+**INFERÊNCIA.** Que o instrumento tenha reprovado o documento que o descreve é o sinal mais
+forte desta fase de que ele não está zerado por conveniência.
+
 ## 7. O que esta fase NÃO fez
 
 - **Não treinou nada.** Nenhum epoch, nenhum modelo.
