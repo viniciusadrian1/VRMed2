@@ -236,3 +236,50 @@ Docs: **44 documentos, 0 violações**. Split congelado **INTOCADO**.
 4. **`series_revised_idc_version` mal lido** como "foi revisada"; vem em 100 % das séries.
 5. **DOI inexistente** já corrigido na Fase 18, e um mutante sobrevivente (**L4**) virou teste.
 6. **Heredoc converteu `` em byte de backspace** num regex — o `cat -A` mostrou `^H`.
+
+---
+
+## Fases 22–23 — 2026-09-06
+
+| Fase | Estado | Resultado |
+|---|---|---|
+| **22** — definição e autoria do LCTSC | **CONCLUÍDA — B** | definição documentada; autoria UNKNOWN; contradição resolvida contra o projeto |
+| **23** — primeiro dataset auditável | **CONCLUÍDA — B** | **5/5 casos reais elegíveis**; pool sem split congelado |
+
+### A correção que a Fase 22 impôs à Fase 20
+
+| | Fase 20 dizia | Correto |
+|---|---|---|
+| `ROIGenerationAlgorithm` nos 908 | UNKNOWN em 908/908 | **MANUAL 731 · SEMIAUTOMATIC 101 · INDETERMINADO 42 · UNKNOWN 34** |
+
+Causa: a coluna do índice é **deduplicada** (0, 1 ou 2 valores, nunca por ROI) e meu leitor
+a tratava como lista paralela. Detectado ao abrir os 60 RTSTRUCT do LCTSC.
+
+### Medições novas
+
+| Medida | Valor |
+|---|---|
+| RTSTRUCT do LCTSC abertos | **60** — primeira vez em 22 fases |
+| `ROIGenerationAlgorithm` do esôfago (LCTSC) | **MANUAL 59/60** |
+| tags de autoria no arquivo | **vazias em 60/60** |
+| esôfago acima do ápice pulmonar — LCTSC | mediana **+17,5 mm**, 54/60 |
+| esôfago acima do ápice pulmonar — 4D-Lung | mediana **+21,0 mm**, 5/5 |
+| amostra real adquirida | **5 sujeitos**, 108,2 MB |
+| casos elegíveis (critério 23.18) | **5/5** |
+| vínculo máscara↔imagem por UID | **5/5** |
+| ontologia nos casos reais | 5/5 aprovados, buracos 0,0000 % |
+| colisões de identidade (pool e cruzado) | **0** |
+
+### Instrumentos novos
+
+| Módulo | Verificações |
+|---|---:|
+| `fase22/rtstruct_lctsc.py` | 9 |
+| `fase23/aquisicao.py` | 7 |
+| `fase23/ingerir_real.py` | 8 |
+| `fase23/pool.py` | 5 |
+
+### Auditoria
+
+`PASS=340 · FAIL=0 · SKIP=0` — 49 de suíte + 250 de autoteste + 41 de mutação.
+Docs: **54 documentos, 0 violações**. Split congelado **INTOCADO**.
