@@ -1,0 +1,273 @@
+{
+ "diretorio": "C:\\Users\\vinic\\AppData\\Local\\Temp\\vrmed_anon_z_bpvjnf\\fixture",
+ "arquivos": 4,
+ "lidos": 4,
+ "eixo1_tags_identificadoras": [
+  {
+   "tag": "0010,0010",
+   "nome": "PatientName",
+   "acao_esperada": "REMOVER_OU_SUBSTITUIR",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,0020",
+   "nome": "PatientID",
+   "acao_esperada": "SUBSTITUIR",
+   "presente_em": 4,
+   "de": 4,
+   "estado": "INDETERMINADO",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,0030",
+   "nome": "PatientBirthDate",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,0040",
+   "nome": "PatientSex",
+   "acao_esperada": "MANTER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,1010",
+   "nome": "PatientAge",
+   "acao_esperada": "MANTER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,1040",
+   "nome": "PatientAddress",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,2154",
+   "nome": "PatientTelephoneNumbers",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,1000",
+   "nome": "OtherPatientIDs",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,1001",
+   "nome": "OtherPatientNames",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,2160",
+   "nome": "EthnicGroup",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0010,4000",
+   "nome": "PatientComments",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,0090",
+   "nome": "ReferringPhysicianName",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,1050",
+   "nome": "PerformingPhysicianName",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,1070",
+   "nome": "OperatorsName",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,1048",
+   "nome": "PhysiciansOfRecord",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,0080",
+   "nome": "InstitutionName",
+   "acao_esperada": "REMOVER_OU_SUBSTITUIR",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,0081",
+   "nome": "InstitutionAddress",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,1040",
+   "nome": "InstitutionalDepartmentName",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,1010",
+   "nome": "StationName",
+   "acao_esperada": "REMOVER_OU_SUBSTITUIR",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0008,0050",
+   "nome": "AccessionNumber",
+   "acao_esperada": "REMOVER_OU_SUBSTITUIR",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0020,0010",
+   "nome": "StudyID",
+   "acao_esperada": "REMOVER_OU_SUBSTITUIR",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0018,1000",
+   "nome": "DeviceSerialNumber",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0032,1032",
+   "nome": "RequestingPhysician",
+   "acao_esperada": "REMOVER",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  },
+  {
+   "tag": "0070,0084",
+   "nome": "ContentCreatorName",
+   "acao_esperada": "REMOVER_OU_SUBSTITUIR",
+   "presente_em": 0,
+   "de": 4,
+   "estado": "OK",
+   "exemplos": []
+  }
+ ],
+ "eixo2_uids": [
+  {
+   "uid": "StudyInstanceUID",
+   "presente": true,
+   "prefixo": "2.25",
+   "estado": "INDETERMINADO",
+   "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
+  },
+  {
+   "uid": "SeriesInstanceUID",
+   "presente": true,
+   "prefixo": "2.25",
+   "estado": "INDETERMINADO",
+   "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
+  },
+  {
+   "uid": "SOPInstanceUID",
+   "presente": true,
+   "prefixo": "2.25",
+   "estado": "INDETERMINADO",
+   "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
+  },
+  {
+   "uid": "FrameOfReferenceUID",
+   "presente": false,
+   "prefixo": null,
+   "estado": "AUSENTE",
+   "nota": "UID presente e ESPERADO — e a identidade que o esquema exige. O que nao se verifica daqui e se ele foi REMAPEADO na origem; um UID original permite reencontrar o exame no PACS de origem."
+  }
+ ],
+ "eixo3_tags_privadas": {
+  "n_tags_privadas_distintas": 0,
+  "tags": [],
+  "estado": "OK",
+  "nota": "grupo impar e espaco livre do fabricante; ja se encontrou nome e prontuario ali. Presenca nao prova vazamento, mas exige inspecao caso a caso."
+ },
+ "eixo4_caminho": {
+  "arquivos": 4,
+  "suspeitos": [],
+  "n_suspeitos": 0,
+  "estado": "OK"
+ },
+ "n_achados": 0,
+ "veredito": "SEM ACHADO NAS 4 VARREDURAS",
+ "o_que_este_veredito_NAO_significa": [
+  "nao significa 'anonimizado' — significa que estas quatro varreduras nao acharam",
+  "pixel nao foi lido: texto queimado na imagem e invisivel aqui",
+  "reidentificacao por combinacao (data + instituicao + diagnostico raro) nao e avaliada",
+  "nao substitui parecer juridico nem aprovacao etica; licenca aberta nao e consentimento"
+ ]
+}
