@@ -1,6 +1,6 @@
 # Fase 17 — benchmark profundo de reconstrução 3D
 
-Data: 2026-09-06 · 182 medições · 14 variantes × 13 fantomas · 8/8 métricas congeladas · Nada treinado
+Data: 2026-09-06 · 182 medições em fantoma + 33 em anatomia real · 8/8 métricas congeladas · Nada treinado
 
 > **MASTER: MANTIDO.** Nenhuma variante o supera onde importa. Três variantes ficam
 > **empatadas** dentro do ruído no volume analítico e **perdem** em outra dimensão;
@@ -216,6 +216,58 @@ verdadeiro: **10,27 mm contra 0,0009 mm — quatro ordens de grandeza.**
 **INFERÊNCIA.** O aviso estava em `stderr` e passou despercebido porque o comando terminou com
 código 0. Um erro que não interrompe o processo é o mais caro de todos.
 
+## 6-bis. Anatomia real — o braço que testa o alvo de verdade
+
+**FATO.** 11 variantes × 4 estruturas do caso `cta-cardio`, que está **fora de todo split
+congelado** (não é LCTSC, não é NSCLC-Radiomics) — medi-lo não contamina nada. Quatro calibres
+reais: **esôfago 25,3 mL · traqueia 46,6 mL · aorta 132,3 mL · coração 494,5 mL**.
+CSV: `docs/overnight/reconstruction_benchmark_real.csv`.
+
+*(O coração ainda estava rodando no fechamento; as três primeiras estruturas estão completas.)*
+
+### Erro de volume (%) — anatomia real
+
+| Variante | aorta | **esôfago** | traqueia |
+|---|---:|---:|---:|
+| `mc_taubin20` | −0,067 | **−0,239** | −0,075 |
+| `mc_taubin12` | −0,114 | −0,349 | −0,137 |
+| `mc_taubin8` | −0,138 | −0,401 | −0,168 |
+| **`MASTER` (taubin4)** | **−0,160** | **−0,450** | **−0,199** |
+| `mc_taubin2` | −0,170 | −0,472 | −0,215 |
+| `sdf` | −0,171 | −0,470 | −0,230 |
+| `mc_taubin0` | −0,179 | −0,491 | −0,230 |
+| `flying_edges` | −0,187 | −0,528 | −0,249 |
+| `mc_windowed_sinc` | −0,190 | −0,531 | −0,237 |
+| `mc_sigma1_taubin4` | −1,327 | **−3,779** | −1,729 |
+| `surface_nets` | **−2,835** | **−7,049** | **−3,671** |
+
+**FATO.** A ordenação é **idêntica à dos fantomas**, nas três estruturas. E o **esôfago é
+consistentemente a estrutura com maior erro** — coerente com ser a mais fina e tubular das três.
+
+### O achado do braço real: Surface Nets quebra a topologia
+
+**FATO.** Watertight e arestas não-manifold, por variante:
+
+| Variante | esôfago | traqueia | aorta |
+|---|---|---|---|
+| **todas as 10 de marching cubes / flying edges / sdf** | ✔ / 0 | ✔ / 0 | ✔ / 0 |
+| **`surface_nets`** | **✗ / 8** | **✗ / 8** | **✗ / 4** |
+
+**Surface Nets é a única variante que produz malha não-watertight em anatomia real, nas três
+estruturas, com arestas não-manifold que nenhuma outra introduz.** Nos fantomas ele "só" perdia
+volume; aqui ele quebra a topologia também.
+
+**INFERÊNCIA.** Isso reforça a regra 15 do enunciado com evidência do alvo real, não apenas
+sintética. Uma malha não-watertight não tem volume definido — e o VRmed publica volume.
+
+### Custo
+
+**FATO.** Tempo mediano: `surface_nets` 0,40 s · `flying_edges` 1,87 s · **MASTER 2,60 s** ·
+`sdf` **20,53 s**.
+
+**INFERÊNCIA.** `surface_nets` é 6,5× mais rápido que o MASTER — e é a única coisa que ele
+ganha. O `sdf` é **8× mais lento** pelo mesmo resultado geométrico do MASTER.
+
 ## 7. Performance
 
 **FATO.** Todas as variantes de extração custam entre 0,0056 s e 0,0090 s por fantoma, com
@@ -265,7 +317,7 @@ FASE 17 CONCLUÍDA
 MASTER: MANTIDO
 VARIANTES MEDIDAS: 14 × 13 fantomas = 182 linhas
 CANDIDATAS: mc_taubin8/12/20 (troca desfavorável para estrutura fina) — nenhuma promovida
-REJEITADAS POR MEDIÇÃO: mc_sigma1 (funde e rompe topologia), surface_nets (−71,7% em estrutura pequena)
+REJEITADAS POR MEDIÇÃO: mc_sigma1 (funde e rompe topologia), surface_nets (−71,7% em fantoma pequeno; e a UNICA que quebra watertight em anatomia real, nas 3 estruturas)
 LOD: 50% aceitável; 25% exige verificação; 10% rompe ponte fina
 DRACO: 7,7x a 13,2x de compressao por perda de 0,0009-0,0033 mm (micrometros; 3 ordens abaixo do piso da grade)
 ACHADOS DE INSTRUMENTO: 4 (surface_nets medido duas vezes; 3 colunas de topologia vazias; 2 metricas congeladas ausentes; Hausdorff do Draco falso por 4 ordens de grandeza)
