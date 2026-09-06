@@ -78,3 +78,21 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
   estruturas prontas (8/8/4 arestas não-manifold), com −2,8 % a −7,0 % de volume.
 - **FATO** a ordenação de erro de volume é idêntica à dos fantomas nas 3 estruturas.
 - **FATO** sdf é 8× mais lento que o MASTER pelo mesmo resultado geométrico.
+
+## Fase 16 — independência do baseline
+
+- **FATO** SegTHOR (Task 55, inclui esôfago) e BTCV (Task 17) semearam a primeira segmentação
+  do treino do TotalSegmentator (suplemento S2). É circularidade de ANOTAÇÃO, invisível a
+  qualquer sonda de imagem. Remove os dois da lista de candidatos a teste.
+- **FATO** Dataset343 × task total: 1.524 formas em comum, 85,3 % do 343 vem do pool do total.
+  `pericardium` não é segunda opinião independente.
+- **FATO** LUNG1-059 e LUNG1-042 (coorte da Fase 10) estão no SAROS, em folds de TREINO.
+- **FATO** não há model card, splits_final.json nem identificador de caso em disco — verificado
+  nos opcodes dos .pth sem executar pickle. `fold=0` agrava: nem as 1.139 públicas são
+  atribuíveis ao treino efetivo.
+- **FATO** `dataset_fingerprint.json` vaza as formas das 1.559 imagens, inclusive as 420 não
+  publicadas. LCTSC 3/60 (nulo 2,40, p=0,502); NSCLC 1/25 (nulo 1,00). Sem excesso; teto ≲4.
+- **FATO** hipótese SAROS-em-343 derrubada: teto ≈30 casos, sem enriquecimento.
+- **FATO** defeito ATIVO corrigido: a correção da Fase 9 era só documental; manifest.json e o
+  GERADOR coorte.py ainda emitiam a afirmação falsa. Corrigidos os dois juntos.
+- **DECISÃO** K2 BLOQUEADO; K3 BLOQUEADO e registrado como ESTRUTURAL.

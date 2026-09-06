@@ -7,7 +7,7 @@ Nenhum conjunto congelado tocado · Nenhuma linha de histórico apagada
 
 # Resumo executivo
 
-Cinco fases, das quais **quatro concluídas e uma parcial declarada**. O saldo em uma frase:
+Cinco fases, **todas concluídas**, uma delas parcial e declarada como tal. O saldo em uma frase:
 **o projeto fechou o único critério de prontidão que estava sob seu controle, encontrou o
 melhor candidato a teste independente em quinze fases, manteve o MASTER de reconstrução por
 medição — e continua com o treino bloqueado, agora por um motivo mais bem caracterizado.**
@@ -17,10 +17,10 @@ medição — e continua com o treino bloqueado, agora por um motivo mais bem ca
 | **13** — Ontologia | **A** | `ESOPHAGUS_ONTOLOGY_V1` congelada · **K4 RESOLVIDO** · 13 testes de regressão |
 | **14** — Prontidão | **C** | cenário C · K1, K2, K3 bloqueados por razões independentes |
 | **15** — Teste independente | **B** (parcial) | **LyNoS** — 79 candidatos, 230 consultas · classe E |
-| **16** — Independência | *em curso* | auditoria do TotalSegmentator v2 dataset a dataset |
+| **16** — Independência | **K2/K3 bloqueados** | **circularidade de anotação SegTHOR/BTCV** · 2 overlaps identificados · defeito ativo corrigido |
 | **17** — Reconstrução | **A** | **MASTER MANTIDO** · 182 medições em fantoma + 44 em anatomia real · 4 achados de instrumento |
 
-**Nove achados de instrumento** ao longo da noite — sete deles erro do próprio trabalho desta
+**Treze achados de instrumento** ao longo da noite — sete deles erro do próprio trabalho desta
 execução, todos encontrados por controle positivo e todos corrigidos. É o número que melhor
 descreve a noite: **o que mais rendeu foi apontar os instrumentos para si mesmos.**
 
@@ -125,18 +125,74 @@ ondas. Nenhum termo aceito, nenhuma conta criada, nenhum acesso solicitado.
 
 # Fase 16 — independência do baseline
 
-**EM CURSO** no encerramento deste relatório. Workflow `wqo33i814`, 5 arms auditando pesos e
-model card, documentação pública do TotalSegmentator, manifestos locais, o par
-`Dataset343_mediastinum_1786subj` × SAROS, e LCTSC × NSCLC-Radiomics.
+**Resultado: K2 BLOQUEADO · K3 BLOQUEADO.** A fase não fabricou prova de independência — e o
+achado central é que **o pacote distribuído a torna estruturalmente indemonstrável.**
 
-*(Esta seção é atualizada quando a fase concluir; o relatório é publicado com ela em aberto
-porque o restante está fechado e o enunciado manda não deixar relatório incompleto.)*
+## O achado que nenhuma sonda alcança
 
-**O que já se sabe, das fases anteriores:** o SAROS mostrou forte correspondência com
-`pericardium`, e a Fase 8 registrou que o dataset de treino do task 343 tem os **rótulos
-idênticos** aos do SAROS e proveniência com placeholders (`reference: "Jakob"`,
-`licence: "-"`). **Dice alto entre modelo e dataset é exatamente o que se esperaria se o
-dataset estivesse no treino** — o sinal aponta para os dois lados.
+**FATO.** O suplemento S2 do artigo do TotalSegmentator declara que **SegTHOR** (nnU-Net
+Task 55 — aorta, **esôfago**, coração, traqueia) e **BTCV** (Task 17, inclui esôfago) foram
+usados como modelos pré-treinados para gerar a **primeira segmentação** do conjunto de treino,
+depois refinada por humanos.
+
+**INFERÊNCIA.** Não é vazamento de **imagem** — as imagens são de Basel. É **circularidade de
+anotação**: o rótulo de esôfago do treino do baseline foi semeado por modelos treinados em
+SegTHOR e BTCV. **Nenhuma sonda de imagem detecta isso**, inclusive as desta fase. E remove os
+dois da lista de candidatos a teste — **a lista de K3 encolheu**.
+
+## Dois overlaps identificados
+
+| | |
+|---|---|
+| **`Dataset343` (`pericardium`) × task `total`** | 1.524 formas em comum; **85,3 % do `343` vem do pool do `total`**. **`pericardium` não é uma segunda opinião independente** — o projeto vinha tratando os dois como fontes separadas |
+| **Coorte NSCLC do VRmed × SAROS** | `LUNG1-059` = `case_567` (**fold-2**) e `LUNG1-042` = `case_546` (**fold-5**) — casamento exato de `tcia_case_id`, `SeriesInstanceUID` **e** `StudyInstanceUID`, ambos em folds de **treino** |
+
+## A forense dos pesos: a ausência é o achado
+
+**FATO.** Não existe model card, não existe `splits_final.json`, **não existe um único
+identificador de caso** — verificado até nos opcodes dos `.pth`, lendo com `pickletools` **sem
+executar o pickle**.
+
+**Três descobertas laterais:**
+1. Os placeholders de proveniência que a Fase 8 tratou como suspeitos do `343`
+   (`reference: "Jakob"`, `licence: "-"`) estão **idênticos nas 10 tasks — inclusive na que
+   produz o `BASELINE_ESOFAGO_V1`**. A opacidade é do produto, não do `343`.
+2. `debug.json` grava `rndapollolp01.uhbs.ch` — proveniência de **máquina**, não de dados.
+   **Treinar EM Basel não é treinar SÓ COM dados de Basel**, e é exatamente aí que o projeto
+   errou por duas fases.
+3. Todos os modelos são **`fold=0`**: o publicado viu ~80 % das imagens, e o arquivo que diz
+   quais **não foi publicado**. **A opacidade é maior que 26,9 %.**
+
+## O instrumento novo
+
+**FATO.** `dataset_fingerprint.json` vaza as formas das **1.559 imagens de treino, inclusive
+das 420 não publicadas** — primeiro teste de condição necessária sobre o treino não divulgado.
+
+| Coorte | Acertos | Nulo | p |
+|---|---:|---:|---:|
+| LCTSC (60) | 3 | 2,40 | 0,502 |
+| NSCLC (25) | 1 | 1,00 | 1,000 |
+
+**Sem excesso sobre o acaso.** Teto ≲4, poder ≈0,75. **Teto não é prova** — a sonda é cega ao
+canal documental, inclusive à circularidade acima.
+
+## A hipótese da Fase 8, derrubada
+
+**SAROS dentro do `Dataset343`:** teto de **≈30 casos**, e **sem enriquecimento** na assinatura
+de espessura (0,344 no resíduo contra 0,323 no pool de Basel e 0,300 de acaso). Um cético
+levantou o envelope de intensidade como prova de dado externo; **outro o refutou** — é função
+do conjunto de rótulos, não da origem.
+
+## O defeito ativo que a fase corrigiu
+
+**FATO.** A correção da Fase 9 foi feita **só no documento**. A afirmação falsa continuava
+sendo **emitida por máquina** em `.clinica-dados/tier2/lctsc/manifest.json` (campo
+`proveniencia_gt`) **e no gerador** `scripts/validation/tier2/coorte.py:158`, que a reemitiria
+a cada regeneração. **Corrigidos os dois juntos** — corrigir só o artefato foi o erro da Fase 9.
+
+E `RELATORIO-VALIDACAO-RECONSTRUCAO.md`, onde o argumento de anterioridade seguia vivo, com
+três erros num parágrafo. **Anterioridade é a pré-condição da contaminação, não evidência
+contra ela**: os logs datam o treino do `Dataset291` em **2023-05-13**, seis anos depois do LCTSC.
 
 # Fase 17 — benchmark de reconstrução
 
@@ -267,8 +323,8 @@ relatório. *Um erro que não interrompe o processo é o mais caro de todos.*
 | | Estado | Razão |
 |---|---|---|
 | **K1** | **BLOQUEADO** | há candidato (LyNoS), mas independência não estabelecível |
-| **K2** | **BLOQUEADO** | 27 % do treino do baseline não é declarado *(Fase 16 em curso)* |
-| **K3** | **BLOQUEADO** | mesma raiz de K1 |
+| **K2** | **BLOQUEADO** | 26,9 % não atribuído · **sem lista de casos em disco** · `fold=0` agrava · a saída "trocar por outro modelo do TS" fechou |
+| **K3** | **BLOQUEADO — estrutural** | SegTHOR e BTCV removidos por circularidade de rótulo; nenhuma busca o fecha enquanto 26,9 % for cego |
 | **K4** | **RESOLVIDO** | `ESOPHAGUS_ONTOLOGY_V1`, 13 testes |
 
 # Treinamento
@@ -298,7 +354,7 @@ mesma lacuna de 27 %.
 
 1. O LyNoS sobrevive a um passe cético de independência?
 2. O conflito de licença dele resolve para qual das três?
-3. **O `Dataset343` e o SAROS são o mesmo conjunto?** *(Fase 16)*
+3. ~~O `Dataset343` e o SAROS são o mesmo conjunto?~~ **Respondida:** teto ≈30 casos, sem enriquecimento.
 4. n=15 e TC com contraste bastam para uma comparação com sentido?
 5. O `RADCURE` valeria uma solicitação formal de acesso — decisão do usuário?
 
@@ -313,10 +369,11 @@ mesma lacuna de 27 %.
 
 # Próxima única ação recomendada
 
-**Submeter o LyNoS a um passe cético de independência e resolver seu conflito de licença — na
-mesma rodada, porque a licença decide se o candidato pode ser usado e a independência decide
-se ele significa alguma coisa.**
+**Aplicar a sonda geométrica calibrada da Fase 16 ao LyNoS, e resolver seu conflito de licença
+na mesma rodada.**
 
-É a única ação que pode mover um critério de estado: se a independência do LyNoS for
-estabelecível, K1 e K3 saem de BLOQUEADO. Se não for, o bloqueio fica provado estrutural — e
-aí a pergunta seguinte é sobre o **baseline**, não sobre o dado.
+O LyNoS é o único candidato vivo de K1/K3, e o instrumento **já existe** — a sonda tem
+controles positivo e negativo e converte INDETERMINADA em OVERLAP IDENTIFICADO com **um único
+acerto**. Ela **não** consegue produzir INDEPENDÊNCIA DEMONSTRADA, e nenhum instrumento
+disponível ao projeto consegue: por isso a pergunta seguinte é sobre o **baseline**, não sobre
+o dado.

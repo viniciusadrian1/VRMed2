@@ -38,7 +38,7 @@ substituído automaticamente** · nada de e-mail, conta ou aceite de EULA.
 | 13 — Ontologia do esôfago | 03:1x | 03:4x | ~35 min | **CONCLUÍDA — A** | `ESOPHAGUS_ONTOLOGY_V1` congelada; **K4 RESOLVIDO**; 12 testes de regressão passando |
 | 14 — Prontidão para treino | 03:5x | 04:1x | ~20 min | **CONCLUÍDA — C** | cenário C, nenhum TEST defensável; K1/K2/K3 bloqueados, K4 resolvido |
 | 15 — Teste independente | 03:0x | 07:5x | ~4 h (interrompida) | **PARCIAL — B** | **LyNoS** encontrado; 79 candidatos, 230 consultas; sem passe cético |
-| 16 — Independência do baseline | 07:4x | — | — | **em curso** (relançada: `wqo33i814`) | — |
+| 16 — Independência do baseline | 07:4x | 08:3x | ~50 min | **CONCLUÍDA** | K2/K3 bloqueados; **circularidade SegTHOR/BTCV**; 2 overlaps; defeito ativo corrigido |
 | 17 — Benchmark de reconstrução | 04:2x | 05:1x | ~50 min | **CONCLUÍDA** | **MASTER MANTIDO**; 182 medições; 4 achados de instrumento |
 
 
@@ -121,3 +121,23 @@ TotalSegmentator. Classe **E**: independência indeterminada pelas 420 imagens n
 
 **Bloqueios:** sem passe cético; conflito de licença entre três fontes oficiais; 14 candidatos
 de classe D não verificados.
+
+
+### Fase 16 — detalhe
+
+**Arquivos criados:** `docs/RELATORIO-FASE16-INDEPENDENCIA-BASELINE.md`
+
+**Arquivos modificados:** `scripts/validation/tier2/coorte.py` (o **gerador**) ·
+`.clinica-dados/tier2/lctsc/manifest.json` · `docs/RELATORIO-VALIDACAO-RECONSTRUCAO.md`
+
+**Resultado principal:** a independência do baseline é **estruturalmente indemonstrável** com o
+que o pacote distribui — não há model card, não há `splits_final.json`, não há um único
+identificador de caso. E a via de contaminação mais grave é **invisível a toda sonda de
+imagem**: SegTHOR e BTCV semearam o rótulo de esôfago do treino (suplemento S2).
+
+**Achados de instrumento (4):** quatro correções numéricas contra afirmações dos próprios arms,
+todas encontradas pelos céticos — incluindo uma refutação de sinal contrário (a sonda **tem**
+poder, ao contrário do que o arm concluiu).
+
+**Bloqueios:** K2 e K3 permanecem. K3 passa a ser registrado como **estrutural**, não pendência
+de busca.
