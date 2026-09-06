@@ -178,7 +178,7 @@ precisa** ser independente do TotalSegmentator: o VRmed não vai usá-lo. O que 
 | Achado | Medida |
 |---|---|
 | máscara ligada à imagem por identificador no canal DICOM | **908/908** via `ReferencedSeriesInstanceUID` |
-| **`ROIGenerationAlgorithm` para a ROI de esôfago** | **UNKNOWN em 908/908** — a tag que responderia "humano ou modelo" não está preenchida em nenhum |
+| **`ROIGenerationAlgorithm` para a ROI de esôfago** | **CORRIGIDO NA FASE 22:** MANUAL 731 · SEMIAUTOMATIC 101 · INDETERMINADO 42 · UNKNOWN 34. O "908/908 UNKNOWN" da Fase 20 era artefato do leitor (coluna deduplicada lida como lista paralela) |
 | sujeitos distintos com contorno de esôfago no canal público | **807** (não 908 arquivos) |
 | **4D-Lung** | 6.690 séries de **20 sujeitos**; esôfago em **16** |
 | **Pediatric-CT-SEG** | idade **mediana 6 anos, 100 % < 18** — reprovação por ontologia, medida |

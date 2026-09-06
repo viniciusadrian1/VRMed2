@@ -56,13 +56,25 @@ real do DICOM é **+2**. O número (4 × 2) não muda; a composição estava err
 **hoje**; entre *releases*, **só o `sha256` não deriva** — argumento **medido** a favor do
 desenho de quatro chaves.
 
-### Procedência — o gargalo, e é total
+### Procedência — ~~o gargalo, e é total~~ **CORRIGIDO NA FASE 22**
 
-**`ROIGenerationAlgorithm` está VAZIA nas 908 RTSTRUCT com esôfago-órgão do canal público
-inteiro.** A Fase 11 registrou ~25 % de preenchimento no geral; **para o esôfago são 0 %**.
+> **A afirmação original deste relatório era falsa, e a causa era minha.** Está preservada
+> riscada acima. O correto:
 
-Identidade e licença são verificáveis por máquina. **Procedência não é** — e é a única
-cujo modo de falha é **silencioso e irreversível**.
+| Algoritmo declarado para a ROI de esôfago | RTSTRUCT |
+|---|---:|
+| **MANUAL** | **731** |
+| **SEMIAUTOMATIC** | **101** (todo o 4D-Lung) |
+| INDETERMINADO | 42 |
+| UNKNOWN | 34 |
+
+**874 de 908 (96 %) declaram um algoritmo.** A coluna do índice é **deduplicada** e meu
+leitor a tratava como lista paralela, jogando tudo em `UNKNOWN`. Detectado ao abrir os 60
+arquivos do LCTSC na Fase 22.
+
+Identidade, licença **e procedência declarada** são verificáveis por máquina no canal
+DICOM. O que **continua** não verificável por máquina é se um `MANUAL` declarado esconde
+pré-anotação por modelo corrigida à mão — a circularidade da Fase 16.
 
 **O negativo perfeito:** `totalsegmentator_ct_segmentations` — **378.153 séries, 26.194
 sujeitos, CC BY 4.0, DICOM completo, inclui esôfago** — e é saída de modelo. O canal de

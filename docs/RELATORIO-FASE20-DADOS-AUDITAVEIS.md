@@ -12,6 +12,33 @@ Data: 2026-09-06 · 6 arms · 6 passes céticos · **235 consultas registradas**
 > Matriz: [`FASE20-CANDIDATOS-DADOS.md`](FASE20-CANDIDATOS-DADOS.md) ·
 > Log: [`overnight/phase20/source_log.csv`](overnight/phase20/source_log.csv)
 
+
+> ### ⚠ CORREÇÃO DA FASE 22 — 2026-09-06
+>
+> **O achado central deste relatório está REFUTADO por medição posterior.**
+> Onde se lê *"`ROIGenerationAlgorithm` UNKNOWN em 908/908 — procedência é bloqueio
+> total"*, o correto é:
+>
+> | Algoritmo declarado | RTSTRUCT |
+> |---|---:|
+> | **MANUAL** | **731** |
+> | **SEMIAUTOMATIC** | **101** |
+> | INDETERMINADO (2 valores na série) | 42 |
+> | UNKNOWN (tag ausente) | 34 |
+>
+> **A causa era minha, não do dado.** A coluna `ROIGenerationAlgorithms` do
+> `rtstruct_index` é um conjunto **DEDUPLICADO** por série — `len` é sempre 0, 1 ou 2,
+> nunca um valor por ROI. Meu leitor exigia `len(algos) == len(nomes)` para alinhar por
+> posição e, como o DISTINCT colapsa ROIs de mesmo algoritmo, o alinhamento nunca valia
+> e **tudo caía em UNKNOWN**.
+>
+> Detectado ao **abrir os 60 arquivos RTSTRUCT do LCTSC** (Fase 22), que declaram
+> `MANUAL` em 59/60 — exatamente o que o índice, lido corretamente, também diz.
+>
+> **O texto original abaixo é preservado como histórico.** Ver
+> [`RELATORIO-FASE22-LCTSC-DEFINICAO-AUTORIA.md`](RELATORIO-FASE22-LCTSC-DEFINICAO-AUTORIA.md).
+
+
 ---
 
 ## 1. Candidatos
