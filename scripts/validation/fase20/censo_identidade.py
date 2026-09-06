@@ -102,12 +102,49 @@ def medir_colecao(ix: pd.DataFrame, col: str) -> dict:
         "derivada": bool(sub["analysis_result_id"].notna().any()),
         "body_part": sub["BodyPartExamined"].value_counts().head(4).to_dict(),
         "fabricantes": int(sub["Manufacturer"].nunique()),
-        # Estabilidade da identidade entre versoes do IDC: uma serie revisada teve
-        # seus arquivos trocados depois de publicada. Se for muito comum, um sha256
-        # gravado hoje pode nao bater amanha — e isso e um risco de congelamento.
-        "series_revisadas": int(sub["series_revised_idc_version"].notna().sum()),
+        # CORRECAO: a primeira versao deste modulo leu `series_revised_idc_version`
+        # como "esta serie foi revisada depois de publicada". ERRADO — o campo vem
+        # preenchido em 1.032.911/1.032.911 series, ou seja, 100 %. Ele carrega a
+        # VERSAO do IDC em que a serie esta corrente, nao um evento de revisao.
+        # A estabilidade de identidade e medida em `estabilidade_de_uid()`, do
+        # `prior_versions_index`, que e onde a pergunta tem resposta.
+        "versao_corrente_min": int(sub["series_revised_idc_version"].min()),
+        "versao_corrente_max": int(sub["series_revised_idc_version"].max()),
         "versao_inicial_min": int(sub["series_init_idc_version"].min()),
         "versao_inicial_max": int(sub["series_init_idc_version"].max()),
+    }
+
+
+def estabilidade_de_uid() -> dict:
+    """O SeriesInstanceUID sobrevive a uma troca de versao do IDC?
+
+    A pergunta importa para o congelamento: se um `series_id` gravado hoje deixar de
+    existir amanha, ele nao serve de identidade duravel — e so o sha256 do conteudo
+    sobra. E exatamente por isso que o esquema tem QUATRO chaves e nao tres.
+
+    Medido comparando `prior_versions_index` (series de versoes anteriores) com o
+    indice corrente. Um UID que estava la e nao esta aqui mudou, foi removido, ou a
+    serie foi republicada sob outro identificador.
+    """
+    import idc_index_data
+    d = Path(os.path.dirname(idc_index_data.__file__))
+    ix = pd.read_parquet(d / "idc_index.parquet")
+    pv = pd.read_parquet(d / "prior_versions_index.parquet")
+    atual, antigo = set(ix["SeriesInstanceUID"]), set(pv["SeriesInstanceUID"])
+    sumiram = antigo - atual
+    return {
+        "series_no_indice_corrente": int(len(ix)),
+        "series_em_versoes_anteriores": int(len(antigo)),
+        "uid_sobreviveu": int(len(antigo & atual)),
+        "uid_sumiu": int(len(sumiram)),
+        "fracao_que_sumiu": round(len(sumiram) / max(1, len(antigo)), 4),
+        "leitura": (
+            "UID do IDC NAO e persistente entre versoes: %d de %d series de versoes "
+            "anteriores (%.1f %%) tem UID ausente do indice corrente. Logo `series_id` "
+            "e identidade util para detectar vazamento HOJE, e nao e ancora duravel "
+            "entre releases — o sha256 do conteudo e."
+            % (len(sumiram), len(antigo), 100.0 * len(sumiram) / max(1, len(antigo)))
+        ),
     }
 
 
@@ -147,7 +184,7 @@ def autoteste() -> int:
         "analysis_result_id": [None, None, None, None],
         "BodyPartExamined": ["CHEST", "CHEST", "CHEST", "HEAD"],
         "Manufacturer": ["A", "A", "A", "B"],
-        "series_revised_idc_version": [None, 5, None, None],
+        "series_revised_idc_version": [5, 5, 5, 5],
         "series_init_idc_version": [1, 1, 2, 3],
     })
 
@@ -161,8 +198,8 @@ def autoteste() -> int:
         falhas.append("contagem de CT contaminada por RTSTRUCT: " + str(m))
     if not m["licenca_aberta_atribuicao"] or not m["licenca_unica"]:
         falhas.append("licenca aberta unica nao reconhecida: " + str(m["licencas"]))
-    if m["series_revisadas"] != 1:
-        falhas.append("series revisadas nao contadas")
+    if m["versao_corrente_min"] != 5 or m["versao_corrente_max"] != 5:
+        falhas.append("versao corrente lida errado: " + str(m))
     if abs(m["tamanho_GB"] - round(2049.0 / 1024.0, 2)) > 0.01:
         falhas.append("tamanho errado: " + str(m["tamanho_GB"]))
 
@@ -245,6 +282,11 @@ def main(argv=None) -> int:
                  i["series_id"]["presente_em"], i["series_id"]["de"],
                  "UNICO" if i["series_id"]["unico"] else "COM DUPLICATA"))
 
+    est = estabilidade_de_uid()
+    print()
+    print("ESTABILIDADE DE IDENTIDADE ENTRE VERSOES DO IDC")
+    print("  " + est["leitura"])
+
     print()
     print("LICENCAS EM TODO O IDC — o indice traz license_short_name por serie")
     tot = ix["license_short_name"].value_counts()
@@ -280,6 +322,7 @@ def main(argv=None) -> int:
         "n_series_indice": int(len(ix)),
         "n_colecoes": int(ix["collection_id"].nunique()),
         "licencas_globais": {str(k): int(v) for k, v in tot.items()},
+        "estabilidade_de_uid": est,
         "colecoes_esofago": medidas,
         "analysis_results": [
             {"analysis_result_id": str(k), "series": int(r["series"]),
@@ -293,7 +336,7 @@ def main(argv=None) -> int:
 
     campos = ["colecao", "series", "estudos", "sujeitos", "series_por_sujeito",
               "series_ct", "sujeitos_ct", "tamanho_ct_GB", "licenca_unica",
-              "licenca_aberta_atribuicao", "series_revisadas", "ja_usada_pelo_vrmed"]
+              "licenca_aberta_atribuicao", "versao_corrente_max", "ja_usada_pelo_vrmed"]
     with (SAIDA / "censo_identidade.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=campos, extrasaction="ignore")
         w.writeheader()

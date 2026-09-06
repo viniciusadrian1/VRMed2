@@ -126,3 +126,8 @@ Fatos medidos são marcados **FATO**; deduções, **INFERÊNCIA**; sugestões, *
 | 17:40 | `fase20.censo_identidade` | **4D-Lung: 6.690 series de 20 SUJEITOS** (334,5 s/suj); NSCLC com DUAS licencas |
 | 17:52 | `fase20.proveniencia_roi` | **ROIGenerationAlgorithm UNKNOWN em 908/908**; CT ligada por UID em **908/908**; 807 sujeitos |
 | 17:55 | defeito de instrumento | heredoc converteu `\b` em byte de backspace no regex de PRV; corrigido, 0 PRV entre os 908 |
+| 18:20 | `fase21.funil` | 14/14 casos controlados; DICOM 4 identidades, NIfTI 2 |
+| 18:35 | `fase21.mutacao` | 12/13 na 1a rodada — **L4 sobreviveu** (contexto desconhecido nao testado); corrigido, 13/13 |
+| 18:50 | `fase21.anonimizacao` | 4 eixos; regex de caminho estava cego a `_`; corrigido |
+| 19:05 | verificacao de afirmacao de arm | `nsclc_radiomics_interobserver1`: 5 observadores, **0 esofago** (so GTV) |
+| 19:10 | `estabilidade_de_uid` | **13.081 de 58.060 UIDs (22,5 %) de versoes anteriores sumiram do indice** |

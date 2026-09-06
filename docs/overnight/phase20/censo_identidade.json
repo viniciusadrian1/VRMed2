@@ -12,6 +12,14 @@
   "CC BY-NC 3.0": 5851,
   "National Library of Medicine Terms and Conditions; May 21, 2019": 39
  },
+ "estabilidade_de_uid": {
+  "series_no_indice_corrente": 1032911,
+  "series_em_versoes_anteriores": 58060,
+  "uid_sobreviveu": 44979,
+  "uid_sumiu": 13081,
+  "fracao_que_sumiu": 0.2253,
+  "leitura": "UID do IDC NAO e persistente entre versoes: 13081 de 58060 series de versoes anteriores (22.5 %) tem UID ausente do indice corrente. Logo `series_id` e identidade util para detectar vazamento HOJE, e nao e ancora duravel entre releases — o sha256 do conteudo e."
+ },
  "colecoes_esofago": [
   {
    "colecao": "pediatric_ct_seg",
@@ -41,7 +49,8 @@
     "ABDOMEN": 200
    },
    "fabricantes": 3,
-   "series_revisadas": 718,
+   "versao_corrente_min": 7,
+   "versao_corrente_max": 9,
    "versao_inicial_min": 7,
    "versao_inicial_max": 9,
    "ja_usada_pelo_vrmed": false,
@@ -101,7 +110,8 @@
     "LUNG": 2085
    },
    "fabricantes": 6,
-   "series_revisadas": 4926,
+   "versao_corrente_min": 1,
+   "versao_corrente_max": 15,
    "versao_inicial_min": 1,
    "versao_inicial_max": 15,
    "ja_usada_pelo_vrmed": true,
@@ -157,7 +167,8 @@
     "LUNG": 6690
    },
    "fabricantes": 2,
-   "series_revisadas": 6690,
+   "versao_corrente_min": 2,
+   "versao_corrente_max": 2,
    "versao_inicial_min": 2,
    "versao_inicial_max": 2,
    "ja_usada_pelo_vrmed": false,
@@ -213,7 +224,8 @@
     "LUNG": 120
    },
    "fabricantes": 5,
-   "series_revisadas": 120,
+   "versao_corrente_min": 2,
+   "versao_corrente_max": 2,
    "versao_inicial_min": 2,
    "versao_inicial_max": 2,
    "ja_usada_pelo_vrmed": true,
@@ -278,7 +290,8 @@
     "CHESTABDPELVIS": 682
    },
    "fabricantes": 18,
-   "series_revisadas": 30293,
+   "versao_corrente_min": 24,
+   "versao_corrente_max": 24,
    "versao_inicial_min": 24,
    "versao_inicial_max": 24,
    "ja_usada_pelo_vrmed": false,
