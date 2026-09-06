@@ -1,0 +1,166 @@
+{
+ "fase": 19,
+ "estado": "PRE-REGISTRO — nada treinado",
+ "esquema_dataset": "VRMED-ESOPHAGUS-DATASET-V1",
+ "ontologia": "ESOPHAGUS_ONTOLOGY_V1",
+ "desenho_split": {
+  "particoes": {
+   "train": "dados proprios auditaveis — proveniencia completa obrigatoria",
+   "validation": "dados proprios auditaveis — mesma exigencia do train",
+   "test": "conjunto externo, congelado ANTES do treino, lido so em contexto 'avaliacao'"
+  },
+  "regras": [
+   "um mesmo caso NUNCA aparece em duas particoes (verificado por case_id)",
+   "um mesmo estudo NUNCA aparece em duas particoes (verificado por study_id)",
+   "uma mesma serie NUNCA aparece em duas particoes (verificado por series_id)",
+   "um mesmo CONTEUDO nunca aparece em duas particoes (verificado por sha256 de imagem e de mascara) — as tres chaves acima podem ser renomeadas por engano; o hash nao pode",
+   "a fonte de cada caso e rastreavel ate source_dataset + source_case_id + source_doi",
+   "a instituicao e rastreavel quando disponivel; quando nao, UNKNOWN explicito",
+   "caso com proveniencia UNKNOWN NAO entra em TEST sem justificativa gravada em notes",
+   "o TEST e congelado antes do treino e qualquer alteracao exige VERSION INCREMENT",
+   "o TEST nunca participa de selecao de modelo, de hiperparametro nem de epoca"
+  ],
+  "proporcao_alvo": {
+   "nota": "NAO fixada aqui. Fixar proporcao antes de saber quantos casos existem seria numero inventado. A proporcao entra na V2 do desenho, junto com a primeira lista real de casos.",
+   "restricao_ja_conhecida": "o TEST precisa de n suficiente para um IC util. Medido na Fase 18.5 com a dispersao do proprio projeto: n=15 da IC95 de largura 0,077 de Dice e poder 0,485 para separar uma diferenca de 0,05. Qualquer TEST de n=15 herda isso."
+  },
+  "estado": "DESENHO — nenhuma lista de casos existe, e nenhuma sera inventada"
+ },
+ "baseline": {
+  "id": "BASELINE_ESOFAGO_VRMED_V1",
+  "estado": "PRE-REGISTRO — nao treinado",
+  "arquitetura": "nnU-Net v2, configuracao 3d_fullres",
+  "por_que": [
+   "e a arquitetura mais simples que a stack ja instalada suporta sem codigo novo (nnunetv2 2.8.1 ja presente, e o proprio TotalSegmentator roda sobre ela)",
+   "o planner do nnU-Net deriva patch size, spacing e normalizacao DO DADO, o que remove um canal inteiro de escolha humana — e portanto de vazamento por escolha",
+   "torna o baseline comparavel com o TotalSegmentator sem replicar a opacidade dele: a diferenca sera a proveniencia, nao a arquitetura"
+  ],
+  "o_que_nao_e": "nao e proposta de arquitetura melhor. A Fase 19 nao tem dado para escolher arquitetura, e escolher por resultado de LCTSC seria usar TEST para desenho.",
+  "seed": 20260906,
+  "folds": {
+   "plano": "treinar os 5 folds, nao apenas fold=0",
+   "motivo": "a Fase 16 mediu que os pesos publicos do TotalSegmentator sao fold=0 e que o splits_final.json nunca foi publicado — logo nem as imagens declaradas sao atribuiveis ao treino efetivo. Publicar splits_final.json e os 5 folds e exatamente o que fecha esse buraco no nosso lado."
+  },
+  "hiperparametros": "os padroes do nnU-Net, sem ajuste. Ajustar exigiria um sinal, e o unico sinal disponivel viria de VALIDATION ou TEST — o primeiro so apos o treino existir, o segundo nunca.",
+  "alvo": {
+   "definicao": "ESOPHAGUS_ONTOLOGY_V1",
+   "rotulos": {
+    "0": "background",
+    "1": "esophagus"
+   },
+   "representacao": "mascara binaria PREENCHIDA (solida)",
+   "parede_e_lumen": "NAO SEPARADOS — um unico alvo"
+  },
+  "metricas": [
+   "dice",
+   "iou",
+   "precision",
+   "recall",
+   "hd95",
+   "assd",
+   "erro_volume_absoluto",
+   "erro_volume_percentual"
+  ],
+  "criterio_de_sucesso": "NAO DEFINIDO como limiar numerico. Um limiar escolhido agora, sem dado, seria chute; escolhido depois, seria ajuste ao resultado. O criterio da V1 e procedimental: o modelo e aceito se for REPRODUZIVEL a partir do manifesto congelado, do seed e do commit — nao se atingir um Dice.",
+  "criterio_de_regressao": "qualquer execucao que nao reproduza o sha256 do manifesto congelado, ou que leia TEST em contexto de treino, e regressao — independentemente do Dice."
+ },
+ "dataset_json_modelo": {
+  "channel_names": {
+   "0": "CT"
+  },
+  "labels": {
+   "background": 0,
+   "esophagus": 1
+  },
+  "numTraining": 0,
+  "file_ending": ".nii.gz",
+  "overwrite_image_reader_writer": "SimpleITKIO",
+  "_vrmed": {
+   "ontologia": "ESOPHAGUS_ONTOLOGY_V1",
+   "congelada_em": "2026-09-06",
+   "protocolo": "RTOG 1106",
+   "aviso": "o alvo e mascara binaria PREENCHIDA: parede e lumen sao UM objeto. Separa-los seria outra tarefa, e exigiria uma V2 da ontologia."
+  }
+ },
+ "comandos": [
+  {
+   "passo": "planejar e pre-processar",
+   "cmd": "nnUNetv2_plan_and_preprocess -d 501 --verify_dataset_integrity",
+   "le": "train + validation",
+   "nunca_le": "test"
+  },
+  {
+   "passo": "treinar os 5 folds",
+   "cmd": "nnUNetv2_train 501 3d_fullres FOLD --npz   (FOLD em 0..4)",
+   "le": "train + validation",
+   "nunca_le": "test"
+  },
+  {
+   "passo": "escolher pos-processamento",
+   "cmd": "nnUNetv2_find_best_configuration 501 -c 3d_fullres",
+   "le": "validation",
+   "nunca_le": "test"
+  },
+  {
+   "passo": "congelar e publicar o split efetivo",
+   "cmd": "copiar splits_final.json para o snapshot do dataset",
+   "le": "-",
+   "nunca_le": "-",
+   "nota": "e o arquivo cuja ausencia torna o baseline atual inauditavel"
+  },
+  {
+   "passo": "avaliar UMA vez, no fim",
+   "cmd": "nnUNetv2_predict ... (contexto 'avaliacao')",
+   "le": "test",
+   "nunca_le": "-",
+   "nota": "uma unica execucao, sem retorno para desenho"
+  }
+ ],
+ "validacao_do_alvo": {
+  "fonte": "scripts.validation.lynos.auditoria (mesma funcao que julgou o LyNoS)",
+  "volume_ml_min": 5.0,
+  "volume_ml_max": 150.0,
+  "criterios": [
+   "binaria",
+   "nao_vazia",
+   "preenchida_parede_mais_lumen",
+   "objeto_unico_dominante",
+   "calibre_compativel_com_esofago",
+   "dtype inteiro",
+   "volume dentro da faixa"
+  ]
+ },
+ "ambiente": {
+  "python": "3.13.11",
+  "plataforma": "Windows-11-10.0.26200-SP0",
+  "processador": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+  "pacotes": {
+   "nnunetv2": "2.8.1",
+   "torch": "2.6.0+cu124",
+   "numpy": "2.5.2",
+   "scipy": "1.18.1",
+   "scikit-image": "0.26.0",
+   "SimpleITK": "2.5.6",
+   "pydicom": "3.0.2",
+   "nibabel": "5.4.2",
+   "TotalSegmentator": "2.18.0",
+   "dcmrtstruct2nii": "5",
+   "batchgenerators": "0.25.3",
+   "acvl_utils": "0.2.6",
+   "dynamic_network_architectures": "0.4.4",
+   "monai": "AUSENTE",
+   "trimesh": "5.0.0",
+   "vtk": "9.7.0",
+   "scikit-learn": "1.9.0"
+  },
+  "gpu": {
+   "cuda_compilada": "12.4",
+   "disponivel": true,
+   "dispositivo": "NVIDIA GeForce RTX 4060 Ti",
+   "memoria_MiB": 16380
+  },
+  "seed": 20260906,
+  "ontologia": "ESOPHAGUS_ONTOLOGY_V1",
+  "esquema_dataset": "VRMED-ESOPHAGUS-DATASET-V1"
+ }
+}
