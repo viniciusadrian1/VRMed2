@@ -331,3 +331,47 @@ Não treinou, não mediu Dice, não rodou benchmark, não encostou no TEST.
 **O que continua UNKNOWN:** `institution` (tag removida na origem), `annotation_protocol`,
 data de anotação (deslocada na origem), conformidade da desidentificação, e a independência do
 LyNoS — **INCONCLUSIVA por construção**, nunca "sem overlap".
+
+---
+
+## Fases 26 e 27 — treino do baseline (2026-09-06)
+
+**FASE 26: BLOQUEADA POR TEMPO DE PAREDE. FASE 27: NÃO INICIADA (bloqueio da 26).**
+
+Preflight **LIBERADO**: 12/12 versões idênticas ao pré-registro, 32/32 arquivos íntegros por
+`sha256`, composição 10 / 6 / 0, `sha256_manifesto` `9388c736…82632192` confere, TEST
+inalcançável de `treino` **e** de `validacao`, e — a trava que decidiu a fase —
+**`validation` inalcançável de `treino`**.
+
+| Medição | Valor |
+|---|---|
+| tempo de época (execução única e limpa) | **148,92 s** |
+| épocas vinculadas pelo protocolo | **1000** (`nnUNetTrainer.py:159`, comando sem sinalizadores) |
+| custo por fold | **41,4 h** |
+| custo dos 5 folds | **206,8 h ≈ 8,6 dias** |
+
+**Nenhum parâmetro foi encurtado para caber no tempo.** Não se reduziu época, não se trocou o
+*trainer*, não se rodou um fold só, e não se declarou concluído o que não concluiu.
+
+### Quatro desvios, formalizados na V2 do pré-registro
+
+A V1 permanece intacta, como ela própria exige. `BASELINE-ESOPHAGUS-VRMED-V2.md`.
+
+| # | Desvio | Motivo |
+|---|---|---|
+| 1 | `imagesTr` = 10 (só TRAIN), não 16 | a tabela `PERMISSOES` congelada só deixa `treino` ler `train`; **e** o planner extrai *fingerprint* de tudo que está em `imagesTr` — os 6 moldariam spacing, normalização e *patch size* sem entrar em lote nenhum (**vazamento transdutivo**, não coberto pelas 9 regras de split) |
+| 2 | semente efetiva do split é **12345**, não a pré-registrada 20260906 | `nnUNetTrainer.py:624` fixa a semente no código e `nnUNetv2_train` não aceita parâmetro. A semente pré-registrada **não tem ponto de aplicação**. Lacuna **nomeada, não consertada** |
+| 3 | VALIDATION é holdout pós-treino, **e não é um TEST** | mesma coleção, mesmo TPS, mesmo processo de contorno — não há independência de fonte |
+| 4 | homônimo "validation" desambiguado | `find_best_configuration` lê as predições *out-of-fold* dos 10, nunca os 6 |
+
+### Incidente
+
+Dois treinos concorrentes no mesmo `fold_0` — o primeiro lançamento com `nohup &` sobreviveu
+ao shell. Detectado por dois `training_log_*.txt` no mesmo diretório. **Os dois logs foram
+preservados** antes da limpeza; a medição contaminada foi descartada; um único treino foi
+relançado. `splits_final.json` não foi regerado.
+
+### Auditoria
+
+`72` de suíte (12 novos, anti-vazamento) + `203` de autoteste, 0 falhas. Varredura: **61
+documentos, 0 violações**. Manifesto, snapshot e split **intactos**. TEST = 0 e nunca lido.

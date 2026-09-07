@@ -1,0 +1,24 @@
+
+#######################################################################
+Please cite the following paper when using nnU-Net:
+Isensee, F., Jaeger, P. F., Kohl, S. A., Petersen, J., & Maier-Hein, K. H. (2021). nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. Nature methods, 18(2), 203-211.
+#######################################################################
+ 
+2026-09-06 23:25:14.502336: do_dummy_2d_data_aug: True 
+2026-09-06 23:25:14.503824: Using splits from existing split file: C:\Users\vinic\Downloads\InnerVision\vrmed\.clinica-dados\fase26\nnUNet_preprocessed\Dataset501_VRmedEsofago\splits_final.json 
+2026-09-06 23:25:14.509714: The split file contains 5 splits. 
+2026-09-06 23:25:14.514414: Desired fold for training: 0 
+2026-09-06 23:25:14.520031: This split has 8 training and 2 validation cases. 
+
+This is the configuration used by this training:
+Configuration name: 3d_fullres
+ {'data_identifier': 'nnUNetPlans_3d_fullres', 'preprocessor_name': 'DefaultPreprocessor', 'batch_size': 2, 'patch_size': [48, 224, 192], 'median_image_size_in_voxels': [116.0, 512.0, 512.0], 'spacing': [3.0, 0.9765999913215637, 0.9765999913215637], 'normalization_schemes': ['CTNormalization'], 'use_mask_for_norm': [False], 'resampling_fn_data': 'resample_data_or_seg_to_shape', 'resampling_fn_seg': 'resample_data_or_seg_to_shape', 'resampling_fn_data_kwargs': {'is_seg': False, 'order': 3, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_seg_kwargs': {'is_seg': True, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'resampling_fn_probabilities': 'resample_data_or_seg_to_shape', 'resampling_fn_probabilities_kwargs': {'is_seg': False, 'order': 1, 'order_z': 0, 'force_separate_z': None}, 'architecture': {'network_class_name': 'dynamic_network_architectures.architectures.unet.PlainConvUNet', 'arch_kwargs': {'n_stages': 6, 'features_per_stage': [32, 64, 128, 256, 320, 320], 'conv_op': 'torch.nn.modules.conv.Conv3d', 'kernel_sizes': [[1, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]], 'strides': [[1, 1, 1], [1, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2], [1, 2, 2]], 'n_conv_per_stage': [2, 2, 2, 2, 2, 2], 'n_conv_per_stage_decoder': [2, 2, 2, 2, 2], 'conv_bias': True, 'norm_op': 'torch.nn.modules.instancenorm.InstanceNorm3d', 'norm_op_kwargs': {'eps': 1e-05, 'affine': True}, 'dropout_op': None, 'dropout_op_kwargs': None, 'nonlin': 'torch.nn.LeakyReLU', 'nonlin_kwargs': {'inplace': True}}, '_kw_requires_import': ['conv_op', 'norm_op', 'dropout_op', 'nonlin']}, 'batch_dice': True} 
+ 
+These are the global plan.json settings:
+ {'dataset_name': 'Dataset501_VRmedEsofago', 'plans_name': 'nnUNetPlans', 'original_median_spacing_after_transp': [3.0, 0.9765999913215637, 0.9765999913215637], 'original_median_shape_after_transp': [116, 512, 512], 'image_reader_writer': 'SimpleITKIO', 'transpose_forward': [0, 1, 2], 'transpose_backward': [0, 1, 2], 'experiment_planner_used': 'ExperimentPlanner', 'label_manager': 'LabelManager', 'foreground_intensity_properties_per_channel': {'0': {'max': 635.0, 'mean': -30.750856399536133, 'median': 12.0, 'min': -1000.0, 'percentile_00_5': -932.0, 'percentile_99_5': 141.0, 'std': 162.51466369628906}}} 
+ 
+2026-09-06 23:25:38.234536: Unable to plot network architecture: 
+2026-09-06 23:25:38.241842: No module named 'hiddenlayer' 
+2026-09-06 23:25:38.415847:  
+2026-09-06 23:25:38.425299: Epoch 0 
+2026-09-06 23:25:38.432617: Current learning rate: 0.01 

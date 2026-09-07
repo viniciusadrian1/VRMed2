@@ -1,0 +1,57 @@
+{
+ "fase": 26,
+ "estado": "TREINO INICIADO — CONCLUSAO BLOQUEADA POR TEMPO DE PAREDE",
+ "commit": "a90d186f11f0d31fbfc0786245f3e838fdbd7ecf",
+ "arvore_suja_no_inicio": true,
+ "dataset": "VRMED-ESOPHAGUS-POOL16-V1",
+ "dataset_id": 501,
+ "configuracao": "3d_fullres",
+ "trainer": "nnUNetTrainer (default, comando sem sinalizadores)",
+ "num_epochs_protocolo": 1000,
+ "num_iterations_per_epoch": 250,
+ "num_val_iterations_per_epoch": 50,
+ "initial_lr": 0.01,
+ "weight_decay": 3e-05,
+ "oversample_foreground_percent": 0.33,
+ "optimizer": "SGD nesterov momentum=0.99",
+ "loss": "DC_and_CE (deep supervision)",
+ "batch_size": 2,
+ "patch_size": [
+  48,
+  224,
+  192
+ ],
+ "seed_preregistrado": 20260906,
+ "seed_efetiva_do_split": 12345,
+ "nota_seed": "nnUNetTrainer.py:624 fixa seed=12345; nnUNetv2_train nao aceita parametro de semente. A semente pre-registrada NAO tem ponto de aplicacao neste caminho.",
+ "folds_planejados": 5,
+ "folds_concluidos": 0,
+ "fold_em_execucao": 0,
+ "epocas_concluidas": 2,
+ "epoch_time_s": [
+  155.08,
+  142.75
+ ],
+ "epoch_time_medio_s": 148.91500000000002,
+ "train_loss": [
+  0.048,
+  -0.0209
+ ],
+ "val_loss": [
+  0.0017,
+  -0.1069
+ ],
+ "pseudo_dice": [
+  0.0,
+  0.0
+ ],
+ "projecao_por_fold_h": 41.365277777777784,
+ "projecao_5_folds_h": 206.8263888888889,
+ "projecao_5_folds_dias": 8.617766203703704,
+ "gpu": "NVIDIA GeForce RTX 4060 Ti 16379 MiB",
+ "cuda": "12.4",
+ "torch": "2.6.0+cu124",
+ "nnunetv2": "2.8.1",
+ "sha256_manifesto": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+ "log": ".clinica-dados\\fase26\\nnUNet_results\\Dataset501_VRmedEsofago\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_0\\training_log_2026_9_6_23_29_47.txt"
+}

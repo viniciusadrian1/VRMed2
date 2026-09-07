@@ -1,0 +1,82 @@
+[
+    {
+        "train": [
+            "4DLUNG-102_HM10395",
+            "4DLUNG-105_HM10395",
+            "4DLUNG-106_HM10395",
+            "4DLUNG-108_HM10395",
+            "4DLUNG-109_HM10395",
+            "4DLUNG-110_HM10395",
+            "4DLUNG-112_HM10395",
+            "4DLUNG-114_HM10395"
+        ],
+        "val": [
+            "4DLUNG-100_HM10395",
+            "4DLUNG-111_HM10395"
+        ]
+    },
+    {
+        "train": [
+            "4DLUNG-100_HM10395",
+            "4DLUNG-102_HM10395",
+            "4DLUNG-105_HM10395",
+            "4DLUNG-108_HM10395",
+            "4DLUNG-109_HM10395",
+            "4DLUNG-110_HM10395",
+            "4DLUNG-111_HM10395",
+            "4DLUNG-112_HM10395"
+        ],
+        "val": [
+            "4DLUNG-106_HM10395",
+            "4DLUNG-114_HM10395"
+        ]
+    },
+    {
+        "train": [
+            "4DLUNG-100_HM10395",
+            "4DLUNG-102_HM10395",
+            "4DLUNG-105_HM10395",
+            "4DLUNG-106_HM10395",
+            "4DLUNG-109_HM10395",
+            "4DLUNG-111_HM10395",
+            "4DLUNG-112_HM10395",
+            "4DLUNG-114_HM10395"
+        ],
+        "val": [
+            "4DLUNG-108_HM10395",
+            "4DLUNG-110_HM10395"
+        ]
+    },
+    {
+        "train": [
+            "4DLUNG-100_HM10395",
+            "4DLUNG-105_HM10395",
+            "4DLUNG-106_HM10395",
+            "4DLUNG-108_HM10395",
+            "4DLUNG-109_HM10395",
+            "4DLUNG-110_HM10395",
+            "4DLUNG-111_HM10395",
+            "4DLUNG-114_HM10395"
+        ],
+        "val": [
+            "4DLUNG-102_HM10395",
+            "4DLUNG-112_HM10395"
+        ]
+    },
+    {
+        "train": [
+            "4DLUNG-100_HM10395",
+            "4DLUNG-102_HM10395",
+            "4DLUNG-106_HM10395",
+            "4DLUNG-108_HM10395",
+            "4DLUNG-110_HM10395",
+            "4DLUNG-111_HM10395",
+            "4DLUNG-112_HM10395",
+            "4DLUNG-114_HM10395"
+        ],
+        "val": [
+            "4DLUNG-105_HM10395",
+            "4DLUNG-109_HM10395"
+        ]
+    }
+]

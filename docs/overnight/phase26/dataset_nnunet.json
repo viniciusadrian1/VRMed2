@@ -1,0 +1,291 @@
+{
+ "dataset_id": 501,
+ "dataset_nome": "Dataset501_VRmedEsofago",
+ "sha256_manifesto": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+ "n_treino": 10,
+ "n_holdout": 6,
+ "ids_treino": [
+  "4DLUNG-100_HM10395",
+  "4DLUNG-102_HM10395",
+  "4DLUNG-105_HM10395",
+  "4DLUNG-106_HM10395",
+  "4DLUNG-108_HM10395",
+  "4DLUNG-109_HM10395",
+  "4DLUNG-110_HM10395",
+  "4DLUNG-111_HM10395",
+  "4DLUNG-112_HM10395",
+  "4DLUNG-114_HM10395"
+ ],
+ "ids_holdout": [
+  "4DLUNG-101_HM10395",
+  "4DLUNG-103_HM10395",
+  "4DLUNG-104_HM10395",
+  "4DLUNG-107_HM10395",
+  "4DLUNG-115_HM10395",
+  "4DLUNG-116_HM10395"
+ ],
+ "intersecao_treino_holdout": [],
+ "conversoes": [
+  {
+   "case_id": "4DLUNG-100_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 16276,
+   "voxels_fg_destino": 16276,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-102_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 13463,
+   "voxels_fg_destino": 13463,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-105_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 6368,
+   "voxels_fg_destino": 6368,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-106_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 6791,
+   "voxels_fg_destino": 6791,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-108_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 10605,
+   "voxels_fg_destino": 10605,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-109_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 21212,
+   "voxels_fg_destino": 21212,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-110_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 17392,
+   "voxels_fg_destino": 17392,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-111_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 13239,
+   "voxels_fg_destino": 13239,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-112_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 9676,
+   "voxels_fg_destino": 9676,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-114_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 12994,
+   "voxels_fg_destino": 12994,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-101_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 9086,
+   "voxels_fg_destino": 9086,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-103_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 15525,
+   "voxels_fg_destino": 15525,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-104_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 10122,
+   "voxels_fg_destino": 10122,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-107_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 9210,
+   "voxels_fg_destino": 9210,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-115_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 11494,
+   "voxels_fg_destino": 11494,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-116_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 10734,
+   "voxels_fg_destino": 10734,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  }
+ ],
+ "escrito": true,
+ "dataset_json": {
+  "channel_names": {
+   "0": "CT"
+  },
+  "labels": {
+   "background": 0,
+   "esophagus": 1
+  },
+  "numTraining": 10,
+  "file_ending": ".nii.gz",
+  "overwrite_image_reader_writer": "SimpleITKIO",
+  "vrmed_dataset_version": "VRMED-ESOPHAGUS-POOL16-V1",
+  "vrmed_schema": "VRMED-ESOPHAGUS-DATASET-V1",
+  "vrmed_ontology": "ESOPHAGUS_ONTOLOGY_V1",
+  "vrmed_ontology_frozen_at": "2026-09-06",
+  "vrmed_split_rule": "VRMED-SPLIT-RULE-V1",
+  "vrmed_sha256_manifesto": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+  "vrmed_seed": 20260906,
+  "vrmed_source_dataset": "4D-Lung (TCIA)",
+  "vrmed_annotation_method_declared": "SEMIAUTOMATIC",
+  "vrmed_nota": "imagesTr contem SOMENTE a particao train (10 casos). Os 6 casos da particao validation sao holdout e ficam fora desta arvore. TEST = 0 e nao existe. O alvo e mascara binaria preenchida; parede e lumen sao um objeto so; a extensao longitudinal e herdada do GT e nao e avaliavel anatomicamente."
+ },
+ "imagesTr_em_disco": [
+  "4DLUNG-100_HM10395",
+  "4DLUNG-102_HM10395",
+  "4DLUNG-105_HM10395",
+  "4DLUNG-106_HM10395",
+  "4DLUNG-108_HM10395",
+  "4DLUNG-109_HM10395",
+  "4DLUNG-110_HM10395",
+  "4DLUNG-111_HM10395",
+  "4DLUNG-112_HM10395",
+  "4DLUNG-114_HM10395"
+ ],
+ "labelsTr_em_disco": [
+  "4DLUNG-100_HM10395",
+  "4DLUNG-102_HM10395",
+  "4DLUNG-105_HM10395",
+  "4DLUNG-106_HM10395",
+  "4DLUNG-108_HM10395",
+  "4DLUNG-109_HM10395",
+  "4DLUNG-110_HM10395",
+  "4DLUNG-111_HM10395",
+  "4DLUNG-112_HM10395",
+  "4DLUNG-114_HM10395"
+ ],
+ "imagesTr_confere": true,
+ "pareamento_imagem_rotulo": true,
+ "holdout_fora_de_imagesTr": true,
+ "conversoes_todas_identicas": true,
+ "originais_intactos": true,
+ "n_originais_conferidos": 32
+}

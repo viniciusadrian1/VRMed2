@@ -1,0 +1,79 @@
+{
+ "ambiente": {
+  "python": "3.13.11",
+  "plataforma": "Windows-11-10.0.26200-SP0",
+  "pacotes": {
+   "nnunetv2": "2.8.1",
+   "torch": "2.6.0+cu124",
+   "numpy": "2.5.2",
+   "scipy": "1.18.1",
+   "scikit-image": "0.26.0",
+   "SimpleITK": "2.5.6",
+   "pydicom": "3.0.2",
+   "nibabel": "5.4.2",
+   "batchgenerators": "0.25.3",
+   "acvl_utils": "0.2.6",
+   "dynamic_network_architectures": "0.4.4",
+   "scikit-learn": "1.9.0"
+  },
+  "monai": "AUSENTE",
+  "gpu": {
+   "disponivel": true,
+   "torch_cuda_build": "12.4",
+   "nome": "NVIDIA GeForce RTX 4060 Ti",
+   "memoria_total_MiB": 16379,
+   "memoria_livre_MiB": 15221,
+   "capability": "8.9"
+  },
+  "divergentes_do_preregistro": {},
+  "seed": 20260906,
+  "dataset_id": 501,
+  "configuracao": "3d_fullres",
+  "n_folds": 5
+ },
+ "dataset": {
+  "n_entradas": 16,
+  "por_split": {
+   "train": 10,
+   "validation": 6,
+   "test": 0
+  },
+  "composicao_esperada": {
+   "train": 10,
+   "validation": 6,
+   "test": 0
+  },
+  "composicao_confere": true,
+  "congelamento_intacto": true,
+  "sha256_manifesto": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+  "sha256_esperado": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+  "sha256_confere": true,
+  "versao_congelada": "VRMED-ESOPHAGUS-POOL16-V1",
+  "manifesto_valido": true,
+  "arquivos_verificados": 32,
+  "arquivos_ausentes": [],
+  "arquivos_com_hash_divergente": [],
+  "dados_integros": true,
+  "ontologia_no_snapshot": "ESOPHAGUS_ONTOLOGY_V1"
+ },
+ "travas": {
+  "treino": {
+   "bloqueado": true,
+   "conforme": true
+  },
+  "validacao": {
+   "bloqueado": true,
+   "conforme": true
+  },
+  "avaliacao": {
+   "bloqueado": false,
+   "n": 0,
+   "conforme": true
+  },
+  "treino_le_train": 10,
+  "treino_nao_le_validation": true,
+  "tudo_conforme": true
+ },
+ "liberado": true,
+ "bloqueios": []
+}
