@@ -415,3 +415,17 @@ decisão metodológica seria decidir por economia.
 
 **Testes:** 86/86 (14 novos, metade deles travando o comportamento do **framework instalado**).
 Varredura: 62 documentos, 0 violações. Nenhum teste existente enfraquecido.
+
+**Refinamento da verificação adversarial (26A).** O argumento decisivo contra *early stopping*
+não é nenhum dos quatro iniciais: é **incompatibilidade estrutural com o agendador**. O
+`PolyLRScheduler` é parametrizado pela duração total (`max_steps = num_epochs = 1000`), então
+parar antes **não recoze** — parar na época 150 entrega pesos com **86,4 % do LR inicial**.
+É a diferença técnica entre a Opção B e a C: um orçamento menor **declarado antes** reparametriza
+o agendador e recoze integralmente; parar no meio de um horizonte de 1000 não.
+
+Verificação empírica independente (reconstrução da EMA reproduz os **53 recordes** do log,
+último na época 55 = `0,7202`): na época 63 havia **8 épocas sem recorde**, mas o pseudo-Dice
+**cru** era **0,7461 — o 2º maior das 64**. Um `patience=10` estaria a duas épocas de disparar
+no melhor momento recente. Meia-vida da EMA = **6,58 épocas**: qualquer *patience* dessa ordem
+mede o atraso do filtro, não platô. *(Isto demonstra que o sinal é inadequado; não calibra
+nenhum parâmetro — a proibição do Passo 7 segue respeitada.)*

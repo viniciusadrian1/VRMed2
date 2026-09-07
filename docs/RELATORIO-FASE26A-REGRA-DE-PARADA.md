@@ -281,6 +281,73 @@ ele produz um modelo, não um erro; a parada passaria a depender de um sinal cal
 épocas); e `checkpoint_final` passaria a ser "a época em que parou", o que torna a comparação
 entre folds menos interpretável, já que cada fold pararia numa época diferente.
 
+**E mais dois, que a verificação adversarial levantou:**
+
+- **a época de parada vira variável aleatória.** Com amostragem de recortes estocástica e
+  não-determinismo de cuDNN, rodar o mesmo comando duas vezes pararia no mesmo lugar apenas
+  por coincidência. O comprimento do treino do modelo entregue deixaria de ser constante
+  documentável — isso é falha de reprodutibilidade no sentido forte, não estética.
+- **cinco folds virariam cinco orçamentos diferentes**, cada um com o LR truncado num ponto
+  distinto. O "baseline" deixaria de ser *uma* configuração e viraria cinco não-comensuráveis,
+  e `find_best_configuration` passaria a agregar modelos que não são comparáveis entre si.
+
+#### 6.1 O argumento decisivo contra a Opção B — e ele só apareceu na verificação
+
+Os quatro motivos acima já bastavam. Mas a verificação adversarial encontrou um **quinto, de
+natureza diferente**: *early stopping* é **estruturalmente incompatível** com o agendador
+deste framework. Não é inconveniente — é premissa quebrada.
+
+**FATO.** O `PolyLRScheduler` é parametrizado pela **duração total**:
+`lr = 0,01 · (1 − época/1000)^0,9`, com `max_steps = num_epochs = 1000`
+(`nnUNetTrainer.py:555`, `polylr.py:18`). Parar antes **não recoze nada** — apenas congela os
+pesos no meio do regime de alto LR:
+
+| parar na época | LR no momento da parada | % do LR inicial |
+|---|---|---|
+| 100 | 0,009095 | **91,0 %** |
+| 150 | 0,008639 | **86,4 %** |
+| 200 | 0,008181 | **81,8 %** |
+| 300 | 0,007254 | **72,5 %** |
+| 500 | 0,005359 | **53,6 %** |
+| 900 | 0,001259 | 12,6 % |
+
+**INFERÊNCIA.** Um modelo parado na época 150 nunca foi recozido: ele é interrompido com
+**86 % da taxa de aprendizado inicial**. Isso não é "o mesmo modelo, mais cedo" — é um modelo
+sistematicamente pior e com variância muito maior que a de qualquer orçamento fixo
+equivalente. *Early stopping* é técnica importada de frameworks com agendador **adaptativo**;
+enxertada num PolyLR de horizonte fixo, ela quebra a premissa do agendador.
+
+**É exatamente aqui que a Opção C difere da B, e a diferença é grande.** Um orçamento menor
+declarado *antes* (`nnUNetTrainer_250epochs`) reparametriza o agendador para o novo horizonte
+e **recoze integralmente**. Parar no meio de um horizonte de 1000 **não**. As duas coisas
+parecem "treinar menos" e são tecnicamente opostas.
+
+#### 6.2 Demonstração empírica de que o sinal não governa uma parada
+
+Reconstruí a EMA a partir dos 64 pseudo-Dice do log, aplicando `ema = ema·0,9 + 0,1·v`. A
+reconstrução **reproduz exatamente** o que o nnU-Net registrou: **53 recordes**, o último na
+época 55 com **0,7202** — idêntico à linha `Yayy! New best EMA pseudo Dice:
+0.7202000021934509` e ao *mtime* de `checkpoint_best.pth`.
+
+| | |
+|---|---|
+| último recorde de EMA | época **55**, valor 0,7202 |
+| EMA na época 63 | 0,7186 → **8 épocas sem recorde** |
+| pseudo-Dice **cru** na época 63 | **0,7461 — o 2º maior das 64** |
+| maior pseudo-Dice cru | 0,7636 (época 52) |
+| meia-vida da EMA | `ln 0,5 / ln 0,9` = **6,58 épocas** |
+
+**INFERÊNCIA.** Uma regra `patience = 10, min_delta = 0` sobre `ema_fg_dice` estaria a **duas
+épocas de disparar** exatamente no momento em que a métrica bruta acabara de registrar seu
+segundo melhor valor de toda a corrida. Com meia-vida de 6,58 épocas, qualquer *patience* da
+mesma ordem de grandeza **mede o atraso do filtro, não platô do modelo**.
+
+> **O que este cálculo é e o que ele não é.** Ele usa as 64 épocas para mostrar que **o sinal
+> é inadequado como governador de parada** — uma propriedade do sinal (n = 2, baseado em
+> recortes, com atraso de EMA conhecido). Ele **não** calibra *patience* nenhum, e nenhum
+> número desta fase foi escolhido olhando esta curva. A proibição do Passo 7 é sobre
+> **derivar a regra** do resultado observado; ela continua respeitada.
+
 ### Opção C — orçamento máximo emendado formalmente
 
 | Critério | Avaliação |
@@ -300,6 +367,9 @@ entre folds menos interpretável, já que cada fold pararia numa época diferent
 
 **Por que não *early stopping* (Opção B):**
 
+0. **É estruturalmente incompatível com o agendador** (§6.1). Parar no meio de um horizonte
+   PolyLR de 1000 épocas entrega pesos **nunca recozidos** — 86 % do LR inicial se a parada
+   for na época 150. Este é o motivo decisivo, e ele é de projeto, não de conveniência.
 1. **Não existe no framework.** Habilitá-lo significa escrever código novo no caminho crítico
    de um experimento cujo objetivo declarado é **auditabilidade**. Trocar zero linhas por N
    linhas não auditadas é mover na direção errada.
