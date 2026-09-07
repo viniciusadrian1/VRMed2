@@ -1,0 +1,2 @@
+2026-09-07T02:32:10-0300
+EXPERIMENTO EXPLORATORIO | trainer=nnUNetTrainer_250epochs | 250 epocas | 5 folds | train 10 | holdout 6 | test 0 | NAO substitui o baseline canonico de 1000, que segue pendente

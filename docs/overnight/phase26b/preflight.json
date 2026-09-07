@@ -1,0 +1,139 @@
+{
+ "verificacoes": {
+  "01_dataset": {
+   "ok": true,
+   "detalhe": {
+    "versao": "VRMED-ESOPHAGUS-POOL16-V1",
+    "ontologia": "ESOPHAGUS_ONTOLOGY_V1"
+   }
+  },
+  "02_manifest_hash": {
+   "ok": true,
+   "detalhe": {
+    "sha256": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+    "intacto": true
+   }
+  },
+  "03_split": {
+   "ok": true,
+   "detalhe": {
+    "train": 10,
+    "validation": 6,
+    "test": 0
+   }
+  },
+  "04_test_vazio": {
+   "ok": true,
+   "detalhe": {
+    "n_test": 0,
+    "inalcancavel_do_treino": true
+   }
+  },
+  "05_imagesTr_10": {
+   "ok": true,
+   "detalhe": {
+    "n_imagesTr": 10,
+    "n_labelsTr": 10,
+    "confere_com_train": true
+   }
+  },
+  "06_holdout_fora_do_raw": {
+   "ok": true,
+   "detalhe": {
+    "invasores": []
+   }
+  },
+  "07_holdout_fora_do_preprocessado": {
+   "ok": true,
+   "detalhe": {
+    "invasores": []
+   }
+  },
+  "08_folds": {
+   "ok": true,
+   "detalhe": {
+    "n_folds": 5,
+    "universo": 10,
+    "igual_a_train": true
+   }
+  },
+  "09_trainer": {
+   "ok": true,
+   "detalhe": {
+    "resolvido": "nnUNetTrainer_250epochs",
+    "erro": null
+   }
+  },
+  "10_num_epochs": {
+   "ok": true,
+   "detalhe": {
+    "num_epochs": 250
+   }
+  },
+  "11_sem_early_stopping": {
+   "ok": true,
+   "detalhe": {
+    "achados": []
+   }
+  },
+  "12_sem_trainer_customizado": {
+   "ok": true,
+   "detalhe": {
+    "arquivos": []
+   }
+  },
+  "13_saida_separada": {
+   "ok": true,
+   "detalhe": {
+    "res_26b": "C:\\Users\\vinic\\Downloads\\InnerVision\\vrmed\\.clinica-dados\\fase26b\\nnUNet_results\\Dataset501_VRmedEsofago",
+    "res_26": "C:\\Users\\vinic\\Downloads\\InnerVision\\vrmed\\.clinica-dados\\fase26\\nnUNet_results\\Dataset501_VRmedEsofago",
+    "pasta_trainer_26b": "nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres",
+    "pasta_trainer_26": "nnUNetTrainer__nnUNetPlans__3d_fullres"
+   }
+  },
+  "14_sem_checkpoint_herdado": {
+   "ok": true,
+   "detalhe": {
+    "encontrados": []
+   }
+  },
+  "_liberado": true
+ },
+ "identidade": {
+  "run_id": "VRMED-FASE26B-250EP-5FOLD",
+  "natureza": "EXPERIMENTO EXPLORATORIO DE ORCAMENTO REDUZIDO",
+  "nao_e": "baseline definitivo — o canonico de 1000 epocas continua pendente",
+  "commit": "51a23d3487223749e2672acd91a7454f3e33ceed",
+  "dataset_version": "VRMED-ESOPHAGUS-POOL16-V1",
+  "sha256_manifesto": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+  "ontologia": "ESOPHAGUS_ONTOLOGY_V1",
+  "split": {
+   "train": 10,
+   "validation": 6,
+   "test": 0
+  },
+  "trainer": "nnUNetTrainer_250epochs",
+  "epocas": 250,
+  "folds": 5,
+  "configuracao": "3d_fullres",
+  "dataset_id": 501,
+  "identificador_experimental": 20260906,
+  "seed_efetiva_do_framework": 12345,
+  "nota_seed": "20260906 e IDENTIFICADOR do experimento, nao semente. O nnU-Net fixa seed=12345 em nnUNetTrainer.py:624 e nnUNetv2_train nao aceita parametro de semente. A lacuna da V1/V2 nao e reinterpretada aqui.",
+  "checkpoint_primario": "checkpoint_final.pth",
+  "checkpoint_secundario": "checkpoint_best.pth",
+  "regra_de_checkpoint": "declarada na Fase 26A, ANTES de qualquer resultado: os dois sao medidos e reportados; e proibido trocar o primario pelo secundario depois de ver qual foi melhor nos 6 casos.",
+  "python": "3.13.11",
+  "plataforma": "Windows-11-10.0.26200-SP0",
+  "nnunetv2": "2.8.1",
+  "gpu": {
+   "torch": "2.6.0+cu124",
+   "cuda": "12.4",
+   "disponivel": true,
+   "nome": "NVIDIA GeForce RTX 4060 Ti",
+   "memoria_MiB": 16379
+  },
+  "diretorio_resultados": "C:\\Users\\vinic\\Downloads\\InnerVision\\vrmed\\.clinica-dados\\fase26b\\nnUNet_results\\Dataset501_VRmedEsofago",
+  "comando": "nnUNetv2_train 501 3d_fullres FOLD -tr nnUNetTrainer_250epochs --npz   (FOLD em 0..4)"
+ }
+}
