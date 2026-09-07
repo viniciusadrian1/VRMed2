@@ -375,3 +375,43 @@ relançado. `splits_final.json` não foi regerado.
 
 `72` de suíte (12 novos, anti-vazamento) + `203` de autoteste, 0 falhas. Varredura: **61
 documentos, 0 violações**. Manifesto, snapshot e split **intactos**. TEST = 0 e nunca lido.
+
+---
+
+## Fase 26A — regra de parada (2026-09-07)
+
+**DECISÃO: MANTER O PROTOCOLO.** *Early stopping* **não** recomendado. **V3 não necessária.**
+Treino **pausado** em 64/1000 épocas do fold 0; nada apagado.
+
+| Fato verificado no pacote instalado | |
+|---|---|
+| *early stopping* nativo | **não existe** — 0 ocorrências de `early_stop`/`patience`/`should_stop` em todo o `nnunetv2` |
+| laço de treino | `for epoch in range(current_epoch, num_epochs)` — fixo, **sem `break`** |
+| `checkpoint_best.pth` | salvo por `ema_fg_dice` (EMA α=0,1 sobre `mean_fg_dice` do fold interno) |
+| **`nnUNetv2_predict`** | usa **`checkpoint_final.pth`** por default — os pesos da **última época** |
+| variante de épocas | altera **só** `num_epochs`; PolyLR recoze no novo orçamento |
+
+**O achado que decidiu a fase:** seria fácil concluir que o nnU-Net já protege contra
+sobreajuste porque salva o melhor checkpoint. **Ele salva o melhor e entrega o último.** A
+pergunta certa não é *quando parar*, é **qual checkpoint é entregue**.
+
+**Regra declarada (plano de análise da Fase 27, não emenda de protocolo):** primário =
+`checkpoint_final` (default do framework, zero discricionariedade); secundário =
+`checkpoint_best`; **os dois sempre reportados**, e é **proibido** trocar o primário pelo
+secundário depois de ver qual foi melhor nos 6 casos.
+
+**Por que não *early stopping*:** exigiria código novo no caminho crítico de um experimento
+cujo objetivo é auditabilidade; *patience* e `min_delta` seriam arbitrários, sem evidência
+para calibrá-los; e o sinal (`ema_fg_dice` sobre **2 casos**) é ruidoso demais para governar
+uma parada.
+
+**Vazamento:** os 6 do holdout ausentes de `imagesTr`, `labelsTr`, do pré-processado, de
+`gt_segmentations` e dos 5 folds. Cinco vetores de ataque testados, nenhum alcança. A barreira
+é **configuração + ausência física dos `.b2nd`**: um caminho de vazamento produziria **crash
+duro, nunca contaminação silenciosa**.
+
+**Custo continua de pé:** 206,8 h para os 5 folds. Não foi resolvido, porque resolvê-lo por
+decisão metodológica seria decidir por economia.
+
+**Testes:** 86/86 (14 novos, metade deles travando o comportamento do **framework instalado**).
+Varredura: 62 documentos, 0 violações. Nenhum teste existente enfraquecido.
