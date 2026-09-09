@@ -429,3 +429,40 @@ Verificação empírica independente (reconstrução da EMA reproduz os **53 rec
 no melhor momento recente. Meia-vida da EMA = **6,58 épocas**: qualquer *patience* dessa ordem
 mede o atraso do filtro, não platô. *(Isto demonstra que o sinal é inadequado; não calibra
 nenhum parâmetro — a proibição do Passo 7 segue respeitada.)*
+
+---
+
+## Fase 26B / 27B — experimento de 250 épocas concluído (2026-09-09)
+
+**EXPERIMENTO EXPLORATÓRIO.** O baseline canônico de 1000 épocas continua **pendente**.
+
+5/5 folds · **1.250/1.250 épocas** · **47,76 h** · trainer `nnUNetTrainer_250epochs`
+(só `num_epochs` difere; `nnUNetPlans.json`, `dataset_fingerprint.json`, `dataset.json` e
+`splits_final.json` **byte-idênticos** aos da Fase 26).
+
+| | Dice |
+|---|---|
+| *out-of-fold* (n=10, 1 rede por caso) | 0,7008 ± 0,1369 |
+| *out-of-fold* **sem os 2 colapsos** (n=8) | **0,7613 ± 0,0558** |
+| conjunto reservado (n=6, ensemble de 5) — `final` | **0,7630 ± 0,0192** |
+| conjunto reservado — `best` | 0,7639 ± 0,0224 |
+
+### Três correções que a verificação adversarial impôs
+
+| # | Erro evitado | Verificado por |
+|---|---|---|
+| 1 | *"o modelo melhora e estabiliza no reservado"* — **comparação inválida**: 1 rede × ensemble de 5, variâncias de natureza diferente, e o gap inteiro são **2 casos** (sem eles, diferença de **0,0018**; Welch p=0,94) | recálculo próprio |
+| 2 | *"precision>recall + volume negativo + razão<1 = três evidências"* — **circular**: `recall/precision = Vpred/Vref` **exatamente** (delta ≤ 1,1e−16). É o mesmo número três vezes | verificado voxel a voxel |
+| 3 | *"`final` e `best` são idênticos"* — vale **só para o Dice**: HD95 piora 2,7 % com `best` (caso 107: +31,7 %) e erro de volume melhora 11,5 % | comparação caso a caso |
+
+Ainda: **~80 % do erro de fronteira é simétrico** (FP+FN 87,92 mL contra líquido 17,40 mL) —
+imprecisão de localização, não encolhimento. E a diferença treino↔validação **nasce grande**
+nos folds 1 e 4 (−0,23 e −0,27 já no primeiro quarto), o que aponta para dificuldade dos casos
+e não sobreajuste progressivo.
+
+**Failure cases** (regra declarada): `104`, `116`, `115`. Os dois piores falham de formas
+**opostas** — `116` perde um trecho inteiro (recall 0,654, HD95 20,3 mm, −24 % volume);
+`104` tem o pior Dice mas o **melhor** HD95 (4,71 mm) e volume exato (+0,75 %).
+
+**Testes:** 99/99 nos arquivos + 215/215 nos autotestes. Varredura: 0 violações.
+TEST continua **0**; manifesto, snapshot e split **intactos**.

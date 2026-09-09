@@ -211,23 +211,78 @@ existente foi enfraquecido.
 
 ## 10. Resultados
 
-**PENDENTES.** O treino está em execução. Nenhuma métrica é publicada aqui, e nenhuma será
-inventada.
+**Treino concluído:** 5/5 folds, **1.250/1.250 épocas**, todos com `rc=0`, em **47,76 h**
+(9,44–9,62 h por fold). Diagnóstico completo em
+[`RELATORIO-FASE27B-DIAGNOSTICO-250EPOCHS.md`](RELATORIO-FASE27B-DIAGNOSTICO-250EPOCHS.md).
 
-Ficam pendentes, e serão preenchidos quando os cinco folds terminarem:
+### 10.1 Terminologia — os 6 casos não são um TEST
 
-- resultados por fold (validação interna *out-of-fold*, n = 2 por fold);
-- resultados nos 6 casos do holdout, com `checkpoint_final` **e** `checkpoint_best`;
-- as oito métricas congeladas: média, mediana, mínimo, máximo, desvio amostral, por caso e
-  por fold;
-- *failure cases* pela regra já declarada na Fase 27 — os três de menor Dice, desempate por
-  HD95 maior, mais qualquer caso com recall < 0,50, precision < 0,50 ou predição vazia;
-- curvas de *train loss*, *validation loss* interna e pseudo-Dice ao longo das 250 épocas;
-- análise de sobreajuste/subajuste, **sem usar os 6 do holdout para decidir quando houve**;
-- observações descritivas de fase respiratória (`c00`×12, `c80`×2, `c10`×1, `c40`×1) — **sem
-  teste estatístico**, porque dois estratos têm n = 1;
-- observações de *spacing* nos casos fora de 0,9766 mm, **sem remover caso e sem alterar
-  split**.
+**Este relatório evita a palavra "holdout"**, que sugere conjunto intocado. Os 6 casos são a
+**partição `validation` do manifesto congelado**. Eles nunca entraram em treino, mas foram
+**lidos duas vezes** (uma por checkpoint). O primário foi declarado na Fase 26A **antes** de
+qualquer resultado e **não foi trocado** — ainda assim, ler duas vezes não é o mesmo que
+nunca ter lido.
+
+**Não existe desempenho externo neste projeto.** O manifesto não define partição TEST.
+
+### 10.2 Por fold — validação interna *out-of-fold*
+
+| fold | casos de validação interna | Dice do fold | melhor pseudo-Dice | época |
+|---|---|---|---|---|
+| 0 | `100`, `111` | 0,7613 | 0,7694 | 135 |
+| 1 | `106`, `114` | **0,6009** | 0,6666 | 205 |
+| 2 | `108`, `110` | 0,7672 | **0,8119** | 54 |
+| 3 | `102`, `112` | **0,7706** | 0,7881 | 137 |
+| 4 | `105`, `109` | **0,6042** | 0,5856 | 128 |
+
+**Agregado dos 10 casos: Dice 0,7008 · mediana 0,7454 · dp 0,1369 · min 0,4401 · max 0,8642.**
+
+### 10.3 Conjunto reservado (n = 6) — `checkpoint_final`, o primário
+
+| case_id | Dice | IoU | prec | rec | HD95 mm | ASSD mm | ΔVol mL | ΔVol % |
+|---|---|---|---|---|---|---|---|---|
+| `4DLUNG-107` | **0,7902** | 0,6531 | 0,8109 | 0,7705 | 6,84 | 1,230 | 1,31 | −4,98 |
+| `4DLUNG-103` | 0,7756 | 0,6335 | 0,8309 | 0,7272 | 15,41 | 2,023 | 5,54 | −12,48 |
+| `4DLUNG-101` | 0,7699 | 0,6259 | 0,8046 | 0,7382 | 7,74 | 1,368 | 2,15 | −8,25 |
+| `4DLUNG-115` | 0,7584 | 0,6108 | 0,7733 | 0,7441 | 9,85 | 1,775 | 1,24 | −3,77 |
+| `4DLUNG-116` | 0,7440 | 0,5924 | 0,8622 | **0,6543** | **20,28** | 2,677 | 7,41 | **−24,12** |
+| `4DLUNG-104` | **0,7402** | 0,5875 | 0,7374 | 0,7429 | **4,71** | 1,403 | 0,25 | **+0,75** |
+
+| métrica congelada | média | mediana | dp | min | max | IQR |
+|---|---|---|---|---|---|---|
+| dice | 0,7630 | 0,7642 | 0,0192 | 0,7402 | 0,7902 | 0,0266 |
+| iou | 0,6172 | 0,6184 | 0,0252 | 0,5875 | 0,6531 | 0,0346 |
+| precision | 0,8032 | 0,8077 | 0,0437 | 0,7374 | 0,8622 | 0,0448 |
+| recall | 0,7295 | 0,7406 | 0,0395 | 0,6543 | 0,7705 | 0,0139 |
+| hd95 (mm) | 10,80 | 8,79 | 5,90 | 4,71 | 20,28 | 6,96 |
+| assd (mm) | 1,746 | 1,589 | 0,542 | 1,230 | 2,677 | 0,584 |
+| erro_volume_absoluto (mL) | 2,984 | 1,730 | 2,832 | 0,253 | 7,408 | 3,436 |
+| erro_volume_percentual (%) | −8,81 | −6,62 | 8,71 | −24,12 | +0,75 | 7,35 |
+
+### 10.4 `checkpoint_best` — o secundário, reportado sempre
+
+| métrica | final (primário) | best (secundário) |
+|---|---|---|
+| dice médio | **0,7630** | 0,7639 |
+| dice dp | 0,0192 | 0,0224 |
+| hd95 médio (mm) | **10,80** | 11,09 |
+| erro absoluto de volume (mL) | 2,984 | **2,640** |
+
+**O primário não foi trocado**, e a regra de 26A proíbe trocá-lo. Ver §4 do diagnóstico para
+por que "praticamente idênticos" vale só para o Dice.
+
+### 10.5 *Failure cases* — pela regra declarada, não por escolha
+
+Três menores Dice, desempate por HD95 maior: **`104` (0,7402), `116` (0,7440), `115`
+(0,7584)**. Nenhum caso com recall < 0,50, precision < 0,50 ou predição vazia.
+
+Os dois piores falham de formas **opostas**, e isso é o achado clínico-geométrico da fase:
+
+- **`116`** — recall 0,654, HD95 **20,28 mm**, volume **−24,1 %**: perde um trecho inteiro.
+- **`104`** — pior Dice, mas **melhor HD95 (4,71 mm)** e volume quase exato (**+0,75 %**):
+  erro difuso de fronteira, sem falha localizada.
+
+Um Dice único não distingue esses dois modos. As oito métricas distinguem.
 
 ---
 
