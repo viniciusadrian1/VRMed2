@@ -79,7 +79,8 @@ export default function ViewerPage() {
       actions={
         <>
           <SaveSessionButton />
-          <XRButton />
+          <XRButton modo="ar" />
+          <XRButton modo="vr" />
         </>
       }
     >

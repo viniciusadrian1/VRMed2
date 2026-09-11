@@ -34,6 +34,25 @@ import { XRManipulation } from "./XRManipulation";
 type Availability = "checking" | "real" | "placeholder";
 
 /** Aplica camadas, cortes e wireframe ao modelo sempre que o estado muda. */
+/**
+ * Pose do órgão no modo AR, relativa aos pés do usuário no início da sessão.
+ *
+ * Em VR o modelo fica em tamanho de vitrine (~2 unidades ≈ 2 m) e a pessoa
+ * recua 3 m para vê-lo inteiro. Em AR não há 3 m para recuar — o estande é
+ * pequeno, e é essa a razão de existir este modo. Então o órgão vem para a
+ * frente do peito, do tamanho de uma bola: perto o bastante para alcançar com
+ * a mão, pequeno o bastante para a pessoa dar a volta nele sem esbarrar em
+ * nada. A partir daí os controles (e as duas mãos) reposicionam e redimensionam
+ * à vontade — isto é só o ponto de partida.
+ *
+ * Aplicado no PRÓPRIO root do modelo, e não num grupo-pai: `XRManipulation`
+ * mistura posição de mundo com posição local, e um pai com transformação
+ * quebraria o arrastar e o aproximar.
+ */
+const AR_POSICAO: [number, number, number] = [0, 1.15, -0.75];
+/** ~2 unidades × 0,22 ≈ 44 cm de altura. */
+const AR_ESCALA = 0.22;
+
 function ModelStateApplier({
   rootRef,
 }: {
@@ -77,7 +96,9 @@ export function OrganModel() {
   const setInspectedLabel = useVRMedStore((s) => s.setInspectedLabel);
   const inspectedLabel = useVRMedStore((s) => s.inspectedLabel);
   const invalidate = useThree((s) => s.invalidate);
-  const inSession = useXR((state) => Boolean(state.session));
+  const modo = useXR((state) => state.mode);
+  const inSession = modo === "immersive-vr" || modo === "immersive-ar";
+  const emAR = modo === "immersive-ar";
   const organ = getOrganById(organId);
 
   const rootRef = useRef<THREE.Group>(null);
@@ -210,6 +231,8 @@ export function OrganModel() {
     <>
       <group
         ref={rootRef}
+        position={emAR ? AR_POSICAO : [0, 0, 0]}
+        scale={emAR ? AR_ESCALA : 1}
         onClick={handleModelClick}
         onPointerOver={(event) => {
           event.stopPropagation();
@@ -245,8 +268,15 @@ export function OrganModel() {
         <ModelStateApplier rootRef={rootRef} />
       </group>
 
-      {/* Em VR o modelo é manipulado pelos controles do headset. */}
-      {inSession && modelReady && <XRManipulation target={rootRef} />}
+      {/*
+       * Em VR e em AR o modelo é manipulado pelos controles do headset.
+       * `key={modo}` remonta a manipulação ao trocar de modo: ela guarda a
+       * pose inicial no primeiro quadro para o botão de reset, e sem remontar
+       * o reset devolveria o órgão à pose do OUTRO modo.
+       */}
+      {inSession && modelReady && (
+        <XRManipulation key={modo} target={rootRef} />
+      )}
 
       {!inSession && transformMode !== "none" && modelReady && rootRef.current && (
         <TransformControls object={rootRef.current} mode={transformMode} />

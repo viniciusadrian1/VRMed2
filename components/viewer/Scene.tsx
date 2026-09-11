@@ -145,19 +145,31 @@ function XRStage() {
  *  - Html (hotspots) é DOM: invisível em VR e ainda faz raycast por quadro.
  */
 function SceneContents() {
-  const inSession = useXR((state) => Boolean(state.session));
+  const modo = useXR((state) => state.mode);
+  const inSession = modo === "immersive-vr" || modo === "immersive-ar";
+  const emAR = modo === "immersive-ar";
 
   return (
     <>
-      {/* Posiciona o usuário à frente do modelo ao entrar em VR. */}
-      <XROrigin position={[0, FLOOR_Y, 3]}>
+      {/*
+       * Em VR o usuário nasce 3 m atrás do modelo, olhando para ele: a sala é
+       * nossa e cabe. Em AR a sala é a de verdade — recuar 3 m colocaria a
+       * pessoa dentro da parede do estande. Por isso, em AR, a origem fica
+       * onde os pés já estão e é o ÓRGÃO que vem para perto (ver OrganModel).
+       */}
+      <XROrigin position={emAR ? [0, 0, 0] : [0, FLOOR_Y, 3]}>
         <SairDoVR position={[-0.45, 1.25, -0.5]} />
       </XROrigin>
 
-      <ambientLight intensity={inSession ? 0.85 : 0.5} />
+      {/*
+       * Em AR a luz da sala real já ilumina o campo de visão; repetir aqui a
+       * chave forte do modo 2D deixa o órgão "estourado" e chapado contra o
+       * passthrough. Menos intensidade e mais preenchimento.
+       */}
+      <ambientLight intensity={emAR ? 1.15 : inSession ? 0.85 : 0.5} />
       <directionalLight
         position={[5, 7, 5]}
-        intensity={2.1}
+        intensity={emAR ? 1.1 : 2.1}
         castShadow={!inSession}
         shadow-mapSize={[2048, 2048]}
         shadow-bias={-0.0002}
@@ -169,14 +181,19 @@ function SceneContents() {
       </directionalLight>
       <directionalLight
         position={[-6, 3, -5]}
-        intensity={0.55}
+        intensity={emAR ? 0.8 : 0.55}
         color="#9fc3dd"
       />
 
       <OrganModel />
 
+      {/*
+       * O cenário do VR (grade + anel) existe para a pessoa não ficar num vazio
+       * preto. Em AR o vazio não existe: o fundo é a sala. Desenhar a grade
+       * ali seria plantar um chão falso por cima do chão de verdade.
+       */}
       {inSession ? (
-        <XRStage />
+        emAR ? null : <XRStage />
       ) : (
         <>
           <SafeEnvironment />
@@ -217,26 +234,36 @@ export function Scene() {
   // e deixaria o headset com a tela preta.
   const [inXR, setInXR] = useState(false);
 
-  // Registra a entrada em VR na ponte e mede a duração das sessões.
+  // Registra a entrada em VR/AR na ponte e mede a duração das sessões.
   useEffect(() => {
     viewerBridge.enterVR = () => {
       void xrStore.enterVR();
     };
+    viewerBridge.enterAR = () => {
+      void xrStore.enterAR();
+    };
     let enteredAt = 0;
+    // Guardado na entrada: ao sair, `state.mode` já voltou a null e não dá
+    // mais para saber de qual dos dois modos a sessão era.
+    let modoAtivo: "vr" | "ar" = "vr";
     const unsubscribe = xrStore.subscribe((state) => {
       const active = Boolean(state.session);
       setInXR(active);
       if (active && enteredAt === 0) {
         enteredAt = Date.now();
-        track("vr_entered");
+        modoAtivo = state.mode === "immersive-ar" ? "ar" : "vr";
+        track(modoAtivo === "ar" ? "ar_entered" : "vr_entered");
       } else if (!active && enteredAt > 0) {
-        track("vr_exited", { durationMs: Date.now() - enteredAt });
+        track(modoAtivo === "ar" ? "ar_exited" : "vr_exited", {
+          durationMs: Date.now() - enteredAt,
+        });
         enteredAt = 0;
       }
     });
     return () => {
       unsubscribe();
       viewerBridge.enterVR = () => {};
+      viewerBridge.enterAR = () => {};
     };
   }, [xrStore]);
 
