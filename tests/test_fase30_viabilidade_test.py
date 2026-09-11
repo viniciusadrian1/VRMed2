@@ -133,13 +133,18 @@ def test_06_nenhuma_inferencia_nova():
 
 
 def test_07_nenhum_dataset_novo():
+    """A Fase 30 foi só análise: não baixou nada e não tocou no manifesto V1.
+
+    A primeira versão deste teste varria `.clinica-dados/fase3*`, o que era largo
+    demais: passou a acusar o diretório LEGÍTIMO que a Fase 31 criou ao ampliar o
+    TRAIN. O invariante que interessa é sobre a Fase 30 — que não criou árvore de
+    dados nenhuma — e sobre o manifesto V1, que continua com uma fonte só.
+    A Fase 31 tem os seus próprios testes para o que ela acrescentou.
+    """
     fontes = {e["source_dataset"] for e in _ent()}
-    assert fontes == {"4D-Lung (TCIA)"}, "source_dataset novo: %s" % sorted(fontes)
-    # e nenhuma arvore de dados nova apareceu em .clinica-dados
-    base = RAIZ / ".clinica-dados"
-    if base.exists():
-        novos = [d.name for d in base.iterdir() if d.is_dir() and d.name.startswith("fase3")]
-        assert not novos, "diretorio de dados novo: %s" % novos
+    assert fontes == {"4D-Lung (TCIA)"}, "source_dataset novo no manifesto V1: %s" % sorted(fontes)
+    assert not (RAIZ / ".clinica-dados" / "fase30").exists(), (
+        "a Fase 30 criou árvore de dados, e ela era de análise apenas")
 
 
 # --------------------------------------------------------------- [CALCULO]

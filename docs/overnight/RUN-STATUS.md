@@ -612,3 +612,72 @@ convenção, não validade externa.
 **Testes:** 142/142 nos arquivos (17 novos) + 240/240 nos autotestes. Integridade **antes × depois
 inalterada** em manifesto, snapshot, pool16, split, épocas por fold, cada `.pth` e contagem de
 predições. Varredura: 67 documentos, 0 violações.
+
+---
+
+## Fase 31 — ampliação auditável do TRAIN (2026-09-10)
+
+**DECISÃO: (A) TRAIN ampliado e congelado.** `VRMED-ESOPHAGUS-POOL46-V2`,
+`sha256` `f4bd480e…6d20f60b`. **A V1 não foi tocada** (`9388c736…82632192`, 10/6/0).
+
+| | V1 | **V2** |
+|---|---|---|
+| pool | 16 | **46** |
+| TRAIN | 10 | **32** |
+| VALIDATION | 6 | **14** |
+| TEST | 0 | **0** |
+
+### A premissa da fase estava errada, e foi revalidada
+
+O pedido supunha "11 casos restantes do 4D-Lung". **Não há.** Os 11 foram ingeridos **na
+Fase 24**. Revalidei rodando o filtro de novo: 16 sujeitos elegíveis, 16 já no manifesto,
+**zero sobrando**. Existem mais *séries* (101 RTSTRUCT para 16 sujeitos), mas são do mesmo
+paciente — inflariam `n` sem sujeito independente.
+
+### Inventário: sobrou uma fonte
+
+| fonte | status | motivo |
+|---|---|---|
+| 4D-Lung | **ALREADY_USED** | 16/16 usados, esgotado por sujeito |
+| **LCTSC** | **ELIGIBLE_SOURCE** | CC BY 3.0, MANUAL 59/60, 3 instituições, RTOG 1106 |
+| EAY131 | INCOMPATIBLE | classe **F** já documentada: catálogo de **lesão**, não OAR |
+| NSCLC-Radiomics | BLOCKED | **CC BY-NC 3.0** |
+| Pediatric-CT-SEG | INCOMPATIBLE | pediátrico — refutado por medição na Fase 29 |
+
+**Usado só o `development` 30 do split congelado do LCTSC** — é para isso que aquela
+partição foi congelada. `validation` 15 e `test` 15 ficam intactos, com teste que verifica.
+
+### O funil foi parametrizado, não duplicado — e a neutralidade foi provada
+
+`--fonte`, `--somente`, `--saida`, com defaults inalterados. Rodei o funil num caso
+4D-Lung com trabalho redirecionado e comparei **19 campos imutáveis** contra a V1:
+**nenhum divergente**, incluindo os dois `sha256`.
+
+**30 candidatos → 30 elegíveis → 0 rejeitados.**
+
+### A heterogeneidade melhorou, não só o n
+
+| | V1 | V2 |
+|---|---|---|
+| instituições | VCU | + MDACC, MSKCC, MAASTRO |
+| **spacing z** | **3,0 mm em 100 %** | **3,0 · 2,5 · 2,0 · 1,25** |
+| spacing xy | 4 valores | **7 valores** |
+| volume | 23,6–60,7 mL | **23,6–90,6 mL** |
+| protocolo | UNKNOWN 16/16 | UNKNOWN 16 · **RTOG 1106 em 30** |
+
+### Achado exposto, não escondido
+
+**`LCTSC-Train-S3-002` tem 2 componentes conexos.** A ontologia congelada **aprova** — ela
+não exige componente único. Meu primeiro teste era mais estrito que o instrumento, e **o
+teste é que estava errado**. Mantido e contado por um teste dedicado que falha se o
+conjunto de exceções mudar.
+
+### Incidente — terceira ocorrência do mesmo padrão
+
+A primeira execução gravou em `phase23/ingestao_real.json`, **artefato histórico**: criei
+o `--saida` mas **não o liguei**. Restaurado por `git checkout`, ligado de verdade, e há
+agora teste que exige que aquele arquivo continue com os **5** casos da Fase 23.
+
+**Testes:** 164/164 nos arquivos (22 novos) + 250/250 nos autotestes. Integridade antes ×
+depois: manifesto V1 (conteúdo **e** bytes), split, snapshot, pool16, épocas por fold,
+cada `.pth` e predições — **tudo inalterado**. Varredura: 68 documentos, 0 violações.

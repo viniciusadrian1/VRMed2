@@ -1,0 +1,1019 @@
+{
+ "gerado_em": "2026-09-11T02:35:36Z",
+ "fase": 31,
+ "versao": "VRMED-ESOPHAGUS-POOL46-V2",
+ "regra_split": "VRMED-SPLIT-RULE-V2",
+ "limiar": 25,
+ "seed": null,
+ "bandas": {
+  "4D-Lung (TCIA)": [
+   2,
+   8
+  ],
+  "LCTSC (TCIA)": [
+   4,
+   12
+  ],
+  "_global": [
+   6,
+   20
+  ]
+ },
+ "ontologia": "ESOPHAGUS_ONTOLOGY_V1",
+ "esquema": "VRMED-ESOPHAGUS-DATASET-V1",
+ "sha256_manifesto": "f4bd480e8f8046923a8990096d40832145fb405f1a84ca85e8f3be6e6d20f60b",
+ "auditoria": {
+  "n_total": 46,
+  "por_split": {
+   "train": 32,
+   "validation": 14,
+   "test": 0
+  },
+  "estratos": {
+   "4D-Lung (TCIA)": {
+    "n": 16,
+    "train": 10,
+    "validation": 6,
+    "banda": [
+     2,
+     8
+    ],
+    "dentro_da_banda": true
+   },
+   "LCTSC (TCIA)": {
+    "n": 30,
+    "train": 22,
+    "validation": 8,
+    "banda": [
+     4,
+     12
+    ],
+    "dentro_da_banda": true
+   }
+  },
+  "banda_global": [
+   6,
+   20
+  ],
+  "dentro_da_banda_global": true,
+  "identidade": {
+   "case_id": {
+    "distintos": 46,
+    "repetidos": []
+   },
+   "study_id": {
+    "distintos": 46,
+    "repetidos": []
+   },
+   "series_id": {
+    "distintos": 46,
+    "repetidos": []
+   },
+   "image_sha256": {
+    "distintos": 46,
+    "repetidos": []
+   },
+   "mask_sha256": {
+    "distintos": 46,
+    "repetidos": []
+   },
+   "sujeitos_em_dois_splits": [],
+   "n_sujeitos": 46
+  },
+  "licencas": {
+   "ABERTA_ATRIBUICAO": 46
+  },
+  "licencas_bloqueantes": [],
+  "fontes": {
+   "4D-Lung (TCIA)": 16,
+   "LCTSC (TCIA)": 30
+  },
+  "anotacao_declarada": {
+   "SEMIAUTOMATIC": 16,
+   "VAZIO": 1,
+   "MANUAL": 29
+  }
+ },
+ "casos": [
+  {
+   "case_id": "4DLUNG-100_HM10395",
+   "split": "train",
+   "bucket": 34,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "100_HM10395",
+   "image_sha256": "9769dfc3716e8ad12d12c370a64d6595d67c50b236ba621559a1fe1b7dbb223c",
+   "mask_sha256": "c83a55284edba42ebc903d70f0ef0617cec678ffcb1dd613c0174714b2350366",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    142
+   ]
+  },
+  {
+   "case_id": "4DLUNG-101_HM10395",
+   "split": "validation",
+   "bucket": 22,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "101_HM10395",
+   "image_sha256": "665d0eaeb0260d60bcb278cc64a3a4a70b6a1ceb3abc67024956f5ac4ed9aeeb",
+   "mask_sha256": "47ec65ffbf6a5af75e6ca1f10e3be5e609ab3aa287bcd95a2f07f289566c5ea2",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    149
+   ]
+  },
+  {
+   "case_id": "4DLUNG-102_HM10395",
+   "split": "train",
+   "bucket": 86,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "102_HM10395",
+   "image_sha256": "feae6707d0e24edae4726a581e34ac1d6d8df9619bfbaa558f05e1028e8cc109",
+   "mask_sha256": "6198cfa5e8061bb2d1caf1107fe4ae39e962ff8c09efa41555eaba2d47d4faca",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    133
+   ]
+  },
+  {
+   "case_id": "4DLUNG-103_HM10395",
+   "split": "validation",
+   "bucket": 20,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "103_HM10395",
+   "image_sha256": "3b1ecb4f02c508fe690d39a5dd985cc654ff243a07107ea9aeb418b49a02edb4",
+   "mask_sha256": "84f905c8885e9c7c19c8f6c72de9f4959e0a23de0186f56b42b4d3c5a42c25c1",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    117
+   ]
+  },
+  {
+   "case_id": "4DLUNG-104_HM10395",
+   "split": "validation",
+   "bucket": 20,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "104_HM10395",
+   "image_sha256": "5275c0d41d395cce2d42fd540a44d4b0655dce2f33ed3f2c363fb56e30d41bec",
+   "mask_sha256": "85b2d0a299b624c689ebc0ebce35e667e3746c7ff4fbcce2321a034bf54d104a",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.0527,
+    1.0527,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    103
+   ]
+  },
+  {
+   "case_id": "4DLUNG-105_HM10395",
+   "split": "train",
+   "bucket": 43,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "105_HM10395",
+   "image_sha256": "6ac0cc72d23d96a7bc04312390bc43af5a832758c8428e67517d908cb1a8fde1",
+   "mask_sha256": "5291f0e648235dd8dd8bf8e227b4bb9a691123fee440f569ee7c892547084b3b",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.1113,
+    1.1113,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    113
+   ]
+  },
+  {
+   "case_id": "4DLUNG-106_HM10395",
+   "split": "train",
+   "bucket": 56,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "106_HM10395",
+   "image_sha256": "4c5250b9c04d8984a3286368b69a3c1aacfe3d7d24919488907cfab249b1e1bb",
+   "mask_sha256": "44da9a2cf375db652b543b935fc6b0ae60fcfdf548612669f4b6e26b426ca302",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.1621,
+    1.1621,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    103
+   ]
+  },
+  {
+   "case_id": "4DLUNG-107_HM10395",
+   "split": "validation",
+   "bucket": 5,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "107_HM10395",
+   "image_sha256": "196b3bca91b36436e418662304d933ae07eb542ef6b96485f7b9ecccbd9fb59c",
+   "mask_sha256": "89c4c8e3f29c9fca57f6b162d88468e0d9c9e1fb96be92f17c52e8607031bdaa",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    82
+   ]
+  },
+  {
+   "case_id": "4DLUNG-108_HM10395",
+   "split": "train",
+   "bucket": 48,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "108_HM10395",
+   "image_sha256": "97257b6a562beebe77334ddf05c41f1da559b3012d61e3f323d2577c11855474",
+   "mask_sha256": "ca9e4fe52886d2b9ce2d00ef734bc6e019ff2fe21cf31b7907b907c046fd5b43",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    119
+   ]
+  },
+  {
+   "case_id": "4DLUNG-109_HM10395",
+   "split": "train",
+   "bucket": 99,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "109_HM10395",
+   "image_sha256": "665ceb7c205e5907e1e04f0b4f94c3db231cb38fe0e78731516657c6f0e3b240",
+   "mask_sha256": "2d957ab3c60bc35606c303d178ae9acb95c46d71b79c643dc350370d16322acc",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    112
+   ]
+  },
+  {
+   "case_id": "4DLUNG-110_HM10395",
+   "split": "train",
+   "bucket": 98,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "110_HM10395",
+   "image_sha256": "17e904bbdf7cc397b258956c01e770b162087ac9177cdd40c157323252f8754f",
+   "mask_sha256": "81b5c1d6f7a17cdcc07a365a061037fa4eb932d321371ab65ebce3fbde470094",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    113
+   ]
+  },
+  {
+   "case_id": "4DLUNG-111_HM10395",
+   "split": "train",
+   "bucket": 44,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "111_HM10395",
+   "image_sha256": "56dcfa505ea0a178ed7df53270ec855084e7109f5b1a2bf878e97b891f344fa3",
+   "mask_sha256": "53f1f892d172d64765dcabf0139abf371debbf3ec20b3acc742a01641c61cd7d",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    114
+   ]
+  },
+  {
+   "case_id": "4DLUNG-112_HM10395",
+   "split": "train",
+   "bucket": 53,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "112_HM10395",
+   "image_sha256": "88540440fd9b5fe22015266cffb524105773b66d80ab508f222e22baebff3274",
+   "mask_sha256": "7d6997fd6118b04ff721d55e8ace2282b15f7d52a6b7b5d49f70ca41cb715017",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    118
+   ]
+  },
+  {
+   "case_id": "4DLUNG-114_HM10395",
+   "split": "train",
+   "bucket": 99,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "114_HM10395",
+   "image_sha256": "9ea7668ae3f039d096b028b35e9520c8a1c24c3c016df3b2422b400a91ea0903",
+   "mask_sha256": "b44d97e104b1c8a992ae974580292afef831cd91bc48a031d591d30b28a34e0c",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    131
+   ]
+  },
+  {
+   "case_id": "4DLUNG-115_HM10395",
+   "split": "validation",
+   "bucket": 7,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "115_HM10395",
+   "image_sha256": "cb4c76c619f837fc166bca829990547cb42e7ea0bae1c861fb5ad2eac490e6e0",
+   "mask_sha256": "4bf1eec0ff9f71c587c0cb43f4e4f3a31c3cfa92effbf19926390af874c20b38",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    104
+   ]
+  },
+  {
+   "case_id": "4DLUNG-116_HM10395",
+   "split": "validation",
+   "bucket": 7,
+   "source_dataset": "4D-Lung (TCIA)",
+   "source_case_id": "116_HM10395",
+   "image_sha256": "e4b2d333d8052960aab50bc7fcd41bf1c22352ac71d008ae865e9924fe134892",
+   "mask_sha256": "3b89da80116c8c020c4807ad72e5c364ad8b52b32757a062484d09d59c5b6fbf",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    118
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S1-101",
+   "split": "validation",
+   "bucket": 9,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S1-101",
+   "image_sha256": "9edbb39bf8c6e971f76262f1ca3b5d999cf8567f61afef94f1215ac3d50ed6df",
+   "mask_sha256": "d8b89c6690eb2afb7711a373d8e36858e72f4ceadf0c96db010525d31b56e1db",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    130
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S1-102",
+   "split": "train",
+   "bucket": 67,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S1-102",
+   "image_sha256": "f99ee5a3c264fb1511562021d9ff716a9c3fa39f69599f994f17099f9fac674a",
+   "mask_sha256": "31d156e85297aec80c66ca1f7e2bcbf4b506fb0b6378d6422c8f21bc1aede7de",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    148
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S1-203",
+   "split": "train",
+   "bucket": 56,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S1-203",
+   "image_sha256": "70e00a1bcbab716473b0e164998f87422cabfae762349bc39c7690bdf14842c1",
+   "mask_sha256": "42db25d6d97c4e6efe58bbaa73c9d3020852f9810fa4be0c212d4de48ee0a1e6",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    153
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S2-101",
+   "split": "train",
+   "bucket": 65,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S2-101",
+   "image_sha256": "1fa2e64bcc730342a67b27e58f1fbe6947da60f67220cde5475f02de034187f6",
+   "mask_sha256": "84b4aa0dd2235920f29f4e1d70c5558e99d38dd93ccaceff003b711169ba342d",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    160
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S2-104",
+   "split": "train",
+   "bucket": 33,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S2-104",
+   "image_sha256": "5e3c23a68d8ec89adfbbc1f17e31e6e4786079bda6a305dfefcc08d8e913f063",
+   "mask_sha256": "9a8a5282b24e05275a8de429d737cc4c1f7a4cdc1b1775603a89130c3006f2ce",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    144
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S2-201",
+   "split": "train",
+   "bucket": 64,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S2-201",
+   "image_sha256": "b7ab7828ffdec05817c8765191e63bccfb4612eb0f9f9ab8e27bb63767a0061b",
+   "mask_sha256": "4709b8388bb877f9df345dfcfe6abb4f3d4fd6d4f461c19013ebeda95e698830",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    136
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S3-103",
+   "split": "train",
+   "bucket": 88,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S3-103",
+   "image_sha256": "c053f5278603a265722992c4c97205e1eaa4d5a91218c109ad6cf93e118851b8",
+   "mask_sha256": "bd188065ef89dab3f58b3afe7691b39371ebb433756698382362e1fa7b9e8de6",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.2695,
+    1.2695,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    136
+   ]
+  },
+  {
+   "case_id": "LCTSC-Test-S3-104",
+   "split": "train",
+   "bucket": 59,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Test-S3-104",
+   "image_sha256": "fb17657bc03304bdd16ddc4f88cea81ee98773e0c3aea1d7696fff709f38d3ca",
+   "mask_sha256": "85e7d581a9a771d5bc280c8f8202de91c3c598c292c9bc5ece21fbe2cf8211c9",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    165
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S1-002",
+   "split": "train",
+   "bucket": 62,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S1-002",
+   "image_sha256": "70f5d73e73c7795a71a5d8651538afe74a4da34537cd67f3c2769292119e710b",
+   "mask_sha256": "f8bc3422423219131f01fd6909beeaa322b59e0fd14939f56a2a23b33e084495",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    161
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S1-003",
+   "split": "train",
+   "bucket": 71,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S1-003",
+   "image_sha256": "a877a95e455d443150e816de14e973627b832394bb4f411f0249d826490e0bdc",
+   "mask_sha256": "dde72af9be9b4c850267648f5bb84bf01d4c534073fe86277cdbd0f15c777038",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    154
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S1-004",
+   "split": "validation",
+   "bucket": 22,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S1-004",
+   "image_sha256": "3836862fadbfd5c7763733bff81d30dbc29731f14b743b74e091332bf87f3e8d",
+   "mask_sha256": "7d3ea5a70c7c614db437525c9433f90483a3905846dcea2d24e4866aea7ed629",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    158
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S1-005",
+   "split": "train",
+   "bucket": 75,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S1-005",
+   "image_sha256": "581ed2a2edadfa9bffd36ab323d0f2f5867278d11ff8073d9a33cf9080c92022",
+   "mask_sha256": "697c03da8bdb2420607093f2a9849384d15dd370a4222c0042306909ca69cdc9",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    136
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S1-008",
+   "split": "train",
+   "bucket": 86,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S1-008",
+   "image_sha256": "a4d9c7fc8390335f850ca9423c63e47ba7939a0284cadb35f967d29699b59dac",
+   "mask_sha256": "d700281c0490803dda94f920156e486a3c56ad9410a2f379f9ac0204ef6068a5",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    134
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S1-009",
+   "split": "validation",
+   "bucket": 4,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S1-009",
+   "image_sha256": "78becb1795643e0e9166cead0da9f1ca14401bf606ce9c7899f1d3d7d7b28b0c",
+   "mask_sha256": "37dc6373fa439a27d4a2b963a1dfd86fd7c4e4d6000e1db74c04442b177d280c",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    150
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S1-012",
+   "split": "train",
+   "bucket": 57,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S1-012",
+   "image_sha256": "44abeacea9fb488e4d808a7cba42d8b87da17f890d7f5e7a6fda97f83c221275",
+   "mask_sha256": "3f56faffc6ee06e4f2d7b6b8f594f6f6d22270d755c6b5599caed1d23465c1b0",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    131
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S2-002",
+   "split": "train",
+   "bucket": 83,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S2-002",
+   "image_sha256": "3b254ac02741513893150c3c2ee23001b25ee9b1c607f8a5d4a690ee3aedb1a0",
+   "mask_sha256": "1fbd8a825a2e9fab7bcabdf8271867af2807b24eb7dd7800c92016f4c71c71e6",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    152
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S2-003",
+   "split": "train",
+   "bucket": 64,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S2-003",
+   "image_sha256": "5b471367367ee1bfbf9962dd73ea10242d918bcaef7deb557dc34630a06e919c",
+   "mask_sha256": "0d406564434ff410409e37156e2efed8283a729d5fbf1651b2ca7958e3bba9ea",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    144
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S2-007",
+   "split": "train",
+   "bucket": 57,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S2-007",
+   "image_sha256": "958457e099d9bed687cf3ab544ec2fcefc030c7c11a6fa9f34097eb7ac979384",
+   "mask_sha256": "3ffd75eb63fe306821b7ca665c94baa37cbac89b1db55ead03753863e5d39d7c",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    160
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S2-008",
+   "split": "validation",
+   "bucket": 13,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S2-008",
+   "image_sha256": "91208b51ec7f3ede32e7a931d2f4df0f1290656933e5d6a61e9999c3d6b6bff3",
+   "mask_sha256": "e3bc462f540aeac70fcc2e55e2dccbdfef5c2f78d34a8c22d76abfbe13c8917b",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    168
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S2-009",
+   "split": "validation",
+   "bucket": 1,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S2-009",
+   "image_sha256": "bc30f1741695f33307cb950694c069eb270d8120acb26a9e0e0517905ac00c54",
+   "mask_sha256": "491d685576e111b015aad7d5b7d89045391e6f095e1005bab73653a1d055c1ed",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    160
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S2-010",
+   "split": "train",
+   "bucket": 67,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S2-010",
+   "image_sha256": "ee7c7b26ad56d9395b0ca5e330640e3f56d15bf96af0336f64d11e22d1b904dd",
+   "mask_sha256": "2ea7e4f8d81288f68745bf9b24bfb820ed38f5683582707aa3bd32eaf53838e7",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    152
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S2-011",
+   "split": "train",
+   "bucket": 45,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S2-011",
+   "image_sha256": "65d01cf56bde59b79686e7920a3577dea6d7d27f802f1f4b3542705ad6ead054",
+   "mask_sha256": "52f9258839db7b141d18e7d915c690c0f64524c5e530fed88b0a4efa3d58ddca",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    160
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-001",
+   "split": "validation",
+   "bucket": 11,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-001",
+   "image_sha256": "a0f5a7f3c4a6f8c31bb5c6d2a80d7855be94ec606f845672148d73230efcb5e4",
+   "mask_sha256": "f4567ea16d0c7c379dd9b238e6a6e73706eefabf2169b0d20376949ba5c6188b",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.1719,
+    1.1719,
+    2.0
+   ],
+   "shape": [
+    512,
+    512,
+    204
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-002",
+   "split": "train",
+   "bucket": 51,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-002",
+   "image_sha256": "cd9c561d7c4400124e9eaa08dced385b8dc3be48aabfaf03a484f2fc041c9da3",
+   "mask_sha256": "dd927b5a6eb0cf5d682a1f07836e14fd9d617d7008a23afffe9ef3188de134c7",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.5
+   ],
+   "shape": [
+    512,
+    512,
+    206
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-003",
+   "split": "validation",
+   "bucket": 15,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-003",
+   "image_sha256": "3fb59bcdfe5c564d622dd9dbe50b4251654b0a10c6ae1f03a36b2fd1e5577f69",
+   "mask_sha256": "49405053f0776145e863b2e6f29024bd5c55b2be7f6cb1c65005df5f5c040ffa",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.3672,
+    1.3672,
+    2.0
+   ],
+   "shape": [
+    512,
+    512,
+    202
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-005",
+   "split": "validation",
+   "bucket": 23,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-005",
+   "image_sha256": "4238aba3ae06d05da12a42138d0cc3097b664f73092de5547af73cc0c4077472",
+   "mask_sha256": "4552dfe03bf1479723d12670d790b6ed0a032fa1e1026db5c54e3584fb8673f3",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.1719,
+    1.1719,
+    2.0
+   ],
+   "shape": [
+    512,
+    512,
+    188
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-006",
+   "split": "train",
+   "bucket": 42,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-006",
+   "image_sha256": "5d44a28d0a59bdc0ffd37064300277a8ef950bbdb3f7daaf2848677b1fa60269",
+   "mask_sha256": "87b8a3c07933e398d0a78d0fb8c8a23f69845fa6eaf14f57c161163b3444c6b0",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.1719,
+    1.1719,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    148
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-008",
+   "split": "train",
+   "bucket": 90,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-008",
+   "image_sha256": "a45bbed43c174943e15e8c0a72925aab3016a5fec70a23e1d4ed95e62588dc7d",
+   "mask_sha256": "0a1956658efbc87286eb351e8a7ff68e2dea0d93845731d4cd1b7636112b8ff8",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    2.0
+   ],
+   "shape": [
+    512,
+    512,
+    240
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-010",
+   "split": "train",
+   "bucket": 54,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-010",
+   "image_sha256": "d2d3e6a6e26e894974476a568d05024c8e3f309db22fc244ec919e5ddc2e3dfb",
+   "mask_sha256": "2f75d5398bfb76620f90c6ffdaf3e04a58b225e53acad30200a78167b825644b",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    1.1719,
+    1.1719,
+    3.0
+   ],
+   "shape": [
+    512,
+    512,
+    150
+   ]
+  },
+  {
+   "case_id": "LCTSC-Train-S3-012",
+   "split": "train",
+   "bucket": 60,
+   "source_dataset": "LCTSC (TCIA)",
+   "source_case_id": "LCTSC-Train-S3-012",
+   "image_sha256": "00ae0cb4e8fe8f2327b5680379fddf70532098df819d0eb3f71370105dfcda76",
+   "mask_sha256": "a94018f2af48a6b2760d689fb447e77e814f800b6a0bfbf990ecb19ee4e81096",
+   "license_class": "ABERTA_ATRIBUICAO",
+   "spacing": [
+    0.9766,
+    0.9766,
+    1.25
+   ],
+   "shape": [
+    512,
+    512,
+    214
+   ]
+  }
+ ]
+}

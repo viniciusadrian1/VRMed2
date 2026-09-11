@@ -1,0 +1,45 @@
+{
+ "fase": 31,
+ "n_novos": 30,
+ "contra_v1": {
+  "case_id": [],
+  "study_id": [],
+  "series_id": [],
+  "image_sha256": [],
+  "mask_sha256": []
+ },
+ "contra_v1_por_sujeito": [],
+ "colecoes_historicas": {
+  "4d_lung": {
+   "series_em_comum": 0,
+   "studies_em_comum": 0,
+   "estado": "NAO DETECTADO"
+  },
+  "eay131": {
+   "series_em_comum": 0,
+   "studies_em_comum": 0,
+   "estado": "NAO DETECTADO"
+  },
+  "lctsc": {
+   "series_em_comum": 30,
+   "studies_em_comum": 30,
+   "estado": "E A PROPRIA FONTE"
+  },
+  "nsclc_radiomics": {
+   "series_em_comum": 0,
+   "studies_em_comum": 0,
+   "estado": "NAO DETECTADO"
+  },
+  "pediatric_ct_seg": {
+   "series_em_comum": 0,
+   "studies_em_comum": 0,
+   "estado": "NAO DETECTADO"
+  }
+ },
+ "lynos": {
+  "estado": "NOT_AVAILABLE",
+  "motivo": "LyNoS e NIfTI e NAO publica StudyInstanceUID nem SeriesInstanceUID. So resta comparar hash de conteudo, e os formatos diferem (NIfTI original x DICOM convertido por nos). Um MESMO exame nos dois canais NAO seria detectado. Isto e INCONCLUSIVO."
+ },
+ "leitura": "NAO DETECTADO e o resultado do instrumento, nao afirmacao de independencia. Nenhuma destas chaves prova ausencia.",
+ "ressalva_maastro": "LCTSC e NSCLC-Radiomics compartilham dados do MAASTRO, ja documentado no repo. A comparacao por UID acima da 0, mas isso e no nivel de UID. O NSCLC-Radiomics NAO entra no pool V2, entao a questao nao afeta este congelamento — fica registrada."
+}

@@ -70,6 +70,38 @@ ORIGEM_4DLUNG = {
     "license_class": "ABERTA_ATRIBUICAO",
 }
 
+# Procedencia do LCTSC, apurada nas Fases 20 e 22 (fonte primaria: pagina da colecao
+# no TCIA e Yang et al. 2018/2020). Acrescentada na Fase 31 para ampliar o TRAIN.
+# O 4D-Lung acima NAO foi tocado: a V1 tem de continuar reproduzivel byte a byte.
+ORIGEM_LCTSC = {
+    "source_dataset": "LCTSC (TCIA)",
+    "source_doi": "10.7937/K9/TCIA.2017.3r3fvz08",
+    "institution": U,
+    "acquisition": "TC de planejamento de radioterapia toracica, adulto; 3 instituicoes "
+                   "(MDACC, MSKCC, MAASTRO) — a instituicao POR CASO nao e declarada",
+    "annotation_source": (
+        "contorno clinico de radioterapia do desafio AAPM 2017; ROIGenerationAlgorithm "
+        "declarado no proprio RTSTRUCT (MANUAL em 59 dos 60); revisao e edicao por UMA "
+        "pessoa, fisico medico clinico organizador do desafio, com taxa de edicao UNKNOWN"
+    ),
+    "annotation_protocol": ("atlas RTOG 1106, citado nominalmente na pagina do TCIA: do nivel "
+                            "abaixo do cricoide a entrada no estomago na juncao gastroesofagica"),
+    "annotation_date_known": False,
+    "license": "CC BY 3.0 (declarada na API do TCIA)",
+    "license_class": "ABERTA_ATRIBUICAO",
+}
+
+# Cada fonte declara onde vive, para onde converte, e que prefixo de case_id usa.
+# O default de `processar` continua sendo o 4dlung — nada muda para quem ja chamava.
+PROCEDENCIAS = {
+    "4dlung": {"origem": ORIGEM_4DLUNG, "prefixo": "4DLUNG-",
+               "dados": RAIZ / ".clinica-dados" / "fase23" / "4dlung",
+               "trab": RAIZ / ".clinica-dados" / "fase23" / "convertido"},
+    "lctsc": {"origem": ORIGEM_LCTSC, "prefixo": "",  # os diretorios ja sao LCTSC-*
+              "dados": RAIZ / ".clinica-dados" / "tier2" / "lctsc",
+              "trab": RAIZ / ".clinica-dados" / "fase31" / "convertido_lctsc"},
+}
+
 
 def _uid_da_serie_ct(dir_ct: Path) -> str:
     import pydicom
@@ -106,7 +138,9 @@ def vinculo(ds_rt, uid_ct: str) -> dict:
     }
 
 
-def processar(caso_dir: Path) -> dict:
+def processar(caso_dir: Path, proc: dict = None) -> dict:
+    """Funil de ingestao. `proc` default = 4D-Lung, para a V1 continuar identica."""
+    proc = proc or PROCEDENCIAS["4dlung"]
     dir_ct, dir_rt = caso_dir / "ct", caso_dir / "rtstruct"
     reg = {"case_id": caso_dir.name, "erros": [], "bloqueios": []}
 
@@ -146,7 +180,7 @@ def processar(caso_dir: Path) -> dict:
                           "n_rois": len(rois), "todas": [n for n, _ in rois]}
 
     # conversao RTSTRUCT -> voxel. DADO DERIVADO, e sai marcado como tal.
-    destino = TRAB / caso_dir.name
+    destino = proc["trab"] / caso_dir.name
     destino.mkdir(parents=True, exist_ok=True)
     try:
         conv = rtst.converter(f_rt, dir_ct, destino, estruturas=[nome_eso])
@@ -180,7 +214,7 @@ def processar(caso_dir: Path) -> dict:
         return reg
 
     entrada = {
-        "case_id": "4DLUNG-" + caso_dir.name,
+        "case_id": proc["prefixo"] + caso_dir.name,
         "study_id": ident["study_id"],
         "series_id": ident["series_id"],
         "image_path": str(img), "mask_path": str(msk),
@@ -195,7 +229,7 @@ def processar(caso_dir: Path) -> dict:
                   "dcmrtstruct2nii. ROIGenerationAlgorithm declarado no arquivo: %s. "
                   "Vinculo mascara-imagem confirmado por ReferencedSeriesInstanceUID. "
                   "SOPInstanceUID presentes: %d." % (algo or "VAZIO", ident["n_instancias"])),
-        **{k: v for k, v in ORIGEM_4DLUNG.items()},
+        **{k: v for k, v in proc["origem"].items()},
     }
     erros = man.validar_entrada(entrada) + man.validar_licenca(entrada)
     if erros:
@@ -261,6 +295,11 @@ def autoteste() -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--autoteste", action="store_true")
+    # Parametros acrescentados na Fase 31. Os defaults reproduzem a Fase 23/24.
+    ap.add_argument("--fonte", default="4dlung", choices=sorted(PROCEDENCIAS))
+    ap.add_argument("--saida", default=None)
+    ap.add_argument("--somente", default=None,
+                    help="arquivo com um case_id por linha; restringe a esses casos")
     a = ap.parse_args(argv)
     if a.autoteste:
         return autoteste()
@@ -268,15 +307,20 @@ def main(argv=None) -> int:
         return 1
     print()
 
-    casos = sorted([Path(p) for p in glob.glob(str(DADOS / "*")) if Path(p).is_dir()
+    proc = PROCEDENCIAS[a.fonte]
+    casos = sorted([Path(p) for p in glob.glob(str(proc["dados"] / "*")) if Path(p).is_dir()
                     and not Path(p).name.startswith("_")])
+    if a.somente:
+        permitidos = {l.strip() for l in Path(a.somente).read_text(encoding="utf-8").splitlines()
+                      if l.strip()}
+        casos = [c for c in casos if c.name in permitidos]
     if not casos:
-        print("nenhum caso baixado em", DADOS)
+        print("nenhum caso baixado em", proc["dados"])
         return 1
 
     regs = []
     for c in casos:
-        r = processar(c)
+        r = processar(c, proc)
         regs.append(r)
         estado = ("ELEGIVEL" if r.get("elegivel") else
                   "BLOQUEADO: " + (r["bloqueios"][0][:70] if r["bloqueios"] else "?"))
@@ -297,7 +341,9 @@ def main(argv=None) -> int:
                      m["buracos_2d_pct"]))
 
     SAIDA.mkdir(parents=True, exist_ok=True)
-    (SAIDA / "ingestao_real.json").write_text(json.dumps({
+    destino_saida = Path(a.saida) if a.saida else SAIDA
+    destino_saida.mkdir(parents=True, exist_ok=True)
+    (destino_saida / "ingestao_real.json").write_text(json.dumps({
         "fase": 23, "colecao": "4D-Lung",
         "n_casos": len(regs), "n_elegiveis": len(elegiveis),
         "criterio_23_18": [

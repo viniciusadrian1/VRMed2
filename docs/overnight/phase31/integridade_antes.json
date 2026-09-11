@@ -1,0 +1,100 @@
+{
+ "manifesto_v1": {
+  "sha256_conteudo": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+  "intacto": true,
+  "split": {
+   "train": 10,
+   "validation": 6,
+   "test": 0
+  },
+  "sha256_bytes": "5e05e8997033a35cc1b8fe346895daf3d677ac3ff40949872f392e1c6cb549d7"
+ },
+ "VRMED-ESOFAGO-SNAPSHOT-V1.json": "398037723b9e6e86124f46b97f1c8967065ddf5a52d3069f1b8d7373b9701847",
+ "FASE24-POOL-16.json": "1a013531ad65b89275e8878ac6180cdbe0e376cb3d4d88c4433897fb519b11b9",
+ "FASE23-POOL-CANDIDATO.json": "585df2f77d65ad9daf6a51e94a38298d879c3f07a6de789e25398ddc54af232a",
+ "treino": {
+  "26b/fold_0": {
+   "epocas": 250,
+   "pth": {
+    "checkpoint_best.pth": [
+     245809494,
+     1788785163
+    ],
+    "checkpoint_final.pth": [
+     245830192,
+     1788793750
+    ]
+   }
+  },
+  "26b/fold_1": {
+   "epocas": 250,
+   "pth": {
+    "checkpoint_best.pth": [
+     245817430,
+     1788823200
+    ],
+    "checkpoint_final.pth": [
+     245830256,
+     1788828479
+    ]
+   }
+  },
+  "26b/fold_2": {
+   "epocas": 250,
+   "pth": {
+    "checkpoint_best.pth": [
+     245816150,
+     1788857541
+    ],
+    "checkpoint_final.pth": [
+     245830256,
+     1788863373
+    ]
+   }
+  },
+  "26b/fold_3": {
+   "epocas": 250,
+   "pth": {
+    "checkpoint_best.pth": [
+     245811798,
+     1788890482
+    ],
+    "checkpoint_final.pth": [
+     245830192,
+     1788898016
+    ]
+   }
+  },
+  "26b/fold_4": {
+   "epocas": 250,
+   "pth": {
+    "checkpoint_best.pth": [
+     245776214,
+     1788909905
+    ],
+    "checkpoint_final.pth": [
+     245830512,
+     1788932329
+    ]
+   }
+  },
+  "26/fold_0": {
+   "epocas": 64,
+   "pth": {
+    "checkpoint_best.pth": [
+     245765782,
+     1788756127
+    ],
+    "checkpoint_latest.pth": [
+     245764234,
+     1788755284
+    ]
+   }
+  }
+ },
+ "predicoes": {
+  "checkpoint_best": 6,
+  "checkpoint_final": 6
+ },
+ "git_head": "b3085baeea412c2199f14ff278c93cee046924c3"
+}
