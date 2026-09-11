@@ -466,3 +466,51 @@ e não sobreajuste progressivo.
 
 **Testes:** 99/99 nos arquivos + 215/215 nos autotestes. Varredura: 0 violações.
 TEST continua **0**; manifesto, snapshot e split **intactos**.
+
+---
+
+## Fase 28 — descoberta de TEST independente (2026-09-10)
+
+**NENHUM CANDIDATO FORTE. A = 0. TEST continua 0.** Nada baixado, nada treinado.
+
+**50 fichas** pesquisadas em 6 frentes → **33 datasets distintos** → 8 análises adversariais.
+**A=0 · B=2 · C=3 · D=18 · E=10.**
+
+### O achado estrutural
+
+O baseline do projeto é **TotalSegmentator 2.18.0 (pesos v2)**. Boa parte da "evidência de
+independência" que a pesquisa produziu se apoia no artigo do **v1** (1204 exames do PACS de
+Basel) — **versão errada**, e para a v2 não há lista de treino por caso.
+
+Pior: o suplemento do TotalSegmentator declara que **BTCV (Task 17) e SegTHOR (Task 55)** foram
+usados como modelos pré-treinados para gerar a **primeira** segmentação do treino. O rótulo de
+esôfago do baseline **descende de SegTHOR** — **dependência de anotação**, invisível a qualquer
+sonda de `PatientID`/`StudyUID`/`SeriesUID`/`sha256`, porque não há imagem em comum.
+
+**Consequência:** o eixo independência fica INCONCLUSIVO para **todo** candidato, o que sozinho
+limita todos a B.
+
+### Melhor candidato: StructSeg 2019 · Task 3 (B)
+
+Único com esôfago em CT torácica e anotação por 1 oncologista + verificação por um 2º, com
+disjunção institucional positiva. Pendências: **licença sem texto publicado**, **protocolo de
+contorno não declarado**, site do desafio *"under repair"*. Segundo: **Pediatric-CT-SEG** (CC BY
+4.0, RTSTRUCT, humana manual, download direto) — barrado por população **pediátrica** e
+ontologia UNKNOWN.
+
+### Desacordo entre céticos, resolvido
+
+Um cético recomendou **A para o LCTSC**. Errado: o LCTSC já é *"validação — já em uso"*, a
+Fase 16 **bane literalmente** a frase *"O LCTSC é conjunto de teste independente"*, e a
+"evidência positiva" dele era sobre o TotalSegmentator **v1**. As correções factuais que ele
+trouxe ficam registradas; a proibição não se reverte por evidência.
+
+### Incidente de método
+
+A primeira síntese leu **10 das 50 fichas** porque eu truncei o JSON de entrada em 45 KB. Ela
+**detectou e declarou** o truncamento em vez de inventar linhas. As 50 foram recuperadas do
+journal e reclassificadas.
+
+**Testes:** 110/110 nos arquivos (11 novos) + 220/220 nos autotestes. A regra do status A virou
+**código**, com controle positivo (um candidato perfeito **tem de** poder ser A) e negativo
+(cada eixo quebrado sozinho **tem de** impedir). Varredura: 65 documentos, 0 violações.
