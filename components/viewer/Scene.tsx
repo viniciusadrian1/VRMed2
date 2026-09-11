@@ -109,27 +109,25 @@ function SceneInvalidator() {
 }
 
 /**
- * Cenário exclusivo da sessão VR: chão em grade e um anel sob o modelo.
+ * Cenário exclusivo da sessão VR: o chão em grade.
  *
  * Resolve o "tudo preto ao redor" — sem nenhuma referência espacial, o headset
  * mostra um vazio preto e fica impossível saber para onde olhar. A grade também
  * prova que a renderização está funcionando, separando "não renderiza" de
  * "o modelo não carregou". Usa geometria pura (nada de rede, nada de fonte).
+ *
+ * O anel que existia aqui marcava o centro da cena, onde o modelo ficava fixo.
+ * Agora o modelo nasce à frente de quem entra, em qualquer direção, e um anel
+ * no centro apontaria para o lugar errado.
  */
 function XRStage() {
   return (
     <>
       <hemisphereLight args={["#dfe9f2", "#1b2229", 1.1]} />
-      {/* Chão: referência espacial imediata ao entrar em VR. */}
       <gridHelper
         args={[24, 24, "#3d7ab0", "#243542"]}
         position={[0, FLOOR_Y, 0]}
       />
-      {/* Anel sob o modelo: mostra onde o órgão está, mesmo de costas. */}
-      <mesh position={[0, FLOOR_Y + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.05, 1.25, 48]} />
-        <meshBasicMaterial color="#5896c8" transparent opacity={0.55} />
-      </mesh>
     </>
   );
 }
@@ -152,12 +150,13 @@ function SceneContents() {
   return (
     <>
       {/*
-       * Em VR o usuário nasce 3 m atrás do modelo, olhando para ele: a sala é
-       * nossa e cabe. Em AR a sala é a de verdade — recuar 3 m colocaria a
-       * pessoa dentro da parede do estande. Por isso, em AR, a origem fica
-       * onde os pés já estão e é o ÓRGÃO que vem para perto (ver OrganModel).
+       * A origem é o chão sob os pés de quem entra: em AR o piso real (y=0),
+       * em VR o piso da grade. O modelo não fica mais num ponto fixo à espera
+       * de alguém — ele nasce à frente do olhar, no tamanho real (ver
+       * `EntradaXR`), e por isso não há mais por que afastar o usuário do
+       * centro da cena.
        */}
-      <XROrigin position={emAR ? [0, 0, 0] : [0, FLOOR_Y, 3]}>
+      <XROrigin position={emAR ? [0, 0, 0] : [0, FLOOR_Y, 0]}>
         <SairDoVR position={[-0.45, 1.25, -0.5]} />
       </XROrigin>
 

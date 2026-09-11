@@ -2,6 +2,7 @@
 // scene graph and composing node transforms. Flags models whose parts
 // are spread far apart (defective export).
 import { readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import * as THREE from "three";
 
 function load(file) {
@@ -23,7 +24,13 @@ function nodeMatrix(n) {
   );
 }
 
-for (const file of process.argv.slice(2)) {
+/**
+ * Caixa delimitadora de um GLB, nas unidades cruas do arquivo, em espaco de
+ * mundo (compondo as transformacoes dos nos). Exportada porque
+ * `conferir-escala-xr.mjs` precisa exatamente da mesma medida — duas copias
+ * dessa conta acabariam divergindo.
+ */
+export function medirGLB(file) {
   const j = load(file);
   const box = new THREE.Box3();
   const corner = new THREE.Vector3();
@@ -49,12 +56,23 @@ for (const file of process.argv.slice(2)) {
   for (const s of j.scenes ?? [])
     for (const idx of s.nodes ?? []) walk(idx, new THREE.Matrix4());
 
-  const size = box.getSize(new THREE.Vector3());
-  const max = Math.max(size.x, size.y, size.z);
-  const min = Math.min(size.x, size.y, size.z);
-  const ratio = min > 0 ? (max / min).toFixed(1) : "inf";
-  const name = file.split(/[/\\]/).pop();
-  console.log(
-    `${name.padEnd(26)} span ${size.toArray().map((v) => v.toFixed(1)).join(" x ")}  aspect ${ratio}`,
-  );
+  return box.getSize(new THREE.Vector3());
+}
+
+// Só roda a linha de comando quando este arquivo é o ponto de entrada;
+// importado por outro script, ele oferece apenas `medirGLB`.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  for (const file of process.argv.slice(2)) {
+    const size = medirGLB(file);
+    const max = Math.max(size.x, size.y, size.z);
+    const min = Math.min(size.x, size.y, size.z);
+    const ratio = min > 0 ? (max / min).toFixed(1) : "inf";
+    const name = file.split(/[/\\]/).pop();
+    console.log(
+      `${name.padEnd(26)} span ${size
+        .toArray()
+        .map((v) => v.toFixed(1))
+        .join(" x ")}  aspect ${ratio}`,
+    );
+  }
 }

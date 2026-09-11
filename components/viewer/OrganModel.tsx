@@ -35,30 +35,38 @@ type Availability = "checking" | "real" | "placeholder";
 
 /** Aplica camadas, cortes e wireframe ao modelo sempre que o estado muda. */
 /**
- * Pose PROVISÓRIA do órgão em AR, relativa aos pés do usuário.
+ * Pose PROVISÓRIA em sessão imersiva, relativa aos pés do usuário.
  *
  * Quem manda de verdade é o `EntradaXR`, que mede a cabeça no primeiro quadro
- * da sessão e recoloca o órgão à frente do olhar — sentado ou de pé. Esta
- * constante cobre os poucos quadros até o rastreio responder, e é o que fica
- * se ele nunca responder. Supõe alguém de pé, que é o caso comum; era a pose
- * fixa que existia antes, e sozinha ela deixava o órgão alto demais para quem
- * abrisse o modo sentado.
+ * e recoloca o modelo à frente do olhar — sentado ou de pé. Esta constante
+ * cobre os poucos quadros até o rastreio responder, e é o que fica se ele
+ * nunca responder.
  *
- * Em VR o modelo fica em tamanho de vitrine (~2 unidades ≈ 2 m) e a pessoa
- * recua 3 m para vê-lo inteiro. Em AR não há 3 m para recuar — o estande é
- * pequeno, e é essa a razão de existir este modo. Então o órgão vem para a
- * frente do peito, do tamanho de uma bola: perto o bastante para alcançar com
- * a mão, pequeno o bastante para a pessoa dar a volta nele sem esbarrar em
- * nada. A partir daí os controles (e as duas mãos) reposicionam e
- * redimensionam à vontade.
- *
- * Aplicado no PRÓPRIO root do modelo, e não num grupo-pai: `XRManipulation`
+ * Aplicada no PRÓPRIO root do modelo, e não num grupo-pai: `XRManipulation`
  * mistura posição de mundo com posição local, e um pai com transformação
  * quebraria o arrastar e o aproximar.
  */
-const AR_POSICAO: [number, number, number] = [0, 1.15, -0.75];
-/** ~2 unidades × 0,22 ≈ 44 cm de altura. */
-const AR_ESCALA = 0.22;
+const POSE_PROVISORIA: [number, number, number] = [0, 1.3, -0.8];
+
+/**
+ * Escala e altura do modelo em metros, a partir do tamanho real declarado.
+ *
+ * `normalizeContent` deixa todo modelo com o MAIOR eixo medindo exatamente 2
+ * unidades. Então a escala que devolve o tamanho real é `real / 2`, e a altura
+ * sai do eixo Y da caixa já normalizada.
+ *
+ * Fora de AR/VR nada disso se aplica: numa tela plana o modelo ocupa a
+ * viewport, que é o comportamento certo, e "tamanho real" não quer dizer nada.
+ * Sem tamanho declarado, cai no comportamento antigo (escala 1).
+ */
+function escalaReal(
+  tamanhoRealCm: number | undefined,
+  bounds: { size: [number, number, number] } | null,
+): { escala: number; alturaReal: number } | null {
+  if (!tamanhoRealCm || !bounds) return null;
+  const escala = tamanhoRealCm / 100 / 2;
+  return { escala, alturaReal: bounds.size[1] * escala };
+}
 
 function ModelStateApplier({
   rootRef,
@@ -105,8 +113,11 @@ export function OrganModel() {
   const invalidate = useThree((s) => s.invalidate);
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
-  const emAR = modo === "immersive-ar";
   const organ = getOrganById(organId);
+  const modelBounds = useVRMedStore((s) => s.modelBounds);
+  // Em AR e VR o metro é real; na tela plana, não. Só dentro da sessão o
+  // modelo sai da normalização e passa a ter o tamanho que a estrutura tem.
+  const real = inSession ? escalaReal(organ?.tamanhoRealCm, modelBounds) : null;
 
   const rootRef = useRef<THREE.Group>(null);
   const contentRef = useRef<THREE.Group>(null);
@@ -238,8 +249,8 @@ export function OrganModel() {
     <>
       <group
         ref={rootRef}
-        position={emAR ? AR_POSICAO : [0, 0, 0]}
-        scale={emAR ? AR_ESCALA : 1}
+        position={inSession ? POSE_PROVISORIA : [0, 0, 0]}
+        scale={real ? real.escala : 1}
         onClick={handleModelClick}
         onPointerOver={(event) => {
           event.stopPropagation();
@@ -284,7 +295,11 @@ export function OrganModel() {
        * o reset devolveria o órgão à pose do OUTRO modo.
        */}
       {inSession && modelReady && (
-        <EntradaXR key={modo} modo={modo} target={rootRef} />
+        <EntradaXR
+          key={modo}
+          target={rootRef}
+          alturaReal={real ? real.alturaReal : 0}
+        />
       )}
 
       {!inSession && transformMode !== "none" && modelReady && rootRef.current && (
