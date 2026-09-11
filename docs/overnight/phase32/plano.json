@@ -1,0 +1,1117 @@
+{
+ "fase": 32,
+ "config": "3d_fullres",
+ "plano_v2": {
+  "data_identifier": "nnUNetPlans_3d_fullres",
+  "preprocessor_name": "DefaultPreprocessor",
+  "batch_size": 2,
+  "patch_size": [
+   56,
+   192,
+   192
+  ],
+  "median_image_size_in_voxels": [
+   160.0,
+   512.0,
+   512.0
+  ],
+  "spacing": [
+   2.5,
+   0.9765625,
+   0.9765625
+  ],
+  "normalization_schemes": [
+   "CTNormalization"
+  ],
+  "use_mask_for_norm": [
+   false
+  ],
+  "resampling_fn_data": "resample_data_or_seg_to_shape",
+  "resampling_fn_seg": "resample_data_or_seg_to_shape",
+  "resampling_fn_data_kwargs": {
+   "is_seg": false,
+   "order": 3,
+   "order_z": 0,
+   "force_separate_z": null
+  },
+  "resampling_fn_seg_kwargs": {
+   "is_seg": true,
+   "order": 1,
+   "order_z": 0,
+   "force_separate_z": null
+  },
+  "resampling_fn_probabilities": "resample_data_or_seg_to_shape",
+  "resampling_fn_probabilities_kwargs": {
+   "is_seg": false,
+   "order": 1,
+   "order_z": 0,
+   "force_separate_z": null
+  },
+  "architecture": {
+   "network_class_name": "dynamic_network_architectures.architectures.unet.PlainConvUNet",
+   "arch_kwargs": {
+    "n_stages": 6,
+    "features_per_stage": [
+     32,
+     64,
+     128,
+     256,
+     320,
+     320
+    ],
+    "conv_op": "torch.nn.modules.conv.Conv3d",
+    "kernel_sizes": [
+     [
+      1,
+      3,
+      3
+     ],
+     [
+      3,
+      3,
+      3
+     ],
+     [
+      3,
+      3,
+      3
+     ],
+     [
+      3,
+      3,
+      3
+     ],
+     [
+      3,
+      3,
+      3
+     ],
+     [
+      3,
+      3,
+      3
+     ]
+    ],
+    "strides": [
+     [
+      1,
+      1,
+      1
+     ],
+     [
+      1,
+      2,
+      2
+     ],
+     [
+      2,
+      2,
+      2
+     ],
+     [
+      2,
+      2,
+      2
+     ],
+     [
+      2,
+      2,
+      2
+     ],
+     [
+      1,
+      2,
+      2
+     ]
+    ],
+    "n_conv_per_stage": [
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "n_conv_per_stage_decoder": [
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "conv_bias": true,
+    "norm_op": "torch.nn.modules.instancenorm.InstanceNorm3d",
+    "norm_op_kwargs": {
+     "eps": 1e-05,
+     "affine": true
+    },
+    "dropout_op": null,
+    "dropout_op_kwargs": null,
+    "nonlin": "torch.nn.LeakyReLU",
+    "nonlin_kwargs": {
+     "inplace": true
+    }
+   },
+   "_kw_requires_import": [
+    "conv_op",
+    "norm_op",
+    "dropout_op",
+    "nonlin"
+   ]
+  },
+  "batch_dice": true
+ },
+ "comparacao": [
+  {
+   "campo": "dataset_name",
+   "f26b": "Dataset501_VRmedEsofago",
+   "v2": "Dataset502_VRmedEsofagoV2",
+   "mudou": true
+  },
+  {
+   "campo": "experiment_planner",
+   "f26b": "ExperimentPlanner",
+   "v2": "ExperimentPlanner",
+   "mudou": false
+  },
+  {
+   "campo": "mediana_spacing_original",
+   "f26b": [
+    3.0,
+    0.9765999913215637,
+    0.9765999913215637
+   ],
+   "v2": [
+    3.0,
+    0.9765625,
+    0.9765625
+   ],
+   "mudou": true
+  },
+  {
+   "campo": "mediana_shape_original",
+   "f26b": [
+    116,
+    512,
+    512
+   ],
+   "v2": [
+    144,
+    512,
+    512
+   ],
+   "mudou": true
+  },
+  {
+   "campo": "data_identifier",
+   "f26b": "nnUNetPlans_3d_fullres",
+   "v2": "nnUNetPlans_3d_fullres",
+   "mudou": false
+  },
+  {
+   "campo": "preprocessor_name",
+   "f26b": "DefaultPreprocessor",
+   "v2": "DefaultPreprocessor",
+   "mudou": false
+  },
+  {
+   "campo": "batch_size",
+   "f26b": 2,
+   "v2": 2,
+   "mudou": false
+  },
+  {
+   "campo": "patch_size",
+   "f26b": [
+    48,
+    224,
+    192
+   ],
+   "v2": [
+    56,
+    192,
+    192
+   ],
+   "mudou": true
+  },
+  {
+   "campo": "median_image_size_in_voxels",
+   "f26b": [
+    116.0,
+    512.0,
+    512.0
+   ],
+   "v2": [
+    160.0,
+    512.0,
+    512.0
+   ],
+   "mudou": true
+  },
+  {
+   "campo": "spacing",
+   "f26b": [
+    3.0,
+    0.9765999913215637,
+    0.9765999913215637
+   ],
+   "v2": [
+    2.5,
+    0.9765625,
+    0.9765625
+   ],
+   "mudou": true
+  },
+  {
+   "campo": "normalization_schemes",
+   "f26b": [
+    "CTNormalization"
+   ],
+   "v2": [
+    "CTNormalization"
+   ],
+   "mudou": false
+  },
+  {
+   "campo": "use_mask_for_norm",
+   "f26b": [
+    false
+   ],
+   "v2": [
+    false
+   ],
+   "mudou": false
+  },
+  {
+   "campo": "batch_dice",
+   "f26b": true,
+   "v2": true,
+   "mudou": false
+  },
+  {
+   "campo": "network_class",
+   "f26b": "dynamic_network_architectures.architectures.unet.PlainConvUNet",
+   "v2": "dynamic_network_architectures.architectures.unet.PlainConvUNet",
+   "mudou": false
+  },
+  {
+   "campo": "arch.n_stages",
+   "f26b": 6,
+   "v2": 6,
+   "mudou": false
+  },
+  {
+   "campo": "arch.features_per_stage",
+   "f26b": [
+    32,
+    64,
+    128,
+    256,
+    320,
+    320
+   ],
+   "v2": [
+    32,
+    64,
+    128,
+    256,
+    320,
+    320
+   ],
+   "mudou": false
+  },
+  {
+   "campo": "arch.conv_op",
+   "f26b": "torch.nn.modules.conv.Conv3d",
+   "v2": "torch.nn.modules.conv.Conv3d",
+   "mudou": false
+  },
+  {
+   "campo": "arch.kernel_sizes",
+   "f26b": [
+    [
+     1,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ]
+   ],
+   "v2": [
+    [
+     1,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ],
+    [
+     3,
+     3,
+     3
+    ]
+   ],
+   "mudou": false
+  },
+  {
+   "campo": "arch.strides",
+   "f26b": [
+    [
+     1,
+     1,
+     1
+    ],
+    [
+     1,
+     2,
+     2
+    ],
+    [
+     2,
+     2,
+     2
+    ],
+    [
+     2,
+     2,
+     2
+    ],
+    [
+     2,
+     2,
+     2
+    ],
+    [
+     1,
+     2,
+     2
+    ]
+   ],
+   "v2": [
+    [
+     1,
+     1,
+     1
+    ],
+    [
+     1,
+     2,
+     2
+    ],
+    [
+     2,
+     2,
+     2
+    ],
+    [
+     2,
+     2,
+     2
+    ],
+    [
+     2,
+     2,
+     2
+    ],
+    [
+     1,
+     2,
+     2
+    ]
+   ],
+   "mudou": false
+  },
+  {
+   "campo": "arch.n_conv_per_stage",
+   "f26b": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ],
+   "v2": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ],
+   "mudou": false
+  },
+  {
+   "campo": "arch.n_conv_per_stage_decoder",
+   "f26b": [
+    2,
+    2,
+    2,
+    2,
+    2
+   ],
+   "v2": [
+    2,
+    2,
+    2,
+    2,
+    2
+   ],
+   "mudou": false
+  },
+  {
+   "campo": "arch.norm_op",
+   "f26b": "torch.nn.modules.instancenorm.InstanceNorm3d",
+   "v2": "torch.nn.modules.instancenorm.InstanceNorm3d",
+   "mudou": false
+  },
+  {
+   "campo": "arch.nonlin",
+   "f26b": "torch.nn.LeakyReLU",
+   "v2": "torch.nn.LeakyReLU",
+   "mudou": false
+  }
+ ],
+ "custo_por_patch": {
+  "f26b": {
+   "patch_size": [
+    48,
+    224,
+    192
+   ],
+   "voxels_por_patch": 2064384,
+   "batch_size": 2,
+   "parametros": 30703498,
+   "mapa_ativacao": 554143968.0,
+   "macs_por_patch": 614503766016
+  },
+  "v2": {
+   "patch_size": [
+    56,
+    192,
+    192
+   ],
+   "voxels_por_patch": 2064384,
+   "batch_size": 2,
+   "parametros": 30703498,
+   "mapa_ativacao": 554143968.0,
+   "macs_por_patch": 614503766016
+  },
+  "identico_por_iteracao": true,
+  "razao_macs_v2_sobre_26b": 1.0
+ },
+ "tempo_medido_26b": {
+  "por_fold": {
+   "fold_0": {
+    "n_epocas": 250,
+    "media_s": 138.5,
+    "soma_h": 9.618,
+    "parede_h": 9.704,
+    "fora_das_epocas_s": 307.1
+   },
+   "fold_1": {
+    "n_epocas": 250,
+    "media_s": 137.67,
+    "soma_h": 9.56,
+    "parede_h": 9.651,
+    "fora_das_epocas_s": 325.3
+   },
+   "fold_2": {
+    "n_epocas": 250,
+    "media_s": 138.25,
+    "soma_h": 9.6,
+    "parede_h": 9.68,
+    "fora_das_epocas_s": 285.7
+   },
+   "fold_3": {
+    "n_epocas": 250,
+    "media_s": 137.37,
+    "soma_h": 9.54,
+    "parede_h": 9.625,
+    "fora_das_epocas_s": 306.3
+   },
+   "fold_4": {
+    "n_epocas": 250,
+    "media_s": 136.0,
+    "soma_h": 9.445,
+    "parede_h": 9.533,
+    "fora_das_epocas_s": 319.4
+   }
+  },
+  "media_s_por_epoca": 137.56,
+  "min_s": 136.0,
+  "max_s": 138.5,
+  "soma_h_5_folds": 47.76
+ },
+ "custo_250": {
+  "epocas": 250,
+  "s_por_epoca_estimado": 137.56,
+  "h_por_fold": 9.55,
+  "h_5_folds": 47.76,
+  "dias_5_folds": 1.99,
+  "patches_vistos_por_fold": 125000
+ },
+ "custo_1000": {
+  "epocas": 1000,
+  "s_por_epoca_estimado": 137.56,
+  "h_por_fold": 38.21,
+  "h_5_folds": 191.06,
+  "dias_5_folds": 7.96,
+  "patches_vistos_por_fold": 500000
+ },
+ "folds": [
+  {
+   "train": [
+    "4DLUNG-102_HM10395",
+    "4DLUNG-105_HM10395",
+    "4DLUNG-108_HM10395",
+    "4DLUNG-109_HM10395",
+    "4DLUNG-110_HM10395",
+    "4DLUNG-111_HM10395",
+    "4DLUNG-114_HM10395",
+    "LCTSC-Test-S1-102",
+    "LCTSC-Test-S1-203",
+    "LCTSC-Test-S2-104",
+    "LCTSC-Test-S2-201",
+    "LCTSC-Test-S3-104",
+    "LCTSC-Train-S1-002",
+    "LCTSC-Train-S1-005",
+    "LCTSC-Train-S1-008",
+    "LCTSC-Train-S1-012",
+    "LCTSC-Train-S2-002",
+    "LCTSC-Train-S2-003",
+    "LCTSC-Train-S2-007",
+    "LCTSC-Train-S2-010",
+    "LCTSC-Train-S2-011",
+    "LCTSC-Train-S3-006",
+    "LCTSC-Train-S3-008",
+    "LCTSC-Train-S3-010",
+    "LCTSC-Train-S3-012"
+   ],
+   "val": [
+    "4DLUNG-100_HM10395",
+    "4DLUNG-106_HM10395",
+    "4DLUNG-112_HM10395",
+    "LCTSC-Test-S2-101",
+    "LCTSC-Test-S3-103",
+    "LCTSC-Train-S1-003",
+    "LCTSC-Train-S3-002"
+   ]
+  },
+  {
+   "train": [
+    "4DLUNG-100_HM10395",
+    "4DLUNG-102_HM10395",
+    "4DLUNG-105_HM10395",
+    "4DLUNG-106_HM10395",
+    "4DLUNG-108_HM10395",
+    "4DLUNG-109_HM10395",
+    "4DLUNG-112_HM10395",
+    "4DLUNG-114_HM10395",
+    "LCTSC-Test-S1-102",
+    "LCTSC-Test-S1-203",
+    "LCTSC-Test-S2-101",
+    "LCTSC-Test-S2-104",
+    "LCTSC-Test-S2-201",
+    "LCTSC-Test-S3-103",
+    "LCTSC-Test-S3-104",
+    "LCTSC-Train-S1-002",
+    "LCTSC-Train-S1-003",
+    "LCTSC-Train-S1-005",
+    "LCTSC-Train-S2-002",
+    "LCTSC-Train-S2-011",
+    "LCTSC-Train-S3-002",
+    "LCTSC-Train-S3-006",
+    "LCTSC-Train-S3-008",
+    "LCTSC-Train-S3-010",
+    "LCTSC-Train-S3-012"
+   ],
+   "val": [
+    "4DLUNG-110_HM10395",
+    "4DLUNG-111_HM10395",
+    "LCTSC-Train-S1-008",
+    "LCTSC-Train-S1-012",
+    "LCTSC-Train-S2-003",
+    "LCTSC-Train-S2-007",
+    "LCTSC-Train-S2-010"
+   ]
+  },
+  {
+   "train": [
+    "4DLUNG-100_HM10395",
+    "4DLUNG-102_HM10395",
+    "4DLUNG-105_HM10395",
+    "4DLUNG-106_HM10395",
+    "4DLUNG-108_HM10395",
+    "4DLUNG-109_HM10395",
+    "4DLUNG-110_HM10395",
+    "4DLUNG-111_HM10395",
+    "4DLUNG-112_HM10395",
+    "4DLUNG-114_HM10395",
+    "LCTSC-Test-S2-101",
+    "LCTSC-Test-S2-201",
+    "LCTSC-Test-S3-103",
+    "LCTSC-Train-S1-002",
+    "LCTSC-Train-S1-003",
+    "LCTSC-Train-S1-008",
+    "LCTSC-Train-S1-012",
+    "LCTSC-Train-S2-002",
+    "LCTSC-Train-S2-003",
+    "LCTSC-Train-S2-007",
+    "LCTSC-Train-S2-010",
+    "LCTSC-Train-S3-002",
+    "LCTSC-Train-S3-006",
+    "LCTSC-Train-S3-008",
+    "LCTSC-Train-S3-010",
+    "LCTSC-Train-S3-012"
+   ],
+   "val": [
+    "LCTSC-Test-S1-102",
+    "LCTSC-Test-S1-203",
+    "LCTSC-Test-S2-104",
+    "LCTSC-Test-S3-104",
+    "LCTSC-Train-S1-005",
+    "LCTSC-Train-S2-011"
+   ]
+  },
+  {
+   "train": [
+    "4DLUNG-100_HM10395",
+    "4DLUNG-102_HM10395",
+    "4DLUNG-105_HM10395",
+    "4DLUNG-106_HM10395",
+    "4DLUNG-108_HM10395",
+    "4DLUNG-109_HM10395",
+    "4DLUNG-110_HM10395",
+    "4DLUNG-111_HM10395",
+    "4DLUNG-112_HM10395",
+    "4DLUNG-114_HM10395",
+    "LCTSC-Test-S1-102",
+    "LCTSC-Test-S1-203",
+    "LCTSC-Test-S2-101",
+    "LCTSC-Test-S2-104",
+    "LCTSC-Test-S3-103",
+    "LCTSC-Test-S3-104",
+    "LCTSC-Train-S1-003",
+    "LCTSC-Train-S1-005",
+    "LCTSC-Train-S1-008",
+    "LCTSC-Train-S1-012",
+    "LCTSC-Train-S2-003",
+    "LCTSC-Train-S2-007",
+    "LCTSC-Train-S2-010",
+    "LCTSC-Train-S2-011",
+    "LCTSC-Train-S3-002",
+    "LCTSC-Train-S3-008"
+   ],
+   "val": [
+    "LCTSC-Test-S2-201",
+    "LCTSC-Train-S1-002",
+    "LCTSC-Train-S2-002",
+    "LCTSC-Train-S3-006",
+    "LCTSC-Train-S3-010",
+    "LCTSC-Train-S3-012"
+   ]
+  },
+  {
+   "train": [
+    "4DLUNG-100_HM10395",
+    "4DLUNG-106_HM10395",
+    "4DLUNG-110_HM10395",
+    "4DLUNG-111_HM10395",
+    "4DLUNG-112_HM10395",
+    "LCTSC-Test-S1-102",
+    "LCTSC-Test-S1-203",
+    "LCTSC-Test-S2-101",
+    "LCTSC-Test-S2-104",
+    "LCTSC-Test-S2-201",
+    "LCTSC-Test-S3-103",
+    "LCTSC-Test-S3-104",
+    "LCTSC-Train-S1-002",
+    "LCTSC-Train-S1-003",
+    "LCTSC-Train-S1-005",
+    "LCTSC-Train-S1-008",
+    "LCTSC-Train-S1-012",
+    "LCTSC-Train-S2-002",
+    "LCTSC-Train-S2-003",
+    "LCTSC-Train-S2-007",
+    "LCTSC-Train-S2-010",
+    "LCTSC-Train-S2-011",
+    "LCTSC-Train-S3-002",
+    "LCTSC-Train-S3-006",
+    "LCTSC-Train-S3-010",
+    "LCTSC-Train-S3-012"
+   ],
+   "val": [
+    "4DLUNG-102_HM10395",
+    "4DLUNG-105_HM10395",
+    "4DLUNG-108_HM10395",
+    "4DLUNG-109_HM10395",
+    "4DLUNG-114_HM10395",
+    "LCTSC-Train-S3-008"
+   ]
+  }
+ ],
+ "auditoria_folds": {
+  "linhas": [
+   {
+    "fold": 0,
+    "n_train": 25,
+    "n_val": 7,
+    "fontes_train": {
+     "4D-Lung (TCIA)": 7,
+     "LCTSC (TCIA)": 18
+    },
+    "fontes_val": {
+     "4D-Lung (TCIA)": 3,
+     "LCTSC (TCIA)": 4
+    },
+    "institution_val": {
+     "UNKNOWN": 7
+    },
+    "spacing_z_val": {
+     "3.0": 5,
+     "2.5": 2
+    },
+    "val": [
+     "4DLUNG-100_HM10395",
+     "4DLUNG-106_HM10395",
+     "4DLUNG-112_HM10395",
+     "LCTSC-Test-S2-101",
+     "LCTSC-Test-S3-103",
+     "LCTSC-Train-S1-003",
+     "LCTSC-Train-S3-002"
+    ]
+   },
+   {
+    "fold": 1,
+    "n_train": 25,
+    "n_val": 7,
+    "fontes_train": {
+     "4D-Lung (TCIA)": 8,
+     "LCTSC (TCIA)": 17
+    },
+    "fontes_val": {
+     "4D-Lung (TCIA)": 2,
+     "LCTSC (TCIA)": 5
+    },
+    "institution_val": {
+     "UNKNOWN": 7
+    },
+    "spacing_z_val": {
+     "3.0": 4,
+     "2.5": 3
+    },
+    "val": [
+     "4DLUNG-110_HM10395",
+     "4DLUNG-111_HM10395",
+     "LCTSC-Train-S1-008",
+     "LCTSC-Train-S1-012",
+     "LCTSC-Train-S2-003",
+     "LCTSC-Train-S2-007",
+     "LCTSC-Train-S2-010"
+    ]
+   },
+   {
+    "fold": 2,
+    "n_train": 26,
+    "n_val": 6,
+    "fontes_train": {
+     "4D-Lung (TCIA)": 10,
+     "LCTSC (TCIA)": 16
+    },
+    "fontes_val": {
+     "LCTSC (TCIA)": 6
+    },
+    "institution_val": {
+     "UNKNOWN": 6
+    },
+    "spacing_z_val": {
+     "3.0": 3,
+     "2.5": 3
+    },
+    "val": [
+     "LCTSC-Test-S1-102",
+     "LCTSC-Test-S1-203",
+     "LCTSC-Test-S2-104",
+     "LCTSC-Test-S3-104",
+     "LCTSC-Train-S1-005",
+     "LCTSC-Train-S2-011"
+    ]
+   },
+   {
+    "fold": 3,
+    "n_train": 26,
+    "n_val": 6,
+    "fontes_train": {
+     "4D-Lung (TCIA)": 10,
+     "LCTSC (TCIA)": 16
+    },
+    "fontes_val": {
+     "LCTSC (TCIA)": 6
+    },
+    "institution_val": {
+     "UNKNOWN": 6
+    },
+    "spacing_z_val": {
+     "2.5": 2,
+     "3.0": 3,
+     "1.25": 1
+    },
+    "val": [
+     "LCTSC-Test-S2-201",
+     "LCTSC-Train-S1-002",
+     "LCTSC-Train-S2-002",
+     "LCTSC-Train-S3-006",
+     "LCTSC-Train-S3-010",
+     "LCTSC-Train-S3-012"
+    ]
+   },
+   {
+    "fold": 4,
+    "n_train": 26,
+    "n_val": 6,
+    "fontes_train": {
+     "4D-Lung (TCIA)": 5,
+     "LCTSC (TCIA)": 21
+    },
+    "fontes_val": {
+     "4D-Lung (TCIA)": 5,
+     "LCTSC (TCIA)": 1
+    },
+    "institution_val": {
+     "UNKNOWN": 6
+    },
+    "spacing_z_val": {
+     "3.0": 5,
+     "2.0": 1
+    },
+    "val": [
+     "4DLUNG-102_HM10395",
+     "4DLUNG-105_HM10395",
+     "4DLUNG-108_HM10395",
+     "4DLUNG-109_HM10395",
+     "4DLUNG-114_HM10395",
+     "LCTSC-Train-S3-008"
+    ]
+   }
+  ],
+  "problemas": [],
+  "todos_os_folds_com_duas_fontes_na_val": false,
+  "folds_com_uma_fonte_so_na_val": [
+   2,
+   3
+  ],
+  "n_casos_cobertos": 32,
+  "ok": true
+ },
+ "viabilidade": {
+  "gpu": "NVIDIA GeForce RTX 4060 Ti",
+  "vram_mib": 16379,
+  "vram_livre_mib_agora": 15221,
+  "ram_gb": 34.2,
+  "ram_livre_gb": 19.7,
+  "disco_livre_gb": 103.4,
+  "mapa_ativacao_igual_ao_26b": true,
+  "precedente": "o mesmo orcamento de patch, batch e arquitetura ja treinou 5 folds nesta placa na Fase 26B"
+ },
+ "decomposicao_dispersao": {
+  "disponivel": true,
+  "n_folds": 5,
+  "casos_por_fold": 2,
+  "dice_por_fold": [
+   0.7613,
+   0.6009,
+   0.7672,
+   0.7706,
+   0.6042
+  ],
+  "dp_entre_folds": 0.0898,
+  "dp_caso_a_caso_dentro": 0.1443,
+  "F": 0.774,
+  "p": 0.5861,
+  "componente_entre_folds": -0.002349,
+  "efeito_de_fold_detectavel": false,
+  "dp_esperado_so_por_amostragem": {
+   "com_2_casos": 0.102,
+   "com_6_casos": 0.0589,
+   "com_7_casos": 0.0545
+  }
+ },
+ "teto_por_reamostragem": {
+  "disponivel": true,
+  "spacing_alvo": [
+   2.5,
+   0.9765625,
+   0.9765625
+  ],
+  "linhas": [
+   {
+    "case_id": "4DLUNG-101_HM10395",
+    "spacing_nativo_z": 3.0,
+    "forma_nativa": [
+     149,
+     512,
+     512
+    ],
+    "forma_no_alvo": [
+     179,
+     512,
+     512
+    ],
+    "dice_teto": 1.0,
+    "voxels_fg_original": 9086,
+    "voxels_fg_ida_e_volta": 9086
+   },
+   {
+    "case_id": "4DLUNG-103_HM10395",
+    "spacing_nativo_z": 3.0,
+    "forma_nativa": [
+     117,
+     512,
+     512
+    ],
+    "forma_no_alvo": [
+     140,
+     512,
+     512
+    ],
+    "dice_teto": 1.0,
+    "voxels_fg_original": 15525,
+    "voxels_fg_ida_e_volta": 15525
+   },
+   {
+    "case_id": "4DLUNG-104_HM10395",
+    "spacing_nativo_z": 3.0,
+    "forma_nativa": [
+     103,
+     512,
+     512
+    ],
+    "forma_no_alvo": [
+     124,
+     552,
+     552
+    ],
+    "dice_teto": 0.9935,
+    "voxels_fg_original": 10122,
+    "voxels_fg_ida_e_volta": 10025
+   },
+   {
+    "case_id": "4DLUNG-107_HM10395",
+    "spacing_nativo_z": 3.0,
+    "forma_nativa": [
+     82,
+     512,
+     512
+    ],
+    "forma_no_alvo": [
+     98,
+     512,
+     512
+    ],
+    "dice_teto": 1.0,
+    "voxels_fg_original": 9210,
+    "voxels_fg_ida_e_volta": 9210
+   },
+   {
+    "case_id": "4DLUNG-115_HM10395",
+    "spacing_nativo_z": 3.0,
+    "forma_nativa": [
+     104,
+     512,
+     512
+    ],
+    "forma_no_alvo": [
+     125,
+     512,
+     512
+    ],
+    "dice_teto": 1.0,
+    "voxels_fg_original": 11494,
+    "voxels_fg_ida_e_volta": 11494
+   },
+   {
+    "case_id": "4DLUNG-116_HM10395",
+    "spacing_nativo_z": 3.0,
+    "forma_nativa": [
+     118,
+     512,
+     512
+    ],
+    "forma_no_alvo": [
+     142,
+     512,
+     512
+    ],
+    "dice_teto": 1.0,
+    "voxels_fg_original": 10734,
+    "voxels_fg_ida_e_volta": 10734
+   }
+  ],
+  "dice_teto_media": 0.9989,
+  "dice_teto_min": 0.9935,
+  "dice_teto_max": 1.0,
+  "teto_no_26b": 1.0,
+  "motivo_teto_1_no_26b": "o spacing-alvo do 26B (3,0 mm em z) e o nativo dos 6 casos"
+ },
+ "disco": {
+  "v2_raw_gb": 1.08,
+  "v2_preprocessed_gb": 1.239,
+  "f26b_results_gb": 3.004,
+  "f26b_preprocessed_gb": 0.286
+ },
+ "armazenamento_previsto_gb": {
+  "resultados_5_folds": 3.004,
+  "motivo": "mesmo numero de parametros, mesmos 2 checkpoints por fold"
+ },
+ "constantes_do_trainer": {
+  "num_iterations_per_epoch": 250,
+  "num_val_iterations_per_epoch": 50,
+  "n_folds": 5,
+  "seed_do_split": 12345,
+  "semeia_torch_numpy_random": false,
+  "cudnn_deterministic": false,
+  "cudnn_benchmark": true
+ }
+}

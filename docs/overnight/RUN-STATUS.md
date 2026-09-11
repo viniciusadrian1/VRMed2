@@ -681,3 +681,55 @@ agora teste que exige que aquele arquivo continue com os **5** casos da Fase 23.
 **Testes:** 164/164 nos arquivos (22 novos) + 250/250 nos autotestes. Integridade antes ×
 depois: manifesto V1 (conteúdo **e** bytes), split, snapshot, pool16, épocas por fold,
 cada `.pth` e predições — **tudo inalterado**. Varredura: 68 documentos, 0 violações.
+
+---
+
+## Fase 32 — replanejamento pré-treino do POOL46-V2 (2026-09-11)
+
+**DECISÃO: PROTOCOLO A** — `nnUNetTrainer_250epochs`, 5 folds, `Dataset502_VRmedEsofagoV2`,
+`3d_fullres`, `checkpoint_final` primário e `checkpoint_best` secundário, sem parada
+antecipada e sem seleção pela partição `validation`. **Nenhum treino nesta fase.**
+
+O fundamento **não é o custo**: é a autorização nominal da Fase 26A §7 a esta linha
+experimental separada, que **não é o baseline**. O canônico de 1000 épocas continua
+pendente.
+
+### O plano do planner, e o que ele custa
+
+| campo | 26B | V2 | |
+|---|---|---|---|
+| patch | 48 × 224 × 192 | **56 × 192 × 192** | mudou |
+| voxels por patch | 2 064 384 | 2 064 384 | **idêntico** |
+| target spacing z | 3,0 | **2,5** | mudou |
+| batch, arquitetura, parâmetros | 2 · PlainConvUNet · 30 703 498 | **idênticos** | |
+| MACs por patch | 6,14504e11 | **6,14504e11** | **idêntico** |
+
+Plano gerado **duas vezes, byte a byte idêntico**. Custo: **138 ± 3 s/época** →
+**47–52 h** para 250 × 5 folds; **186–206 h** para 1000 × 5.
+
+### Três coisas derrubadas, duas delas minhas
+
+1. **O `dp = 0,0898` entre folds não mede instabilidade de treino.** ANOVA sobre os 10 Dice
+   *out-of-fold* do 26B: **F(4,5) = 0,774 · p = 0,586**, componente entre folds ≤ 0. O
+   endpoint "o dp cai com TRAIN=32?" foi **retirado**.
+2. **"Instituições: VCU → + MDACC, MSKCC, MAASTRO" é inferência de coleção, não fato de
+   caso.** `institution` é **UNKNOWN em 46/46**. A tabela da Fase 31 acima afirma sem essa
+   ressalva; a correção fica registrada, o documento histórico não é editado.
+3. **Os 206,8 h que bloquearam a Fase 26 vêm de duas épocas, uma delas o *warmup*.** Sobre
+   as 64 épocas do mesmo log: **140,42 s/época → ~195 h**. O bloqueio continua real.
+
+### Emenda ao pré-registro
+
+`docs/BASELINE-ESOPHAGUS-VRMED-V3.md`, `sha256` `387f48fa…e5548d16`, congelado antes do
+primeiro `nnUNetv2_train`. **Era devida na Fase 31** — a cláusula da V1 protege *"o split,
+em qualquer partição"* e a Fase 31 mudou 10/6/0 para 32/14/0 sem consultá-la. **Quarta
+ocorrência do padrão "regra que só existe em prosa".** A resposta é a mesma das outras
+três: as duas listas de fontes viraram código, e `test_28` as cobra.
+
+**Testes:** 194/194 nos arquivos (30 novos) · 366/366 nos autotestes · 71 documentos, 0
+violações. Integridade antes × depois em 200 arquivos e 4,48 GB, incluindo os 12 `.pth`
+inteiros: **0 divergências**.
+
+**Próximo:** Fase 33 — TREINO, começando pelo passo zero de 15 min
+(`nnUNetTrainerBenchmark_5epochs` + `nvidia-smi`) que mede s/época e pico de VRAM no
+`Dataset502`, duas grandezas que hoje são inferência.

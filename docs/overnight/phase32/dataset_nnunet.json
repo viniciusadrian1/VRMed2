@@ -1,0 +1,758 @@
+{
+ "perfil": "VRMED-ESOPHAGUS-POOL46-V2",
+ "dataset_id": 502,
+ "dataset_nome": "Dataset502_VRmedEsofagoV2",
+ "base": "C:\\Users\\vinic\\Downloads\\InnerVision\\vrmed\\.clinica-dados\\fase32",
+ "sha256_manifesto": "f4bd480e8f8046923a8990096d40832145fb405f1a84ca85e8f3be6e6d20f60b",
+ "n_treino": 32,
+ "n_holdout": 14,
+ "ids_treino": [
+  "4DLUNG-100_HM10395",
+  "4DLUNG-102_HM10395",
+  "4DLUNG-105_HM10395",
+  "4DLUNG-106_HM10395",
+  "4DLUNG-108_HM10395",
+  "4DLUNG-109_HM10395",
+  "4DLUNG-110_HM10395",
+  "4DLUNG-111_HM10395",
+  "4DLUNG-112_HM10395",
+  "4DLUNG-114_HM10395",
+  "LCTSC-Test-S1-102",
+  "LCTSC-Test-S1-203",
+  "LCTSC-Test-S2-101",
+  "LCTSC-Test-S2-104",
+  "LCTSC-Test-S2-201",
+  "LCTSC-Test-S3-103",
+  "LCTSC-Test-S3-104",
+  "LCTSC-Train-S1-002",
+  "LCTSC-Train-S1-003",
+  "LCTSC-Train-S1-005",
+  "LCTSC-Train-S1-008",
+  "LCTSC-Train-S1-012",
+  "LCTSC-Train-S2-002",
+  "LCTSC-Train-S2-003",
+  "LCTSC-Train-S2-007",
+  "LCTSC-Train-S2-010",
+  "LCTSC-Train-S2-011",
+  "LCTSC-Train-S3-002",
+  "LCTSC-Train-S3-006",
+  "LCTSC-Train-S3-008",
+  "LCTSC-Train-S3-010",
+  "LCTSC-Train-S3-012"
+ ],
+ "ids_holdout": [
+  "4DLUNG-101_HM10395",
+  "4DLUNG-103_HM10395",
+  "4DLUNG-104_HM10395",
+  "4DLUNG-107_HM10395",
+  "4DLUNG-115_HM10395",
+  "4DLUNG-116_HM10395",
+  "LCTSC-Test-S1-101",
+  "LCTSC-Train-S1-004",
+  "LCTSC-Train-S1-009",
+  "LCTSC-Train-S2-008",
+  "LCTSC-Train-S2-009",
+  "LCTSC-Train-S3-001",
+  "LCTSC-Train-S3-003",
+  "LCTSC-Train-S3-005"
+ ],
+ "intersecao_treino_holdout": [],
+ "conversoes": [
+  {
+   "case_id": "4DLUNG-100_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 16276,
+   "voxels_fg_destino": 16276,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-102_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 13463,
+   "voxels_fg_destino": 13463,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-105_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 6368,
+   "voxels_fg_destino": 6368,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-106_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 6791,
+   "voxels_fg_destino": 6791,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-108_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 10605,
+   "voxels_fg_destino": 10605,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-109_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 21212,
+   "voxels_fg_destino": 21212,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-110_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 17392,
+   "voxels_fg_destino": 17392,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-111_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 13239,
+   "voxels_fg_destino": 13239,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-112_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 9676,
+   "voxels_fg_destino": 9676,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-114_HM10395",
+   "destino": "treino",
+   "voxels_fg_origem": 12994,
+   "voxels_fg_destino": 12994,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S1-102",
+   "destino": "treino",
+   "voxels_fg_origem": 11251,
+   "voxels_fg_destino": 11251,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S1-203",
+   "destino": "treino",
+   "voxels_fg_origem": 15055,
+   "voxels_fg_destino": 15055,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S2-101",
+   "destino": "treino",
+   "voxels_fg_origem": 25552,
+   "voxels_fg_destino": 25552,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S2-104",
+   "destino": "treino",
+   "voxels_fg_origem": 16589,
+   "voxels_fg_destino": 16589,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S2-201",
+   "destino": "treino",
+   "voxels_fg_origem": 17230,
+   "voxels_fg_destino": 17230,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S3-103",
+   "destino": "treino",
+   "voxels_fg_origem": 9631,
+   "voxels_fg_destino": 9631,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S3-104",
+   "destino": "treino",
+   "voxels_fg_origem": 23597,
+   "voxels_fg_destino": 23597,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S1-002",
+   "destino": "treino",
+   "voxels_fg_origem": 8580,
+   "voxels_fg_destino": 8580,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S1-003",
+   "destino": "treino",
+   "voxels_fg_origem": 21649,
+   "voxels_fg_destino": 21649,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S1-005",
+   "destino": "treino",
+   "voxels_fg_origem": 9370,
+   "voxels_fg_destino": 9370,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S1-008",
+   "destino": "treino",
+   "voxels_fg_origem": 11600,
+   "voxels_fg_destino": 11600,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S1-012",
+   "destino": "treino",
+   "voxels_fg_origem": 13128,
+   "voxels_fg_destino": 13128,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S2-002",
+   "destino": "treino",
+   "voxels_fg_origem": 15087,
+   "voxels_fg_destino": 15087,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S2-003",
+   "destino": "treino",
+   "voxels_fg_origem": 21433,
+   "voxels_fg_destino": 21433,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S2-007",
+   "destino": "treino",
+   "voxels_fg_origem": 15784,
+   "voxels_fg_destino": 15784,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S2-010",
+   "destino": "treino",
+   "voxels_fg_origem": 13491,
+   "voxels_fg_destino": 13491,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S2-011",
+   "destino": "treino",
+   "voxels_fg_origem": 14695,
+   "voxels_fg_destino": 14695,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-002",
+   "destino": "treino",
+   "voxels_fg_origem": 23445,
+   "voxels_fg_destino": 23445,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-006",
+   "destino": "treino",
+   "voxels_fg_origem": 9984,
+   "voxels_fg_destino": 9984,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-008",
+   "destino": "treino",
+   "voxels_fg_origem": 25300,
+   "voxels_fg_destino": 25300,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-010",
+   "destino": "treino",
+   "voxels_fg_origem": 11136,
+   "voxels_fg_destino": 11136,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-012",
+   "destino": "treino",
+   "voxels_fg_origem": 24498,
+   "voxels_fg_destino": 24498,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-101_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 9086,
+   "voxels_fg_destino": 9086,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-103_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 15525,
+   "voxels_fg_destino": 15525,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-104_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 10122,
+   "voxels_fg_destino": 10122,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-107_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 9210,
+   "voxels_fg_destino": 9210,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-115_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 11494,
+   "voxels_fg_destino": 11494,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "4DLUNG-116_HM10395",
+   "destino": "holdout",
+   "voxels_fg_origem": 10734,
+   "voxels_fg_destino": 10734,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Test-S1-101",
+   "destino": "holdout",
+   "voxels_fg_origem": 9671,
+   "voxels_fg_destino": 9671,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S1-004",
+   "destino": "holdout",
+   "voxels_fg_origem": 15218,
+   "voxels_fg_destino": 15218,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S1-009",
+   "destino": "holdout",
+   "voxels_fg_origem": 17226,
+   "voxels_fg_destino": 17226,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S2-008",
+   "destino": "holdout",
+   "voxels_fg_origem": 24318,
+   "voxels_fg_destino": 24318,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S2-009",
+   "destino": "holdout",
+   "voxels_fg_origem": 16861,
+   "voxels_fg_destino": 16861,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-001",
+   "destino": "holdout",
+   "voxels_fg_origem": 11200,
+   "voxels_fg_destino": 11200,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-003",
+   "destino": "holdout",
+   "voxels_fg_origem": 24228,
+   "voxels_fg_destino": 24228,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  },
+  {
+   "case_id": "LCTSC-Train-S3-005",
+   "destino": "holdout",
+   "voxels_fg_origem": 11903,
+   "voxels_fg_destino": 11903,
+   "conjuntos_identicos": true,
+   "valores_destino": [
+    0,
+    1
+   ],
+   "dtype_destino": "uint8",
+   "shape_confere": true
+  }
+ ],
+ "escrito": true,
+ "dataset_json": {
+  "channel_names": {
+   "0": "CT"
+  },
+  "labels": {
+   "background": 0,
+   "esophagus": 1
+  },
+  "numTraining": 32,
+  "file_ending": ".nii.gz",
+  "overwrite_image_reader_writer": "SimpleITKIO",
+  "vrmed_dataset_version": "VRMED-ESOPHAGUS-POOL46-V2",
+  "vrmed_schema": "VRMED-ESOPHAGUS-DATASET-V1",
+  "vrmed_ontology": "ESOPHAGUS_ONTOLOGY_V1",
+  "vrmed_ontology_frozen_at": "2026-09-06",
+  "vrmed_split_rule": "VRMED-SPLIT-RULE-V2",
+  "vrmed_sha256_manifesto": "f4bd480e8f8046923a8990096d40832145fb405f1a84ca85e8f3be6e6d20f60b",
+  "vrmed_seed": 20260906,
+  "vrmed_source_dataset": "4D-Lung (TCIA) + LCTSC (TCIA)",
+  "vrmed_annotation_method_declared": "declarado POR CASO no manifesto (MANUAL, SEMIAUTOMATIC, VAZIO)",
+  "vrmed_nota": "imagesTr contem SOMENTE a particao train (32 casos). Os 14 casos da particao validation sao holdout e ficam fora desta arvore. TEST = 0 e nao existe. O alvo e mascara binaria preenchida; parede e lumen sao um objeto so; a extensao longitudinal e herdada do GT e nao e avaliavel anatomicamente.",
+  "vrmed_seed_nota": "vrmed_seed e carimbo de pre-registro, NAO controle de treinamento. O nnUNetTrainer 2.8.1 nao semeia torch, numpy nem random, e roda com cudnn.deterministic=False e cudnn.benchmark=True. O unico passo semeado e a divisao em 5 folds (generate_crossval_split, seed=12345 fixo no framework), e ela fica congelada em splits_final.json."
+ },
+ "imagesTr_em_disco": [
+  "4DLUNG-100_HM10395",
+  "4DLUNG-102_HM10395",
+  "4DLUNG-105_HM10395",
+  "4DLUNG-106_HM10395",
+  "4DLUNG-108_HM10395",
+  "4DLUNG-109_HM10395",
+  "4DLUNG-110_HM10395",
+  "4DLUNG-111_HM10395",
+  "4DLUNG-112_HM10395",
+  "4DLUNG-114_HM10395",
+  "LCTSC-Test-S1-102",
+  "LCTSC-Test-S1-203",
+  "LCTSC-Test-S2-101",
+  "LCTSC-Test-S2-104",
+  "LCTSC-Test-S2-201",
+  "LCTSC-Test-S3-103",
+  "LCTSC-Test-S3-104",
+  "LCTSC-Train-S1-002",
+  "LCTSC-Train-S1-003",
+  "LCTSC-Train-S1-005",
+  "LCTSC-Train-S1-008",
+  "LCTSC-Train-S1-012",
+  "LCTSC-Train-S2-002",
+  "LCTSC-Train-S2-003",
+  "LCTSC-Train-S2-007",
+  "LCTSC-Train-S2-010",
+  "LCTSC-Train-S2-011",
+  "LCTSC-Train-S3-002",
+  "LCTSC-Train-S3-006",
+  "LCTSC-Train-S3-008",
+  "LCTSC-Train-S3-010",
+  "LCTSC-Train-S3-012"
+ ],
+ "labelsTr_em_disco": [
+  "4DLUNG-100_HM10395",
+  "4DLUNG-102_HM10395",
+  "4DLUNG-105_HM10395",
+  "4DLUNG-106_HM10395",
+  "4DLUNG-108_HM10395",
+  "4DLUNG-109_HM10395",
+  "4DLUNG-110_HM10395",
+  "4DLUNG-111_HM10395",
+  "4DLUNG-112_HM10395",
+  "4DLUNG-114_HM10395",
+  "LCTSC-Test-S1-102",
+  "LCTSC-Test-S1-203",
+  "LCTSC-Test-S2-101",
+  "LCTSC-Test-S2-104",
+  "LCTSC-Test-S2-201",
+  "LCTSC-Test-S3-103",
+  "LCTSC-Test-S3-104",
+  "LCTSC-Train-S1-002",
+  "LCTSC-Train-S1-003",
+  "LCTSC-Train-S1-005",
+  "LCTSC-Train-S1-008",
+  "LCTSC-Train-S1-012",
+  "LCTSC-Train-S2-002",
+  "LCTSC-Train-S2-003",
+  "LCTSC-Train-S2-007",
+  "LCTSC-Train-S2-010",
+  "LCTSC-Train-S2-011",
+  "LCTSC-Train-S3-002",
+  "LCTSC-Train-S3-006",
+  "LCTSC-Train-S3-008",
+  "LCTSC-Train-S3-010",
+  "LCTSC-Train-S3-012"
+ ],
+ "imagesTr_confere": true,
+ "pareamento_imagem_rotulo": true,
+ "holdout_fora_de_imagesTr": true,
+ "conversoes_todas_identicas": true,
+ "originais_intactos": true,
+ "n_originais_conferidos": 92
+}

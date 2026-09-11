@@ -1,0 +1,361 @@
+{
+ "alvos": {
+  "v1_manifesto": {
+   "caminho": "docs/VRMED-ESOFAGO-MANIFESTO-V1.jsonl",
+   "existe": true,
+   "bytes": 22108,
+   "sha256": "5e05e8997033a35cc1b8fe346895daf3d677ac3ff40949872f392e1c6cb549d7",
+   "n_casos": 16,
+   "sha256_canonico": "9388c7368cc0807b0629bcb18dd00be7cc6e61cb6d10f2181674afa582632192",
+   "split": {
+    "train": 10,
+    "validation": 6,
+    "test": 0
+   }
+  },
+  "v1_snapshot": {
+   "caminho": "docs/VRMED-ESOFAGO-SNAPSHOT-V1.json",
+   "existe": true,
+   "bytes": 3571,
+   "sha256": "398037723b9e6e86124f46b97f1c8967065ddf5a52d3069f1b8d7373b9701847"
+  },
+  "v1_pool16": {
+   "caminho": "docs/FASE24-POOL-16.json",
+   "existe": true,
+   "bytes": 18594,
+   "sha256": "1a013531ad65b89275e8878ac6180cdbe0e376cb3d4d88c4433897fb519b11b9"
+  },
+  "v1_prerregistro": {
+   "caminho": "docs/BASELINE-ESOPHAGUS-VRMED-V1.md",
+   "existe": true,
+   "bytes": 9161,
+   "sha256": "501e0a0519f8f8ea7074d4548fce71582219b4b7391ff939e09fa6ac9f220056"
+  },
+  "v2_manifesto": {
+   "caminho": "docs/VRMED-ESOPHAGUS-MANIFESTO-V2.jsonl",
+   "existe": true,
+   "bytes": 74046,
+   "sha256": "4e42ebb7bf488e96373978c577df7c062fa01ec234d453dccf3d154a0026cf04",
+   "n_casos": 46,
+   "sha256_canonico": "f4bd480e8f8046923a8990096d40832145fb405f1a84ca85e8f3be6e6d20f60b",
+   "split": {
+    "train": 32,
+    "validation": 14,
+    "test": 0
+   }
+  },
+  "v2_snapshot": {
+   "caminho": "docs/VRMED-ESOPHAGUS-SNAPSHOT-V2.json",
+   "existe": true,
+   "bytes": 9474,
+   "sha256": "080dd4c2996fb53b72764c47515a63f6760aac21d63d57084ae13d54023b1a8e"
+  },
+  "v2_pool": {
+   "caminho": "docs/VRMED-ESOPHAGUS-POOL-V2.json",
+   "existe": true,
+   "bytes": 24474,
+   "sha256": "dbd340680b30f7b2d74577bd8742a34dacbd584517247751600110b0719aff4a"
+  },
+  "v2_regra_split": {
+   "caminho": "docs/VRMED-SPLIT-RULE-V2.md",
+   "existe": true,
+   "bytes": 3929,
+   "sha256": "ca5124f4727846ae0ff86c924bb90b2a672bd5ad363472b7b0ca1d2ae2f5d7b3"
+  },
+  "ontologia": {
+   "caminho": "docs/ESOPHAGUS-ONTOLOGY-V1.md",
+   "existe": true,
+   "bytes": 7920,
+   "sha256": "aef81b383c81395b9bef026f7a723c09348244d0f119e7ff054c8450d6aa0e60"
+  },
+  "prerregistro_v2": {
+   "caminho": "docs/BASELINE-ESOPHAGUS-VRMED-V2.md",
+   "existe": true,
+   "bytes": 10012,
+   "sha256": "52068a26fa2a5ab11fe8c5232071ae74739629f21dbff46cb91ed6aea95a8cf8"
+  },
+  "f26_results": {
+   "caminho": ".clinica-dados/fase26/nnUNet_results",
+   "existe": true,
+   "n_arquivos": 8,
+   "bytes_total": 492097619,
+   "arquivos": {
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/dataset.json": "89e03484c988ee6c7e64c988a8f0d6de0f9d961c7960a99bcdb560977e89691b",
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/dataset_fingerprint.json": "3511a5fac36e5d78812707ee1cfc492873efc8f8ce1152e02e87701cee362ded",
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/fold_0/checkpoint_best.pth": "528068e0f1cfb397e69cd4ede151f07e95d1fac42b5d48f24150ba17d9edf366",
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/fold_0/checkpoint_latest.pth": "57aea3bada61ad7201c9f9ee80ec191bbd8ca8d4f71451611a5e30ace94801a3",
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/fold_0/debug.json": "028b1fd837a5d3e33084a9ffdf8708a36cbbfeedc41e7aec6537c3a7c4ac2aec",
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/fold_0/progress.png": "f22199803310c31802e81f618612bbca653fb3953a7dbd042fad95898f751e89",
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/fold_0/training_log_2026_9_6_23_29_47.txt": "974601e23367d4e4debaef35e8331a5d47791e904dedadb013d135ea59baa4ec",
+    "Dataset501_VRmedEsofago/nnUNetTrainer__nnUNetPlans__3d_fullres/plans.json": "067bf8da308e0428ac58fe9ba742e42f75e83ef48d8526da53c5bf6a9c6be514"
+   }
+  },
+  "f26_raw": {
+   "caminho": ".clinica-dados/fase26/nnUNet_raw",
+   "existe": true,
+   "n_arquivos": 21,
+   "bytes_total": 271407921,
+   "arquivos": {
+    "Dataset501_VRmedEsofago/dataset.json": "2c92c906627d80a08987a740f08a07e1939bdbe518f912631644b593ab99c71e",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-100_HM10395_0000.nii.gz": "9769dfc3716e8ad12d12c370a64d6595d67c50b236ba621559a1fe1b7dbb223c",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-102_HM10395_0000.nii.gz": "feae6707d0e24edae4726a581e34ac1d6d8df9619bfbaa558f05e1028e8cc109",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-105_HM10395_0000.nii.gz": "6ac0cc72d23d96a7bc04312390bc43af5a832758c8428e67517d908cb1a8fde1",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-106_HM10395_0000.nii.gz": "4c5250b9c04d8984a3286368b69a3c1aacfe3d7d24919488907cfab249b1e1bb",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-108_HM10395_0000.nii.gz": "97257b6a562beebe77334ddf05c41f1da559b3012d61e3f323d2577c11855474",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-109_HM10395_0000.nii.gz": "665ceb7c205e5907e1e04f0b4f94c3db231cb38fe0e78731516657c6f0e3b240",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-110_HM10395_0000.nii.gz": "17e904bbdf7cc397b258956c01e770b162087ac9177cdd40c157323252f8754f",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-111_HM10395_0000.nii.gz": "56dcfa505ea0a178ed7df53270ec855084e7109f5b1a2bf878e97b891f344fa3",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-112_HM10395_0000.nii.gz": "88540440fd9b5fe22015266cffb524105773b66d80ab508f222e22baebff3274",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-114_HM10395_0000.nii.gz": "9ea7668ae3f039d096b028b35e9520c8a1c24c3c016df3b2422b400a91ea0903",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-100_HM10395.nii.gz": "818c8ec9a41244c0e168c0ee3eb615610110972ed911f2b6adb5499e0c006f1d",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-102_HM10395.nii.gz": "6d7135668a6d209b680363cdf044792d505c96b7e9512cab7da1137630407588",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-105_HM10395.nii.gz": "b97a3967d1137a9099dde83b2c465feea49a63db5c7db9e3c9f81356499c28e4",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-106_HM10395.nii.gz": "d42214422873bfc22dc966d925497ee53530943af81014ccaa4e4c964da3e9d6",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-108_HM10395.nii.gz": "b138369dfda690c0ae35fe4b669b25b6dc28f5f77fa8f82259644fafbd413e77",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-109_HM10395.nii.gz": "be4d906b72a06ed3bbd12acc5ae37f7cea913dc1967671cb8354c2d9f733e942",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-110_HM10395.nii.gz": "ea9db3e317c2b3ea9c565d2f9b4da11cfc624f891df6540647dedcebd618c2db",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-111_HM10395.nii.gz": "0f482bd937d0873533efc41394873af72e6b81efdc71d29cf530a43bea2243bd",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-112_HM10395.nii.gz": "688e622c52c5a2e4d0b1054e32ec6730ac6cc520017fa006cae525486f362c7a",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-114_HM10395.nii.gz": "8ea9a02a8cf8f9033e27ef7162e96ca5beed0cc6b01e9397fc13c4dd11e14d9a"
+   }
+  },
+  "f26_holdout": {
+   "caminho": ".clinica-dados/fase26/validation_holdout",
+   "existe": true,
+   "n_arquivos": 12,
+   "bytes_total": 153693574,
+   "arquivos": {
+    "images/4DLUNG-101_HM10395_0000.nii.gz": "665d0eaeb0260d60bcb278cc64a3a4a70b6a1ceb3abc67024956f5ac4ed9aeeb",
+    "images/4DLUNG-103_HM10395_0000.nii.gz": "3b1ecb4f02c508fe690d39a5dd985cc654ff243a07107ea9aeb418b49a02edb4",
+    "images/4DLUNG-104_HM10395_0000.nii.gz": "5275c0d41d395cce2d42fd540a44d4b0655dce2f33ed3f2c363fb56e30d41bec",
+    "images/4DLUNG-107_HM10395_0000.nii.gz": "196b3bca91b36436e418662304d933ae07eb542ef6b96485f7b9ecccbd9fb59c",
+    "images/4DLUNG-115_HM10395_0000.nii.gz": "cb4c76c619f837fc166bca829990547cb42e7ea0bae1c861fb5ad2eac490e6e0",
+    "images/4DLUNG-116_HM10395_0000.nii.gz": "e4b2d333d8052960aab50bc7fcd41bf1c22352ac71d008ae865e9924fe134892",
+    "labels/4DLUNG-101_HM10395.nii.gz": "7694cadb4656dea1d9e20ef2dc1f8662624904331a002580429e3baa9db98187",
+    "labels/4DLUNG-103_HM10395.nii.gz": "afdd7774f9887247ac8c6ecfd8773a9cd2c97f2fe3cfa153d51f6dac9738f108",
+    "labels/4DLUNG-104_HM10395.nii.gz": "cbc56a629f11cf8d12f64e3e751e35ff177042f5ad9ac0b9fd44520542e0285e",
+    "labels/4DLUNG-107_HM10395.nii.gz": "5bd15f948a4b503b4d21d4c693fc4bcb4711109d1c3ff4a3866d725752e4e9f3",
+    "labels/4DLUNG-115_HM10395.nii.gz": "af1938c99b8f1c153814a436cb4ef1cd8c083d01e2edbe068ad63a4d313aafd8",
+    "labels/4DLUNG-116_HM10395.nii.gz": "a5766cab0fbf06664457bd3034d008ef2f25d98b4b4f18587ee023d68ec51bc9"
+   }
+  },
+  "f26b_results": {
+   "caminho": ".clinica-dados/fase26b/nnUNet_results",
+   "existe": true,
+   "n_arquivos": 63,
+   "bytes_total": 3003851572,
+   "arquivos": {
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/dataset.json": "89e03484c988ee6c7e64c988a8f0d6de0f9d961c7960a99bcdb560977e89691b",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/dataset_fingerprint.json": "3511a5fac36e5d78812707ee1cfc492873efc8f8ce1152e02e87701cee362ded",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/checkpoint_best.pth": "2419cdcbee8cc604bf766d3e73117312914f5c94599d583ea9bd5b5b27e6a378",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/checkpoint_final.pth": "b54f1a0490d875d10d0ef091d1033b1c3f8d9f701d0918268807b434b8f20a5a",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/debug.json": "4d5f6ffdd815379ba80c1af17f25fb5e4412b84811a63bfe18904ed69a8c26cd",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/progress.png": "74fad688174249cbd72b195f511a94f860665bd8f2f489def4ce35af3cd7bc82",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/training_log_2026_9_7_02_29_07.txt": "e40d5331cdf45ea58800db58b73d5024a77b3a3ec1c155037eafc1ea5e2e26f9",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/validation/4DLUNG-100_HM10395.nii.gz": "ee33b5aaa37abd25111576b8a0ce74e4f9e9384f91459ecf19f35ac484bec0a2",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/validation/4DLUNG-100_HM10395.npz": "f8397a982787070b9ceb035818d1f1b33216c7ab7b677c43dc2ab85c8100a3c3",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/validation/4DLUNG-100_HM10395.pkl": "bbfcb643c65731e9abc1580e96c78e8e56f4f25067c6517ca19deb665cecec57",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/validation/4DLUNG-111_HM10395.nii.gz": "4759703e754aea187728e6fe9be8872231e638fa1d8199fda268db0c3297d9a7",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/validation/4DLUNG-111_HM10395.npz": "96f01d6831aa08f0fcc0c007f37d0b0e20e815fd49957ca66d2864d2d016b929",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/validation/4DLUNG-111_HM10395.pkl": "b9188881e05de0319488ada8b0659ba19b8b2838a96fc48d49d3e590b991d699",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_0/validation/summary.json": "8882e2dd089ea1ad17121094394994ad34f48c3e6d6174966689b5e17c33a53b",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/checkpoint_best.pth": "475bf51aa821f0ad13db2f50bc1cec64925d272d5b783004da87736e04af420e",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/checkpoint_final.pth": "9d73806703560d73be8dd309cabfe7159f028feb8e464d383688fce976eb5ea2",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/debug.json": "6dde88d387d0e0b6b240883cc762a0ea98df4c86b26367f31bbae42953757a3f",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/progress.png": "2d7063aaa69b3c2b45b3a6960417f42f384f96033a3c54bfee6704dad79af57f",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/training_log_2026_9_7_12_11_28.txt": "1ae7174f3cd97f3168d0298293cf6b049eccce7f1496c1825b42c64e419c1f74",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/validation/4DLUNG-106_HM10395.nii.gz": "a3b63ee0bebcd0c3e20a074fa683d35a49d56fc335fe51cddd4431d40bfef23e",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/validation/4DLUNG-106_HM10395.npz": "a7ae40a32d4a64e539a31676c87de3cf15212b037214929a9ddd61eddf455bd6",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/validation/4DLUNG-106_HM10395.pkl": "f979cc0811fe3a857212144ae8c2cbdc09362032547f03a4947fbb3d8b921746",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/validation/4DLUNG-114_HM10395.nii.gz": "10f451c09dd81c3846f3f70841ece4e37fbdbfd47a89fcb4b65cfdf1d8c52498",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/validation/4DLUNG-114_HM10395.npz": "895c61c8e6be47c11d1e970fce4f7694cc076f61a80b1c89b20ddea186b27946",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/validation/4DLUNG-114_HM10395.pkl": "12f1e5c6b3b6d5765584509903bef758886adca0eef154da8726d220fc4b59cb",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_1/validation/summary.json": "28da9552f3240ddc1a8d815eb3513f31b32e9dcd3515755fbd81a9637400e42f",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/checkpoint_best.pth": "5156822c251a40afcb8d3853d13657797efea473c8becc6566b63a7d9e7fcd91",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/checkpoint_final.pth": "b69ba6d25c32c1bc856f240f90e9da63ad76a2cd99086193104180de4665084e",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/debug.json": "33aefefaaffe45d58c51dd7fb6a41329884ad0b1747ba3d3287f3a5e0ba0d448",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/progress.png": "4d44a97c023933500c66a3bf173de0e000c43583dc358c2bdd77eca84d93b54a",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/training_log_2026_9_7_21_50_40.txt": "9ca050587afe4140cf2c48b067322931b9b4a2ef3758ae4f3f6044700664b839",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/validation/4DLUNG-108_HM10395.nii.gz": "6e4330e8b608c4d9b4a17442b00b13ed81e53f6230fd756ed17bb70c9c66d360",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/validation/4DLUNG-108_HM10395.npz": "52626f67a7fb275fe23c2c1ec57307b168b8b27257f90e2b4bba0c91ba7a94b5",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/validation/4DLUNG-108_HM10395.pkl": "64352bb20908a4b55ee7977b180dddf4d6b361670574007bd6b12c854b97802e",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/validation/4DLUNG-110_HM10395.nii.gz": "79d80e40d7add925bbba0706a6fe5f7aabf48955587f92348500104ebd31796a",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/validation/4DLUNG-110_HM10395.npz": "e0f3b1bae79c31f0590c1b9a11c69f6f6bb338388d9393d096c183bfb1a46f68",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/validation/4DLUNG-110_HM10395.pkl": "a25584846e0c47a98b07b7a9dd30eb1fe5579211cc78a7cb4d9e06f969220b39",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_2/validation/summary.json": "f35c6b2736890aab1717075bfcd8a978af6f3dd54218e0c53e3e2fe59a291f8e",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/checkpoint_best.pth": "ab1a7057e2996a24bb62f6ee822abaa1a4967108713434870add84909c6d41b4",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/checkpoint_final.pth": "8067b1760e94972a3aa00184f4b8b8d5d2dcaf21ab7f64ab3dd699552bd26207",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/debug.json": "1b7d82f58cfa0c4ba2675c9c98b77aa65c90edefa962534ef95432978c637e4b",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/progress.png": "adc9ae8d1b1a1b1fabce8bcf47a5482f005e5687b2570c22561e849fc20265a8",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/training_log_2026_9_8_07_31_34.txt": "0d3d3cba4301c861ff3a3d631a8bbc0c860eaa57463a0ca807f09cd172d7d27c",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/validation/4DLUNG-102_HM10395.nii.gz": "937a0daf8e20de17d1121f5f7f0d52766e19d243ccee06749ac59a572d28ad1a",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/validation/4DLUNG-102_HM10395.npz": "98853a822802aab06f5a8ab4496a9572df3a1780f10460c83f3844a6996c592f",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/validation/4DLUNG-102_HM10395.pkl": "713b97af0af1da3784158476c710d06800cfd4b736d1bb5ac88142b34a57d6de",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/validation/4DLUNG-112_HM10395.nii.gz": "716c6043603f7cc8242fd2f1c0c74de924c5ad4fac1dbf40a3f9d7f344d85a06",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/validation/4DLUNG-112_HM10395.npz": "401bdf2f45697a1948506aabae57a65148c612e76e1ae1a985bc91f08487b507",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/validation/4DLUNG-112_HM10395.pkl": "e29bf04336e037ac72752d1bb075bc24327a49ce5febb62b080c858672ece5cd",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_3/validation/summary.json": "a4130f90088ae091cf8e7c443d08502db2c1da1549550b60499e1ab4958a41ea",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/checkpoint_best.pth": "3752f2efefbcc6f1d834d3c099b4cc56696392a2a3dd85335ee6df85c7fbf6a0",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/checkpoint_final.pth": "2a3677dfd467974de80a85d8f7d87cbacdace3ce052117f71c0bee48353aaced",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/debug.json": "d73786a8f9688031ba583465bbbe5167261db8720bd857d8b8b60f489c602079",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/progress.png": "42db12b3490dfeacf25f54c9b0dc15a01b4aac4537f8a21020dabe9945005d04",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/training_log_2026_9_8_17_09_13.txt": "d8c9cad84b34eadc28621e3cee92aedab9dd3e9b7b331934377c975413cd090e",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/validation/4DLUNG-105_HM10395.nii.gz": "f43e45f592cc3892e8d96d97c5c4596dcf30acc0bed2967ed8730deb63273f33",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/validation/4DLUNG-105_HM10395.npz": "0c9a7fbd29bafdde6d83865c554a5e5f60a6165390bf6d6da6c02703a385f386",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/validation/4DLUNG-105_HM10395.pkl": "6800b5b2f0a36b8a9437fbdf326c926fd31b3e83de14cb36eae6aa6fda706050",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/validation/4DLUNG-109_HM10395.nii.gz": "66e43e3fc1ca97f4a3dc5300758d87894c7302749deda572d733e0ceaec69f8d",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/validation/4DLUNG-109_HM10395.npz": "9c82d4631f298066ead03c0403fc6723a9c251cabc2681d207970d33a8a9e6bc",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/validation/4DLUNG-109_HM10395.pkl": "6b05e7f05bcdcbded041ca7aa989b6210c4615be37b04659c87faf7c4da2c5af",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_4/validation/summary.json": "f332debfd8d5e0c0703e520705fd78421b495439d61696ec43d875b0f606941f",
+    "Dataset501_VRmedEsofago/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/plans.json": "067bf8da308e0428ac58fe9ba742e42f75e83ef48d8526da53c5bf6a9c6be514"
+   }
+  },
+  "f26b_raw": {
+   "caminho": ".clinica-dados/fase26b/nnUNet_raw",
+   "existe": true,
+   "n_arquivos": 21,
+   "bytes_total": 271407921,
+   "arquivos": {
+    "Dataset501_VRmedEsofago/dataset.json": "2c92c906627d80a08987a740f08a07e1939bdbe518f912631644b593ab99c71e",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-100_HM10395_0000.nii.gz": "9769dfc3716e8ad12d12c370a64d6595d67c50b236ba621559a1fe1b7dbb223c",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-102_HM10395_0000.nii.gz": "feae6707d0e24edae4726a581e34ac1d6d8df9619bfbaa558f05e1028e8cc109",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-105_HM10395_0000.nii.gz": "6ac0cc72d23d96a7bc04312390bc43af5a832758c8428e67517d908cb1a8fde1",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-106_HM10395_0000.nii.gz": "4c5250b9c04d8984a3286368b69a3c1aacfe3d7d24919488907cfab249b1e1bb",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-108_HM10395_0000.nii.gz": "97257b6a562beebe77334ddf05c41f1da559b3012d61e3f323d2577c11855474",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-109_HM10395_0000.nii.gz": "665ceb7c205e5907e1e04f0b4f94c3db231cb38fe0e78731516657c6f0e3b240",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-110_HM10395_0000.nii.gz": "17e904bbdf7cc397b258956c01e770b162087ac9177cdd40c157323252f8754f",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-111_HM10395_0000.nii.gz": "56dcfa505ea0a178ed7df53270ec855084e7109f5b1a2bf878e97b891f344fa3",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-112_HM10395_0000.nii.gz": "88540440fd9b5fe22015266cffb524105773b66d80ab508f222e22baebff3274",
+    "Dataset501_VRmedEsofago/imagesTr/4DLUNG-114_HM10395_0000.nii.gz": "9ea7668ae3f039d096b028b35e9520c8a1c24c3c016df3b2422b400a91ea0903",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-100_HM10395.nii.gz": "818c8ec9a41244c0e168c0ee3eb615610110972ed911f2b6adb5499e0c006f1d",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-102_HM10395.nii.gz": "6d7135668a6d209b680363cdf044792d505c96b7e9512cab7da1137630407588",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-105_HM10395.nii.gz": "b97a3967d1137a9099dde83b2c465feea49a63db5c7db9e3c9f81356499c28e4",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-106_HM10395.nii.gz": "d42214422873bfc22dc966d925497ee53530943af81014ccaa4e4c964da3e9d6",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-108_HM10395.nii.gz": "b138369dfda690c0ae35fe4b669b25b6dc28f5f77fa8f82259644fafbd413e77",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-109_HM10395.nii.gz": "be4d906b72a06ed3bbd12acc5ae37f7cea913dc1967671cb8354c2d9f733e942",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-110_HM10395.nii.gz": "ea9db3e317c2b3ea9c565d2f9b4da11cfc624f891df6540647dedcebd618c2db",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-111_HM10395.nii.gz": "0f482bd937d0873533efc41394873af72e6b81efdc71d29cf530a43bea2243bd",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-112_HM10395.nii.gz": "688e622c52c5a2e4d0b1054e32ec6730ac6cc520017fa006cae525486f362c7a",
+    "Dataset501_VRmedEsofago/labelsTr/4DLUNG-114_HM10395.nii.gz": "8ea9a02a8cf8f9033e27ef7162e96ca5beed0cc6b01e9397fc13c4dd11e14d9a"
+   }
+  },
+  "f26b_preprocessed": {
+   "caminho": ".clinica-dados/fase26b/nnUNet_preprocessed",
+   "existe": true,
+   "n_arquivos": 44,
+   "bytes_total": 285804062,
+   "arquivos": {
+    "Dataset501_VRmedEsofago/dataset.json": "2c92c906627d80a08987a740f08a07e1939bdbe518f912631644b593ab99c71e",
+    "Dataset501_VRmedEsofago/dataset_fingerprint.json": "3511a5fac36e5d78812707ee1cfc492873efc8f8ce1152e02e87701cee362ded",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-100_HM10395.nii.gz": "818c8ec9a41244c0e168c0ee3eb615610110972ed911f2b6adb5499e0c006f1d",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-102_HM10395.nii.gz": "6d7135668a6d209b680363cdf044792d505c96b7e9512cab7da1137630407588",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-105_HM10395.nii.gz": "b97a3967d1137a9099dde83b2c465feea49a63db5c7db9e3c9f81356499c28e4",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-106_HM10395.nii.gz": "d42214422873bfc22dc966d925497ee53530943af81014ccaa4e4c964da3e9d6",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-108_HM10395.nii.gz": "b138369dfda690c0ae35fe4b669b25b6dc28f5f77fa8f82259644fafbd413e77",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-109_HM10395.nii.gz": "be4d906b72a06ed3bbd12acc5ae37f7cea913dc1967671cb8354c2d9f733e942",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-110_HM10395.nii.gz": "ea9db3e317c2b3ea9c565d2f9b4da11cfc624f891df6540647dedcebd618c2db",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-111_HM10395.nii.gz": "0f482bd937d0873533efc41394873af72e6b81efdc71d29cf530a43bea2243bd",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-112_HM10395.nii.gz": "688e622c52c5a2e4d0b1054e32ec6730ac6cc520017fa006cae525486f362c7a",
+    "Dataset501_VRmedEsofago/gt_segmentations/4DLUNG-114_HM10395.nii.gz": "8ea9a02a8cf8f9033e27ef7162e96ca5beed0cc6b01e9397fc13c4dd11e14d9a",
+    "Dataset501_VRmedEsofago/nnUNetPlans.json": "067bf8da308e0428ac58fe9ba742e42f75e83ef48d8526da53c5bf6a9c6be514",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-100_HM10395.b2nd": "fea2f358652207b6e521bac37ad5e6e0692a7f1ca69fa59baf13b410faa00d61",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-100_HM10395.pkl": "bbfcb643c65731e9abc1580e96c78e8e56f4f25067c6517ca19deb665cecec57",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-100_HM10395_seg.b2nd": "62851e5f16083c166456a3fbeef84428edf4530cb805c9849594fe778d2658d6",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-102_HM10395.b2nd": "96399689ad9dc1df4c5faa32fe0dba180f09a71aeffeb645ea45fff894ec3e9f",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-102_HM10395.pkl": "713b97af0af1da3784158476c710d06800cfd4b736d1bb5ac88142b34a57d6de",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-102_HM10395_seg.b2nd": "8ad0cfebcb398ecb88fa18d7dfada7b3f4724347e0f57f7e57860f04f56716e1",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-105_HM10395.b2nd": "3addae6ed1db277ffca3e83c028a2df0ced8b40104f097f446425f3a9887daf9",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-105_HM10395.pkl": "6800b5b2f0a36b8a9437fbdf326c926fd31b3e83de14cb36eae6aa6fda706050",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-105_HM10395_seg.b2nd": "1ba752ac5372a0a8358a4415af57ec07db302d6296a9586fc95fa9c13e592bf1",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-106_HM10395.b2nd": "8df5909d96d69f94668acd64761ffdca9b71f99772b470dae98951a4f6b4e086",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-106_HM10395.pkl": "f979cc0811fe3a857212144ae8c2cbdc09362032547f03a4947fbb3d8b921746",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-106_HM10395_seg.b2nd": "1c52d6c109d7db27b07f366597308a3e17f6904e9aee069c06564a8ea2f5699f",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-108_HM10395.b2nd": "6f4107558357458759375763958e94e46150e5dffdefd13113eaea58b27f9e07",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-108_HM10395.pkl": "64352bb20908a4b55ee7977b180dddf4d6b361670574007bd6b12c854b97802e",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-108_HM10395_seg.b2nd": "21ac285eaeb194fdc259d5f6f8098518f072a6e4d396107cca3cf3b641378f30",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-109_HM10395.b2nd": "bd17df2f31412951d258043530042fc278f6420df9aab41c285498ab2b675954",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-109_HM10395.pkl": "6b05e7f05bcdcbded041ca7aa989b6210c4615be37b04659c87faf7c4da2c5af",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-109_HM10395_seg.b2nd": "5eb5be3c0fecde40c0d7233fb922a0464f3418c8fe03d7568c55d6a629d1765f",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-110_HM10395.b2nd": "fd4b4d7a1ead4c5e6133a5ce91028e4ed59298bcaf65b5aec887142260c2abac",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-110_HM10395.pkl": "a25584846e0c47a98b07b7a9dd30eb1fe5579211cc78a7cb4d9e06f969220b39",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-110_HM10395_seg.b2nd": "b4b76cd69fa9296da6e5f433f7da5b5b51700b390181b9360f3e7e0eb7da5605",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-111_HM10395.b2nd": "01d9d4fdf2986b2162d35b069d1a669d41719c9d0a374e9f233bece2b051e95b",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-111_HM10395.pkl": "b9188881e05de0319488ada8b0659ba19b8b2838a96fc48d49d3e590b991d699",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-111_HM10395_seg.b2nd": "1550fb9931be65bc23c7642e120758243643048c90795ab593cebd556447c451",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-112_HM10395.b2nd": "ce07a07550837949e11640d181568e8a7989259ed30dc0186dfeff7acd0ba339",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-112_HM10395.pkl": "e29bf04336e037ac72752d1bb075bc24327a49ce5febb62b080c858672ece5cd",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-112_HM10395_seg.b2nd": "30241a5cf0df9eba295ae2c22d6196df5ebb3b1f0f7b4a9102dadedd43dbbf31",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-114_HM10395.b2nd": "7f7e74a62942d4bc4ccad866b4026d0a6d393d87019d7c4a2ba1a55768389cb4",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-114_HM10395.pkl": "12f1e5c6b3b6d5765584509903bef758886adca0eef154da8726d220fc4b59cb",
+    "Dataset501_VRmedEsofago/nnUNetPlans_3d_fullres/4DLUNG-114_HM10395_seg.b2nd": "77a8c938bf50f3a96c970103d71b33176e78a2f6449e19d0950b18603f0eb1bc",
+    "Dataset501_VRmedEsofago/splits_final.json": "41e2dbe86f0dbec0b99c048d23680f4c094961c8a9491e794359dea046b4894c"
+   }
+  },
+  "f26b_predicoes": {
+   "caminho": ".clinica-dados/fase26b/predicoes_holdout",
+   "existe": true,
+   "n_arquivos": 18,
+   "bytes_total": 410881,
+   "arquivos": {
+    "checkpoint_best/4DLUNG-101_HM10395.nii.gz": "4888f137e4e8e214de746b499e26e17601bbef6c7de45b982ab6e587197d4a94",
+    "checkpoint_best/4DLUNG-103_HM10395.nii.gz": "76c99110c63473832514039c2bee0fd8a02104b9b2e04a39b64b4c8b1e933787",
+    "checkpoint_best/4DLUNG-104_HM10395.nii.gz": "c7767c324975f2e87721eb09bebc1b631d5408664564854799dd68ac9439b9f7",
+    "checkpoint_best/4DLUNG-107_HM10395.nii.gz": "159d50128756e8a087601aff8fbebb172b5522244d9d411f9935b507aa32180d",
+    "checkpoint_best/4DLUNG-115_HM10395.nii.gz": "cd3d123f0163e1075f186761b76847d2e5929ed406f12ed2dd426e384a82f4d1",
+    "checkpoint_best/4DLUNG-116_HM10395.nii.gz": "64c5767ea741545c963b7cc2727c0aa1c33acbf2df72a202f568e5a96d4884ca",
+    "checkpoint_best/dataset.json": "89e03484c988ee6c7e64c988a8f0d6de0f9d961c7960a99bcdb560977e89691b",
+    "checkpoint_best/plans.json": "067bf8da308e0428ac58fe9ba742e42f75e83ef48d8526da53c5bf6a9c6be514",
+    "checkpoint_best/predict_from_raw_data_args.json": "e246346f2450e1fbfbf4552efdb7ee3e2b27dd99ee10afd8f7b60d728084ed9e",
+    "checkpoint_final/4DLUNG-101_HM10395.nii.gz": "b33cbf5d81062b29c5b56e755dfab8d4fd7977dbc98b6555dc0ab081826d60ec",
+    "checkpoint_final/4DLUNG-103_HM10395.nii.gz": "6f2b4a9f620a40a934a987ed4586942d6ee2f515ad8bf09e7c10a2010f4dbc4d",
+    "checkpoint_final/4DLUNG-104_HM10395.nii.gz": "8e9375937acbb0323ab80c27c1bf3656a9581442428b7ddf9279e9a7b1047fc7",
+    "checkpoint_final/4DLUNG-107_HM10395.nii.gz": "e67476c7afa4c8bed59da39a2ecc754d8c893fdbdae4e7603c027f125d360e83",
+    "checkpoint_final/4DLUNG-115_HM10395.nii.gz": "d97a30764f048d2d92a4240ed7c7bf352d71f8aa5710e6830de4a5af3fae75f3",
+    "checkpoint_final/4DLUNG-116_HM10395.nii.gz": "0ca3ac14e0e0d707f19f4aa0db91fd980cf2c3db211d4086a117cde839fefa16",
+    "checkpoint_final/dataset.json": "89e03484c988ee6c7e64c988a8f0d6de0f9d961c7960a99bcdb560977e89691b",
+    "checkpoint_final/plans.json": "067bf8da308e0428ac58fe9ba742e42f75e83ef48d8526da53c5bf6a9c6be514",
+    "checkpoint_final/predict_from_raw_data_args.json": "68490627246ffcf991e622d165a1da1f3a897e55760c6612adf92f903b0d6958"
+   }
+  },
+  "f27_avaliacoes": {
+   "caminho": "docs/overnight/phase27",
+   "existe": true,
+   "n_arquivos": 2,
+   "bytes_total": 16285,
+   "arquivos": {
+    "avaliacao_26b_best.json": "370a867964e7a02f96b83cece4ba0449677435676d144f32e06ad86d1cf5074d",
+    "avaliacao_26b_final.json": "d4e5e5d06c55ee1271750d25c3e99b9e502ac70ba62e919dbb95a07fcd159d03"
+   }
+  },
+  "f26b_curvas": {
+   "caminho": "docs/overnight/phase26b/curvas.json",
+   "existe": true,
+   "bytes": 62480,
+   "sha256": "9caa80e7f4727f8583107465e559bcf1da48472a6631a5dc548cce1ec1607e87"
+  }
+ },
+ "sentinelas": {
+  "docs/overnight/phase23/ingestao_real.json": {
+   "existe": true,
+   "bytes": 57439,
+   "sha256": "effe04eb6467bdfa2ce2b436b860a754c4109b8f012ebf09a5507510e6efdd74",
+   "ocorrencias_HM10395": 30,
+   "esperado": 5
+  },
+  "docs/overnight/phase21/mutacao.json": {
+   "existe": true,
+   "bytes": 6116,
+   "sha256": "787f34906a65ca7701f454ef210c9152b6513bfeab7aee27b0079d32c283171c"
+  },
+  "docs/overnight/phase23/aquisicao.json": {
+   "existe": true,
+   "bytes": 6958,
+   "sha256": "18ef361b3de6ba287bbb2dc97a1b60557ede5081bee01e20bf742b5dfe115527"
+  }
+ },
+ "git": {
+  "head": "fc809fa52a1e6ddbec8c33a39e797d6596426af0",
+  "branch": "master",
+  "sujo": "M scripts/validation/fase23/ingerir_real.py\n M scripts/validation/fase26/dataset_nnunet.py\n?? docs/BASELINE-ESOPHAGUS-VRMED-V3.md\n?? docs/FASE32-PROTOCOLO-TREINO-V2.json\n?? docs/RELATORIO-FASE32-REPLANEJAMENTO-TREINO.md\n?? docs/overnight/phase32/\n?? scripts/validation/fase32/\n?? tests/test_fase32_replanejamento.py"
+ }
+}

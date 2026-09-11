@@ -9,13 +9,13 @@ Se alguem quiser colocar um caso de VALIDATION no treino, tera de mudar a tabela
 `PERMISSOES` do manifesto congelado — e ha mutante plantado exatamente ai, alem do
 autoteste 6 deste modulo.
 
-POR QUE imagesTr TEM 10 CASOS, E NAO 16
+POR QUE imagesTr TEM SO OS CASOS DE `train`, E NAO O POOL INTEIRO
 
 O pre-registro (Fase 19) anotou que `plan_and_preprocess` "le train + validation". Aquele
-desenho foi escrito quando se esperava um TEST externo: os 16 seriam o pool de
-cross-validation e o TEST seria o holdout. **Hoje TEST = 0.** Sob a leitura literal, os
-6 de VALIDATION entrariam em imagesTr e seriam usados como TREINO em 4 dos 5 folds do
-nnU-Net — e nao sobraria nenhum caso nunca visto.
+desenho foi escrito quando se esperava um TEST externo: o pool seria a cross-validation e
+o TEST seria o holdout. **Hoje TEST = 0.** Sob a leitura literal, os casos de VALIDATION
+entrariam em imagesTr e seriam usados como TREINO em 4 dos 5 folds do nnU-Net — e nao
+sobraria nenhum caso nunca visto.
 
 A tabela de permissoes congelada na Fase 25 ja responde a pergunta, e ela e executavel:
 
@@ -25,6 +25,18 @@ O contexto de treino pode ler `train`, e SO `train`. Colocar VALIDATION em image
 exatamente o vazamento que essa tabela existe para impedir. Este modulo obedece a tabela.
 
 **Isto e um desvio do texto do pre-registro e esta declarado como tal no relatorio.**
+
+DOIS PERFIS, UM CODIGO (acrescentado na Fase 32)
+
+O perfil `v1` e o dataset de 10 casos das Fases 26 e 26B. O perfil `v2` e o de 32 casos
+do `VRMED-ESOPHAGUS-POOL46-V2`. **O default continua sendo `v1` e o resultado dele
+continua identico byte a byte** — a Fase 32 prova isso rodando o perfil v1 contra o
+`dataset.json` que ja esta em disco, em vez de afirmar.
+
+Perfis diferentes escrevem em ARVORES diferentes e usam IDENTIFICADORES diferentes de
+dataset. Reaproveitar `Dataset501` para 32 casos faria dois conteudos distintos
+compartilharem um nome, e todo diretorio de resultado que carrega esse nome ficaria
+ambiguo depois do fato.
 
 O QUE E FEITO COM A MASCARA, E O QUE NAO E
 
@@ -40,6 +52,7 @@ reamostragem, nenhum recorte. As imagens sao copiadas byte a byte.
 
   python -m scripts.validation.fase26.dataset_nnunet --autoteste
   python -m scripts.validation.fase26.dataset_nnunet --escrever
+  python -m scripts.validation.fase26.dataset_nnunet --perfil v2 --escrever
 """
 
 from __future__ import annotations
@@ -66,8 +79,8 @@ BASE = RAIZ / ".clinica-dados" / "fase26"
 NNUNET_RAW = BASE / "nnUNet_raw"
 NNUNET_PREPROCESSED = BASE / "nnUNet_preprocessed"
 NNUNET_RESULTS = BASE / "nnUNet_results"
-# Os 6 de VALIDATION ficam FORA da arvore do nnU-Net, de proposito: o que nao esta em
-# imagesTr nao pode ser sorteado para treino por engano.
+# Os casos de VALIDATION ficam FORA da arvore do nnU-Net, de proposito: o que nao esta
+# em imagesTr nao pode ser sorteado para treino por engano.
 HOLDOUT = BASE / "validation_holdout"
 
 DATASET_ID = 501                       # pre-registro, secao "Comandos"
@@ -77,9 +90,61 @@ SEED = 20260906                        # pre-registro, secao "Seeds"
 ROTULO_FUNDO = 0
 ROTULO_ESOFAGO = 1
 
+# Cada perfil e um dataset inteiro: manifesto, snapshot, arvore, identificador e o que
+# vai carimbado no `dataset.json`. `n_train` e `n_holdout` NAO sao configuracao — sao a
+# contagem esperada, conferida pelo autoteste contra o manifesto. Se o manifesto mudar,
+# o autoteste cai; e para cair.
+PERFIS = {
+    "v1": {
+        "manifesto": MANIFESTO,
+        "snapshot": SNAPSHOT,
+        "base": BASE,
+        "saida": SAIDA,
+        "dataset_id": DATASET_ID,
+        "dataset_nome": DATASET_NOME,
+        "n_train": 10,
+        "n_holdout": 6,
+        "versao_pool": "VRMED-ESOPHAGUS-POOL16-V1",
+        "regra_split": "VRMED-SPLIT-RULE-V1",
+        "source_dataset": "4D-Lung (TCIA)",
+        "annotation_method": "SEMIAUTOMATIC",
+    },
+    "v2": {
+        "manifesto": RAIZ / "docs" / "VRMED-ESOPHAGUS-MANIFESTO-V2.jsonl",
+        "snapshot": RAIZ / "docs" / "VRMED-ESOPHAGUS-SNAPSHOT-V2.json",
+        "base": RAIZ / ".clinica-dados" / "fase32",
+        "saida": RAIZ / "docs" / "overnight" / "phase32",
+        "dataset_id": 502,
+        "dataset_nome": "Dataset502_VRmedEsofagoV2",
+        "n_train": 32,
+        "n_holdout": 14,
+        "versao_pool": "VRMED-ESOPHAGUS-POOL46-V2",
+        "regra_split": "VRMED-SPLIT-RULE-V2",
+        "source_dataset": "4D-Lung (TCIA) + LCTSC (TCIA)",
+        # nao ha um metodo so: o manifesto declara por caso. Escrever "MANUAL" aqui
+        # apagaria a diferenca entre as duas fontes.
+        "annotation_method": "declarado POR CASO no manifesto (MANUAL, SEMIAUTOMATIC, VAZIO)",
+        # Apurado de primeira mao no nnUNetTrainer 2.8.1 instalado (Fase 32). Sem esta
+        # nota, `vrmed_seed` seria lido como controle de treino, que ele nao e.
+        "seed_nota": (
+            "vrmed_seed e carimbo de pre-registro, NAO controle de treinamento. O "
+            "nnUNetTrainer 2.8.1 nao semeia torch, numpy nem random, e roda com "
+            "cudnn.deterministic=False e cudnn.benchmark=True. O unico passo semeado e a "
+            "divisao em 5 folds (generate_crossval_split, seed=12345 fixo no framework), "
+            "e ela fica congelada em splits_final.json."),
+    },
+}
 
-def entradas():
-    return man.carregar(MANIFESTO)
+
+def _perfil(p=None) -> dict:
+    """Default `v1`, para quem ja chamava continuar recebendo o mesmo dataset."""
+    if p is None:
+        return PERFIS["v1"]
+    return PERFIS[p] if isinstance(p, str) else p
+
+
+def entradas(perfil=None):
+    return man.carregar(_perfil(perfil)["manifesto"])
 
 
 def casos_de_treino(ent):
@@ -89,7 +154,7 @@ def casos_de_treino(ent):
 
 
 def casos_de_holdout(ent):
-    """Os 6 de VALIDATION. Contexto `validacao`, e filtrados para a particao certa."""
+    """Os casos de VALIDATION. Contexto `validacao`, filtrados para a particao certa."""
     lidos = man.carregar_particao(ent, "validation", "validacao")
     return sorted([e for e in lidos if e["split"] == "validation"],
                   key=lambda e: e["case_id"])
@@ -127,8 +192,9 @@ def converter_mascara(origem: Path, destino: Path) -> dict:
     }
 
 
-def montar_dataset_json(n_treino: int, sha_manifesto: str) -> dict:
+def montar_dataset_json(n_treino: int, sha_manifesto: str, perfil=None) -> dict:
     """O `dataset.json`, carimbado com a procedencia — exigencia do pre-registro."""
+    pf = _perfil(perfil)
     return {
         # ---- o que o nnU-Net le
         "channel_names": {"0": "CT"},
@@ -137,26 +203,29 @@ def montar_dataset_json(n_treino: int, sha_manifesto: str) -> dict:
         "file_ending": ".nii.gz",
         "overwrite_image_reader_writer": "SimpleITKIO",
         # ---- o que o VRmed carimba (o nnU-Net ignora, a auditoria nao)
-        "vrmed_dataset_version": "VRMED-ESOPHAGUS-POOL16-V1",
+        "vrmed_dataset_version": pf["versao_pool"],
         "vrmed_schema": man.VERSAO_ESQUEMA,
         "vrmed_ontology": onto.VERSAO,
         "vrmed_ontology_frozen_at": onto.CONGELADA_EM,
-        "vrmed_split_rule": "VRMED-SPLIT-RULE-V1",
+        "vrmed_split_rule": pf["regra_split"],
         "vrmed_sha256_manifesto": sha_manifesto,
         "vrmed_seed": SEED,
-        "vrmed_source_dataset": "4D-Lung (TCIA)",
-        "vrmed_annotation_method_declared": "SEMIAUTOMATIC",
+        "vrmed_source_dataset": pf["source_dataset"],
+        "vrmed_annotation_method_declared": pf["annotation_method"],
         "vrmed_nota": (
-            "imagesTr contem SOMENTE a particao train (10 casos). Os 6 casos da particao "
+            "imagesTr contem SOMENTE a particao train (%d casos). Os %d casos da particao "
             "validation sao holdout e ficam fora desta arvore. TEST = 0 e nao existe. "
             "O alvo e mascara binaria preenchida; parede e lumen sao um objeto so; a "
-            "extensao longitudinal e herdada do GT e nao e avaliavel anatomicamente."),
+            "extensao longitudinal e herdada do GT e nao e avaliavel anatomicamente."
+            % (n_treino, pf["n_holdout"])),
+        **({"vrmed_seed_nota": pf["seed_nota"]} if pf.get("seed_nota") else {}),
     }
 
 
-def montar(escrever: bool = False) -> dict:
-    ent = entradas()
-    snap = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
+def montar(escrever: bool = False, perfil=None) -> dict:
+    pf = _perfil(perfil)
+    ent = entradas(pf)
+    snap = json.loads(Path(pf["snapshot"]).read_text(encoding="utf-8"))
     conf = man.verificar_congelamento(ent, snap)
     if not conf["intacto"]:
         raise man.ManifestoInvalido("manifesto divergiu do snapshot; nao se monta dataset "
@@ -168,9 +237,14 @@ def montar(escrever: bool = False) -> dict:
     ids_treino = [e["case_id"] for e in treino]
     ids_holdout = [e["case_id"] for e in holdout]
 
+    raiz_ds = pf["base"] / "nnUNet_raw" / pf["dataset_nome"]
+    holdout_dir = pf["base"] / "validation_holdout"
+
     r = {
-        "dataset_id": DATASET_ID,
-        "dataset_nome": DATASET_NOME,
+        "perfil": pf["versao_pool"],
+        "dataset_id": pf["dataset_id"],
+        "dataset_nome": pf["dataset_nome"],
+        "base": str(pf["base"]),
         "sha256_manifesto": conf["sha256_atual"],
         "n_treino": len(treino),
         "n_holdout": len(holdout),
@@ -183,13 +257,12 @@ def montar(escrever: bool = False) -> dict:
     if not escrever:
         return r
 
-    raiz_ds = NNUNET_RAW / DATASET_NOME
     (raiz_ds / "imagesTr").mkdir(parents=True, exist_ok=True)
     (raiz_ds / "labelsTr").mkdir(parents=True, exist_ok=True)
-    (HOLDOUT / "images").mkdir(parents=True, exist_ok=True)
-    (HOLDOUT / "labels").mkdir(parents=True, exist_ok=True)
-    NNUNET_PREPROCESSED.mkdir(parents=True, exist_ok=True)
-    NNUNET_RESULTS.mkdir(parents=True, exist_ok=True)
+    (holdout_dir / "images").mkdir(parents=True, exist_ok=True)
+    (holdout_dir / "labels").mkdir(parents=True, exist_ok=True)
+    (pf["base"] / "nnUNet_preprocessed").mkdir(parents=True, exist_ok=True)
+    (pf["base"] / "nnUNet_results").mkdir(parents=True, exist_ok=True)
 
     for e in treino:
         cid = e["case_id"]
@@ -199,11 +272,11 @@ def montar(escrever: bool = False) -> dict:
 
     for e in holdout:
         cid = e["case_id"]
-        shutil.copyfile(RAIZ / e["image_path"], HOLDOUT / "images" / ("%s_0000.nii.gz" % cid))
-        prova = converter_mascara(RAIZ / e["mask_path"], HOLDOUT / "labels" / ("%s.nii.gz" % cid))
+        shutil.copyfile(RAIZ / e["image_path"], holdout_dir / "images" / ("%s_0000.nii.gz" % cid))
+        prova = converter_mascara(RAIZ / e["mask_path"], holdout_dir / "labels" / ("%s.nii.gz" % cid))
         r["conversoes"].append({"case_id": cid, "destino": "holdout", **prova})
 
-    dj = montar_dataset_json(len(treino), conf["sha256_atual"])
+    dj = montar_dataset_json(len(treino), conf["sha256_atual"], pf)
     (raiz_ds / "dataset.json").write_text(json.dumps(dj, indent=1, ensure_ascii=False),
                                           encoding="utf-8")
     r["dataset_json"] = dj
@@ -232,25 +305,28 @@ def montar(escrever: bool = False) -> dict:
     return r
 
 
-def autoteste() -> int:
+def autoteste(perfil=None) -> int:
+    pf = _perfil(perfil)
+    n_tr, n_ho = pf["n_train"], pf["n_holdout"]
     falhas = []
-    ent = entradas()
+    ent = entradas(pf)
 
     # 1. a porta de entrada devolve exatamente a particao train
     tr = casos_de_treino(ent)
-    if len(tr) != 10 or any(e["split"] != "train" for e in tr):
-        falhas.append("casos_de_treino nao devolveu 10 casos de train: %d" % len(tr))
+    if len(tr) != n_tr or any(e["split"] != "train" for e in tr):
+        falhas.append("casos_de_treino nao devolveu %d casos de train: %d" % (n_tr, len(tr)))
 
     # 2. e o holdout e exatamente a particao validation
     ho = casos_de_holdout(ent)
-    if len(ho) != 6 or any(e["split"] != "validation" for e in ho):
-        falhas.append("casos_de_holdout nao devolveu 6 casos de validation: %d" % len(ho))
+    if len(ho) != n_ho or any(e["split"] != "validation" for e in ho):
+        falhas.append("casos_de_holdout nao devolveu %d casos de validation: %d"
+                      % (n_ho, len(ho)))
 
     # 3. os dois conjuntos sao disjuntos
     if set(e["case_id"] for e in tr) & set(e["case_id"] for e in ho):
         falhas.append("treino e holdout se sobrepoem")
 
-    # 4. e cobrem os 16, sem sobra
+    # 4. e cobrem o manifesto inteiro, sem sobra
     if len(tr) + len(ho) != len(ent):
         falhas.append("treino + holdout nao cobrem o manifesto")
 
@@ -278,8 +354,8 @@ def autoteste() -> int:
     # 8. controle NEGATIVO do controle negativo: treino ainda le train.
     #    Sem isto, uma tabela que proibisse tudo passaria em 6 e 7 sem provar nada.
     try:
-        if len(man.carregar_particao(ent, "train", "treino")) != 10:
-            falhas.append("treino nao leu os 10 casos de train")
+        if len(man.carregar_particao(ent, "train", "treino")) != n_tr:
+            falhas.append("treino nao leu os %d casos de train" % n_tr)
     except man.AcessoIndevido:
         falhas.append("treino nao consegue ler train — a tabela proibe demais")
 
@@ -310,24 +386,44 @@ def autoteste() -> int:
             falhas.append("o verificador nao percebeu a mudanca de foreground")
 
     # 11. o dataset.json carimba a ontologia congelada e o seed
-    dj = montar_dataset_json(10, "x" * 64)
+    dj = montar_dataset_json(n_tr, "x" * 64, pf)
     if dj["vrmed_ontology"] != onto.VERSAO:
         falhas.append("dataset.json nao carimba a ontologia congelada")
     if dj["vrmed_seed"] != SEED:
         falhas.append("dataset.json nao carimba o seed do pre-registro")
     if dj["labels"] != {"background": 0, "esophagus": 1}:
         falhas.append("rotulos do dataset.json divergiram")
-    if dj["numTraining"] != 10:
-        falhas.append("numTraining divergiu de 10")
+    if dj["numTraining"] != n_tr:
+        falhas.append("numTraining divergiu de %d" % n_tr)
 
     # 12. montar() em modo seco nao escreve nada
-    r = montar(escrever=False)
+    r = montar(escrever=False, perfil=pf)
     if r["escrito"] or r["intersecao_treino_holdout"]:
         falhas.append("montar(escrever=False) escreveu ou sobrepos particoes")
 
+    # 13. NEUTRALIDADE DA PARAMETRIZACAO (Fase 32). O perfil v1 tem de reproduzir,
+    #     campo a campo, o `dataset.json` que ja esta em disco desde a Fase 26.
+    #     Sem esta checagem, "o default nao mudou" seria afirmacao, nao prova.
+    ja_em_disco = (RAIZ / ".clinica-dados" / "fase26" / "nnUNet_raw"
+                   / "Dataset501_VRmedEsofago" / "dataset.json")
+    if ja_em_disco.exists():
+        antigo = json.loads(ja_em_disco.read_text(encoding="utf-8"))
+        novo = montar_dataset_json(10, antigo["vrmed_sha256_manifesto"], PERFIS["v1"])
+        if novo != antigo:
+            dif = sorted(k for k in set(novo) | set(antigo) if novo.get(k) != antigo.get(k))
+            falhas.append("o perfil v1 deixou de reproduzir o dataset.json da Fase 26: %s" % dif)
+    else:
+        falhas.append("o dataset.json da Fase 26 sumiu; a checagem 13 nao prova nada")
+
+    # 14. os dois perfis nao compartilham arvore nem identificador
+    a_, b_ = PERFIS["v1"], PERFIS["v2"]
+    if a_["base"] == b_["base"] or a_["dataset_nome"] == b_["dataset_nome"]:
+        falhas.append("os perfis v1 e v2 colidem em arvore ou identificador")
+
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste dataset_nnunet: %d verificacoes, %d falhas" % (12, len(falhas)))
+    print("autoteste dataset_nnunet [%s]: %d verificacoes, %d falhas"
+          % (pf["versao_pool"], 14, len(falhas)))
     return 1 if falhas else 0
 
 
@@ -335,16 +431,19 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--autoteste", action="store_true")
     ap.add_argument("--escrever", action="store_true")
+    ap.add_argument("--perfil", default="v1", choices=sorted(PERFIS))
     a = ap.parse_args(argv)
+    pf = PERFIS[a.perfil]
     if a.autoteste:
-        return autoteste()
-    if autoteste() != 0:
+        return autoteste(pf)
+    if autoteste(pf) != 0:
         return 1
     print()
 
-    r = montar(escrever=a.escrever)
+    r = montar(escrever=a.escrever, perfil=pf)
     print("DATASET %s (id %d)" % (r["dataset_nome"], r["dataset_id"]))
     print("   manifesto  : %s" % r["sha256_manifesto"])
+    print("   arvore     : %s" % r["base"])
     print("   treino     : %d casos -> imagesTr" % r["n_treino"])
     for c in r["ids_treino"]:
         print("      %s" % c)
@@ -358,7 +457,7 @@ def main(argv=None) -> int:
         return 0
 
     print()
-    print("ESCRITO EM %s" % (NNUNET_RAW / DATASET_NOME))
+    print("ESCRITO EM %s" % (pf["base"] / "nnUNet_raw" / pf["dataset_nome"]))
     print("   imagesTr confere com a particao train : %s" % r["imagesTr_confere"])
     print("   imagem <-> rotulo pareados            : %s" % r["pareamento_imagem_rotulo"])
     print("   holdout fora de imagesTr              : %s" % r["holdout_fora_de_imagesTr"])
@@ -367,10 +466,11 @@ def main(argv=None) -> int:
     print("   originais intactos por sha256         : %s (%d arquivos)"
           % (r["originais_intactos"], r["n_originais_conferidos"]))
 
-    SAIDA.mkdir(parents=True, exist_ok=True)
-    (SAIDA / "dataset_nnunet.json").write_text(
+    saida = Path(pf["saida"])
+    saida.mkdir(parents=True, exist_ok=True)
+    (saida / "dataset_nnunet.json").write_text(
         json.dumps(r, indent=1, ensure_ascii=False), encoding="utf-8")
-    print("\nescrito:", SAIDA / "dataset_nnunet.json")
+    print("\nescrito:", saida / "dataset_nnunet.json")
 
     ok = (r["imagesTr_confere"] and r["pareamento_imagem_rotulo"]
           and r["holdout_fora_de_imagesTr"] and r["conversoes_todas_identicas"]

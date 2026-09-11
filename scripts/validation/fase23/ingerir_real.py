@@ -340,11 +340,10 @@ def main(argv=None) -> int:
                      m["orientacao"], m["volume_ml"], m["extensao_axial_mm"],
                      m["buracos_2d_pct"]))
 
-    SAIDA.mkdir(parents=True, exist_ok=True)
     destino_saida = Path(a.saida) if a.saida else SAIDA
     destino_saida.mkdir(parents=True, exist_ok=True)
     (destino_saida / "ingestao_real.json").write_text(json.dumps({
-        "fase": 23, "colecao": "4D-Lung",
+        "fase": 23, "colecao": proc["origem"]["source_dataset"],
         "n_casos": len(regs), "n_elegiveis": len(elegiveis),
         "criterio_23_18": [
             "imagem legivel", "mascara legivel", "vinculo por UID confirmado",
@@ -354,7 +353,7 @@ def main(argv=None) -> int:
         ],
         "casos": regs,
     }, indent=1, ensure_ascii=False, default=str), encoding="utf-8")
-    print("\nescrito:", SAIDA / "ingestao_real.json")
+    print("\nescrito:", destino_saida / "ingestao_real.json")
     return 0
 
 
