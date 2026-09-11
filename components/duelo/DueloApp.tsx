@@ -141,7 +141,7 @@ export function DueloApp() {
       {!inSession && (
         <>
           <Link
-            href="/"
+            href="/viewer"
             className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-medium text-white backdrop-blur hover:bg-black/70"
           >
             <ArrowLeft className="size-4" />

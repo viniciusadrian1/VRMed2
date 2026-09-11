@@ -69,7 +69,7 @@ export function ClinicaApp() {
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex h-16 max-w-5xl items-center gap-3 px-5">
           <Link
-            href="/"
+            href="/viewer"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             ← VRmed

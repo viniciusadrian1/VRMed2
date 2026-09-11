@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, type RefObject } from "react";
+import { useRef, useState, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useXRInputSourceState } from "@react-three/xr";
+import { useXR, useXRInputSourceState } from "@react-three/xr";
 import * as THREE from "three";
 
 /** Limites de escala, relativos ao tamanho original do modelo. */
@@ -298,4 +298,147 @@ export function XRManipulation({
   });
 
   return null;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Pose de entrada em AR                                                       */
+/* ------------------------------------------------------------------------- */
+
+/** Distância horizontal entre a cabeça e o centro do órgão, ao entrar em AR. */
+const AR_DISTANCIA = 0.6;
+/**
+ * Quanto o centro do órgão fica ABAIXO da linha dos olhos.
+ *
+ * Com o órgão em ~44 cm, 0,18 m deixa o topo dele pouco acima do olhar e o
+ * corpo logo abaixo — a pessoa baixa um pouco os olhos, que é como se olha
+ * para algo na mão, em vez de erguer a cabeça.
+ */
+const AR_ABAIXO_DOS_OLHOS = 0.18;
+/**
+ * Quadros de tolerância esperando o rastreio reportar a cabeça. Passado esse
+ * limite a manipulação é liberada assim mesmo, com a pose fixa que já estava
+ * aplicada: melhor um órgão no lugar aproximado do que um órgão que ninguém
+ * consegue agarrar porque o rastreio não respondeu.
+ */
+const AR_QUADROS_DE_ESPERA = 90;
+
+/**
+ * Coloca o órgão à frente de QUEM ESTÁ OLHANDO, no instante em que a sessão
+ * de AR começa — uma vez só, não a cada quadro.
+ *
+ * O problema que isto resolve: a pose fixa supunha alguém de pé. Abrindo o
+ * modo sentado, o órgão aparecia alto e distante, e a pessoa tinha de olhar
+ * para cima. A altura dos olhos varia quase meio metro entre sentado e de pé,
+ * e a direção para onde a pessoa começa virada é imprevisível num estande.
+ *
+ * A pose vem do `XRFrame`, não da câmera do three: a câmera só recebe a pose
+ * do quadro ANTERIOR, e no primeiro quadro da sessão ela ainda está na
+ * posição do modo 2D. `getViewerPose` é a fonte autoritativa e já vale no
+ * primeiro quadro; enquanto ela não vier (rastreio ainda iniciando), espera.
+ *
+ * Só a componente HORIZONTAL do olhar é usada. Quem entra olhando para o chão
+ * ou para o teto continua recebendo o órgão à sua frente, na altura certa —
+ * usar a direção crua enterraria o modelo no piso.
+ */
+function PoseDeEntradaAR({
+  target,
+  onPronto,
+}: {
+  target: RefObject<THREE.Group | null>;
+  onPronto: () => void;
+}) {
+  const origem = useXR((state) => state.origin);
+  const quadros = useRef(0);
+  const feito = useRef(false);
+
+  useFrame((state, _delta, frame) => {
+    if (feito.current) return;
+    const model = target.current;
+    if (!model) return;
+
+    quadros.current += 1;
+    const desistir = quadros.current > AR_QUADROS_DE_ESPERA;
+
+    const espaco = state.gl.xr.getReferenceSpace();
+    const pose = frame && espaco ? frame.getViewerPose(espaco) : null;
+    if (!pose) {
+      if (desistir) {
+        feito.current = true;
+        onPronto();
+      }
+      return;
+    }
+
+    const p = pose.transform.position;
+    const o = pose.transform.orientation;
+    const cabeca = new THREE.Vector3(p.x, p.y, p.z);
+    const frente = new THREE.Vector3(0, 0, -1).applyQuaternion(
+      new THREE.Quaternion(o.x, o.y, o.z, o.w),
+    );
+
+    // Do espaço de referência do WebXR para o mundo: o XROrigin pode estar
+    // deslocado (em AR ele fica na origem, mas isto não é suposição daqui).
+    if (origem) {
+      cabeca.applyMatrix4(origem.matrixWorld);
+      frente.transformDirection(origem.matrixWorld);
+    }
+
+    frente.y = 0;
+    if (frente.lengthSq() < 1e-4) {
+      // Olhando quase reto para cima ou para baixo: sem direção horizontal
+      // confiável. Tenta no próximo quadro.
+      if (desistir) {
+        feito.current = true;
+        onPronto();
+      }
+      return;
+    }
+    frente.normalize();
+
+    const alvo = cabeca.clone().addScaledVector(frente, AR_DISTANCIA);
+    alvo.y = cabeca.y - AR_ABAIXO_DOS_OLHOS;
+    if (model.parent) model.parent.worldToLocal(alvo);
+    model.position.copy(alvo);
+
+    // Vira o órgão de frente para quem olha. Em VR o usuário nasce no +Z e vê
+    // a face +Z do modelo; aqui o +Z tem de apontar de volta para a cabeça,
+    // senão a pessoa pode começar olhando para as costas do órgão.
+    model.rotation.set(0, Math.atan2(-frente.x, -frente.z), 0);
+
+    feito.current = true;
+    onPronto();
+  });
+
+  return null;
+}
+
+/**
+ * Entrada num modo imersivo: coloca o órgão no lugar e só então libera a
+ * manipulação.
+ *
+ * A ordem importa. O `XRManipulation` guarda a pose inicial no primeiro
+ * quadro em que roda, para o botão de reset (A/X) poder devolver o modelo ao
+ * ponto de partida. Se ele montasse antes do posicionamento de AR, o reset
+ * levaria o órgão para a pose de VR — a que o estande não comporta.
+ *
+ * Em VR não há o que medir: a cena é nossa e a pose é fixa, então a
+ * manipulação entra direto.
+ */
+export function EntradaXR({
+  modo,
+  target,
+}: {
+  modo: XRSessionMode | null;
+  target: RefObject<THREE.Group | null>;
+}) {
+  const [posicionado, setPosicionado] = useState(modo !== "immersive-ar");
+
+  return (
+    <>
+      {!posicionado && (
+        <PoseDeEntradaAR target={target} onPronto={() => setPosicionado(true)} />
+      )}
+      {posicionado && <XRManipulation target={target} />}
+    </>
+  );
 }

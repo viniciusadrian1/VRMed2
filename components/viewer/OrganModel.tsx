@@ -29,21 +29,28 @@ import { useVRMedStore } from "@/lib/store";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GLBModel } from "./GLBModel";
 import { PlaceholderOrgan } from "./PlaceholderOrgan";
-import { XRManipulation } from "./XRManipulation";
+import { EntradaXR } from "./XRManipulation";
 
 type Availability = "checking" | "real" | "placeholder";
 
 /** Aplica camadas, cortes e wireframe ao modelo sempre que o estado muda. */
 /**
- * Pose do órgão no modo AR, relativa aos pés do usuário no início da sessão.
+ * Pose PROVISÓRIA do órgão em AR, relativa aos pés do usuário.
+ *
+ * Quem manda de verdade é o `EntradaXR`, que mede a cabeça no primeiro quadro
+ * da sessão e recoloca o órgão à frente do olhar — sentado ou de pé. Esta
+ * constante cobre os poucos quadros até o rastreio responder, e é o que fica
+ * se ele nunca responder. Supõe alguém de pé, que é o caso comum; era a pose
+ * fixa que existia antes, e sozinha ela deixava o órgão alto demais para quem
+ * abrisse o modo sentado.
  *
  * Em VR o modelo fica em tamanho de vitrine (~2 unidades ≈ 2 m) e a pessoa
  * recua 3 m para vê-lo inteiro. Em AR não há 3 m para recuar — o estande é
  * pequeno, e é essa a razão de existir este modo. Então o órgão vem para a
  * frente do peito, do tamanho de uma bola: perto o bastante para alcançar com
  * a mão, pequeno o bastante para a pessoa dar a volta nele sem esbarrar em
- * nada. A partir daí os controles (e as duas mãos) reposicionam e redimensionam
- * à vontade — isto é só o ponto de partida.
+ * nada. A partir daí os controles (e as duas mãos) reposicionam e
+ * redimensionam à vontade.
  *
  * Aplicado no PRÓPRIO root do modelo, e não num grupo-pai: `XRManipulation`
  * mistura posição de mundo com posição local, e um pai com transformação
@@ -269,13 +276,15 @@ export function OrganModel() {
       </group>
 
       {/*
-       * Em VR e em AR o modelo é manipulado pelos controles do headset.
-       * `key={modo}` remonta a manipulação ao trocar de modo: ela guarda a
+       * Em VR e em AR o modelo é manipulado pelos controles do headset. Em AR,
+       * antes disso, ele é colocado à frente de quem está olhando.
+       *
+       * `key={modo}` remonta tudo ao trocar de modo: a manipulação guarda a
        * pose inicial no primeiro quadro para o botão de reset, e sem remontar
        * o reset devolveria o órgão à pose do OUTRO modo.
        */}
       {inSession && modelReady && (
-        <XRManipulation key={modo} target={rootRef} />
+        <EntradaXR key={modo} modo={modo} target={rootRef} />
       )}
 
       {!inSession && transformMode !== "none" && modelReady && rootRef.current && (
