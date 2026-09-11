@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Glasses } from "lucide-react";
+import { Glasses, ScanEye } from "lucide-react";
 import { viewerBridge } from "@/lib/viewer-bridge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,8 +11,32 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-/** Botão de entrada em realidade virtual (WebXR). */
-export function XRButton() {
+/**
+ * Os dois modos imersivos são a MESMA verificação com outro `XRSessionMode`:
+ * um aparelho pode suportar um e não o outro (Quest 2/3 suportam ambos; um
+ * celular com WebXR normalmente só faz `immersive-ar`). Por isso cada botão
+ * pergunta pelo seu modo em vez de herdar a resposta do outro.
+ */
+const MODOS = {
+  vr: {
+    sessao: "immersive-vr" as XRSessionMode,
+    rotulo: "Entrar em VR",
+    Icone: Glasses,
+    entrar: () => viewerBridge.enterVR(),
+    semSuporte: "Este dispositivo ou navegador não suporta WebXR em VR.",
+  },
+  ar: {
+    sessao: "immersive-ar" as XRSessionMode,
+    rotulo: "Entrar em AR",
+    Icone: ScanEye,
+    entrar: () => viewerBridge.enterAR(),
+    semSuporte: "Este dispositivo ou navegador não suporta WebXR em AR.",
+  },
+};
+
+/** Botão de entrada em realidade virtual ou aumentada (WebXR). */
+export function XRButton({ modo = "vr" }: { modo?: keyof typeof MODOS }) {
+  const { sessao, rotulo, Icone, entrar, semSuporte } = MODOS[modo];
   const [supported, setSupported] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -21,20 +45,20 @@ export function XRButton() {
       return;
     }
     navigator.xr
-      .isSessionSupported("immersive-vr")
+      .isSessionSupported(sessao)
       .then(setSupported)
       .catch(() => setSupported(false));
-  }, []);
+  }, [sessao]);
 
   const button = (
     <Button
       variant={supported ? "default" : "outline"}
       size="sm"
       disabled={supported !== true}
-      onClick={() => viewerBridge.enterVR()}
+      onClick={entrar}
     >
-      <Glasses />
-      Entrar em VR
+      <Icone />
+      {rotulo}
     </Button>
   );
 
@@ -51,8 +75,8 @@ export function XRButton() {
         </TooltipTrigger>
         <TooltipContent side="bottom">
           {supported === null
-            ? "Verificando suporte a VR…"
-            : "Este dispositivo ou navegador não suporta WebXR."}
+            ? `Verificando suporte a ${modo.toUpperCase()}…`
+            : semSuporte}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -16,6 +16,8 @@ export interface ViewerBridge {
   zoom: (factor: number) => void;
   /** Solicita a entrada em modo VR (WebXR). */
   enterVR: () => void;
+  /** Solicita a entrada em modo AR — passthrough, o órgão sobre a sala real. */
+  enterAR: () => void;
 }
 
 export const viewerBridge: ViewerBridge = {
@@ -24,4 +26,5 @@ export const viewerBridge: ViewerBridge = {
   frameTo: () => {},
   zoom: () => {},
   enterVR: () => {},
+  enterAR: () => {},
 };

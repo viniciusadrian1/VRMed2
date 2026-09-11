@@ -1,166 +1,153 @@
 import Link from "next/link";
 import {
+  type LucideIcon,
   FileText,
   Glasses,
   GraduationCap,
   Lamp,
-  MapPin,
   ScanLine,
   Swords,
   Volume2,
 } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { MagicCard } from "@/components/ui/magic-card";
 import { Reveal } from "./Reveal";
-import { CatalogGlyph } from "./mockups";
+
+type BentoItem = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  /** Quando presente, o cartão inteiro vira link para a rota e mostra "Abrir →". */
+  href?: string;
+  /** Rótulo mono no canto superior direito (ex.: "VR"). */
+  tag?: string;
+  /** Cartão em destaque: tipografia e respiro maiores. */
+  featured?: boolean;
+  /** Classes de span da célula do grid (ocupação assimétrica). */
+  span?: string;
+};
+
+// Modos e recursos extras da plataforma — NÃO inclui Catálogo (seção própria).
+// Ordem e spans compõem o bento: Sala em destaque (largo) abre a grade e
+// Histórico fecha (largo), preenchendo 3×3 no lg sem buracos.
+const cards: BentoItem[] = [
+  {
+    icon: Lamp,
+    title: "Sala de estudos",
+    href: "/sala",
+    tag: "VR",
+    featured: true,
+    span: "sm:col-span-2 lg:col-span-2",
+    description:
+      "Quarto 3D com flashcards, rádio e tutor de IA; estuda no desktop ou no headset.",
+  },
+  {
+    icon: ScanLine,
+    title: "Clínica",
+    href: "/clinica",
+    tag: "VR",
+    description:
+      "Casos em 3D a partir de exames reais anonimizados. Visualização educacional, não substitui laudo.",
+  },
+  {
+    icon: Swords,
+    title: "Duelo 1×1",
+    href: "/duelo",
+    description:
+      "Quiz de anatomia contra bot em três dificuldades; online em breve.",
+  },
+  {
+    icon: Glasses,
+    title: "Arena VR",
+    href: "/arena",
+    tag: "VR",
+    description:
+      "Desafio de anatomia imersivo em qualquer headset WebXR, direto do navegador.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Modo quiz",
+    href: "/quiz",
+    description:
+      "Teste-se identificando estruturas marcadas sobre os próprios modelos 3D.",
+  },
+  {
+    icon: Volume2,
+    title: "Narração em áudio",
+    description:
+      "Ouça a descrição de cada estrutura com a voz do navegador, em português.",
+  },
+  {
+    icon: FileText,
+    title: "Histórico e PDF",
+    href: "/history",
+    span: "lg:col-span-2",
+    description:
+      "Salve sessões com anotações, conversas e capturas e exporte um relatório pronto para revisar.",
+  },
+];
 
 /**
- * Grade "bento" com as demais capacidades da plataforma. Mistura cartões de
- * tamanhos diferentes para um layout moderno e respirado, sem repetir o grid
- * uniforme de funcionalidades. Os cartões com `href` levam às respectivas
- * páginas — é por aqui que quem chega pela landing descobre Sala, Duelo,
- * Clínica e Arena.
+ * Seção "E ainda" — bento assimétrico com os modos e recursos extras da
+ * plataforma. Cada cartão usa <MagicCard> por dentro (spotlight no hover);
+ * os que têm `href` são clicáveis por inteiro, com foco visível.
  */
 export function BentoGrid() {
   return (
-    <div className="grid auto-rows-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {/* Catálogo — cartão alto, ocupa duas linhas */}
-      <Reveal className="sm:row-span-2">
-        <article className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground">
-            <MapPin className="size-5" />
-          </span>
-          <h3 className="mt-4 text-lg font-semibold">Três níveis de detalhe</h3>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Do corpo inteiro ao detalhe regional: 18 modelos organizados em
-            sistemas, regiões anatômicas e órgãos individuais.
-          </p>
-          <div className="mt-auto pt-6">
-            <CatalogGlyph />
-          </div>
-        </article>
-      </Reveal>
-
-      {/* Sala de estudos */}
-      <Reveal delay={0.05}>
-        <BentoCard
-          icon={Lamp}
-          title="Sala de estudos"
-          href="/sala"
-          description="Quarto 3D com flashcards, rádio e tutor de IA; funciona no desktop e no headset."
-        />
-      </Reveal>
-
-      {/* Duelo 1×1 */}
-      <Reveal delay={0.1}>
-        <BentoCard
-          icon={Swords}
-          title="Duelo 1×1"
-          href="/duelo"
-          description="Quiz de anatomia contra bot em três dificuldades; online em breve."
-        />
-      </Reveal>
-
-      {/* Clínica */}
-      <Reveal delay={0.15}>
-        <BentoCard
-          icon={ScanLine}
-          title="Clínica"
-          href="/clinica"
-          description="Casos em 3D a partir de exames reais anonimizados. Visualização educacional, não substitui laudo."
-        />
-      </Reveal>
-
-      {/* Arena VR */}
-      <Reveal delay={0.2}>
-        <BentoCard
-          icon={Glasses}
-          title="Arena VR"
-          href="/arena"
-          description="Desafio de anatomia imersivo em qualquer headset WebXR, direto do navegador."
-        />
-      </Reveal>
-
-      {/* Quiz */}
-      <Reveal delay={0.25}>
-        <BentoCard
-          icon={GraduationCap}
-          title="Modo quiz"
-          href="/quiz"
-          description="Teste-se identificando estruturas marcadas sobre os próprios modelos 3D."
-        />
-      </Reveal>
-
-      {/* Narração */}
-      <Reveal delay={0.3}>
-        <BentoCard
-          icon={Volume2}
-          title="Narração em áudio"
-          description="Ouça a descrição de cada estrutura com a voz do navegador, em português."
-        />
-      </Reveal>
-
-      {/* PDF — cartão largo */}
-      <Reveal delay={0.35} className="sm:col-span-2">
-        <article className="flex h-full items-center gap-5 rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground">
-            <FileText className="size-5" />
-          </span>
-          <div>
-            <h3 className="text-lg font-semibold">
-              Histórico e exportação em PDF
-            </h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Salve sessões de estudo com anotações, conversas e capturas — e
-              exporte tudo num relatório pronto para revisar.
-            </p>
-          </div>
-        </article>
-      </Reveal>
+    <div className="grid auto-rows-[1fr] gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {cards.map((card, i) => (
+        <Reveal key={card.title} delay={i * 0.05} className={card.span}>
+          <BentoCard {...card} />
+        </Reveal>
+      ))}
     </div>
   );
 }
 
-function BentoCard({
-  icon: Icon,
-  title,
-  description,
-  href,
-}: {
-  icon: typeof Glasses;
-  title: string;
-  description: string;
-  /** Quando presente, o cartão inteiro vira um link para a rota. */
-  href?: string;
-}) {
-  const card = (
-    <article
-      className={
-        "flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm" +
-        (href ? " transition-colors hover:border-primary/40 hover:shadow-md" : "")
-      }
-    >
-      <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground">
-        <Icon className="size-5" />
-      </span>
-      <h3 className="mt-4 text-lg font-semibold">{title}</h3>
+function BentoCard({ icon: Icon, title, description, href, tag, featured }: BentoItem) {
+  const shell =
+    "block h-full rounded-2xl border border-border bg-card shadow-sm";
+
+  const content = (
+    <MagicCard className={cn("h-full rounded-[inherit]", featured ? "p-6 sm:p-8" : "p-6")}>
+      <div className="flex items-start justify-between gap-3">
+        <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-foreground">
+          <Icon className="size-5" aria-hidden />
+        </span>
+        {tag ? (
+          <span className="font-mono text-[10px] uppercase tracking-wider text-primary/70">
+            {tag}
+          </span>
+        ) : null}
+      </div>
+      <h3 className={cn("mt-4 font-semibold", featured ? "text-xl sm:text-2xl" : "text-lg")}>
+        {title}
+      </h3>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
         {description}
       </p>
       {href ? (
-        <span className="mt-auto pt-4 text-sm font-medium text-primary">
-          Abrir →
+        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+          Abrir <span aria-hidden>→</span>
         </span>
       ) : null}
-    </article>
+    </MagicCard>
   );
 
-  if (!href) return card;
+  if (!href) {
+    return <article className={shell}>{content}</article>;
+  }
 
   return (
     <Link
       href={href}
-      className="block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={cn(
+        shell,
+        "transition-colors hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      )}
     >
-      {card}
+      {content}
     </Link>
   );
 }

@@ -52,3 +52,11 @@ next-env.d.ts
 # Python (pipeline clínico)
 __pycache__/
 *.pyc
+
+# Rascunho de subagente na raiz do repo — os workflows rodam com cwd = raiz e
+# gravam respostas de API soltas (ax1.xml, dc.json...). Evidencia util vai para
+# docs/overnight/<fase>/raw/ de proposito, e nao por `git add -A`.
+/*.xml
+/dc.json
+/zn*.json
+/tmp_*

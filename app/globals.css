@@ -222,6 +222,16 @@
     background-size: 44px 44px;
   }
 
+  /* Régua de marcações (estética de instrumento/atlas): tracinhos verticais
+     regulares. Usada em faixas finas de 1px de altura entre seções. */
+  .vrmed-ruler {
+    background-image: repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--primary) 45%, transparent) 0 1px,
+      transparent 1px 11px
+    );
+  }
+
   /* Esconde elementos visualmente mantendo-os para leitores de tela */
   .sr-only-focusable:not(:focus):not(:focus-within) {
     position: absolute;

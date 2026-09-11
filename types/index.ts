@@ -254,6 +254,8 @@ export type AnalyticsEvent =
   | "compare_mode_used"
   | "vr_entered"
   | "vr_exited"
+  | "ar_entered"
+  | "ar_exited"
   | "pdf_exported";
 
 /* -------------------------------------------------------------------------- */

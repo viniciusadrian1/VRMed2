@@ -22,6 +22,10 @@ export function SairDoVR({
   rotationY?: number;
 }) {
   const session = useXR((state) => state.session);
+  // O rótulo segue o modo da sessão: quem entrou em AR procura "Sair do AR".
+  // Nas cenas que só existem em VR (sala, arena, duelo, clínica) o modo é
+  // sempre `immersive-vr`, então o texto não muda.
+  const emAR = useXR((state) => state.mode === "immersive-ar");
   if (!session) return null;
 
   const sair = () => {
@@ -34,7 +38,13 @@ export function SairDoVR({
 
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
-      <Button3D label="Sair do VR" width={0.42} height={0.1} color="#5c6b7a" onClick={sair} />
+      <Button3D
+        label={emAR ? "Sair do AR" : "Sair do VR"}
+        width={0.42}
+        height={0.1}
+        color="#5c6b7a"
+        onClick={sair}
+      />
     </group>
   );
 }
