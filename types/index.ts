@@ -54,6 +54,19 @@ export interface OrganDefinition {
   pathologyName?: string;
   /** Frase curta exibida no seletor. */
   blurb: string;
+  /**
+   * Maior dimensão da estrutura no adulto, em centímetros — usada SÓ para
+   * dimensionar o modelo em AR e VR, onde metro quer dizer alguma coisa.
+   *
+   * Não sai do arquivo: os `.glb` do catálogo vêm em unidades diferentes uns
+   * dos outros (os sistemas em metros, algumas regiões em milímetros, os
+   * órgãos em nada reconhecível), e nenhum declara qual usa. Sem este campo o
+   * coração aparecia maior que um corpo inteiro.
+   *
+   * É valor de REFERÊNCIA para exibição, não medição de caso nem dado de
+   * pesquisa. Ver o comentário em `lib/organs.ts`.
+   */
+  tamanhoRealCm?: number;
 }
 
 /* -------------------------------------------------------------------------- */
