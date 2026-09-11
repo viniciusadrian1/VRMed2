@@ -4,9 +4,23 @@ import { useXR } from "@react-three/xr";
 import { Button3D } from "@/components/arena/ui3d";
 
 /**
- * Botão 3D "Sair do VR". Dentro da sessão imersiva o DOM não existe, então o
- * link "← VRmed" da página some e a pessoa ficava presa no modo. Este botão
- * encerra a sessão e volta para a página anterior.
+ * Para onde a pessoa volta ao sair de um modo imersivo.
+ *
+ * Antes isto era `history.back()`, e o resultado era quase sempre a landing
+ * page: quem entra na sala, no duelo ou na clínica costuma chegar pela home,
+ * então "a página anterior" é a página de marketing. Sair do VR e cair num
+ * hero com botão "Começar agora" não é voltar para o app — é sair dele.
+ *
+ * O `/viewer` é a tela inicial do app: traz a barra lateral com todas as
+ * seções e o seletor de modelos. É de lá que se escolhe o que fazer em
+ * seguida, e é para lá que sair leva.
+ */
+const DESTINO_AO_SAIR = "/viewer";
+
+/**
+ * Botão 3D "Sair do VR" / "Sair do AR". Dentro da sessão imersiva o DOM não
+ * existe, então o link "← VRmed" da página some e a pessoa ficava presa no
+ * modo. Este botão encerra a sessão e leva para a tela inicial do app.
  *
  * Colocar como FILHO do <XROrigin>: a posição fica relativa aos pés do
  * usuário e vale para qualquer cenário (sentado ou de pé, basta a altura).
@@ -30,8 +44,11 @@ export function SairDoVR({
 
   const sair = () => {
     const voltar = () => {
-      if (window.history.length > 1) window.history.back();
-      else window.location.assign("/");
+      // Já estando no destino (sair do AR/VR dentro do próprio visualizador),
+      // navegar recarregaria a cena 3D inteira à toa.
+      if (window.location.pathname !== DESTINO_AO_SAIR) {
+        window.location.assign(DESTINO_AO_SAIR);
+      }
     };
     session.end().then(voltar, voltar);
   };
