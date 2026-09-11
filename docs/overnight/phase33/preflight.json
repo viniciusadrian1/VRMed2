@@ -1,0 +1,54 @@
+{
+ "split": {
+  "train": 32,
+  "validation": 14,
+  "test": 0
+ },
+ "sha256_manifesto": "f4bd480e8f8046923a8990096d40832145fb405f1a84ca85e8f3be6e6d20f60b",
+ "congelamento_intacto": true,
+ "n_imagesTr": 32,
+ "n_labelsTr": 32,
+ "validation_em_imagesTr": [],
+ "imagesTs_existe": false,
+ "n_holdout_fora_da_arvore": 14,
+ "hashes": {
+  "nnUNetPlans.json": "ffcd9bebb5b3109e98cb382a63b32df65519c2f76d0148388c814aaea0626bd4",
+  "dataset_fingerprint.json": "9fe99aa599be6470d3a8e3be3a97d35b6c5bc6a8fe9ae4fd322c715223603601",
+  "splits_final.json": "2217546e260839327c744788851c6e17273ca94627a9c4cf1a4fae225ce09747"
+ },
+ "dataset_json": {
+  "numTraining": 32,
+  "labels": {
+   "background": 0,
+   "esophagus": 1
+  },
+  "vrmed_dataset_version": "VRMED-ESOPHAGUS-POOL46-V2",
+  "vrmed_ontology": "ESOPHAGUS_ONTOLOGY_V1",
+  "vrmed_sha256_manifesto": "f4bd480e8f8046923a8990096d40832145fb405f1a84ca85e8f3be6e6d20f60b"
+ },
+ "ontologia": {
+  "versao": "ESOPHAGUS_ONTOLOGY_V1",
+  "congelada_em": "2026-09-06"
+ },
+ "n_folds": 5,
+ "trainer": {
+  "classe": "nnUNetTrainer_250epochs",
+  "base": "nnUNetTrainer",
+  "linhas_proprias": 5
+ },
+ "termos_de_parada_encontrados": [],
+ "atributos_alterados_pela_variante": [
+  "num_epochs"
+ ],
+ "constantes_do_trainer": {
+  "num_iterations_per_epoch": true,
+  "num_val_iterations_per_epoch": true,
+  "initial_lr": true,
+  "weight_decay": true,
+  "oversample_foreground_percent": true
+ },
+ "resultados_preexistentes": [],
+ "benchmark_em_arvore_propria": "C:\\Users\\vinic\\Downloads\\InnerVision\\vrmed\\.clinica-dados\\fase33\\benchmark",
+ "falhas": [],
+ "aprovado": true
+}

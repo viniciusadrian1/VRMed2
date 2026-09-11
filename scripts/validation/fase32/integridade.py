@@ -74,6 +74,23 @@ ALVOS = [
     ("f26b_curvas", "docs/overnight/phase26b/curvas.json", "arquivo"),
 ]
 
+# A Fase 33 acrescenta o que a Fase 32 congelou e que o treino NAO pode tocar: o
+# pre-registro vigente, o plano, a fingerprint, os folds e a arvore de entrada do
+# Dataset502. Os alvos da Fase 32 continuam todos na lista — acrescentar, nunca trocar.
+# `nnUNet_results` do 502 fica DE FORA de proposito: e a unica arvore que o treino pode
+# escrever, e congela-la faria a comparacao antes x depois falhar por desenho.
+ALVOS_FASE33 = ALVOS + [
+    ("v3_prerregistro", "docs/BASELINE-ESOPHAGUS-VRMED-V3.md", "arquivo"),
+    ("f32_protocolo", "docs/FASE32-PROTOCOLO-TREINO-V2.json", "arquivo"),
+    ("ds502_raw", ".clinica-dados/fase32/nnUNet_raw", "arvore"),
+    ("ds502_preprocessed", ".clinica-dados/fase32/nnUNet_preprocessed", "arvore"),
+    ("ds502_holdout", ".clinica-dados/fase32/validation_holdout", "arvore"),
+    ("f32_saidas", "docs/overnight/phase32", "arvore"),
+]
+
+PERFIS = {"fase32": ALVOS, "fase33": ALVOS_FASE33}
+
+
 # Arquivos historicos que ja foram sobrescritos uma vez. Nao basta estarem na lista
 # acima: aqui declara-se o CONTEUDO minimo que cada um tem de continuar tendo, para
 # que a checagem falhe por motivo legivel e nao so por hash diferente.
@@ -124,9 +141,9 @@ def _foto_arvore(d: Path) -> dict:
     }
 
 
-def tirar_foto() -> dict:
-    foto = {"alvos": {}}
-    for rotulo, rel, tipo in ALVOS:
+def tirar_foto(perfil: str = "fase32") -> dict:
+    foto = {"perfil": perfil, "alvos": {}}
+    for rotulo, rel, tipo in PERFIS[perfil]:
         p = RAIZ / rel
         if tipo == "manifesto":
             foto["alvos"][rotulo] = {"caminho": rel, **_foto_manifesto(p)}
@@ -276,7 +293,28 @@ def autoteste() -> int:
 
     for f in falhas:
         print("FALHA:", f)
-    print("autoteste integridade: %d verificacoes, %d falhas" % (10, len(falhas)))
+    # 11. o perfil da Fase 33 acrescenta alvos e NAO tira nenhum da Fase 32.
+    #     Trocar a lista em vez de estende-la deixaria de vigiar o que ja era vigiado.
+    rotulos32 = [r for r, _, _ in ALVOS]
+    rotulos33 = [r for r, _, _ in ALVOS_FASE33]
+    if rotulos32 != rotulos33[:len(rotulos32)]:
+        falhas.append("o perfil fase33 nao preserva a ordem e o conteudo do fase32")
+    novos = set(rotulos33) - set(rotulos32)
+    if not novos:
+        falhas.append("o perfil fase33 nao acrescentou nenhum alvo")
+
+    # 12. e os alvos novos existem de verdade — senao a foto nao prova nada sobre eles
+    f33 = tirar_foto("fase33")
+    ausentes33 = [r for r in novos if not f33["alvos"][r].get("existe")]
+    if ausentes33:
+        falhas.append("alvos novos da fase33 ausentes: %s" % sorted(ausentes33))
+
+    # 13. a arvore de resultados do Dataset502 NAO entra na foto: e a unica que o treino
+    #     pode escrever, e vigia-la faria a fase falhar por desenho.
+    if any("fase32/nnUNet_results" in rel for _, rel, _ in ALVOS_FASE33):
+        falhas.append("nnUNet_results do Dataset502 entrou na foto; o treino escreve la")
+
+    print("autoteste integridade: %d verificacoes, %d falhas" % (13, len(falhas)))
     return 1 if falhas else 0
 
 
@@ -284,6 +322,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--autoteste", action="store_true")
     ap.add_argument("--gravar", help="caminho do JSON da foto")
+    ap.add_argument("--perfil", default="fase32", choices=sorted(PERFIS))
     ap.add_argument("--comparar", nargs=2, metavar=("ANTES", "DEPOIS"))
     a = ap.parse_args(argv)
 
@@ -301,9 +340,9 @@ def main(argv=None) -> int:
         print("\nPORTAO DE INTEGRIDADE: %s" % ("OK" if r["intacto"] else "REPROVADO"))
         return 0 if r["intacto"] else 1
 
-    foto = tirar_foto()
-    print("FOTO DE INTEGRIDADE  (head %s, branch %s)"
-          % (foto["git"]["head"][:8], foto["git"]["branch"]))
+    foto = tirar_foto(a.perfil)
+    print("FOTO DE INTEGRIDADE [%s]  (head %s, branch %s)"
+          % (a.perfil, foto["git"]["head"][:8], foto["git"]["branch"]))
     for rotulo, d in foto["alvos"].items():
         if not d.get("existe"):
             print("   %-20s AUSENTE  %s" % (rotulo, d["caminho"]))
