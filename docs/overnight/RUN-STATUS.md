@@ -559,3 +559,56 @@ cinco exigidos em `DEMONSTRADA`. `PLAUSIVEL` não basta.
 
 **Testes:** 125/125 nos arquivos (15 novos) + 230/230 nos autotestes. `git status` mostra
 **apenas arquivos novos** — nada modificado. Varredura: 66 documentos, 0 violações.
+
+---
+
+## Fase 30 — viabilidade de TEST próprio e poder com TRAIN=10 (2026-09-10)
+
+**DECISÃO: (4) aumentar TRAIN primeiro; TEST próprio em seguida.**
+Mínimo com utilidade real **n = 10**; recomendado **n = 15**. TEST continua **0**.
+Nada baixado, treinado, inferido ou anotado.
+
+### O argumento, em três números
+
+1. **dp entre as 5 redes com TRAIN=10 = 0,0898** (folds: 0,6009 · 0,6042 · 0,7613 · 0,7672 ·
+   0,7706; amplitude 0,170). É a maior fonte de incerteza do projeto.
+2. **Um TEST de n=15 mediria a ±0,031** (σ intermediário) — **0,34× o dp entre folds**. Seria
+   medir 3× mais fino do que o objeto varia.
+3. **Com n=5 há 48,7 % de chance** de o TEST conter um colapso, e um único colapso moveria a
+   média em **0,063**.
+
+**Investir primeiro no TEST seria comprar precisão de medida quando falta estabilidade do
+medido.**
+
+### Tabela de tamanhos (IC 95 % da média de Dice, t·σ/√n)
+
+| n | σ 0,0192 | σ 0,0558 | σ 0,1369 | 1 colapso move | P(≥1 colapso) |
+|---|---|---|---|---|---|
+| 3 | ±0,048 | ±0,139 | ±0,340 | **−0,104** | 33 % |
+| 5 | ±0,024 | ±0,069 | ±0,170 | −0,063 | 49 % |
+| **10** | ±0,014 | ±0,040 | ±0,098 | −0,031 | 74 % |
+| **15** | ±0,011 | ±0,031 | ±0,076 | −0,021 | 87 % |
+| 20 | ±0,009 | ±0,026 | ±0,064 | −0,016 | 93 % |
+
+Os **três σ vêm de estimadores diferentes** (ensemble de 5 × uma rede por caso) e **não foram
+misturados** — é o erro que a verificação da Fase 27B pegou.
+
+### Dois TESTs diferentes, que o projeto tratava como um
+
+| | medir o **modelo próprio** | comparar com o **TotalSegmentator** |
+|---|---|---|
+| independência da linhagem de anotação do baseline | **não precisa** | **precisa — e trava aqui** |
+
+O primeiro é bem mais fácil de construir. O segundo exigiria um GT cuja linhagem seja
+comprovadamente disjunta da do TotalSegmentator, e a Fase 29 mostrou que o v2 é **inconclusivo**.
+
+### Desenho recomendado, se e quando
+
+**TEST-ROBUST n = 15**, modelo de anotação **B** no mínimo (2 anotadores independentes +
+adjudicação) — o menor desenho que produz **Dice interobservador**, sem o qual 0,76 não tem
+referência. Risco maior: **viés de anotador próprio** — anotar nós mesmos mede aderência à nossa
+convenção, não validade externa.
+
+**Testes:** 142/142 nos arquivos (17 novos) + 240/240 nos autotestes. Integridade **antes × depois
+inalterada** em manifesto, snapshot, pool16, split, épocas por fold, cada `.pth` e contagem de
+predições. Varredura: 67 documentos, 0 violações.

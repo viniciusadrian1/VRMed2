@@ -1,0 +1,166 @@
+{
+ "fase": "30",
+ "test_atual": 0,
+ "train_atual": 10,
+ "validation_atual": 6,
+ "natureza": "VIABILIDADE E PLANEJAMENTO — nada baixado, treinado, inferido ou anotado",
+ "cenarios": [
+  {
+   "id": "A",
+   "nome": "manter TEST=0 e aumentar TRAIN",
+   "risco": "baixo",
+   "custo": "baixo",
+   "tempo": "semanas",
+   "resolve": "a incerteza dominante (dp 0,0898 entre folds)",
+   "nao_resolve": "numero publicavel"
+  },
+  {
+   "id": "B",
+   "nome": "criar TEST proprio pequeno agora",
+   "risco": "alto",
+   "custo": "alto",
+   "tempo": "2-6 semanas",
+   "resolve": "primeiro holdout de verdade",
+   "nao_resolve": "instabilidade do modelo; vies de anotador proprio"
+  },
+  {
+   "id": "C",
+   "nome": "destravar TEST externo",
+   "risco": "alto",
+   "custo": "medio",
+   "tempo": "meses",
+   "resolve": "independencia institucional",
+   "nao_resolve": "eixo de linhagem de anotacao"
+  },
+  {
+   "id": "D",
+   "nome": "aumentar TRAIN e depois criar TEST proprio",
+   "risco": "baixo",
+   "custo": "medio",
+   "tempo": "semanas + 2-6 semanas",
+   "resolve": "ataca a incerteza dominante primeiro e mede quando medir valer a pena",
+   "nao_resolve": "adia o numero publicavel"
+  }
+ ],
+ "test_sizes": [
+  {
+   "n": 3,
+   "ic_meia_largura": {
+    "otimista": 0.0477,
+    "intermediario": 0.1386,
+    "pessimista": 0.3401
+   },
+   "desloc_por_1_colapso": -0.1043,
+   "prob_ao_menos_um_colapso": 0.33
+  },
+  {
+   "n": 5,
+   "ic_meia_largura": {
+    "otimista": 0.0238,
+    "intermediario": 0.0693,
+    "pessimista": 0.17
+   },
+   "desloc_por_1_colapso": -0.0626,
+   "prob_ao_menos_um_colapso": 0.487
+  },
+  {
+   "n": 6,
+   "ic_meia_largura": {
+    "otimista": 0.0202,
+    "intermediario": 0.0586,
+    "pessimista": 0.1437
+   },
+   "desloc_por_1_colapso": -0.0522,
+   "prob_ao_menos_um_colapso": 0.551
+  },
+  {
+   "n": 8,
+   "ic_meia_largura": {
+    "otimista": 0.0161,
+    "intermediario": 0.0467,
+    "pessimista": 0.1145
+   },
+   "desloc_por_1_colapso": -0.0391,
+   "prob_ao_menos_um_colapso": 0.656
+  },
+  {
+   "n": 10,
+   "ic_meia_largura": {
+    "otimista": 0.0137,
+    "intermediario": 0.0399,
+    "pessimista": 0.0979
+   },
+   "desloc_por_1_colapso": -0.0313,
+   "prob_ao_menos_um_colapso": 0.737
+  },
+  {
+   "n": 15,
+   "ic_meia_largura": {
+    "otimista": 0.0106,
+    "intermediario": 0.0309,
+    "pessimista": 0.0758
+   },
+   "desloc_por_1_colapso": -0.0209,
+   "prob_ao_menos_um_colapso": 0.865
+  },
+  {
+   "n": 20,
+   "ic_meia_largura": {
+    "otimista": 0.009,
+    "intermediario": 0.0261,
+    "pessimista": 0.0641
+   },
+   "desloc_por_1_colapso": -0.0157,
+   "prob_ao_menos_um_colapso": 0.931
+  },
+  {
+   "n": 25,
+   "ic_meia_largura": {
+    "otimista": 0.0079,
+    "intermediario": 0.023,
+    "pessimista": 0.0565
+   },
+   "desloc_por_1_colapso": -0.0125,
+   "prob_ao_menos_um_colapso": 0.965
+  },
+  {
+   "n": 30,
+   "ic_meia_largura": {
+    "otimista": 0.0072,
+    "intermediario": 0.0208,
+    "pessimista": 0.0511
+   },
+   "desloc_por_1_colapso": -0.0104,
+   "prob_ao_menos_um_colapso": 0.982
+  }
+ ],
+ "recommended_test_size": 15,
+ "minimo_com_utilidade_real": 10,
+ "modelo_de_anotacao_minimo": "B — 2 anotadores independentes + adjudicacao (produz Dice interobservador)",
+ "recommended_next_step": "(4) aumentar TRAIN primeiro; TEST proprio em seguida",
+ "reasoning": [
+  "dp ENTRE as 5 redes treinadas com TRAIN=10 e 0,0898 (amplitude 0,170) — e a maior fonte de incerteza do projeto",
+  "um TEST de n=15 mediria a +/-0,031 sob sigma intermediario, ou seja 0,34x o dp entre folds: medida 3x mais fina que a variacao do objeto medido",
+  "com n=5 ha 48,7 % de chance de o TEST conter um colapso, e um unico colapso moveria a media em 0,063",
+  "abaixo de n=10 um unico caso muda a conclusao qualitativa; e o criterio foi declarado antes de olhar a tabela",
+  "TEST nao reduz incerteza de generalizacao, de validade externa nem de capacidade do modelo — so a precisao do estimador",
+  "um TEST anotado pela mesma equipe que escreveu a ontologia mede aderencia a propria convencao, nao validade externa"
+ ],
+ "premissas": [
+  "sigma de um TEST futuro e DESCONHECIDO; os tres cenarios sao os sigmas observados no projeto e diferem por fator 7",
+  "os tres sigmas vem de estimadores diferentes (ensemble de 5 x uma rede por caso) e NAO foram misturados",
+  "p de colapso = 2/16 = 12,5 %, frequencia observada, ela mesma muito incerta",
+  "o IC assume amostragem independente; com casos de uma so coorte isso e aproximacao",
+  "NAO se afirma que mais TRAIN melhora o desempenho — apenas que aumenta a informacao para estimar o modelo"
+ ],
+ "dp_entre_folds": 0.0898,
+ "dice_por_fold": [
+  0.7613,
+  0.6009,
+  0.7672,
+  0.7706,
+  0.6042
+ ],
+ "confidence": "media-alta para a decisao (o argumento e aritmetico sobre dados observados); baixa para o sigma de um TEST futuro",
+ "timestamp": "2026-09-10"
+}

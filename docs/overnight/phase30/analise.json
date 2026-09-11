@@ -1,0 +1,520 @@
+{
+ "tabela_tamanhos": [
+  {
+   "n": 3,
+   "prob_ao_menos_um_colapso": 0.330078125,
+   "desloc_por_1_colapso": -0.10433333333333333,
+   "desloc_por_2_colapsos": -0.20866666666666667,
+   "desloc_por_1_excelente": 0.03566666666666666,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.04769929359980082,
+     "largura_total": 0.09539858719960163,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.13862607202442115,
+     "largura_total": 0.2772521440488423,
+     "menor_que_dp_entre_folds": false
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.3401059007194132,
+     "largura_total": 0.6802118014388264,
+     "menor_que_dp_entre_folds": false
+    }
+   }
+  },
+  {
+   "n": 5,
+   "prob_ao_menos_um_colapso": 0.487091064453125,
+   "desloc_por_1_colapso": -0.0626,
+   "desloc_por_2_colapsos": -0.1252,
+   "desloc_por_1_excelente": 0.021399999999999995,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.023836126869271352,
+     "largura_total": 0.047672253738542704,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.06927374371381988,
+     "largura_total": 0.13854748742763975,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.1699565504376692,
+     "largura_total": 0.3399131008753384,
+     "menor_que_dp_entre_folds": false
+    }
+   }
+  },
+  {
+   "n": 6,
+   "prob_ao_menos_um_colapso": 0.5512046813964844,
+   "desloc_por_1_colapso": -0.05216666666666667,
+   "desloc_por_2_colapsos": -0.10433333333333333,
+   "desloc_por_1_excelente": 0.01783333333333333,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.020152442011825762,
+     "largura_total": 0.040304884023651524,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.05856803459686864,
+     "largura_total": 0.11713606919373729,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.14369110996973683,
+     "largura_total": 0.28738221993947366,
+     "menor_que_dp_entre_folds": false
+    }
+   }
+  },
+  {
+   "n": 8,
+   "prob_ao_menos_um_colapso": 0.6563910841941833,
+   "desloc_por_1_colapso": -0.039125,
+   "desloc_por_2_colapsos": -0.07825,
+   "desloc_por_1_excelente": 0.013374999999999998,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.016054152360059373,
+     "largura_total": 0.03210830472011875,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.046657380296422565,
+     "largura_total": 0.09331476059284513,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.11446945094229835,
+     "largura_total": 0.2289389018845967,
+     "menor_que_dp_entre_folds": false
+    }
+   }
+  },
+  {
+   "n": 10,
+   "prob_ao_menos_um_colapso": 0.7369244238361716,
+   "desloc_por_1_colapso": -0.0313,
+   "desloc_por_2_colapsos": -0.0626,
+   "desloc_por_1_excelente": 0.010699999999999998,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.013733898369217675,
+     "largura_total": 0.02746779673843535,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.03991414213553888,
+     "largura_total": 0.07982828427107776,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.09792555660134895,
+     "largura_total": 0.1958511132026979,
+     "menor_que_dp_entre_folds": false
+    }
+   }
+  },
+  {
+   "n": 15,
+   "prob_ao_menos_um_colapso": 0.86506618626143,
+   "desloc_por_1_colapso": -0.020866666666666665,
+   "desloc_por_2_colapsos": -0.04173333333333333,
+   "desloc_por_1_excelente": 0.007133333333333333,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.010633663075347083,
+     "largura_total": 0.021267326150694165,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.030904083312727464,
+     "largura_total": 0.06180816662545493,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.07582023307369873,
+     "largura_total": 0.15164046614739746,
+     "menor_que_dp_entre_folds": true
+    }
+   }
+  },
+  {
+   "n": 20,
+   "prob_ao_menos_um_colapso": 0.9307912412260697,
+   "desloc_por_1_colapso": -0.01565,
+   "desloc_por_2_colapsos": -0.0313,
+   "desloc_por_1_excelente": 0.005349999999999999,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.008985773331661553,
+     "largura_total": 0.017971546663323106,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.02611490374514139,
+     "largura_total": 0.05222980749028278,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.06407043589085765,
+     "largura_total": 0.1281408717817153,
+     "menor_que_dp_entre_folds": true
+    }
+   }
+  },
+  {
+   "n": 25,
+   "prob_ao_menos_um_colapso": 0.964502209206743,
+   "desloc_por_1_colapso": -0.01252,
+   "desloc_por_2_colapsos": -0.02504,
+   "desloc_por_1_excelente": 0.004279999999999999,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.00792576,
+     "largura_total": 0.01585152,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.02303424,
+     "largura_total": 0.04606848,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.05651231999999999,
+     "largura_total": 0.11302463999999998,
+     "menor_que_dp_entre_folds": true
+    }
+   }
+  },
+  {
+   "n": 30,
+   "prob_ao_menos_um_colapso": 0.9817928659099648,
+   "desloc_por_1_colapso": -0.010433333333333333,
+   "desloc_por_2_colapsos": -0.020866666666666665,
+   "desloc_por_1_excelente": 0.0035666666666666663,
+   "ic": {
+    "otimista": {
+     "sigma": 0.0192,
+     "meia_largura": 0.007168592832627613,
+     "largura_total": 0.014337185665255226,
+     "menor_que_dp_entre_folds": true
+    },
+    "intermediario": {
+     "sigma": 0.0558,
+     "meia_largura": 0.020833722919824004,
+     "largura_total": 0.04166744583964801,
+     "menor_que_dp_entre_folds": true
+    },
+    "pessimista": {
+     "sigma": 0.1369,
+     "meia_largura": 0.051113560353475015,
+     "largura_total": 0.10222712070695003,
+     "menor_que_dp_entre_folds": true
+    }
+   }
+  }
+ ],
+ "train_vs_test": {
+  "dp_entre_folds": 0.0898,
+  "dice_por_fold": [
+   0.7613,
+   0.6009,
+   0.7672,
+   0.7706,
+   0.6042
+  ],
+  "amplitude_entre_folds": 0.16969999999999996,
+  "cenarios": {
+   "otimista": {
+    "origem": "reservado n=6, ensemble de 5 folds, mix estreito de casos",
+    "sigma": 0.0192,
+    "por_n": {
+     "3": {
+      "meia_largura_ic": 0.04769929359980082,
+      "razao_ic_sobre_dp_entre_folds": 0.53117253451894,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "5": {
+      "meia_largura_ic": 0.023836126869271352,
+      "razao_ic_sobre_dp_entre_folds": 0.2654357112391019,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "6": {
+      "meia_largura_ic": 0.020152442011825762,
+      "razao_ic_sobre_dp_entre_folds": 0.22441472173525345,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "8": {
+      "meia_largura_ic": 0.016054152360059373,
+      "razao_ic_sobre_dp_entre_folds": 0.17877675233919124,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "10": {
+      "meia_largura_ic": 0.013733898369217675,
+      "razao_ic_sobre_dp_entre_folds": 0.15293873462380483,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "15": {
+      "meia_largura_ic": 0.010633663075347083,
+      "razao_ic_sobre_dp_entre_folds": 0.11841495629562453,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "20": {
+      "meia_largura_ic": 0.008985773331661553,
+      "razao_ic_sobre_dp_entre_folds": 0.10006429099845827,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "25": {
+      "meia_largura_ic": 0.00792576,
+      "razao_ic_sobre_dp_entre_folds": 0.08826013363028953,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "30": {
+      "meia_largura_ic": 0.007168592832627613,
+      "razao_ic_sobre_dp_entre_folds": 0.07982842798026295,
+      "medicao_mais_fina_que_o_modelo": true
+     }
+    }
+   },
+   "intermediario": {
+    "origem": "out-of-fold n=8, uma rede por caso, sem os 2 colapsos",
+    "sigma": 0.0558,
+    "por_n": {
+     "3": {
+      "meia_largura_ic": 0.13862607202442115,
+      "razao_ic_sobre_dp_entre_folds": 1.5437201784456698,
+      "medicao_mais_fina_que_o_modelo": false
+     },
+     "5": {
+      "meia_largura_ic": 0.06927374371381988,
+      "razao_ic_sobre_dp_entre_folds": 0.7714225357886401,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "6": {
+      "meia_largura_ic": 0.05856803459686864,
+      "razao_ic_sobre_dp_entre_folds": 0.6522052850430806,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "8": {
+      "meia_largura_ic": 0.046657380296422565,
+      "razao_ic_sobre_dp_entre_folds": 0.5195699364857747,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "10": {
+      "meia_largura_ic": 0.03991414213553888,
+      "razao_ic_sobre_dp_entre_folds": 0.44447819750043294,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "15": {
+      "meia_largura_ic": 0.030904083312727464,
+      "razao_ic_sobre_dp_entre_folds": 0.34414346673415885,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "20": {
+      "meia_largura_ic": 0.02611490374514139,
+      "razao_ic_sobre_dp_entre_folds": 0.2908118457142694,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "25": {
+      "meia_largura_ic": 0.02303424,
+      "razao_ic_sobre_dp_entre_folds": 0.256506013363029,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "30": {
+      "meia_largura_ic": 0.020833722919824004,
+      "razao_ic_sobre_dp_entre_folds": 0.23200136881763922,
+      "medicao_mais_fina_que_o_modelo": true
+     }
+    }
+   },
+   "pessimista": {
+    "origem": "out-of-fold n=10, uma rede por caso, COM os 2 colapsos",
+    "sigma": 0.1369,
+    "por_n": {
+     "3": {
+      "meia_largura_ic": 0.3401059007194132,
+      "razao_ic_sobre_dp_entre_folds": 3.787370832064735,
+      "medicao_mais_fina_que_o_modelo": false
+     },
+     "5": {
+      "meia_largura_ic": 0.1699565504376692,
+      "razao_ic_sobre_dp_entre_folds": 1.892611920241305,
+      "medicao_mais_fina_que_o_modelo": false
+     },
+     "6": {
+      "meia_largura_ic": 0.14369110996973683,
+      "razao_ic_sobre_dp_entre_folds": 1.6001237190393856,
+      "medicao_mais_fina_que_o_modelo": false
+     },
+     "8": {
+      "meia_largura_ic": 0.11446945094229835,
+      "razao_ic_sobre_dp_entre_folds": 1.2747154893351709,
+      "medicao_mais_fina_que_o_modelo": false
+     },
+     "10": {
+      "meia_largura_ic": 0.09792555660134895,
+      "razao_ic_sobre_dp_entre_folds": 1.0904850401041086,
+      "medicao_mais_fina_que_o_modelo": false
+     },
+     "15": {
+      "meia_largura_ic": 0.07582023307369873,
+      "razao_ic_sobre_dp_entre_folds": 0.8443233081703644,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "20": {
+      "meia_largura_ic": 0.06407043589085765,
+      "razao_ic_sobre_dp_entre_folds": 0.7134792415462989,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "25": {
+      "meia_largura_ic": 0.05651231999999999,
+      "razao_ic_sobre_dp_entre_folds": 0.6293131403118039,
+      "medicao_mais_fina_que_o_modelo": true
+     },
+     "30": {
+      "meia_largura_ic": 0.051113560353475015,
+      "razao_ic_sobre_dp_entre_folds": 0.5691933224217708,
+      "medicao_mais_fina_que_o_modelo": true
+     }
+    }
+   }
+  },
+  "leitura": "A variacao ENTRE as 5 redes treinadas com TRAIN=10 e 0,0898 de desvio (amplitude 0,170). Assim que a meia-largura do IC do TEST fica abaixo disso, aumentar o TEST passa a medir com mais precisao um objeto que continua variando mais do que a propria medida."
+ },
+ "cenarios_sigma": [
+  {
+   "nome": "otimista",
+   "sigma": 0.0192,
+   "origem": "reservado n=6, ensemble de 5 folds, mix estreito de casos"
+  },
+  {
+   "nome": "intermediario",
+   "sigma": 0.0558,
+   "origem": "out-of-fold n=8, uma rede por caso, sem os 2 colapsos"
+  },
+  {
+   "nome": "pessimista",
+   "sigma": 0.1369,
+   "origem": "out-of-fold n=10, uma rede por caso, COM os 2 colapsos"
+  }
+ ],
+ "simulacao_reservado": {
+  "3": {
+   "n": 3,
+   "media_das_medias": 0.7630798530861392,
+   "p2_5": 0.7427200076075029,
+   "p97_5": 0.7834196484675883,
+   "largura": 0.04069964086008537,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "5": {
+   "n": 5,
+   "media_das_medias": 0.7630689078820118,
+   "p2_5": 0.7480144484130077,
+   "p97_5": 0.7785101139103657,
+   "largura": 0.03049566549735805,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "6": {
+   "n": 6,
+   "media_das_medias": 0.7630750592193325,
+   "p2_5": 0.7494460528591744,
+   "p97_5": 0.7769706483844367,
+   "largura": 0.02752459552526232,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "8": {
+   "n": 8,
+   "media_das_medias": 0.7630624203623367,
+   "p2_5": 0.7510918698854822,
+   "p97_5": 0.7752144975958697,
+   "largura": 0.024122627710387534,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "10": {
+   "n": 10,
+   "media_das_medias": 0.7630590196298718,
+   "p2_5": 0.7523671822103543,
+   "p97_5": 0.7738898345884185,
+   "largura": 0.021522652378064278,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "15": {
+   "n": 15,
+   "media_das_medias": 0.7630683267290759,
+   "p2_5": 0.7542449792323366,
+   "p97_5": 0.7719214736537079,
+   "largura": 0.017676494421371314,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "20": {
+   "n": 20,
+   "media_das_medias": 0.7630846011046765,
+   "p2_5": 0.755525614055909,
+   "p97_5": 0.7707787398631807,
+   "largura": 0.015253125807271672,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "25": {
+   "n": 25,
+   "media_das_medias": 0.7630796027520736,
+   "p2_5": 0.7563132722709336,
+   "p97_5": 0.7698919284619002,
+   "largura": 0.013578656190966654,
+   "repeticoes": 20000,
+   "origem_n": 6
+  },
+  "30": {
+   "n": 30,
+   "media_das_medias": 0.763056588130978,
+   "p2_5": 0.7568333888040779,
+   "p97_5": 0.7692316337624333,
+   "largura": 0.012398244958355398,
+   "repeticoes": 20000,
+   "origem_n": 6
+  }
+ },
+ "premissas": [
+  "sigma e DESCONHECIDO para um TEST futuro; os tres cenarios sao os sigmas observados no projeto",
+  "os tres sigmas vem de estimadores diferentes e NAO sao misturados",
+  "p de colapso = 2/16, frequencia observada, ela mesma muito incerta",
+  "o IC assume amostragem independente de uma populacao; com casos de uma so coorte isso e aproximacao"
+ ]
+}
