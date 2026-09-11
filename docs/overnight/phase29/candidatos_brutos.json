@@ -1,0 +1,129 @@
+{
+ "fase": 29,
+ "natureza": "AUDITORIA — nenhum dado baixado, nenhum treino, nenhum TEST criado",
+ "status": "CONCLUIDA",
+ "baseline_do_projeto": "TotalSegmentator 2.18.0 (pesos v2)",
+ "decisao": "C — nao existe TEST externo adequado neste momento; com recomendacao forte de D (TEST proprio). Os dois candidatos B herdados da Fase 28 foram REBAIXADOS: StructSeg para D (acesso bloqueado, licenca NC/SA, contaminacao em modelos de fundacao) e Pediatric-CT-SEG para C (adequacao ao adulto refutada por evidencia positiva). A=0 e B=0.",
+ "pendencias": [
+  "linhagem de anotacao do TotalSegmentator v2 permanece INCONCLUSIVA — nao ha artigo, model card nem lista de treino por caso do v2",
+  "os ~420 sujeitos adicionais do treino v2 NAO foram publicados",
+  "nenhum candidato tem os cinco eixos de independencia demonstrados"
+ ],
+ "candidatos": [
+  {
+   "nome": "StructSeg 2019 - Task 3 (OAR toracico)",
+   "n_sujeitos": "60 (50 com GT publico)",
+   "licenca_classe": "UNKNOWN",
+   "anotacao_tipo": "HUMANA_REVISADA",
+   "ontologia": "PARCIAL",
+   "acesso": "INDISPONIVEL",
+   "overlap": "DETECTADO",
+   "adequacao_adulto": "SIM (adultos NSCLC), mas z de 3-5 mm degrada metrica de esofago",
+   "independencia": {
+    "imagem": "PLAUSIVEL",
+    "exame": "INCONCLUSIVO",
+    "instituicao": "DEMONSTRADA",
+    "anotacao": "INCONCLUSIVO",
+    "linhagem_anotacao": "INCONCLUSIVO"
+   },
+   "status": "D",
+   "motivo": "Acesso BLOQUEADO e demonstrado: /Download/ devolve HTTP 403 e o dominio structseg-challenge.org e NXDOMAIN (reverificado 2026-09-10). Licenca dos dados de 2019 UNKNOWN; o unico sinal documental dos organizadores e o design doc de 2020 declarando 'CC BY NC SA' — nao-comercial e ShareAlike — e um terceiro que teve os dados declara que eles 'can not be publicly posted, or distributed'. A ordem das classes no .nii.gz esta em CONFLITO nao resolvido entre a pagina oficial e terceiros. E os 50 casos publicos aparecem como dado de TREINO em modelos de fundacao (Hermes, arXiv 2306.02416; Iris, arXiv 2503.19359).",
+   "pendencias": [
+    "contato com os organizadores para licenca e protocolo — NAO executado",
+    "ordem das classes so se resolve medindo volumes no proprio dado, que nao se tem"
+   ]
+  },
+  {
+   "nome": "Pediatric-CT-SEG (TCIA)",
+   "n_sujeitos": "359 (esofago em 353)",
+   "licenca_classe": "ABERTA_ATRIBUICAO",
+   "anotacao_tipo": "HUMANA_MANUAL",
+   "ontologia": "PARCIAL",
+   "acesso": "ABERTO",
+   "overlap": "NAO DETECTADO",
+   "adequacao_adulto": "NAO — refutada por evidencia positiva",
+   "independencia": {
+    "imagem": "DEMONSTRADA",
+    "exame": "DEMONSTRADA",
+    "instituicao": "INCONCLUSIVO",
+    "anotacao": "INCONCLUSIVO",
+    "linhagem_anotacao": "DEMONSTRADA"
+   },
+   "status": "C",
+   "motivo": "Licenca CC BY 4.0 e acesso direto sao os melhores do lote, e o esofago consta em 353 dos 359. Mas a adequacao ao adulto foi REFUTADA POR EVIDENCIA POSITIVA, nao por duvida: modelo adulto rende DSC 0,47+/-0,18 no esofago deste dataset, e o teto in-domain do proprio dataset e 0,70. Alem disso, que o esofago esteja entre as 25 estruturas manuais e ARITMETICA do investigador (29 menos as 4 semiautomaticas) — o artigo diz 'up to 29' e nunca lista quais 25. Nenhum atlas de contorno e citado.",
+   "pendencias": [
+    "abrir os ROI Names de um RTSTRUCT v2 para fechar 'esofago e manual' (minutos)",
+    "fixar a versao v2 (2022-03-31): a v1 tinha 103 series com RTSTRUCT duplicado",
+    "inventario de proveniencia dos pesos: existem modelos pediatricos treinados NESTE dataset"
+   ],
+   "uso_condicional": "banca de analise de domain shift — nunca TEST de esofago adulto"
+  },
+  {
+   "nome": "RADCURE (TCIA)",
+   "n_sujeitos": "3.337 (esofago em 2.708)",
+   "licenca_classe": "RESTRITA",
+   "anotacao_tipo": "HUMANA_REVISADA",
+   "ontologia": "UNKNOWN",
+   "acesso": "DUA",
+   "overlap": "DETECTADO",
+   "adequacao_adulto": "adultos SIM; cobertura do esofago PARCIAL (coorte de cabeca-pescoco)",
+   "independencia": {
+    "imagem": "PLAUSIVEL",
+    "exame": "INCONCLUSIVO",
+    "instituicao": "DEMONSTRADA",
+    "anotacao": "INCONCLUSIVO",
+    "linhagem_anotacao": "INCONCLUSIVO"
+   },
+   "status": "C",
+   "motivo": "Achado duro e verificado em fonte primaria: o CSV oficial RADCURE_OAR_contour_mapping_v04_20241219.csv tem 3.337 linhas e a coluna de esofago preenchida em 2.708 delas. Mas: e coorte de CABECA-PESCOCO, entao o campo cobre esofago cervical/torax alto e nao o orgao inteiro; o acesso e NIH Controlled Data Access; e ha overlap DEMONSTRADO — o TCIA declara que RADCURE 'replaces the OPC-Radiomics dataset' (603 pacientes, 419 com esofago, que circularam anos como colecao separada), e o RADCURE E corpus de treino de modelos publicos de auto-segmentacao de 19 OARs incluindo esofago.",
+   "pendencias": [
+    "medir a extensao cranio-caudal real do esofago contornado",
+    "excluir os 603 IDs OPC-* se algum dia for usado",
+    "inventariar pesos de OAR de cabeca-pescoco no pipeline"
+   ]
+  },
+  {
+   "nome": "NSCLC-Cetuximab / RTOG-0617 (TCIA)",
+   "n_sujeitos": "490",
+   "licenca_classe": "RESTRITA",
+   "anotacao_tipo": "UNKNOWN",
+   "ontologia": "UNKNOWN",
+   "acesso": "DUA",
+   "overlap": "INCONCLUSIVO",
+   "adequacao_adulto": "SIM (adultos NSCLC) — a unica coorte do lote com a populacao certa",
+   "independencia": {
+    "imagem": "INCONCLUSIVO",
+    "exame": "INCONCLUSIVO",
+    "instituicao": "INCONCLUSIVO",
+    "anotacao": "INCONCLUSIVO",
+    "linhagem_anotacao": "INCONCLUSIVO"
+   },
+   "status": "C",
+   "motivo": "Continua com a pergunta central em aberto: NAO foi demonstrado que existe contorno de ESOFAGO nos RTSTRUCT. Acesso sob NIH Controlled Data Access Policy (dbGaP/DUA, nao redistribuivel). Os contornos sao clinicos, submetidos pelas instituicoes participantes do ensaio NCTN/RTOG, e o conteudo exato nao e verificavel sem acesso.",
+   "pendencias": [
+    "confirmar existencia de contorno de esofago — decide se vale pedir acesso",
+    "verificar o regime de DUA e se permite uso como TEST publicavel"
+   ]
+  },
+  {
+   "nome": "TROTS (Erasmus MC)",
+   "n_sujeitos": "120",
+   "licenca_classe": "ABERTA_ATRIBUICAO",
+   "anotacao_tipo": "UNKNOWN",
+   "ontologia": "INCOMPATIVEL",
+   "acesso": "ABERTO",
+   "overlap": "INCONCLUSIVO",
+   "adequacao_adulto": "adultos, mas os protocolos sao prostata/cabeca-pescoco/figado",
+   "independencia": {
+    "imagem": "PLAUSIVEL",
+    "exame": "INCONCLUSIVO",
+    "instituicao": "DEMONSTRADA",
+    "anotacao": "INCONCLUSIVO",
+    "linhagem_anotacao": "INCONCLUSIVO"
+   },
+   "status": "D",
+   "motivo": "Licenca aberta, mas sem utilidade para o alvo: as estruturas estao embutidas em arquivos Matlab/HDF5 como conjuntos de voxels amostrados para otimizacao de dose, nao como mascara de imagem; e os protocolos nao cobrem CT toracica com esofago como orgao. Quem delineou nao e descrito.",
+   "pendencias": []
+  }
+ ]
+}

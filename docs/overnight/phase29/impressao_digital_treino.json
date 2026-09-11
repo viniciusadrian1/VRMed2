@@ -1,0 +1,82 @@
+{
+ "folds": {
+  "26b/fold_0": {
+   "epocas": 250,
+   "checkpoints": {
+    "checkpoint_best.pth": {
+     "bytes": 245809494,
+     "mtime": 1788785163
+    },
+    "checkpoint_final.pth": {
+     "bytes": 245830192,
+     "mtime": 1788793750
+    }
+   }
+  },
+  "26b/fold_1": {
+   "epocas": 250,
+   "checkpoints": {
+    "checkpoint_best.pth": {
+     "bytes": 245817430,
+     "mtime": 1788823200
+    },
+    "checkpoint_final.pth": {
+     "bytes": 245830256,
+     "mtime": 1788828479
+    }
+   }
+  },
+  "26b/fold_2": {
+   "epocas": 250,
+   "checkpoints": {
+    "checkpoint_best.pth": {
+     "bytes": 245816150,
+     "mtime": 1788857541
+    },
+    "checkpoint_final.pth": {
+     "bytes": 245830256,
+     "mtime": 1788863373
+    }
+   }
+  },
+  "26b/fold_3": {
+   "epocas": 250,
+   "checkpoints": {
+    "checkpoint_best.pth": {
+     "bytes": 245811798,
+     "mtime": 1788890482
+    },
+    "checkpoint_final.pth": {
+     "bytes": 245830192,
+     "mtime": 1788898016
+    }
+   }
+  },
+  "26b/fold_4": {
+   "epocas": 250,
+   "checkpoints": {
+    "checkpoint_best.pth": {
+     "bytes": 245776214,
+     "mtime": 1788909905
+    },
+    "checkpoint_final.pth": {
+     "bytes": 245830512,
+     "mtime": 1788932329
+    }
+   }
+  },
+  "26/fold_0": {
+   "epocas": 64,
+   "checkpoints": {
+    "checkpoint_best.pth": {
+     "bytes": 245765782,
+     "mtime": 1788756127
+    },
+    "checkpoint_latest.pth": {
+     "bytes": 245764234,
+     "mtime": 1788755284
+    }
+   }
+  }
+ }
+}

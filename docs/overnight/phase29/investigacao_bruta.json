@@ -1,0 +1,964 @@
+{
+ "investigacoes": [
+  {
+   "alvo": "Pediatric-CT-SEG (Pediatric Chest/Abdomen/Pelvic CT Exams with Expert Organ Contours) — TCIA, DOI 10.7937/TCIA.X0H0-1706; artigo de dados Jordan et al., Med Phys 2022, DOI 10.1002/mp.15485 (PMC9090951)",
+   "licenca_classe": "Aberta — CC BY 4.0 (atribuição obrigatória; uso comercial permitido pelo texto da licença). Confiança média-alta: o valor aparece no campo \"License\" da página oficial da coleção no TCIA; o artigo NÃO enuncia licença (diz apenas \"openly available on The Cancer Imaging Archive\"). Licença de dados ≠ licença de qualquer código associado.",
+   "acesso": "Público, sem solicitação/aprovação de comitê e sem acordo de uso restrito: download direto via TCIA Data Retriever (~65,69 GB, 718 séries, 110.442 imagens) e busca pela interface NBIA; espelho em nuvem pelo Imaging Data Commons (IDC). Versão corrente v2 (2022-03-31), que corrigiu contornos de pele errôneos da v1 (2021-11).",
+   "anotacao_tipo": "Manual humana, com QA clínico. \"Four expert medical analysts retrospectively and manually contoured 25 structures in the thorax, abdomen, and pelvis using the ProKnow contouring software\" — pulmão, pele e osso (4 das 29 estruturas) foram semiautomáticos (Eclipse SmartSegmentation + correção manual). Por aritmética explícita (29 − Lung_L − Lung_R − Skin − Bones = 25), o ESÔFAGO está no conjunto MANUAL. \"A quality assurance (QA) review was performed by a board-certified radiation oncologist\" (agradecimento nominal a \"Dr. Gordan Wong for contour review\"). Nenhum atlas/guideline de contorno (p.ex. RTOG) é citado.",
+   "ontologia": "PARCIAL",
+   "independencia": {
+    "imagem": "DEMONSTRADA — critérios de inclusão mutuamente exclusivos: coorte de 359 pacientes de 5 dias a 16 anos (média 7, mediana 6) de um hospital pediátrico; nenhum adulto com NSCLC pode estar nela. Observação metodológica: isto é demonstração por disjunção populacional, não por checagem de hash/UID contra o pool do VRmed.",
+    "exame": "DEMONSTRADA — exames de CT tórax-abdome-pelve ou abdome-pelve de indicação clínica pediátrica de rotina ('random pediatric cases from Children's Wisconsin based upon routine clinical indications'), adquiridos em 3 scanners do Children's Wisconsin (LightSpeed VCT n=159, Somatom Definition AS+ n=131, Revolution n=69). Nenhum é exame de planejamento/estadiamento de NSCLC adulto.",
+    "instituicao": "INCONCLUSIVO — a origem do Pediatric-CT-SEG está demonstrada (Children's Wisconsin, com Marquette University, Medical College of Wisconsin, Varian e Stanford no consórcio). Falta o outro lado: o pool de treino do VRmed (10 adultos NSCLC) não foi nomeado nesta frente. Se for LCTSC (3 instituições, identificadas na literatura do desafio AAPM 2017 como MD Anderson, Memorial Sloan Kettering e MAASTRO) ou NSCLC-Radiomics, a independência institucional passa a DEMONSTRADA. Enquanto o pool não for nomeado, permanece INCONCLUSIVO.",
+    "anotacao": "INCONCLUSIVO — os 4 'expert medical analysts' não são nominalmente identificados no artigo e não se sabe quem anotou o pool de treino do VRmed. Não encontrei sobreposição de anotadores, e isso NÃO é prova de independência.",
+    "linhagem_de_anotacao": "DEMONSTRADA para o esôfago, com ressalva — o rótulo de esôfago é contorno manual humano em ProKnow, não saída de modelo; as únicas estruturas com semente automática (SmartSegmentation/threshold) são pulmão, pele e osso. Portanto o rótulo de esôfago não descende de nenhum modelo que possa ter tocado o pipeline do VRmed. Ressalva: não é verificável se os analistas usaram algum auxílio interativo não relatado."
+   },
+   "achados": [
+    {
+     "item": "Licença",
+     "resposta": "CC BY 4.0 (aberta)",
+     "confianca": "media",
+     "fonte": "The Cancer Imaging Archive — página oficial da coleção (primária)",
+     "url": "https://www.cancerimagingarchive.net/collection/pediatric-ct-seg/",
+     "titulo": "PEDIATRIC-CT-SEG",
+     "data": "coleção v2, 2022-03-31 (acesso 2026-09-10)",
+     "trecho": "License: CC BY 4.0",
+     "interpretacao": "Licença aberta demonstrada na fonte primária do repositório. O artigo de dados NÃO enuncia licença — diz apenas 'The described dataset is openly available on The Cancer Imaging Archive as collection Pediatric-CT-SEG'. Confiança média (e não alta) porque o valor vem do campo estruturado da página, lido via extração automática, e não de um texto de termos assinado. Não presumir que 'TCIA' implique aberto: aqui é aberto porque a coleção declara CC BY 4.0, não porque está no TCIA."
+    },
+    {
+     "item": "Acesso",
+     "resposta": "Download público direto, sem credencial ou aprovação",
+     "confianca": "alta",
+     "fonte": "TCIA — página oficial da coleção (primária)",
+     "url": "https://www.cancerimagingarchive.net/collection/pediatric-ct-seg/",
+     "titulo": "PEDIATRIC-CT-SEG — Data Access",
+     "data": "acesso 2026-09-10",
+     "trecho": "Download via TCIA Data Retriever (65.69 GB)",
+     "interpretacao": "Acesso demonstrado como irrestrito, com espelho no Imaging Data Commons. Custo de aquisição: ~66 GB."
+    },
+    {
+     "item": "Tamanho e conteúdo",
+     "resposta": "359 sujeitos; 718 séries; 110.442 imagens; DICOM + 1 RTSTRUCT por sujeito",
+     "confianca": "alta",
+     "fonte": "Jordan et al., Med Phys 2022 (artigo de dados, primária) e página TCIA",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Pediatric chest-abdomen-pelvis and abdomen-pelvis CT images with expert organ contours",
+     "data": "2022 (online 2022-02-04)",
+     "trecho": "359 pediatric patients (180 male, 179 female)",
+     "interpretacao": "Demonstrado. Formato RTSTRUCT (contorno vetorial por corte), não NIfTI/rasterizado — exige conversão para máscara, com as ambiguidades usuais de rasterização (especialmente penalizante em estrutura fina como o esôfago)."
+    },
+    {
+     "item": "Esôfago presente na Tabela 2",
+     "resposta": "SIM — 'Esophagus', região Thorax, presente em 353 dos 359 exames",
+     "confianca": "alta",
+     "fonte": "Jordan et al., Med Phys 2022, Tabela 2 (primária, via PMC full text)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Table 2 — anatomical structures and number of CT scans",
+     "data": "2022",
+     "trecho": "Thorax | Esophagus | 353",
+     "interpretacao": "Demonstrado: o esôfago é uma das 29 estruturas e é a segunda mais completa do tórax. O nome de contorno é literalmente 'Esophagus' (confirmado independentemente pelo organ_mapper.json de um repositório terceiro que processou os RTSTRUCTs — fonte secundária, usada só como corroboração). Volume bruto de casos com esôfago é grande (353), o que é atraente — mas volume não resolve a questão de domínio."
+    },
+    {
+     "item": "Protocolo de anotação",
+     "resposta": "4 analistas humanos, contorno manual em ProKnow; QA por radio-oncologista certificado; sem atlas/guideline citado",
+     "confianca": "alta",
+     "fonte": "Jordan et al., Med Phys 2022 (primária)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Pediatric chest-abdomen-pelvis and abdomen-pelvis CT images with expert organ contours",
+     "data": "2022",
+     "trecho": "Four expert medical analysts retrospectively and manually contoured 25 structures in the thorax, abdomen, and pelvis using the ProKnow contouring software",
+     "interpretacao": "Número de anotadores DEMONSTRADO (4) e revisão DEMONSTRADA ('A quality assurance (QA) review was performed by a board-certified radiation oncologist'). O que NÃO está demonstrado: qual definição de borda do esôfago foi usada (extensão crânio-caudal, inclusão de parede vs lúmen, tratamento de ar intraluminal). Nenhum atlas de contorno é citado. Isso é exatamente o eixo em que a compatibilidade com um protocolo de RT torácica adulta (estilo RTOG/LCTSC) fica NÃO DEMONSTRADA."
+    },
+    {
+     "item": "Não há inter-observer/variabilidade reportada",
+     "resposta": "Nenhuma métrica de concordância entre os 4 analistas é reportada",
+     "confianca": "media",
+     "fonte": "Jordan et al., Med Phys 2022 (primária) — ausência no texto",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Pediatric chest-abdomen-pelvis and abdomen-pelvis CT images with expert organ contours",
+     "data": "2022",
+     "trecho": "(sem trecho — ausência de relato de inter-observer agreement no texto recuperado)",
+     "interpretacao": "Inconclusivo por ausência: não consegui localizar métrica de variabilidade interobservador no texto acessado via PMC. Ausência na minha leitura não prova ausência no artigo completo (tabelas/suplemento podem conter). Consequência prática: não há piso de ruído de rótulo conhecido para calibrar um Dice de esôfago medido neste conjunto."
+    },
+    {
+     "item": "População — faixa etária",
+     "resposta": "5 dias a 16 anos; média 7 ± 4,5; mediana 6; 180M/179F; ZERO adultos",
+     "confianca": "alta",
+     "fonte": "Jordan et al., Med Phys 2022 (primária)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Pediatric chest-abdomen-pelvis and abdomen-pelvis CT images with expert organ contours",
+     "data": "2022",
+     "trecho": "Subjects ranged in age from five days to 16 years, with an average age of 7 +/- 4.5 years and a median age of 6 years.",
+     "interpretacao": "Este é o fato que decide a frente. A mediana de 6 anos significa que METADE do conjunto é criança pequena. Não é uma coorte 'pediátrica com cauda adolescente' que se aproximaria de anatomia adulta: é centrada na primeira infância. Para o objetivo 'esôfago adulto', a sobreposição de domínio com o alvo é essencialmente nula."
+    },
+    {
+     "item": "Indicação clínica / seleção",
+     "resposta": "Casos clínicos de rotina, aleatórios, de um único hospital pediátrico; sem dados médicos ou diagnóstico disponíveis",
+     "confianca": "alta",
+     "fonte": "Jordan et al., Med Phys 2022 (primária)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Pediatric chest-abdomen-pelvis and abdomen-pelvis CT images with expert organ contours",
+     "data": "2022",
+     "trecho": "The datasets represent random pediatric cases from Children's Wisconsin based upon routine clinical indications. No medical or diagnostic data is available for any patient dataset.",
+     "interpretacao": "Demonstrado: não é coorte oncológica de planejamento de RT. Consequência para estratificação: como não há metadado clínico, não dá para separar casos com patologia torácica que distorça o mediastino. Também não há como reproduzir uma subcoorte 'adolescente saudável' com garantia clínica — só por idade."
+    },
+    {
+     "item": "Aquisição — scanners e reconstrução",
+     "resposta": "3 scanners; 62 casos contornados em espessura nativa (0,6-0,625 mm), 297 reamostrados para 2,0 mm antes do contorno",
+     "confianca": "alta",
+     "fonte": "Jordan et al., Med Phys 2022 (primária) + página TCIA",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Pediatric chest-abdomen-pelvis and abdomen-pelvis CT images with expert organ contours",
+     "data": "2022",
+     "trecho": "297 datasets were reformatted to 2.0-mm slice thickness using a cubic spline interpolation algorithm prior to contouring",
+     "interpretacao": "Demonstrado um segundo eixo de domain shift, independente da idade: 83% dos rótulos foram desenhados sobre cortes de 2,0 mm. Para um tubo de ~1 cm de calibre, a resolução longitudinal domina o Dice. Qualquer comparação com um pool adulto de CT de planejamento (tipicamente 2-3 mm, mas com protocolo de dose adulta) mistura efeito de idade com efeito de espessura/ruído. Some-se o protocolo de baixa dose pediátrico: 'some structures were not contoured due to insufficient contrast-to-noise ratio, resulting from the use of low-dose pediatric scanning protocols'."
+    },
+    {
+     "item": "Calibre do esôfago: pediátrico vs adulto",
+     "resposta": "Diâmetro esofágico escala com o peso: ~7 mm a 3 kg vs ~16,4 mm a 70 kg (nível T3); ~8,8 mm vs ~18,4 mm (nível T7)",
+     "confianca": "alta",
+     "fonte": "Loff S. et al., Frontiers in Pediatrics (primária)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8918730/",
+     "titulo": "Esophageal Diameter as a Function of Weight in Neonates, Children and Adolescents: Reference Values for Dilatation of Esophageal Stenoses",
+     "data": "2022-02-28",
+     "trecho": "y = 0.1391x + 6.6282 ... high correlation of r = 0.86743, p < 0.0001",
+     "interpretacao": "Demonstrado quantitativamente que o ALVO da segmentação — não só o paciente — muda de tamanho por um fator >2 entre um lactente e um adulto de 70 kg. Isto é decisivo: Dice de estrutura tubular fina é dominado pela fração de vóxeis de borda; ao reduzir o calibre pela metade mantendo a resolução, o mesmo erro absoluto de contorno custa muito mais Dice. Ressalva de método: as medidas de Loff são por esofagograma/medida radiográfica em coorte pediátrica, e o valor 'a 70 kg' é extrapolação da mesma regressão para o extremo do peso, não medida em adultos — por isso a comparação pediátrico-vs-adulto é PLAUSÍVEL e bem sustentada, não medida head-to-head em CT."
+    },
+    {
+     "item": "Evidência empírica direta: modelo adulto falha no esôfago pediátrico",
+     "resposta": "Modelo comercial treinado em adultos (LimbusAI) obteve DSC < 0,5 no esôfago pediátrico, com modo de falha anatômico",
+     "confianca": "alta",
+     "fonte": "Thibodeau-Antonacci A. et al., Medical Physics (primária)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12149715/",
+     "titulo": "Trade-off of different deep learning-based auto-segmentation approaches for treatment planning of pediatric craniospinal irradiation",
+     "data": "2025 (Med Phys 52(6):3541-3556)",
+     "trecho": "LimbusAI contours of the esophagus were often truncated distally and mistaken for the trachea for younger patients, resulting in a DSC score of less than 0.5 on both datasets.",
+     "interpretacao": "Este é o achado mais informativo da frente. Demonstra que, no eixo adulto→pediátrico e ESPECIFICAMENTE no esôfago, o erro não é degradação suave: é confusão de estrutura (esôfago vs traqueia) e truncamento distal, em duas coortes pediátricas independentes (St. Jude n=27; McGill n=16). Ou seja, um Dice baixo do VRmed no Pediatric-CT-SEG seria o resultado ESPERADO e não distinguiria 'modelo ruim' de 'modelo bom fora de domínio'. Um teste cujo resultado ruim é previsível a priori não é um teste da hipótese que interessa."
+    },
+    {
+     "item": "Domain shift adulto→pediátrico quantificado no PRÓPRIO Pediatric-CT-SEG",
+     "resposta": "TotalSegmentator (treinado em adultos) rende DSC médio 53,1% em 0-3 anos e 62,9% em 4-6 anos neste dataset",
+     "confianca": "alta",
+     "fonte": "Liu C.-Y. et al., MIDL 2024 (primária, arXiv HTML)",
+     "url": "https://arxiv.org/html/2404.13185",
+     "titulo": "Unlocking Robust Segmentation Across All Age Groups via Continual Learning",
+     "data": "2024",
+     "trecho": "TotalSegmentator exhibits poor performance on young patients",
+     "interpretacao": "Demonstrado que o Pediatric-CT-SEG (usado por eles como o dataset pediátrico, citando Jordan et al. 2022) já é conhecido na literatura precisamente como BANCADA DE DOMAIN SHIFT, não como teste de qualidade geral. A faixa de mediana 6 anos é justamente a região onde um modelo adulto colapsa. Nota: métrica multi-órgão, não específica de esôfago."
+    },
+    {
+     "item": "Teto in-domain do esôfago neste dataset",
+     "resposta": "Modelo treinado NO PRÓPRIO dado pediátrico atinge apenas DSC mediano 0,70 (média 0,68 ± 0,11) no esôfago",
+     "confianca": "alta",
+     "fonte": "Adamson PM et al. (mesmo grupo), Medical Physics (primária)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9007850/",
+     "titulo": "Technical Note: Evaluation of a V-Net Autosegmentation algorithm for Pediatric CT Scans: Performance, Generalizability and Application to Patient-Specific CT Dosimetry",
+     "data": "2022 (Med Phys 49(4):2342-2354)",
+     "interpretacao": "Número crítico para interpretação: o TETO conhecido para esôfago neste conjunto, com treino in-domain, é ~0,70. Portanto o dataset não tem headroom para discriminar qualidade: entre um modelo adulto decente e um ruim, ambos cairão bem abaixo de 0,70 por motivo de domínio, e o resultado não separa as hipóteses. Evidência adicional de instabilidade por idade dentro do próprio pediátrico: o mesmo estudo mostra que modelos treinados em ≤8 anos e testados em ≥9 anos (e vice-versa) não generalizam igualmente (ex.: pâncreas DSC 0,531 vs 0,383)."
+    },
+    {
+     "item": "Relação com LCTSC",
+     "resposta": "Sem relação demonstrada; populações mutuamente exclusivas por idade. LCTSC = 60 pacientes torácicos adultos de RT, 3 instituições, CC BY 3.0, com contorno de esôfago",
+     "confianca": "media",
+     "fonte": "TCIA — página oficial LCTSC (primária)",
+     "url": "https://www.cancerimagingarchive.net/collection/lctsc/",
+     "titulo": "LCTSC — Lung CT Segmentation Challenge 2017",
+     "data": "acesso 2026-09-10",
+     "trecho": "The following organs-at-risk (OARs) are included in this challenge: Esophagus, Heart, Left and Right Lungs, Spinal cord",
+     "interpretacao": "A página do TCIA diz apenas 'Data were acquired from 3 institutions (20 each)' sem nomeá-las; a literatura do desafio AAPM 2017 (Yang et al., Med Phys 2018, 10.1002/mp.13141) associa o desafio a MD Anderson, Memorial Sloan Kettering e MAASTRO — atribuição de instituições em confiança MÉDIA, pois não li a lista de contribuintes na fonte primária do artigo. Importante para o VRmed: se o pool de treino for LCTSC, então (a) a independência institucional passa a demonstrada e (b) o LCTSC — e não o Pediatric-CT-SEG — é o candidato natural a teste de esôfago ADULTO, com protocolo de contorno de RT torácica compatível."
+    },
+    {
+     "item": "Relação com TotalSegmentator",
+     "resposta": "Sem sobreposição de treino: TotalSegmentator foi treinado em 1204 CTs clínicos do University Hospital Basel",
+     "confianca": "media",
+     "fonte": "Wasserthal et al., Radiology: Artificial Intelligence 2023;5(5):e230024",
+     "url": "https://pubs.rsna.org/doi/full/10.1148/ryai.230024",
+     "titulo": "TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images",
+     "data": "2023",
+     "interpretacao": "Plausível e bem suportado que o Pediatric-CT-SEG NÃO esteja no treino do TotalSegmentator (origem única declarada: Basel). Consequência para o eixo 5: se o pipeline do VRmed usa TotalSegmentator em qualquer ponto (pré-rótulo, inicialização, pseudo-label), os rótulos do Pediatric-CT-SEG continuam livres dessa linhagem — eles são manuais. Confiança média porque li a descrição do corpus de treino em resumo, não a seção de métodos completa na fonte primária."
+    },
+    {
+     "item": "Relação com 4D-Lung / SegTHOR / BTCV",
+     "resposta": "Nenhuma relação encontrada; não verificada em fonte primária nesta frente",
+     "confianca": "baixa",
+     "fonte": "—",
+     "interpretacao": "NÃO VERIFICÁVEL com o trabalho feito aqui. Não busquei as páginas primárias de 4D-Lung, SegTHOR e BTCV. O único argumento disponível é populacional (todos são coortes adultas; Pediatric-CT-SEG é 0-16 anos), o que torna sobreposição de PACIENTE implausível — mas 'não encontrei overlap' não é prova de independência e não foi sequer procurado aqui."
+    },
+    {
+     "item": "Compatibilidade de ontologia/protocolo de contorno",
+     "resposta": "PARCIAL — nome de estrutura compatível ('Esophagus'), definição de contorno não demonstrada",
+     "confianca": "media",
+     "fonte": "Jordan et al., Med Phys 2022 (primária) — ausência de citação de atlas",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9090951/",
+     "titulo": "Pediatric chest-abdomen-pelvis and abdomen-pelvis CT images with expert organ contours",
+     "data": "2022",
+     "interpretacao": "O nome bate e a região anatômica bate, mas nenhum guideline de delineamento é citado no artigo. 'Human annotated' NÃO implica protocolo compatível com o pool adulto de NSCLC: em RT torácica adulta o esôfago costuma ser contornado do cricoide até a junção gastroesofágica seguindo convenção do protocolo; aqui a extensão crânio-caudal depende do campo de visão de um CT de rotina tórax-abdome-pelve, e o artigo registra explicitamente que 'Some patient datasets do not contain all structures due to limited longitudinal scan range'. Diferença sistemática de extensão gera penalidade de Dice que NÃO é erro do modelo."
+    },
+    {
+     "item": "Legenda assumida de status_recomendado (declarar para o orquestrador)",
+     "resposta": "A = TEST principal; B = TEST secundário; C = uso restrito a análise de domain shift/robustez; D = bloqueado por pendências; E = descartar. Minha decisão é C.",
+     "confianca": "baixa",
+     "interpretacao": "A legenda A-E não foi fornecida nesta frente; declaro o mapeamento que usei para que o orquestrador possa reconverter sem ambiguidade. Se na convenção do projeto C significar outra coisa, a decisão textual prevalece: NÃO é teste principal, NÃO é teste secundário de desempenho adulto, e NÃO deve ser descartado do repositório — serve como bancada de domain shift."
+    }
+   ],
+   "status_recomendado": "C",
+   "pendencias": [
+    "Nomear a origem exata dos 10 adultos NSCLC do pool de treino do VRmed (coleção, DOI, instituições, anotadores). Sem isso, os eixos 3 (instituição) e 4 (anotação) permanecem INCONCLUSIVOS — e a comparação de protocolo de contorno de esôfago fica impossível de fechar.",
+    "Obter a definição de delineamento do esôfago usada pelos 4 analistas (extensão crânio-caudal, parede vs lúmen, conduta com ar intraluminal). O artigo não cita atlas. Caminho: contatar os autores correspondentes (Jordan / Schmidt) ou inspecionar empiricamente os RTSTRUCTs — medir início/fim do contorno em relação a marcos ósseos em uma amostra.",
+    "Verificar se o artigo completo (tabelas/suplemento, não acessados integralmente) traz variabilidade interobservador para o esôfago; sem piso de ruído de rótulo não há como calibrar nenhum Dice medido aqui.",
+    "Confirmar em fonte primária a lista de instituições contribuintes do LCTSC (Yang et al., Med Phys 2018) — a página do TCIA só diz '3 institutions (20 each)'.",
+    "Checar 4D-Lung, SegTHOR e BTCV em fonte primária caso algum deles entre no desenho de teste — não foram verificados nesta frente.",
+    "Se o pipeline do VRmed usa qualquer modelo pré-treinado (TotalSegmentator, nnU-Net com pesos públicos, modelo comercial), documentar a procedência desses pesos: é o único caminho pelo qual o eixo 5 poderia ser contaminado, e ele precisa ser fechado do LADO DO VRMED, não do lado do dataset."
+   ],
+   "nao_verificavel": [
+    "Se algum dos 4 'expert medical analysts' do Pediatric-CT-SEG também anotou o pool de treino do VRmed — os analistas não são identificados nominalmente no artigo e o pool do VRmed não foi nomeado nesta frente.",
+    "A definição operacional exata do contorno de esôfago (limites crânio-caudais, parede vs lúmen) — nenhum atlas ou guideline é citado no artigo de dados.",
+    "Variabilidade interobservador do esôfago neste dataset — não localizada no texto acessado via PMC; pode existir em tabela/suplemento não lido.",
+    "Se os analistas usaram qualquer auxílio semiautomático não relatado ao contornar o esôfago (o artigo atribui semiautomação apenas a pulmão, pele e osso).",
+    "O texto integral de licença/termos de uso aplicado no ato do download (li o campo 'License: CC BY 4.0' da página da coleção, não um instrumento assinado).",
+    "Diâmetro esofágico adulto medido em CT na MESMA metodologia do estudo pediátrico de Loff — o valor de ~16-18 mm a 70 kg é extrapolação da regressão pediátrica, não medida head-to-head.",
+    "Qualquer relação (ou ausência dela) com 4D-Lung, SegTHOR e BTCV — não investigada em fonte primária nesta frente.",
+    "Se houve resposta de organizadores, contato com autores ou qualquer comunicação — NÃO houve; nada foi solicitado nem recebido."
+   ]
+  },
+  {
+   "alvo": "TotalSegmentator v2 (linhagem)",
+   "acesso": "Acesso publico e verificado por fonte primaria: repositorio oficial (github.com/wasserth/TotalSegmentator, LICENSE Apache-2.0), PyPI (TotalSegmentator 2.18.0, upload 2026-08-12, license \"Apache 2.0\"), Zenodo record 10047292 (dataset publico v2.0.1, CC-BY-4.0), preprint arXiv:2208.05868v1 (PDF completo baixado e extraido localmente, inclui Material Suplementar A) e versao publicada Radiology: AI (PMC10546353 / doi 10.1148/ryai.230024). Pesos do modelo sao baixados automaticamente de GitHub releases. NAO houve contato com autores; nenhum email/resposta de organizador foi obtido ou fabricado.",
+   "anotacao_tipo": "Anotacao hibrida \"model-in-the-loop\": pre-segmentacao automatica por modelos publicos pre-treinados (para 68 das 104 classes do v1, esofago entre elas) + segmentacao manual de 36 classes restantes + refinamento manual iterativo com active learning (retreino apos 5, 20, 100 e 1000 sujeitos) + revisao/correcao manual de todos os 1204 exames, supervisionada por medicos. NAO e anotacao manual de novo, NAO e anotacao puramente automatica.",
+   "licenca_classe": "Codigo e pesos da task `total` (a que contem `esophagus`): Apache-2.0, declarada literalmente no README (\"Openly available for any usage (Apache-2.0 license): total: default task containing 117 main classes\") e no arquivo LICENSE do repositorio (Apache License Version 2.0). Dataset publico v2.0.1 no Zenodo: CC-BY-4.0. ATENCAO: outras subtasks (appendicular_bones, tissue_types, face, heartchambers_highres, vertebrae_body) sao non-commercial — nao se aplicam ao esofago. A licenca dos datasets de terceiros cuja LINHAGEM DE ROTULO alimentou a pre-segmentacao (BTCV/Synapse syn3193805, SegTHOR/CodaLab 21145) NAO foi verificada nesta frente: UNKNOWN.",
+   "ontologia": "PARCIAL",
+   "independencia": {
+    "imagem": "Para o v1: DEMONSTRADO que as imagens vieram do PACS do University Hospital Basel ('we randomly sampled CT images from our PACS', arXiv:2208.05868v1, sec. 2.1 Data selection), com consentimento geral de pesquisa. Nao ha evidencia de que imagens do BTCV ou do SegTHOR tenham entrado no conjunto de treino v1 — o suplemento descreve uso de MODELOS treinados nesses datasets, nao das imagens. Para o v2: INCONCLUSIVO. O changelog diz que foram adicionadas imagens 'from GE scanners and other institutions', sem nomear instituicoes nem publicar a lista por caso. Nao e possivel demonstrar nem refutar overlap de imagens do v2 com datasets publicos.",
+    "anotacao": "NAO INDEPENDENTE por construcao para o esofago. A primeira segmentacao do esofago foi gerada por modelos pre-treinados em BTCV (Task 17) e SegTHOR (Task 55) e depois 'validated and refined manually'. A anotacao final e um produto derivado da saida desses modelos, filtrada por revisao humana de extensao nao quantificada. O grau de independencia residual NAO e verificavel com os dados disponiveis (nao ha metrica de quanto voxel foi alterado, nem por classe).",
+    "linhagem_de_anotacao": "DEMONSTRADA para o v1: esofago aparece explicitamente nas classes de DOIS modelos de pre-segmentacao (Task 17 BTCV e Task 55 SegTHOR). Para o v2: INCONCLUSIVO se as mascaras de esofago do v2 descendem das mesmas sementes — plausivel (o changelog nao lista o esofago entre as classes reanotadas/corrigidas e declara 'same subjects as in v1 for training and validation'), mas nao ha documentacao v2-especifica do processo de anotacao.",
+    "exame": "Nao aplicavel/UNKNOWN: nao ha publicacao de identificadores de paciente ou exame que permita checar overlap de paciente entre TotalSegmentator e qualquer dataset externo. Ausencia de lista impede qualquer verificacao de patient overlap.",
+    "instituicao": "v1: instituicao unica declarada (University Hospital Basel, Suica). v2: multi-institucional nao especificado ('other institutions'), portanto UNKNOWN."
+   },
+   "achados": [
+    {
+     "item": "Existe artigo, model card ou release notes proprios do TotalSegmentator v2?",
+     "resposta": "NAO existe artigo revisado por pares nem model card formal do v2. A unica documentacao v2-especifica e o arquivo resources/improvements_in_v2.md do repositorio oficial + o CHANGELOG. O artigo da Radiology: AI descreve o v1.",
+     "trecho": "Zenodo v2.0.1: cita 'the corresponding paper' em doi 10.1148/ryai.230024 e nota que 'the paper describes v1 of the dataset'.",
+     "interpretacao": "DEMONSTRADO que nao ha fonte primaria revisada por pares descrevendo o v2. Toda inferencia metodologica sobre o v2 depende de (a) extrapolar o artigo do v1 ou (b) do changelog do repositorio. Isso torna a documentacao do v2 INCONCLUSIVA para qualquer afirmacao de processo de anotacao.",
+     "confianca": "alta",
+     "fonte": "Zenodo (pagina oficial do dataset) + repositorio oficial",
+     "url": "https://zenodo.org/records/10047292",
+     "titulo": "TotalSegmentator dataset, Version 2.0.1",
+     "data": "2023-10-27"
+    },
+    {
+     "item": "Que dados treinaram os pesos v2 (os efetivamente usados pelo pip TotalSegmentator)?",
+     "resposta": "1559 imagens de treino (contra 1139 no v1). Os ~420 sujeitos adicionais NAO foram publicados.",
+     "trecho": "\"We increased the number of training images from 1139 to 1559.\" e \"same subjects as in v1 for training and validation (we did not publish the additional subjects we used for TotalSegmentator v2 training)\".",
+     "interpretacao": "DEMONSTRADO: o conjunto de treino real do modelo v2 e maior que o dataset publico e NAO e auditavel caso a caso. Consequencia direta: e IMPOSSIVEL verificar, por caso, overlap de imagem ou de paciente entre o treino do v2 e qualquer dataset de avaliacao externo. Qualquer afirmacao de 'nao ha contaminacao' no v2 e nao verificavel com os dados disponiveis.",
+     "confianca": "alta",
+     "fonte": "repositorio oficial (arquivo de documentacao do v2)",
+     "url": "https://github.com/wasserth/TotalSegmentator/blob/master/resources/improvements_in_v2.md",
+     "titulo": "Changes and improvements in TotalSegmentator v2",
+     "data": "acessado 2026-09-10"
+    },
+    {
+     "item": "Origem das imagens adicionais do v2",
+     "resposta": "Parcialmente descrita e nao rastreavel: whole-body onde o TS falhava, pes/maos, cabeca, sangramentos abdominais, e 'more images from GE scanners and other institutions'.",
+     "trecho": "\"more images from GE scanners and other institutions\"",
+     "interpretacao": "INCONCLUSIVO. 'other institutions' nao e nomeado. NAO e possivel afirmar que o v2 e single-center, nem afirmar que imagens de datasets publicos entraram. Ambas as hipoteses permanecem abertas. Registrar como UNKNOWN, nao como ausencia de risco.",
+     "confianca": "alta",
+     "fonte": "repositorio oficial",
+     "url": "https://github.com/wasserth/TotalSegmentator/blob/master/resources/improvements_in_v2.md",
+     "titulo": "Changes and improvements in TotalSegmentator v2",
+     "data": "acessado 2026-09-10"
+    },
+    {
+     "item": "Origem das imagens do v1 (base do v2)",
+     "resposta": "Amostragem aleatoria do PACS do University Hospital Basel ao longo de ~10 anos, apenas pacientes com consentimento geral de pesquisa.",
+     "trecho": "\"we randomly sampled CT images from our PACS\" (secao 2.1 Data selection); afiliacao: Radiology Department, University Hospital Basel, Switzerland.",
+     "interpretacao": "DEMONSTRADO que as IMAGENS do v1 sao clinicas de uma unica instituicao, nao imagens reempacotadas de BTCV/SegTHOR. Isso sustenta a afirmacao de ausencia de overlap de imagens no v1 (baseada em descricao da fonte, nao em auditoria por caso — portanto forte, mas nao e prova formal).",
+     "confianca": "alta",
+     "fonte": "preprint oficial dos autores (arXiv)",
+     "url": "https://arxiv.org/abs/2208.05868",
+     "titulo": "TotalSegmentator: robust segmentation of 104 anatomical structures in CT images (arXiv:2208.05868v1)",
+     "data": "2022-08-11"
+    },
+    {
+     "item": "Quais datasets aparecem como origem dos MODELOS de pre-segmentacao? (lista literal do suplemento)",
+     "resposta": "Cinco fontes. Literalmente, no Material Suplementar A do preprint ('A. List of pretrained models used during data annotation'): (1) Multi-Atlas Labeling Beyond the Cranial Vault - Abdomen (nnU-Net Task 17), doi 10.7303/syn3193805, classes: spleen, kidney left/right, gallbladder, esophagus, liver, stomach, aorta, inferior vena cava, portal vein and splenic vein, pancreas, adrenal gland left/right; (2) RibFrac 2020 Challenge, 24 costelas; (3) Large Scale Vertebrae Segmentation Challenge (VerSe), 25 vertebras; (4) Johof Lung Segmentation (lungmask), 5 lobos pulmonares; (5) SegTHOR: Segmentation of THoracic Organs at Risk in CT images (nnU-Net Task 55), competitions.codalab.org/competitions/21145, classes: aorta, esophagus, heart, trachea.",
+     "trecho": "\"A. List of pretrained models used during data annotation\" ... \"Name: Multi-Atlas Labeling Beyond the Cranial Vault - Abdomen (nnU-Net Task 17)\" ... \"Name: SegTHOR: Segmentation of THoracic Organs at Risk in CT images (nnU-Net Task 55)\" ... \"Classes: aorta, esophagus, heart, trachea\"",
+     "interpretacao": "DEMONSTRADO e literal: Task 17 (BTCV) e Task 55 (SegTHOR) SAO citados nominalmente no suplemento, e o ESOFAGO aparece na lista de classes de AMBOS. Na versao publicada (Radiology: AI) a mesma lista e referenciada como 'Appendix S2'. Isso estabelece linhagem de rotulo do esofago do TotalSegmentator a partir de modelos treinados em BTCV e SegTHOR. NAO estabelece que imagens desses datasets foram usadas.",
+     "confianca": "alta",
+     "fonte": "Material Suplementar do preprint oficial (PDF extraido integralmente)",
+     "url": "https://arxiv.org/pdf/2208.05868v1",
+     "titulo": "TotalSegmentator — Supplementary materials, A. List of pretrained models used during data annotation",
+     "data": "2022-08-11"
+    },
+    {
+     "item": "COMO as pre-segmentacoes foram usadas? Houve correcao humana?",
+     "resposta": "Sim. O modelo existente gerava a primeira segmentacao, que era validada e refinada manualmente. 68 das 104 classes receberam primeira segmentacao automatica; 36 foram segmentadas manualmente do zero.",
+     "trecho": "Versao publicada: \"If an existing model for a given structure was publicly available (Appendix S2), that model was used to create a first segmentation, which was then validated and refined manually.\" Preprint: \"Given the high variability of our dataset a further refinement was often necessary.\" e \"This gave us a first segmentation for 68 classes. For the remaining 36 classes, manual segmentation was necessary.\"",
+     "interpretacao": "DEMONSTRADO o mecanismo qualitativo: pre-segmentacao por modelo + refinamento humano, com o esofago no grupo dos 68 pre-segmentados. NAO DEMONSTRADA a proporcao: nao ha numero de quantos casos de esofago foram efetivamente alterados, nem magnitude da alteracao. 'often necessary' e qualitativo e nao quantifica nada.",
+     "confianca": "alta",
+     "fonte": "Radiology: AI (versao publicada, PMC) + preprint arXiv",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10546353/",
+     "titulo": "TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images",
+     "data": "2023"
+    },
+    {
+     "item": "Processo iterativo (active learning) e cobertura da revisao humana",
+     "resposta": "Apos os 5 primeiros pacientes manuais, treinou-se uma nnU-Net preliminar e passou-se a corrigir apenas as predicoes; retreino apos 5, 20, 100 e 1000 sujeitos. Todos os 1204 exames tiveram anotacao revisada manualmente.",
+     "trecho": "\"After manual segmentation of the first five patients was completed, a preliminary nnU-Net was trained, and its predictions were manually refined, if necessary. The nnU-Net was retrained after review and refinement of five patients, 20 patients, and 100 patients.\" e \"In the end, all 1204 CT examinations had annotations that were manually reviewed and corrected whenever necessary.\"",
+     "interpretacao": "DEMONSTRADO que houve revisao humana em 100% dos exames do v1. ATENCAO a leitura rigorosa: 'reviewed and corrected whenever necessary' significa revisao universal, NAO correcao universal. Alem disso, o preprint declara que grande parte da revisao foi acelerada por inspecao de renderizacao 3D em PNG ('if a mask has errors you can typically spot it in the 3D rendering'), e admite que 'when evaluating segmentations only based on 3D renderings minor errors can be missed'. Portanto a revisao nao foi, em geral, voxel a voxel — o que limita o quanto a revisao humana pode ter removido o vies do modelo semeador em estruturas finas e pequenas como o esofago.",
+     "confianca": "alta",
+     "fonte": "Radiology: AI (publicado) + preprint arXiv",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10546353/",
+     "titulo": "TotalSegmentator — Materials and Methods / preprint secao de criacao do ground truth",
+     "data": "2023"
+    },
+    {
+     "item": "Quem supervisionou a anotacao?",
+     "resposta": "Versao publicada: dois medicos com 3 e 6 anos de experiencia em body imaging. Preprint: supervisao por radiologista certificado.",
+     "trecho": "Publicado: \"Segmentation was supervised by two physicians with 3 (M.S.) and 6 (H.C.B.) years of experience in body imaging, respectively.\" Preprint: \"Refinement of segmentations as well as manual segmentation was supervised by a board-certified radiologist.\"",
+     "interpretacao": "DEMONSTRADO que houve supervisao medica, e que ela foi SUPERVISAO — nao anotacao independente por multiplos leitores. NAO ha numero de anotadores primarios por classe, nao ha estudo de concordancia inter-observador, nao ha protocolo de delineacao publicado para o esofago. Nao inferir protocolo a partir de 'human annotated'.",
+     "confianca": "alta",
+     "fonte": "Radiology: AI (publicado) + preprint arXiv",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10546353/",
+     "titulo": "TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images",
+     "data": "2023"
+    },
+    {
+     "item": "A anotacao final do esofago pode ser considerada independente do modelo que a pre-segmentou?",
+     "resposta": "NAO DEMONSTRADO que seja independente. A evidencia disponivel aponta para dependencia de linhagem nao quantificada.",
+     "trecho": "Cadeia literal: \"that model was used to create a first segmentation, which was then validated and refined manually\" + \"Classes: aorta, esophagus, heart, trachea\" (Task 55) + \"Classes: spleen, ..., esophagus, ...\" (Task 17).",
+     "interpretacao": "Conclusao rigorosa: a anotacao do esofago do TotalSegmentator e ANCORADA (seeded) em saidas de modelos treinados em SegTHOR e BTCV. Onde o modelo semeador ja acertava segundo o julgamento do revisor, a mascara final PRESERVA a convencao de delineacao do dataset de origem (incluindo, no caso do SegTHOR, a convencao de contorno de OAR de radioterapia). Onde havia erro visivel, foi corrigida. A fracao de cada situacao e NAO VERIFICAVEL com os dados disponiveis. Portanto: independencia parcial, grau desconhecido; 'independente' nao pode ser afirmado, 'totalmente derivado' tambem nao.",
+     "confianca": "media",
+     "fonte": "sintese de fontes primarias (suplemento + metodos)",
+     "url": "https://arxiv.org/pdf/2208.05868v1",
+     "titulo": "TotalSegmentator — suplemento A + metodos de criacao do ground truth",
+     "data": "2022-08-11"
+    },
+    {
+     "item": "Ha evidencia de overlap de IMAGENS com SegTHOR ou BTCV?",
+     "resposta": "Nao ha evidencia de overlap de imagens; e tambem nao ha auditoria por caso que o refute no v2.",
+     "trecho": "\"we randomly sampled CT images from our PACS\" (v1) vs. \"we did not publish the additional subjects we used for TotalSegmentator v2 training\" (v2).",
+     "interpretacao": "Para o v1: a descricao da fonte (PACS unico de Basel) torna o overlap de imagens com BTCV/SegTHOR IMPLAUSIVEL, e o suplemento deixa claro que o que foi importado foram MODELOS, nao imagens. Para o v2: INCONCLUSIVO — sem lista de casos nao ha como verificar. Registro explicito da regra: 'nao encontrei overlap' NAO e prova de independencia. NAO afirmar contaminacao de imagens.",
+     "confianca": "media",
+     "fonte": "sintese de fontes primarias",
+     "url": "https://github.com/wasserth/TotalSegmentator/blob/master/resources/improvements_in_v2.md",
+     "titulo": "Changes and improvements in TotalSegmentator v2 + arXiv 2208.05868v1 sec 2.1",
+     "data": "acessado 2026-09-10"
+    },
+    {
+     "item": "Natureza da anotacao do SegTHOR (dataset semeador do esofago toracico)",
+     "resposta": "40 pacientes de treino / 20 de teste; orgaos de risco (coracao, traqueia, aorta, esofago) contornados manualmente por um radioterapeuta experiente; desafio ISBI 2019, hospedado no CodaLab; imagens do Centre Henri Becquerel (Rouen, Franca) segundo o artigo do dataset.",
+     "trecho": "Do artigo do dataset: os OARs \"have been contoured manually by an experienced radiotherapist\" (aorta, coracao, traqueia, esofago).",
+     "interpretacao": "Relevante para o VRmed: a convencao de delineacao herdada pela semente do esofago do TotalSegmentator e de contorno de OAR para planejamento de radioterapia (anotador unico), nao de segmentacao anatomica multi-leitor. Isso e uma questao de PROTOCOLO, e afeta comparabilidade de fronteira (limites cranial/caudal, tratamento de conteudo/ar intraluminal). Licenca de uso do SegTHOR: UNKNOWN — nao verificada nesta frente, nao presumir abertura.",
+     "confianca": "media",
+     "fonte": "artigo do dataset SegTHOR (arXiv:1912.05950) via busca; pagina do desafio no CodaLab nao acessada diretamente",
+     "url": "https://arxiv.org/pdf/1912.05950",
+     "titulo": "SegTHOR: Segmentation of Thoracic Organs at Risk in CT images",
+     "data": "2019"
+    },
+    {
+     "item": "O pip TotalSegmentator 2.18.0 usa os pesos v2? Houve retreino do modelo CT `total` depois do 2.0.0?",
+     "resposta": "2.18.0 foi publicado em 2026-08-12 sob Apache 2.0. O CHANGELOG registra o treino com nnU-Net v2 e o dataset ampliado na Release 2.0.0 e NAO registra nenhum retreino do modelo CT `total` nas releases seguintes (registra retreino explicito apenas dos modelos de MR e de subtasks como coronary_arteries, lung_vessels, heartchambers).",
+     "trecho": "Release 2.0.0: \"train models with nnU-Net v2\" e \"more classes and improved training dataset (for details see resources/improvements_in_v2.md)\". Release posterior, sobre MR: \"major update to all MR models: double the number of training subjects (this includes a retraining of these models...)\".",
+     "interpretacao": "PLAUSIVEL (nao demonstrado) que os pesos CT `total` usados pelo 2.18.0 sejam da linhagem v2 original (dataset de 1559 imagens), com mudancas posteriores apenas de inferencia (step_size 0.8, ordem de resampling, higher_order_resampling). Silencio do changelog nao e prova de que os pesos nao mudaram; os pesos sao baixados de GitHub releases e poderiam ter sido substituidos sem entrada no changelog. Para fechar isso o VRmed deveria registrar o hash/arquivo de pesos efetivamente baixado em ~/.totalsegmentator.",
+     "confianca": "media",
+     "fonte": "CHANGELOG do repositorio oficial + PyPI JSON API",
+     "url": "https://github.com/wasserth/TotalSegmentator/blob/master/CHANGELOG.md",
+     "titulo": "TotalSegmentator CHANGELOG / PyPI release metadata",
+     "data": "2026-08-12"
+    },
+    {
+     "item": "Distincao conceitual exigida: image overlap / patient overlap / annotation lineage overlap / model-derived annotation dependence",
+     "resposta": "Sao quatro coisas distintas e independentemente verificaveis. (1) IMAGE OVERLAP: o MESMO arquivo/serie de imagem aparece em treino e em avaliacao. Verificavel por identificador de serie, hash de pixel ou fingerprint perceptual. Status aqui: nao demonstrado no v1 (implausivel, fonte PACS unico); nao verificavel no v2. (2) PATIENT OVERLAP: exames DIFERENTES do MESMO paciente em treino e avaliacao — nao ha imagem repetida, mas ha vazamento de anatomia individual, que infla metricas sem nenhum arquivo duplicado. Verificavel apenas com pseudo-identificadores de paciente. Status aqui: NAO VERIFICAVEL, nenhum dos lados publica identificadores. (3) ANNOTATION LINEAGE OVERLAP: as imagens sao totalmente distintas, mas os ROTULOS de um conjunto descendem de rotulos/convencoes do outro (mesma escola de delineacao, mesmo protocolo herdado). E uma relacao entre LABEL SETS, nao entre pixels. Status aqui: DEMONSTRADO para o esofago via Task 17/Task 55. (4) MODEL-DERIVED ANNOTATION DEPENDENCE: caso forte do (3) — os rotulos foram literalmente PRODUZIDOS pela inferencia de um modelo, e depois editados. Herda-se nao so a convencao mas tambem o vies sistematico e os modos de erro daquele modelo, na medida em que o revisor humano nao os detectou. Status aqui: DEMONSTRADO para o esofago no v1; inconclusivo, porem plausivel por heranca, no v2.",
+     "trecho": "n/a — sintese conceitual, nao citacao.",
+     "interpretacao": "Consequencia pratica: avaliar o TotalSegmentator v2 em SegTHOR ou BTCV NAO e um teste limpo de generalizacao, mesmo sem um unico pixel em comum, porque o alvo de referencia e parcialmente co-linhagem do preditor. E um problema de circularidade de rotulo (categorias 3 e 4), e deve ser nomeado assim — nunca como 'contaminacao de dados' ou 'vazamento de imagem'.",
+     "confianca": "alta",
+     "fonte": "analise conceitual do avaliador, sem fonte externa",
+     "url": "",
+     "titulo": "Taxonomia de dependencia aplicada ao caso",
+     "data": ""
+    },
+    {
+     "item": "O que PODE e o que NAO PODE ser concluido para o VRmed (BASELINE_ESOFAGO_V1)",
+     "resposta": "PODE-SE AFIRMAR: (a) o TotalSegmentator task `total` (que contem `esophagus`) e Apache-2.0 e o dataset publico v2.0.1 e CC-BY-4.0, logo o uso como baseline e licitamente sustentado por fonte primaria; (b) a anotacao de esofago do TotalSegmentator NAO e anotacao humana de novo — e anotacao semeada por modelo derivado de BTCV (Task 17) e SegTHOR (Task 55) e depois revisada por humano, e isso esta documentado literalmente no suplemento do artigo do v1; (c) as imagens do v1 sao de rotina clinica de uma unica instituicao (Basel), nao de datasets publicos de desafio; (d) o conjunto de treino real do v2 (1559 imagens) e maior que o publico e nao foi liberado por caso. NAO SE PODE AFIRMAR: (i) que exista contaminacao de IMAGENS entre TotalSegmentator v2 e SegTHOR/BTCV — isso NAO esta demonstrado e a evidencia aponta para uso de modelos, nao de imagens; (ii) que a anotacao humana final do esofago seja independente do modelo semeador — nao demonstrado, e a proporcao de correcao nunca foi publicada; (iii) que o processo de anotacao descrito no artigo do v1 se aplique identicamente ao v2 — a documentacao do v2 e INCONCLUSIVA, nao ha artigo nem model card do v2; (iv) que nao ha patient overlap com qualquer coorte externa — nao verificavel em nenhuma direcao; (v) que 'human annotated' implique protocolo de delineacao compativel com o do VRmed — nao ha protocolo de esofago publicado.",
+     "trecho": "n/a — sintese de conclusoes, apoiada nos achados citados acima.",
+     "interpretacao": "Recomendacao operacional para o VRmed: tratar o TotalSegmentator v2 como BASELINE tecnico valido e licenciado, mas NAO como ground truth independente. Em qualquer avaliacao do VRmed contra SegTHOR ou BTCV, declarar explicitamente a dependencia de linhagem de rotulo do esofago (categoria 3/4 acima) como limitacao metodologica. Nenhum numero de Dice contra esses dois conjuntos deve ser apresentado como evidencia de generalizacao independente sem essa ressalva escrita.",
+     "confianca": "alta",
+     "fonte": "sintese das fontes primarias listadas nesta frente",
+     "url": "",
+     "titulo": "Conclusoes aplicaveis ao VRmed",
+     "data": ""
+    }
+   ],
+   "status_recomendado": "C",
+   "pendencias": [
+    "Registrar no pipeline do VRmed o identificador exato dos pesos baixados (arquivo/URL da GitHub release e hash em ~/.totalsegmentator) para fechar a duvida de MEDIA confianca sobre se o 2.18.0 ainda usa os pesos CT `total` treinados na Release 2.0.0.",
+    "Perguntar formalmente ao autor (jakob.wasserthal@usb.ch, endereco publicado no README oficial) tres itens que nenhuma documentacao responde: (1) origem institucional dos ~420 sujeitos adicionais de treino do v2; (2) se as mascaras de esofago do v2 foram reanotadas ou herdadas do v1; (3) se existe alguma estimativa da fracao de casos em que o esofago pre-segmentado foi corrigido. NENHUMA resposta foi obtida ate aqui — nao registrar resposta presumida.",
+    "Verificar a licenca real do SegTHOR (CodaLab competition 21145) e do BTCV/Synapse syn3193805 antes de qualquer uso desses dados pelo VRmed. Atualmente UNKNOWN. Nao presumir abertura por serem datasets de desafio.",
+    "Baixar o meta.csv do Zenodo v2.0.1 e confirmar quais colunas de split/instituicao/patologia existem por caso — util para documentar o que E auditavel no subconjunto publico (1228 imagens) em contraste com o que nao e (o treino real do v2).",
+    "Definir e escrever o protocolo de delineacao do esofago do VRmed (limites cranial/caudal, tratamento de ar e conteudo intraluminal, parede vs lumen) e compara-lo explicitamente com a convencao OAR do SegTHOR — hoje a compatibilidade ontologica e PARCIAL apenas por falta desse documento dos dois lados.",
+    "Se houver avaliacao futura em SegTHOR/BTCV, incluir no texto do relatorio a ressalva de dependencia de linhagem de rotulo; nao apresentar o resultado como generalizacao independente."
+   ],
+   "nao_verificavel": [
+    "Lista de treino por caso do TotalSegmentator v2 (1559 imagens): NAO publicada. Impede verificar image overlap e patient overlap do v2 com qualquer coorte externa, e impede replicar exatamente o treino.",
+    "Identidade institucional dos ~420 sujeitos adicionais do v2 ('other institutions' nao nomeadas).",
+    "Proporcao de casos em que a pre-segmentacao do ESOFAGO foi efetivamente corrigida por humano, e magnitude da correcao (nenhuma metrica por classe foi publicada).",
+    "Numero de anotadores primarios, protocolo de delineacao escrito e concordancia inter-observador para o esofago: nao publicados.",
+    "Se as mascaras de esofago do dataset v2 foram reanotadas do zero ou herdadas da linhagem semeada do v1 — o changelog nao lista o esofago entre as classes com correcao sistemica, mas isso e silencio, nao confirmacao.",
+    "Existencia de qualquer identificador de paciente comum entre TotalSegmentator e SegTHOR/BTCV: nao verificavel em nenhuma direcao, pois nenhum dos lados publica pseudo-identificadores cruzaveis.",
+    "Licenca de uso dos dados SegTHOR e BTCV (UNKNOWN — nao presumir que licenca de codigo ou status de desafio implique licenca aberta de dados).",
+    "Se os pesos CT `total` distribuidos pela release 2.18.0 sao bit-identicos aos da release 2.0.0 (o changelog nao registra retreino, mas silencio nao e prova)."
+   ]
+  },
+  {
+   "alvo": "StructSeg 2019 — Task 3 (Thoracic OAR / segmentacao de orgaos de risco em CT de torax de pacientes com cancer de pulmao)",
+   "acesso": "BLOQUEADO NA PRATICA. A pagina oficial de download (https://structseg2019.grand-challenge.org/Download/) retorna \"Forbidden — You do not have permission to access this content\" para visitante nao autenticado (verificado por navegador em 2026-09-10). O botao \"Join\" redireciona para o login do Grand Challenge, ou seja exige conta + aprovacao dos organizadores. Os dois dominios proprios do desafio estao MORTOS: structseg-challenge.org e www.structseg-challenge.org retornam NXDOMAIN (nslookup, 2026-09-10) — isso derruba simultaneamente o \"results site (under repair)\", o site de submissao publica e o e-mail de suporte support@structseg-challenge.org. Nao ha mirror oficial em Zenodo/TCIA/IEEE Dataport com as imagens da Task 3. Nao foi possivel verificar se o zip Task3_Thoracic_OAR.zip ainda e servido a participantes aprovados sem criar conta (acao nao executada deliberadamente).",
+   "licenca_classe": "UNKNOWN para os dados de 2019. Nenhum texto de licenca publicado em fonte primaria acessivel. Unico sinal documental de licenca vindo dos organizadores: o challenge design document do StructSeg 2020 (Zenodo DOI 10.5281/zenodo.3718885), campo \"Data usage agreement\", responde literalmente \"CC BY NC SA.\" — isto e, NAO-COMERCIAL e ShareAlike. NAO demonstrado que essa mesma licenca se aplique retroativamente a edicao de 2019. Evidencia independente em sentido restritivo: repositorio de terceiro que teve os dados declara \"Due to the agreement with the creators of the orCA Score dataset ... and StructSeg 2019 ... the datasets can not be publicly posted, or distributed to anyone outside of this project.\"",
+   "anotacao_tipo": "Contorno manual clinico reaproveitado de planos reais de radioterapia. Fonte primaria (Dataset page): \"Each CT scan is annotated by one experienced oncologist and verified by another one.\" Design doc 2020: \"All annotations are from actual radiation therapy plans following clinical practice.\" e \"Experienced oncologists who have performed hundreds of radiation therapy plans.\" Merge de multiplas anotacoes: \"None.\" Sem protocolo de contorno publicado, sem atlas citado, sem definicao anatomica escrita de nenhum orgao.",
+   "ontologia": "PARCIAL",
+   "independencia": {
+    "imagem": "PLAUSIVEL — nao demonstrada. Fonte primaria declara aquisicao em Philips Brilliance Big Bore no Cancer Hospital of University of Chinese Academy of Sciences (= Zhejiang Cancer Hospital), o que torna implausivel coincidencia com LCTSC (MDACC/MSKCC/MAASTRO), SegTHOR (Centre Henri Becquerel, Rouen), 4D-Lung (coleta norte-americana no TCIA), BTCV (Vanderbilt) e TotalSegmentator (University Hospital Basel). Porem nenhum identificador de imagem, hash, SeriesUID ou lista de pacientes foi publicado; ausencia de overlap NAO foi verificada e nao pode ser verificada com os dados disponiveis.",
+    "exame": "INCONCLUSIVO — nenhum StudyUID/AccessionNumber/data de exame publicado; o design doc afirma apenas 'Patient-identity information is removed from data to protect patient privacy'. Nao ha como demonstrar que os exames sao outros, nem que nao se repetem entre StructSeg 2019 (50 treino) e StructSeg 2020 (60 treino) — ao contrario, o proprio design doc 2020 sugere reuso/ampliacao da mesma coorte ('Ethics approval on data from StructSeg 2019 have been obtained. We only need to re-new the ethics approval for StructSeg 2020'), o que e um risco de overlap INTERNO entre as duas edicoes.",
+    "instituicao": "DEMONSTRADA em relacao a LCTSC, SegTHOR, 4D-Lung, BTCV e TotalSegmentator/Basel — cada uma dessas declara instituicao de origem distinta em fonte primaria, e o StructSeg declara Cancer Hospital of University of Chinese Academy of Sciences (Zhejiang Cancer Hospital). NAO VERIFICAVEL em relacao ao 'nosso dado', cuja instituicao de origem nao me foi informada nesta frente.",
+    "anotacao": "INCONCLUSIVO — os anotadores nunca foram nomeados nem contados. O formulario BIAS do design doc 2020 pergunta explicitamente 'If human annotation was involved, state the number of annotators' e os organizadores NAO respondem o numero (respondem 'Pixel-level segmentation of the organs-at-risk of interest.'). Sabe-se apenas 'one experienced oncologist' + 'verified by another experienced one' por caso, sem identidade, sem saber se e o mesmo par em todos os 50 casos. Logo nao e possivel demonstrar que nenhum desses anotadores anotou outro dado.",
+    "linhagem_de_anotacao": "Em relacao ao TotalSegmentator v1: DEMONSTRADA. O apendice S2 do artigo ('List of all pretrained models which were used during data annotation') lista exaustivamente BTCV/Multi-Atlas Beyond the Cranial Vault (Task 17), RibFrac 2020, VerSe, JoHof lungmask e SegTHOR (Task 55) — StructSeg NAO aparece, e a string 'StructSeg' nao ocorre em nenhum ponto do artigo. Alem disso os rotulos StructSeg sao de 2019 e derivam de planos clinicos reais, sendo temporalmente anteriores ao TotalSegmentator (2022/2023): nao podem descender dele. Em relacao ao TotalSegmentator v2 especificamente: INCONCLUSIVO em termos formais — o v2 (n=1559, 33 classes novas, 'improved label quality') nao possui apendice publicado equivalente ao S2 documentando como os rotulos foram regerados; entretanto esofago, traqueia, coracao e medula ja existiam no v1, logo a linhagem documentada do v1 se aplica a eles. Veredito pratico: PLAUSIVEL FORTE, com a lacuna documental do v2 explicitada."
+   },
+   "achados": [
+    {
+     "item": "1. Acesso real aos dados (o download ainda funciona?)",
+     "resposta": "NAO demonstrado que funcione. Pagina /Download/ retorna 'Forbidden' para nao-participante; dominio proprio do desafio nao existe mais (NXDOMAIN).",
+     "titulo": "Download / Home — StructSeg2019 Grand Challenge",
+     "url": "https://structseg2019.grand-challenge.org/Download/",
+     "fonte": "Pagina oficial do desafio (primaria), verificada por navegador",
+     "data": "2026-09-10",
+     "trecho": "Forbidden — You do not have permission to access this content. | (Home) results site (under repair): http://www.structseg-challenge.org/",
+     "interpretacao": "O aviso 'results site (under repair)' de 2019 continua literalmente na home em 2026, e o dominio citado nao resolve mais (nslookup structseg-challenge.org -> Non-existent domain). O unico caminho remanescente e criar conta no Grand Challenge e pedir aprovacao dos organizadores — nao executado. Portanto: acesso NAO demonstrado, nao refutado.",
+     "confianca": "alta"
+    },
+    {
+     "item": "2. Licenca DOS DADOS (existe texto publicado? onde?)",
+     "resposta": "Nao existe texto de licenca publicado para os dados de 2019 em fonte primaria acessivel. O unico texto de licenca escrito pelos organizadores e do StructSeg 2020: 'CC BY NC SA.'",
+     "titulo": "Automatic Structure Segmentation for Radiotherapy Planning Challenge 2020 (challenge design document)",
+     "url": "https://zenodo.org/records/3718885",
+     "fonte": "Zenodo — documento oficial de design do desafio, autoria Hongsheng Li e Ming Chen (primaria)",
+     "data": "2020-03",
+     "trecho": "Data usage agreement — Clarify how the data can be used and distributed by the teams that participate in the challenge and by others during and after the challenge. This should include the explicit listing of the license applied. [...] CC BY NC SA.",
+     "interpretacao": "Sinal documental forte de que os organizadores entendem os dados como NAO-COMERCIAIS (NC) e ShareAlike (SA). Porem isso esta escrito para a edicao 2020; NAO e demonstrado que a edicao 2019 tenha a mesma licenca. Para 2019 a resposta correta e UNKNOWN. Nota: a licenca CC-BY-ND do registro Zenodo aplica-se ao PDF, nao aos dados.",
+     "confianca": "alta"
+    },
+    {
+     "item": "2b. Evidencia adicional de restricao de redistribuicao (2019)",
+     "resposta": "Terceiro que obteve os dados declara que o acordo proibe postar publicamente ou distribuir fora do projeto.",
+     "titulo": "zhilothebest/Coronary_Calcium — Dataset Use Statement",
+     "url": "https://raw.githubusercontent.com/zhilothebest/Coronary_Calcium/master/README.md",
+     "fonte": "Repositorio de terceiro (secundaria — usada apenas porque nao existe primaria acessivel)",
+     "data": "n/d",
+     "trecho": "Due to the agreement with the creators of the orCA Score dataset (https://orcascore.grand-challenge.org/), and StructSeg 2019 (https://structseg2019.grand-challenge.org/Home/) the datasets can not be publicly posted, or distributed to anyone outside of this project. If you have access to this repo, please do not share this dataset with anyone.",
+     "interpretacao": "Evidencia de que existia um acordo de uso (provavelmente na pagina /Download/ hoje inacessivel) com clausula de nao-redistribuicao. NAO e prova do texto exato da licenca; e testemunho de um usuario a jusante. Confianca media.",
+     "confianca": "media"
+    },
+    {
+     "item": "3. Disponibilidade das imagens",
+     "resposta": "50 CTs de treino teoricamente disponiveis a participantes aprovados; 10 CTs de teste NUNCA foram liberados.",
+     "titulo": "Submit / Dataset — StructSeg2019",
+     "url": "https://structseg2019.grand-challenge.org/Submit/",
+     "fonte": "Pagina oficial do desafio (primaria)",
+     "data": "2019 (verificada 2026-09-10)",
+     "trecho": "The test data will not be released to the public. [...] The challenge organizers will run your method on all test data. This guarantees that the test data remains secret and cannot be included in the training procedure.",
+     "interpretacao": "Demonstrado: o conjunto de teste (10 pacientes) e permanentemente indisponivel. Como o servidor de avaliacao (dominio structseg-challenge.org) nao existe mais, o teste oficial e hoje inutilizavel de qualquer forma.",
+     "confianca": "alta"
+    },
+    {
+     "item": "4. Disponibilidade das mascaras/contornos (GT publico so nos 50 de treino?)",
+     "resposta": "SIM — GT publico apenas nos 50 casos de treino. Cada pasta de paciente contem data.nii.gz + label.nii.gz.",
+     "titulo": "Dataset — StructSeg2019 / StructSeg 2019 Task3 (openmedlab)",
+     "url": "https://structseg2019.grand-challenge.org/Dataset/",
+     "fonte": "Pagina oficial (primaria) + ficha openmedlab (secundaria, corroborante)",
+     "data": "2019",
+     "trecho": "6 OARs of 50 lung cancer patients will be annotated and released to public as the training data. Another 10 patients' CT scans will be used as the test data.",
+     "interpretacao": "Demonstrado. GT de teste nunca publico. Qualquer 'benchmark StructSeg Task 3' na literatura pos-2020 e feito com split proprio dos 50 de treino, nao com o teste oficial — portanto nao comparavel ao leaderboard original.",
+     "confianca": "alta"
+    },
+    {
+     "item": "5. Formato dos dados",
+     "resposta": "NIfTI comprimido (.nii.gz). Um diretorio por paciente (1..50) com data.nii.gz e label.nii.gz; label unico multi-classe 1..6. Zip: Task3_Thoracic_OAR.zip.",
+     "titulo": "StructSeg 2019 Dataset Naming (README de quem teve os dados) + ficha openmedlab",
+     "url": "https://raw.githubusercontent.com/zhilothebest/Coronary_Calcium/master/README.md",
+     "fonte": "Secundaria (dois terceiros independentes concordam)",
+     "data": "n/d",
+     "trecho": "Task3_Thoracic_OAR.zip: Organ-at-risk segmentation from chest CT scans. Same format as above. The 6 annotated OARs contain Lung_L,Lung_R,Heart,Esophagus,Trachea,Spinal_Cord, corresponding to the label 1 to 6 in the annotation file.",
+     "interpretacao": "Ordem de rotulos DEMONSTRADA como 1=Lung_L, 2=Lung_R, 3=Heart, 4=Esophagus, 5=Trachea, 6=Spinal_Cord. ATENCAO — ARMADILHA: a ficha do openmedlab (Awesome-Medical-Dataset) lista a ordem como lung_left, lung_right, spinal_cord, esophagus, heart e atribui volume mediano 691 cm3 ao 'spinal_cord' e 55 cm3 ao 'heart', o que e anatomicamente impossivel. Sob a ordem do README (3=Heart=691 cm3, 4=Esophagus=35 cm3, 5=Trachea=55 cm3) os numeros ficam plausiveis. Conclusao: a tabela do openmedlab esta com rotulos trocados e quem mapear classes por ela troca coracao com medula silenciosamente. Resolucao: spacing (0.9765-1.3671, idem, 3.0-5.0) mm, tamanho 512x512x(80-127), 4.775 fatias 2D.",
+     "confianca": "alta"
+    },
+    {
+     "item": "6. Definicao anatomica do esofago (inicio, fim, parede vs lumen, atlas)",
+     "resposta": "NAO DOCUMENTADA. Nenhum atlas citado, nenhum limite cranio-caudal definido, nenhuma distincao parede/lumen publicada.",
+     "titulo": "Automatic Structure Segmentation ... Challenge 2020 — Annotation characteristics",
+     "url": "https://zenodo.org/records/3718885",
+     "fonte": "Documento oficial de design (primaria)",
+     "data": "2020-03",
+     "trecho": "b) Provide the instructions given to the annotators (if any) prior to the annotation. [...] Preferably, provide a link to the annotation protocol. — All annotations are from actual radiation therapy plans following clinical practice.",
+     "interpretacao": "Os organizadores responderam a pergunta sobre protocolo com uma nao-resposta: 'pratica clinica'. Nao ha atlas (compare-se com LCTSC, que declara explicitamente seguir o 'RTOG 1106 contouring atlas'). Consequencia pratica: o esofago do StructSeg Task 3 e uma convencao local do Zhejiang Cancer Hospital, nao harmonizada com RTOG/ESTRO. Nao comparavel de forma defensavel com esofago LCTSC ou TotalSegmentator sem estudo de concordancia proprio. Veredito: definicao anatomica NAO DEMONSTRADA.",
+     "confianca": "alta"
+    },
+    {
+     "item": "7. Protocolo de anotacao",
+     "resposta": "Inexistente como documento. Unica descricao: contorno clinico de plano de RT real, 1 oncologista + verificacao por outro, sem merge de anotacoes.",
+     "titulo": "Dataset — StructSeg2019 + design doc 2020",
+     "url": "https://structseg2019.grand-challenge.org/Dataset/",
+     "fonte": "Primarias",
+     "data": "2019 / 2020",
+     "trecho": "Each CT scan is annotated by one experienced oncologist and verified by another one. | d) Describe the method(s) used to merge multiple annotations for one case (if any). — None. | Sources of error: ~2-3mm.",
+     "interpretacao": "Nao ha protocolo publicado, nem link, nem treinamento de anotadores descrito. A estimativa de erro '~2-3mm' e afirmada sem estudo de variabilidade inter/intra-observador publicado — e uma alegacao nao sustentada por dado. Veredito: protocolo NAO DEMONSTRADO.",
+     "confianca": "alta"
+    },
+    {
+     "item": "8. Numero de anotadores",
+     "resposta": "UNKNOWN. Os organizadores foram perguntados diretamente e nao responderam o numero.",
+     "titulo": "Automatic Structure Segmentation ... Challenge 2020 — Annotation characteristics (a)",
+     "url": "https://zenodo.org/records/3718885",
+     "fonte": "Documento oficial de design (primaria)",
+     "data": "2020-03",
+     "trecho": "a) Describe the method for determining the reference annotation [...] If human annotation was involved, state the number of annotators. — Pixel-level segmentation of the organs-at-risk of interest.",
+     "interpretacao": "O formulario BIAS pede explicitamente o numero de anotadores e a resposta dada nao contem numero algum. Sabe-se apenas que por caso houve 1 anotador + 1 verificador; nao se sabe quantas pessoas distintas cobriram os 50 casos, nem se foi sempre a mesma dupla. NAO fabricar numero. UNKNOWN.",
+     "confianca": "alta"
+    },
+    {
+     "item": "9. Revisao por segundo especialista",
+     "resposta": "SIM, afirmada pelos organizadores: um segundo oncologista experiente verifica cada caso. Sem metrica de concordancia publicada.",
+     "titulo": "Dataset — StructSeg2019",
+     "url": "https://structseg2019.grand-challenge.org/Dataset/",
+     "fonte": "Pagina oficial (primaria)",
+     "data": "2019",
+     "trecho": "Each CT scan is annotated by one experienced oncologist and verified by another one.",
+     "interpretacao": "Afirmacao dos organizadores, plausivel mas nao auditavel: nao ha kappa, nao ha Dice inter-observador, nao ha registro de quantos casos foram efetivamente corrigidos. 'Verificado' nao e o mesmo que 'anotado em duplicata e consolidado' — e o design doc confirma que nao houve merge de anotacoes ('None'). Veredito: revisao declarada, NAO demonstrada quantitativamente.",
+     "confianca": "media"
+    },
+    {
+     "item": "10. Instituicoes participantes",
+     "resposta": "Dados e anotacoes: Cancer Hospital of the University of Chinese Academy of Sciences (= Zhejiang Cancer Hospital), Hangzhou, China. Organizacao tecnica: SenseTime Research, CUHK, Shenzhen YINO Intelligent Technology.",
+     "titulo": "Organizers / Home — StructSeg2019 + design doc 2020 (Data source)",
+     "url": "https://structseg2019.grand-challenge.org/Organizers/",
+     "fonte": "Paginas oficiais (primarias)",
+     "data": "2019 / 2020",
+     "trecho": "The data and annotations are provided by Zhejiang Cancer Hospital. | The data are collected by Philips Brilliance Big Bore CT scanners at Cancer Hospital of University of Chinese Academy of Sciences. | Ming Chen, Deputy Chief Director, Cancer Hospital of the University of Chinese Academy of Sciences.",
+     "interpretacao": "Instituicao unica de origem dos dados (single-center). Zhejiang Cancer Hospital tornou-se o Cancer Hospital afiliado da University of Chinese Academy of Sciences em 2019 — mesma instituicao, dois nomes. Scanner unico declarado (Philips Brilliance Big Bore), o que e um forte limitador de diversidade de dominio: um modelo avaliado so nele NAO demonstra robustez multi-scanner.",
+     "confianca": "alta"
+    },
+    {
+     "item": "11. Relacao institucional com LCTSC, 4D-Lung, Basel/TotalSegmentator, SegTHOR, BTCV",
+     "resposta": "Nenhuma relacao institucional declarada ou encontrada. Todas as coortes declaram instituicoes distintas em fonte primaria.",
+     "titulo": "TCIA LCTSC; SegTHOR (arXiv); TotalSegmentator (Radiology AI); BTCV/Vanderbilt; TCIA 4D-Lung",
+     "url": "https://www.cancerimagingarchive.net/collection/lctsc/",
+     "fonte": "Paginas primarias de cada dataset",
+     "data": "2017-2023",
+     "trecho": "(LCTSC, TCIA) three institutions ... 20 each ... RTOG 1106 contouring atlas | (SegTHOR) ... the Henri Becquerel Center (CHB), a regional anti-cancer center in Rouen ... 60 patients ... treated ... between February 2016 and June 2017 | (TotalSegmentator) ... dataset from the 'Multi-Atlas Labeling Beyond the Cranial Vault Challenge' ... acquired at Vanderbilt University Medical Center",
+     "interpretacao": "LCTSC = MD Anderson / MSKCC / MAASTRO (EUA+NL), CC BY 3.0, atlas RTOG 1106. SegTHOR = Centre Henri Becquerel, Rouen (FR). BTCV = Vanderbilt (EUA). 4D-Lung = coorte norte-americana no TCIA (20 pacientes NSCLC, CC BY 3.0). TotalSegmentator = University Hospital Basel (CH). StructSeg = Zhejiang/UCAS (CN). Independencia institucional DEMONSTRADA em relacao a todos esses cinco. Isso NAO demonstra independencia de paciente/exame por si so, mas torna overlap implausivel.",
+     "confianca": "alta"
+    },
+    {
+     "item": "12. DOI",
+     "resposta": "NAO EXISTE DOI para o dataset StructSeg 2019 Task 3. O DOI 10.21227/h75x-gt46 frequentemente citado NAO e deste dataset.",
+     "titulo": "StructSeg2019 GTV Segmentation — IEEE DataPort",
+     "url": "https://ieee-dataport.org/documents/structseg2019-gtv-segmentation",
+     "fonte": "IEEE DataPort (primaria do registro re-publicado)",
+     "data": "2023-02-22",
+     "trecho": "two annotated GTV CT datasets of lung and nasopharynx cancer from Zhejiang Cancer Hospital. Each dataset contains 50 CT scans, each of which was annotated by one experienced oncologist and validated by another. | download url.txt (83 bytes)",
+     "interpretacao": "Tres problemas cumulativos: (a) esse registro e de GTV (Tasks 2 e 4), NAO do OAR toracico (Task 3); (b) o unico arquivo do registro e um txt de 83 bytes com uma URL — nao contem os dados; (c) o autor declarado e Jun Shi (USTC), que nao e organizador do StructSeg — e uma re-publicacao de terceiro, nao um deposito oficial. A ficha do openmedlab propaga esse DOI como citacao da Task 3, o que e uma atribuicao ERRADA. Veredito: sem DOI valido; a citacao canonica e apenas a URL do desafio.",
+     "confianca": "alta"
+    },
+    {
+     "item": "13. Pagina oficial",
+     "resposta": "https://structseg2019.grand-challenge.org/ (viva, conteudo congelado em 2019/2020). Site proprio http://www.structseg-challenge.org/ MORTO (NXDOMAIN).",
+     "titulo": "Home — StructSeg2019 - Grand Challenge",
+     "url": "https://structseg2019.grand-challenge.org/",
+     "fonte": "Primaria, verificada por navegador",
+     "data": "2026-09-10",
+     "trecho": "results site (under repair): http://www.structseg-challenge.org/ | The Challenge Submission site is not available. StructSeg 2020 challenge submission site will reopen in autumn 2020.",
+     "interpretacao": "O site do Grand Challenge sobrevive como vitrine estatica. Toda a infraestrutura propria (resultados, submissao, suporte) esta extinta: o dominio nao resolve. O 'StructSeg 2020' anunciado para o outono de 2020 nao tem pagina propria ('c) Provide the URL for the challenge website (if any). — None at this moment.'). Nao ha snapshot da pagina /Download/ no Wayback Machine (consulta a API retornou archived_snapshots vazio), logo o texto do acordo de uso de 2019 esta perdido para consulta publica.",
+     "confianca": "alta"
+    },
+    {
+     "item": "14. Documentacao oficial",
+     "resposta": "Escassa. Paginas Home/Dataset/Evaluation/Submit/Organizers do Grand Challenge + o design document do StructSeg 2020 no Zenodo. Nao ha data descriptor, data dictionary, nem readme oficial publico.",
+     "titulo": "Automatic Structure Segmentation for Radiotherapy Planning Challenge 2020 (Zenodo)",
+     "url": "https://zenodo.org/records/3718885",
+     "fonte": "Primaria",
+     "data": "2020-03",
+     "trecho": "Ethics approval on data from StructSeg 2019 have been obtained. We only need to re-new the ethics approval for StructSeg 2020. | Patient-identity information is removed from data to protect patient privacy. | Conflicts of interest ... None.",
+     "interpretacao": "O design doc do 2020 e, ironicamente, a melhor documentacao existente sobre o dado de 2019 — e mesmo ele omite numero de anotadores, protocolo, numero/IRB da aprovacao etica e URL do parecer. Aprovacao etica e AFIRMADA sem identificacao de comite, numero ou data: nao verificavel.",
+     "confianca": "alta"
+    },
+    {
+     "item": "15a. Uso juridico como TEST interno",
+     "resposta": "NAO SUPORTADO hoje. Sem licenca publicada para 2019 e sem acesso legitimo demonstrado, nao ha base juridica afirmavel. Se a licenca CC BY-NC-SA declarada em 2020 valer, uso interno em contexto NAO-comercial seria plausivel; em contexto comercial, NAO.",
+     "titulo": "Data usage agreement (design doc 2020) + Dataset Use Statement (terceiro)",
+     "url": "https://zenodo.org/records/3718885",
+     "fonte": "Primaria + secundaria",
+     "data": "2020 / n/d",
+     "trecho": "CC BY NC SA. | ... the datasets can not be publicly posted, or distributed to anyone outside of this project.",
+     "interpretacao": "Inconclusivo por falta de texto normativo aplicavel a 2019. Nao presumir. A clausula NC e o risco dominante para qualquer produto comercial.",
+     "confianca": "media"
+    },
+    {
+     "item": "15b. Uso juridico como BENCHMARK (publicacao de numeros)",
+     "resposta": "PARCIALMENTE SUPORTADO em cenario academico nao-comercial, mas com valor cientifico degradado.",
+     "titulo": "Submit — StructSeg2019",
+     "url": "https://structseg2019.grand-challenge.org/Submit/",
+     "fonte": "Primaria",
+     "data": "2019",
+     "trecho": "The test data will not be released to the public.",
+     "interpretacao": "Mesmo que a licenca permitisse, o benchmark oficial esta morto: teste nunca liberado + servidor de avaliacao extinto (NXDOMAIN). Qualquer numero reportado hoje vem de split caseiro dos 50 de treino e NAO e comparavel ao leaderboard historico. Usar como benchmark comparavel: NAO DEMONSTRAVEL.",
+     "confianca": "alta"
+    },
+    {
+     "item": "15c. Uso juridico como DADO PROCESSADO (derivados, redistribuicao)",
+     "resposta": "NAO SUPORTADO. Sinal de SA (ShareAlike) obriga derivados sob a mesma licenca NC; sinal independente diz que redistribuicao a terceiros e vedada.",
+     "titulo": "Data usage agreement (2020) + Dataset Use Statement (terceiro)",
+     "url": "https://raw.githubusercontent.com/zhilothebest/Coronary_Calcium/master/README.md",
+     "fonte": "Primaria (2020) + secundaria",
+     "data": "2020 / n/d",
+     "trecho": "CC BY NC SA. | the datasets can not be publicly posted, or distributed to anyone outside of this project.",
+     "interpretacao": "Redistribuir imagens, mascaras ou derivados reconstruiveis (crops, resamples, versoes convertidas) e juridicamente indefensavel com a documentacao atual. Publicar apenas metricas agregadas seria o limite conservador — e ainda assim depende de acesso licito, que nao esta demonstrado.",
+     "confianca": "media"
+    },
+    {
+     "item": "16. Risco de overlap de pacientes/exames",
+     "resposta": "BAIXO em relacao a LCTSC/SegTHOR/4D-Lung/BTCV/TotalSegmentator (instituicoes e paises distintos). NAO NULO e NAO VERIFICAVEL formalmente. Risco REAL e interno: sobreposicao entre StructSeg 2019 (50) e StructSeg 2020 (60) da mesma instituicao.",
+     "titulo": "Design doc 2020 — Ethics approval + Training and test case characteristics",
+     "url": "https://zenodo.org/records/3718885",
+     "fonte": "Primaria",
+     "data": "2020-03",
+     "trecho": "Ethics approval on data from StructSeg 2019 have been obtained. We only need to re-new the ethics approval for StructSeg 2020. | Training data: 6 OARs of 60 lung cancer patients; Test data: 6 OARs of 10 lung cancer patients.",
+     "interpretacao": "Nao ha identificadores publicados que permitam qualquer verificacao de overlap: nenhum PatientID, StudyUID, data de exame ou hash. 'Nao encontrei overlap' nao seria prova de nada aqui, porque nao existe o dado necessario para procurar. O aumento de 50 para 60 pacientes de 2019 para 2020 na MESMA instituicao, com reaproveitamento da aprovacao etica, torna PLAUSIVEL que os 50 de 2019 estejam contidos nos 60 de 2020 — quem usar as duas edicoes juntas corre risco concreto de duplicacao. Veredito: INCONCLUSIVO por ausencia de metadado.",
+     "confianca": "alta"
+    },
+    {
+     "item": "17. Independencia da linhagem de anotacao em relacao ao TotalSegmentator v2",
+     "resposta": "DEMONSTRAVEL para o v1 por documento primario; formalmente INCONCLUSIVA para o v2 por ausencia de apendice equivalente — mas com forte suporte indireto.",
+     "titulo": "TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images — Supplementary S2",
+     "url": "https://arxiv.org/abs/2208.05868",
+     "fonte": "Artigo original (primaria), versao v2 = versao publicada na Radiology: Artificial Intelligence",
+     "data": "2023",
+     "trecho": "S2: List of all pretrained models which were used during data annotation — Multi-Atlas Labeling Beyond the Cranial Vault - Abdomen (nnU-Net Task 17) [...] RibFrac 2020 Challenge [...] Large Scale Vertebrae Segmentation Challenge [...] Johof Lung Segmentation [...] SegTHOR: Segmentation of THoracic Organs at Risk in CT images (nnU-Net Task 55) — Classes: aorta, esophagus, heart, trachea",
+     "interpretacao": "Demonstrado por lista exaustiva e explicita: os modelos pre-treinados usados para semear a anotacao do TotalSegmentator sao BTCV, RibFrac, VerSe, lungmask e SegTHOR. StructSeg NAO esta na lista e a string 'StructSeg' nao ocorre no artigo (busca em texto completo extraido do PDF). Para esofago/traqueia/coracao a semente foi SegTHOR (+BTCV para esofago), refinada manualmente sob supervisao de radiologista certificado em Basel. Na direcao oposta, os rotulos StructSeg sao de 2019 e vieram de planos clinicos reais, anteriores ao TotalSegmentator — logo nao podem descender dele. LACUNA: o TotalSegmentator v2 (n=1559, 33 classes novas, 'improved label quality') nao tem apendice publicado documentando a re-geracao dos rotulos; esofago/traqueia/coracao/medula, porem, nao sao classes novas do v2, de modo que a linhagem documentada do v1 se aplica a eles. Veredito final: independencia de linhagem PLAUSIVEL FORTE / DEMONSTRADA para v1, com a lacuna documental do v2 declarada.",
+     "confianca": "alta"
+    },
+    {
+     "item": "Extra A. Existe artigo do desafio? (paper do StructSeg)",
+     "resposta": "NAO. Os organizadores declararam explicitamente que nao publicariam paper do desafio, e nenhum data descriptor foi encontrado.",
+     "titulo": "Design doc 2020 — Publication policy",
+     "url": "https://zenodo.org/records/3718885",
+     "fonte": "Primaria",
+     "data": "2020-03",
+     "trecho": "f) Define the publication policy. [...] We will not publish a challenge paper with submission methods. Each team can submit their paper on their own.",
+     "interpretacao": "Para o StructSeg 2020 a politica de nao publicar paper do desafio e explicita; para 2019 a home so promete um numero especial da Neurocomputing para os times vencedores (artigos de METODO dos participantes, nao descricao do dado). Busca por data descriptor dos organizadores nao retornou nada. Consequencia: nao existe fonte revisada por pares descrevendo a coorte, o protocolo ou a licenca — toda a documentacao e material cinzento de challenge. Veredito: sem paper do desafio; UNKNOWN sobre a existencia de um artigo institucional nao indexado em ingles.",
+     "confianca": "alta"
+    },
+    {
+     "item": "Extra B. Os organizadores publicaram os dados em outro lugar (Zenodo, Baidu, Drive)? Alguem re-publicou?",
+     "resposta": "Nao ha deposito oficial em Zenodo/TCIA. Existe UMA re-publicacao de terceiro no IEEE DataPort, so de GTV, e que nao contem os dados.",
+     "titulo": "IEEE DataPort — StructSeg2019 GTV Segmentation / Zenodo 3718885",
+     "url": "https://ieee-dataport.org/documents/structseg2019-gtv-segmentation",
+     "fonte": "Primarias dos respectivos repositorios",
+     "data": "2023-02-22 / 2020-03",
+     "trecho": "download url.txt (83 bytes) | (Zenodo) One file: AutomaticStructureSegmentationforRadiotherapyPlanningChallenge2020.pdf",
+     "interpretacao": "O registro do Zenodo contem apenas o PDF de design, nenhum dado. O registro do IEEE DataPort refere-se a GTV (Tasks 2/4), foi criado por terceiro (Jun Shi, USTC) em 2023, exige login/assinatura e seu unico arquivo e um ponteiro de 83 bytes. Um PR ao tensorflow/datasets (tensorflow/datasets#1034) tentou empacotar o StructSeg (Task 1) e nao foi incorporado; nao declarava licenca, so citava a URL do desafio. Nenhum mirror publico verificado de Task3_Thoracic_OAR.zip foi encontrado — o que NAO prova que nao exista.",
+     "confianca": "alta"
+    },
+    {
+     "item": "Extra C. Ontologia / mapeamento de classes",
+     "resposta": "PARCIAL. Os seis nomes casam nominalmente com classes do TotalSegmentator, mas as definicoes nao sao equivalentes e o pulmao e granular demais no TS.",
+     "titulo": "README de terceiro (ordem de rotulos) + TotalSegmentator (lista de classes)",
+     "url": "https://raw.githubusercontent.com/zhilothebest/Coronary_Calcium/master/README.md",
+     "fonte": "Secundaria + primaria",
+     "data": "n/d / 2023",
+     "trecho": "The 6 annotated OARs contain Lung_L,Lung_R,Heart,Esophagus,Trachea,Spinal_Cord, corresponding to the label 1 to 6",
+     "interpretacao": "StructSeg entrega pulmao inteiro E/D, enquanto o TotalSegmentator entrega 5 lobos (agregacao necessaria, e a agregacao de lobos nao reproduz exatamente um contorno de pulmao de RT, que costuma excluir estruturas hilares). Coracao: StructSeg = coracao inteiro de plano de RT (que tipicamente segue o pericardio por atlas RTOG — aqui sem atlas declarado); TS trata coracao/subestruturas de forma propria. Esofago e medula: mesmos nomes, definicoes nao harmonizadas e sem atlas do lado StructSeg. Veredito: mapeamento nominal possivel, equivalencia semantica NAO DEMONSTRADA — qualquer metrica cruzada exige estudo de concordancia proprio antes de ser interpretada.",
+     "confianca": "media"
+    }
+   ],
+   "status_recomendado": "E",
+   "pendencias": [
+    "MAPEAMENTO DE STATUS: a escala A-E nao me foi definida. Adotei A=liberado ate E=bloqueado. Sob essa leitura o StructSeg Task 3 e E: sem acesso legitimo demonstrado + sem licenca publicada para os dados de 2019 + unico sinal de licenca existente e NAO-COMERCIAL (CC BY-NC-SA, edicao 2020) + sinal independente de proibicao de redistribuicao. Se a escala do projeto for outra, reclassificar.",
+    "CAMINHO DE REMEDIACAO UNICO E VIAVEL: escrever para o contato primario declarado no design doc oficial, Hongsheng Li (CUHK), hsli@ee.cuhk.edu.hk, pedindo (a) o texto do acordo de uso/licenca da edicao 2019, (b) confirmacao se a Task 3 e coberta por CC BY-NC-SA, (c) acesso ao Task3_Thoracic_OAR.zip. NAO executei nenhum contato — envio de mensagem em nome do usuario exige autorizacao explicita. O e-mail de suporte do desafio (support@structseg-challenge.org) esta morto: o dominio nao resolve.",
+    "Alternativa de acesso: criar conta no grand-challenge.org e solicitar 'Join' no desafio para ver se a pagina /Download/ ainda serve os arquivos. NAO executei — criar conta e aceitar termos exige autorizacao explicita do usuario.",
+    "Verificar se o /Download/ de 2019 continha um texto de DUA (o testemunho de terceiro sugere que sim). Nao ha snapshot no Wayback Machine (archived_snapshots vazio). Tentar outros arquivos (archive.today, Bing cache, memento) ou pedir o texto aos organizadores.",
+    "Se o dado for eventualmente obtido: NAO mapear classes pela ficha do openmedlab. A ordem correta e 1=Lung_L, 2=Lung_R, 3=Heart, 4=Esophagus, 5=Trachea, 6=Spinal_Cord. Validar sempre por volume (coracao ~600-900 cm3, esofago ~20-60 cm3, traqueia ~40-70 cm3, medula ~30-50 cm3) antes de treinar/avaliar qualquer coisa.",
+    "Antes de qualquer comparacao de esofago com LCTSC (atlas RTOG 1106), SegTHOR ou TotalSegmentator, rodar estudo de concordancia proprio: o esofago StructSeg nao tem atlas, extensao cranio-caudal nem convencao parede/lumen documentadas.",
+    "Se houver intencao de usar StructSeg 2019 e 2020 juntos: assumir overlap de pacientes ate prova em contrario (mesma instituicao, 50 -> 60 pacientes, aprovacao etica reaproveitada).",
+    "Documentar a lacuna do TotalSegmentator v2: nao existe apendice publicado equivalente ao S2 do v1 descrevendo como os rotulos do v2 foram regerados. Para fechar o eixo 5 de forma DEMONSTRADA tambem no v2, seria preciso confirmacao dos autores (wasserth) ou documentacao do release v2."
+   ],
+   "nao_verificavel": [
+    "Se o download do Task3_Thoracic_OAR.zip ainda funciona para participantes aprovados (pagina /Download/ retorna Forbidden a visitante; nao criei conta).",
+    "O texto exato da licenca / acordo de uso dos dados da edicao 2019 — nunca localizado em fonte primaria e sem snapshot no Wayback Machine.",
+    "Numero de anotadores distintos envolvidos na Task 3 — os organizadores foram perguntados no formulario BIAS e nao responderam.",
+    "Identidade, especialidade e anos de experiencia dos anotadores e do verificador.",
+    "Definicao anatomica do esofago (limite cranial/caudal, parede vs lumen, atlas de referencia) — nenhum documento.",
+    "Concordancia inter/intra-observador real: o '~2-3mm' do design doc e afirmado sem estudo publicado.",
+    "Numero, comite e data da aprovacao etica (afirmada como obtida, sem IRB, sem numero, sem URL).",
+    "Overlap de pacientes/exames com qualquer outra coorte — impossivel de testar: nenhum PatientID, StudyUID, data de exame ou hash foi publicado.",
+    "Independencia de imagem e de exame em relacao ao 'nosso dado': a origem institucional do dado interno do projeto nao me foi informada nesta frente.",
+    "Se existe artigo institucional em chines descrevendo a coorte, nao indexado nas buscas em ingles.",
+    "Existencia de mirrors privados/nao indexados (Baidu Pan, Drive) do Task3_Thoracic_OAR.zip.",
+    "Como os rotulos do TotalSegmentator v2 foram regerados ('improved label quality') — sem apendice publicado equivalente ao S2 do v1."
+   ]
+  },
+  {
+   "alvo": "FRENTE 29C — reavaliação cirúrgica de 3 candidatos C: (1) NSCLC-Cetuximab / RTOG-0617 (TCIA), (2) RADCURE (TCIA/UHN Toronto), (3) TROTS (Erasmus MC). Pergunta central: existe contorno de ESÔFAGO utilizável, em que regime de acesso, e com que independência?",
+   "achados": [
+    {
+     "item": "VEREDITO NSCLC-Cetuximab / RTOG-0617",
+     "resposta": "C (mantido, mas com dois bloqueios abertos) — único dos três com CT torácica real; esôfago NÃO demonstrado; download atualmente indisponível no TCIA",
+     "titulo": "NSCLC-Cetuximab (RTOG-0617) — TCIA Collection",
+     "url": "https://www.cancerimagingarchive.net/collection/nsclc-cetuximab/",
+     "fonte": "Página oficial do dataset (TCIA)",
+     "data": "Version 1: 2019/04/15; página consultada 2026-09-10",
+     "trecho": "Images and Radiation Therapy Structures | RTPLAN, CT, RTSTRUCT, RTDOSE | DICOM | Unavailable | 490 | 490 | 2,116 | 75,063 | NIH Controlled Data Access Policy",
+     "interpretacao": "Demonstrado: o pacote contém RTSTRUCT e RTDOSE para 490 pacientes de ensaio torácico. Demonstrado: o ponto de acesso está marcado 'Unavailable'. Não demonstrado: quais estruturas existem no RTSTRUCT.",
+     "confianca": "alta"
+    },
+    {
+     "item": "NSCLC-Cetuximab — existe contorno de esôfago nos RTSTRUCT?",
+     "resposta": "NÃO DEMONSTRADO (plausível, inconclusivo). Nenhuma fonte primária lista as estruturas do RTSTRUCT desta coleção.",
+     "titulo": "NSCLC-Cetuximab — TCIA Collection (texto integral da página)",
+     "url": "https://www.cancerimagingarchive.net/collection/nsclc-cetuximab/",
+     "fonte": "Página oficial do dataset (TCIA), texto bruto capturado e varrido por regex",
+     "data": "2026-09-10",
+     "trecho": "Busca literal por 'esophag' / 'Esophag' no texto integral da página: 0 ocorrências. A página descreve os tipos de dado (RTPLAN, CT, RTSTRUCT, RTDOSE) e nunca enumera estruturas.",
+     "interpretacao": "Não verificável com os dados disponíveis. ATENÇÃO — armadilha detectada e descartada: o motor de busca sintetizou a frase 'GTV-1 e estruturas anatômicas selecionadas (i.e., lung, heart and esophagus)' como se fosse do NSCLC-Cetuximab; essa frase é literalmente a descrição do NSCLC-Radiomics (Aerts/Maastro), coleção DIFERENTE. Não use essa confusão como evidência.",
+     "confianca": "alta"
+    },
+    {
+     "item": "NSCLC-Cetuximab — evidência INDIRETA de que o esôfago foi contornado no ensaio",
+     "resposta": "PLAUSÍVEL — existe análise secundária publicada que extrai DVH de esôfago de 326 pacientes do RTOG 0617",
+     "titulo": "Independent External Validation of Radiation-Induced Esophagitis Prediction during Chemoradiation Therapy for NSCLC Using RTOG 0617 Trial Data (IJROBP)",
+     "url": "https://www.sciencedirect.com/science/article/pii/S036030162501853X",
+     "fonte": "Artigo revisado por pares (texto completo bloqueado — HTTP 403; conteúdo obtido via resumo do motor de busca)",
+     "data": "2025/2026",
+     "trecho": "'Among 495 trial patients, 326 met inclusion criteria'; 'The relative esophageal volume receiving ≥55 Gy (V55Gy) and the UM thoracic esophagus mean dose (Dmean) were both confirmed as good predictors'; 'RTOG 0617 trial data retrieved from The Cancer Imaging Archive' e 'NCTN/NCORP Data Archive'",
+     "interpretacao": "Plausível que o esôfago venha contornado no pacote — mas NÃO demonstrado: o artigo pode ter re-contornado ou auto-segmentado o esôfago, e não consegui abrir o Methods para verificar. 'Existe DVH de esôfago em uma análise secundária' NÃO é prova de que o RTSTRUCT distribuído contém a estrutura.",
+     "confianca": "media"
+    },
+    {
+     "item": "NSCLC-Cetuximab — contra-evidência: nem todo OAR está no pacote",
+     "resposta": "Demonstrado que apenas coração e pulmões são descritos como 'rotineiramente contornados' em um uso independente dos mesmos dados; esôfago NÃO é citado",
+     "titulo": "Prediction of Grade 4 radiation-induced lymphopenia during chemoradiation therapy for lung cancer patients (usa RTOG 0617)",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12151671/",
+     "fonte": "Artigo revisado por pares (PMC, texto aberto)",
+     "data": "2025",
+     "trecho": "contornos clinicamente delineados de 'heart and lungs' que eram 'routinely contoured'; para timo e ossos, 'are not routinely contoured', então os autores fizeram segmentação automática. Acesso: 'Data-Archive-Data-Use-Agreement n. 1687'; 227 pacientes incluídos.",
+     "interpretacao": "Aumenta a incerteza: um grupo que baixou o mesmo pacote descreve explicitamente quais estruturas vinham prontas e o esôfago não aparece na lista. Inconclusivo (pode ser só porque não precisavam dele), mas é sinal negativo, não positivo.",
+     "confianca": "alta"
+    },
+    {
+     "item": "NSCLC-Cetuximab — regime de acesso",
+     "resposta": "CONTROLADO E ATUALMENTE INDISPONÍVEL PELO TCIA. Licença = NIH Controlled Data Access Policy; rota histórica = DUA no NCTN/NCORP Data Archive.",
+     "titulo": "NIH Controlled Data Access Policy (TCIA) + página da coleção + wiki legado",
+     "url": "https://www.cancerimagingarchive.net/nih-controlled-data-access-policy/",
+     "fonte": "Páginas oficiais TCIA (política + coleção + wiki legado pageId=33948334)",
+     "data": "política vigente desde 04/04/2025 e 08/07/2025",
+     "trecho": "Coleção: 'Due to NIH Controlled Data Access Policy changes, downloads that previously required login-access are no longer available via TCIA. Watch for announcements re-enabling these in a new form.' | Política: 'TCIA ceased hosting of controlled access datasets as of July 8, 2025'; pedidos via dbGaP e 'requestors must be at a level equivalent to a tenure-track professor, or senior scientist'. | Wiki legado: 'This is a limited access data set. To request access please register an account on the NCTN Data Archive.' (licença: NCTN/NCORP Data Archive License, With Collaborative Agreement)",
+     "interpretacao": "Demonstrado: não é dado aberto, não é baixável hoje pelo TCIA, exige DUA institucional e requerente de nível PI. NÃO presumir que 'está no TCIA' implica licença aberta — aqui é o oposto.",
+     "confianca": "alta"
+    },
+    {
+     "item": "NSCLC-Cetuximab — anatomia/compatibilidade",
+     "resposta": "COMPATÍVEL — CT de tórax, estágio III NSCLC, multi-institucional (NCTN/RTOG), 490 pacientes",
+     "titulo": "NSCLC-Cetuximab — TCIA Collection",
+     "url": "https://www.cancerimagingarchive.net/collection/nsclc-cetuximab/",
+     "fonte": "Página oficial do dataset",
+     "data": "2019/04/15",
+     "trecho": "\"Each patient's CT of the chest (including the adrenals) was obtained within 6 weeks of registration.\" — 490 subjects, Non-small Cell Lung Cancer, Lung.",
+     "interpretacao": "Demonstrado: cobertura torácica completa, exatamente o domínio de interesse. É por isso que vale a pena manter o candidato em C apesar dos bloqueios — é o único dos três com o domínio certo.",
+     "confianca": "alta"
+    },
+    {
+     "item": "VEREDITO RADCURE",
+     "resposta": "C (mantido) — esôfago DEMONSTRADO e em volume grande, mas domínio anatômico só parcialmente compatível e acesso controlado (dbGaP/face)",
+     "titulo": "RADCURE — TCIA Collection",
+     "url": "https://www.cancerimagingarchive.net/collection/radcure/",
+     "fonte": "Página oficial do dataset + arquivo oficial de mapeamento de contornos",
+     "data": "Version 4: 2024/12/19",
+     "trecho": "'This full release of RADCURE contains all clinically available contours (primary gross tumor volume (GTVp), nodal gross tumor volume (GTVn), and 19 OARs), as mentioned in Welch et al., 2024, https://doi.org/10.1002/mp.16972'",
+     "interpretacao": "Demonstrado que há 19 OARs padronizados TG-263. Serve como teste de deslocamento de domínio (domain shift) para esôfago cervical, não como validação externa equivalente a CT torácica.",
+     "confianca": "alta"
+    },
+    {
+     "item": "RADCURE — existe esôfago? (PROVA DURA)",
+     "resposta": "SIM, DEMONSTRADO: 2.708 de 3.337 pacientes têm contorno de esôfago",
+     "titulo": "RADCURE_OAR_contour_mapping_v04_20241219.csv (arquivo de suporte oficial hospedado pelo TCIA)",
+     "url": "https://www.cancerimagingarchive.net/wp-content/uploads/RADCURE_OAR_contour_mapping_v04_20241219.csv",
+     "fonte": "Arquivo primário oficial do dataset, baixado e contado por mim",
+     "data": "v04, 2024/12/19",
+     "trecho": "Cabeçalho literal: ',OPC-Radiomics,GTVp,NODES,BrachialPlex_L,BrachialPlex_R,Brainstem,Cochlea_L,Cochlea_R,Esophagus,Eye_L,Eye_R,Larynx,Lens_L,Lens_R,Lips,Mandible_Bone,Nrv_Optic_L,Nrv_Optic_R,OpticChiasm,Parotid_L,Parotid_R,SpinalCord' — Contagem feita por mim sobre 3.337 linhas: coluna 'Esophagus' preenchida em 2.708 casos (variantes originais: ESOPHAGUS 2654, OESOPHAGUS 27, esophagus 19, Esophagus 7, EESOPHAGUS 1; vazio em 629).",
+     "interpretacao": "DEMONSTRADO por fonte primária. Esta é a única afirmação de 'existe esôfago' entre os três candidatos que está provada. A contagem 2.708 é cálculo meu sobre o arquivo oficial, não um número publicado — reproduza antes de citar em texto.",
+     "confianca": "alta"
+    },
+    {
+     "item": "RADCURE — o esôfago é o esôfago TORÁCICO?",
+     "resposta": "NÃO DEMONSTRADO — população cabeça-pescoço; extensão craniocaudal do contorno não documentada",
+     "titulo": "RADCURE — TCIA Collection / Welch et al. 2024",
+     "url": "https://www.cancerimagingarchive.net/collection/radcure/",
+     "fonte": "Página oficial (o artigo Welch 2024 na Wiley retornou HTTP 403; não consegui ler o texto completo)",
+     "data": "2024",
+     "trecho": "'3,346 head and neck cancer CT image volumes collected from 2005-2017 treated with definitive RT at the University Health Network (UHN) in Toronto, Canada'. Nenhuma declaração sobre extensão craniocaudal da CT nem do contorno de esôfago.",
+     "interpretacao": "Inconclusivo. Em planejamento de cabeça-pescoço o esôfago contornado é tipicamente o segmento cervical/torácico superior, e a CT de simulação raramente desce até a junção gastroesofágica — mas isso é conhecimento de domínio, NÃO evidência deste dataset. Se o nosso alvo é esôfago torácico completo, RADCURE cobre no máximo a porção proximal. Precisa ser medido nos próprios dados antes de qualquer uso.",
+     "confianca": "media"
+    },
+    {
+     "item": "RADCURE — qualidade do rótulo de esôfago",
+     "resposta": "Sinal de rótulo ruidoso: esôfago tem das piores métricas entre os 19 OARs em estudo que usou RADCURE",
+     "titulo": "Auto-segmentation of organs-of-interest clinical acceptability & reproducibility framework in head and neck cancer",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13312076/",
+     "fonte": "Artigo revisado por pares (PMC, aberto)",
+     "data": "2025",
+     "trecho": "'The 19 essential OOIs used were: brainstem, chiasm, esophagus, acoustics (L/R), larynx, eye (L/R), lips, lens (L/R), optic nerve (L/R), parotid gland (L/R), brachial plexus (L/R), mandible, and spinal cord.' — desempenho do esôfago: 'median 95HD of 6.1 mm ± 10.2 mm' no modelo Refined WOLNET. Também: 582 pacientes com delineação completa dos 19 OOIs.",
+     "interpretacao": "Confirma independentemente que esôfago está na lista dos 19. O 95HD alto com desvio maior que a mediana indica contornos clínicos de esôfago heterogêneos/inconsistentes — típico de contorno clínico de OAR não-dosimetricamente-crítico. Plausível que o rótulo seja mais ruidoso que um rótulo de pesquisa dedicado; não demonstrado quanto.",
+     "confianca": "media"
+    },
+    {
+     "item": "RADCURE — regime de acesso",
+     "resposta": "CONTROLADO para as imagens (risco de reconstrução facial); só os dados clínicos são CC BY 4.0",
+     "titulo": "RADCURE — TCIA Collection",
+     "url": "https://www.cancerimagingarchive.net/collection/radcure/",
+     "fonte": "Página oficial do dataset",
+     "data": "consultada 2026-09-10",
+     "trecho": "'Some data in this collection contains images that could potentially be used to reconstruct a human face. The process for requesting access to these is outlined in the NIH Controlled Data Access Policy page.' — Linhas de imagem (CT+RTSTRUCT, 333.13gb e subset OPC 58.55gb): licença 'NIH Controlled Data Access Policy'. Linha 'Clinical data ... XLSX ... CC BY 4.0'.",
+     "interpretacao": "Demonstrado: NÃO presumir licença aberta. A licença CC BY 4.0 cobre a planilha clínica, não as imagens nem os RTSTRUCT. A página ainda mostra botão 'Download (requires TCIA Data Retriever)' ao lado da licença controlada, e existem manifests 'GC_manifest_RADCURE_20260326.csv' (GC = General Commons) — sinal de migração para o NCI General Commons via dbGaP. Regime exato do download hoje: inconclusivo, precisa de confirmação com o helpdesk do TCIA.",
+     "confianca": "media"
+    },
+    {
+     "item": "VEREDITO TROTS",
+     "resposta": "E — descartar. Não há protocolo torácico, não há evidência de esôfago, o CT é deliberadamente adulterado e as estruturas não são máscaras de imagem.",
+     "titulo": "Data for TROTS – The Radiotherapy Optimisation Test Set (Breedveld & Heijmen, Data in Brief 12:143-149)",
+     "url": "https://repub.eur.nl/pub/116520/Repub_116520_O-A.pdf",
+     "fonte": "Artigo de dados original, open access (PDF baixado e varrido integralmente)",
+     "data": "2017-04-01",
+     "trecho": "Tabela 1 literal: 'Prostate CK 30', 'Prostate VMAT 30', 'Head-and-Neck 15', 'Head-and-Neck Alt 15', 'Protons 20 — Patients with cancer in the head-and-neck region, treated with 3-beam proton therapy', 'Liver 10'. Total: 'The dataset contains 120 problems (patients), divided over 6 different treatment protocols/tumour types.' Busca literal por 'sophag'/'Oesophag' no PDF integral: 0 ocorrências.",
+     "interpretacao": "Demonstrado: nenhum protocolo torácico/pulmão. Demonstrado: o artigo nunca menciona esôfago. Mesmo que exista um contorno de esôfago cervical nos casos de cabeça-pescoço (não verificável sem baixar os .mat), seriam 30-50 casos de anatomia errada.",
+     "confianca": "alta"
+    },
+    {
+     "item": "TROTS — o formato é utilizável como dado de imagem?",
+     "resposta": "NÃO, praticamente. CT com níveis de cinza alterados e estruturas como conjuntos de voxels amostrados, não máscaras.",
+     "titulo": "Data for TROTS – The Radiotherapy Optimisation Test Set",
+     "url": "https://repub.eur.nl/pub/116520/Repub_116520_O-A.pdf",
+     "fonte": "Artigo de dados original, open access",
+     "data": "2017",
+     "trecho": "'To avoid potential facial recognition, the facial profile of head-and-neck patients is smoothed, and the grey levels of the CT are flattened, see Fig. 1.' | 'The number of rows typically indicate the number of voxels (sampled elements in the CT where the dose is evaluated)' | 'The patient structure is not required for optimisation, but useful in visualisation and interpretation of the results.' | 'The data is stored in Matlab files, MAT version 7.3. The files are fully HDF5 compliant'",
+     "interpretacao": "Demonstrado e decisivo: a anonimização altera os valores de HU do CT — qualquer modelo de segmentação treinado em HU real vê um domínio artificialmente distorcido. Somado a isso, as estruturas existem como índices de voxels amostrados para otimização de dose, não como máscara densa registrada à imagem. Reconstituir máscara é possível em tese, mas o dado subjacente já está comprometido e a anatomia é errada. Não vale o esforço.",
+     "confianca": "alta"
+    },
+    {
+     "item": "Comparação decisiva entre os três",
+     "resposta": "RADCURE = esôfago provado, anatomia parcialmente errada. NSCLC-Cetuximab = anatomia certa, esôfago não provado, acesso fechado. TROTS = nada dos dois.",
+     "interpretacao": "Se o objetivo é validação externa de esôfago em CT torácica: NSCLC-Cetuximab é o único alvo com o domínio correto e por isso merece o esforço de UMA pergunta ao TCIA helpdesk / NCTN Data Archive (lista de estruturas do RTSTRUCT). RADCURE só serve como teste de robustez fora de domínio, e mesmo assim atrás de dbGaP. TROTS sai da lista.",
+     "confianca": "alta"
+    }
+   ],
+   "status_recomendado": "C",
+   "acesso": "Nenhum dos três é acesso aberto para imagem. (1) NSCLC-Cetuximab: licença 'NIH Controlled Data Access Policy', Access Points = 'Unavailable' no TCIA desde 08/07/2025; rota histórica = conta + DUA no NCTN/NCORP Data Archive (um artigo de 2025 cita 'Data-Archive-Data-Use-Agreement n. 1687'); pedidos dbGaP exigem requerente de nível professor efetivo/cientista sênior. (2) RADCURE: imagens e RTSTRUCT sob 'NIH Controlled Data Access Policy' por risco de reconstrução facial; apenas a planilha clínica é CC BY 4.0; manifests 'GC_manifest' indicam hospedagem no NCI General Commons. (3) TROTS: artigo de dados sob CC BY, dados hospedados pelo Erasmus MC/Zenodo — este é o único com licença aberta, e é justamente o inútil.",
+   "anotacao_tipo": "RADCURE: contorno clínico manual de planejamento radioterápico, revisado em rounds semanais de QA no UHN ('contours were generated and reviewed at weekly quality assurance rounds'), depois renomeado para nomenclatura TG-263. NSCLC-Cetuximab: contornos clínicos submetidos pelas instituições participantes do ensaio NCTN/RTOG (conteúdo exato não verificável). TROTS: delineação clínica no Erasmus MC ('delineate tumour(s), organs and other volumes of interest on the CT'), convertida em conjuntos de voxels amostrados para otimização.",
+   "licenca_classe": "Mista e majoritariamente restritiva: 2 de 3 sob NIH Controlled Data Access Policy (acesso controlado, dbGaP/DUA, não redistribuível); TROTS sob CC BY (aberta) mas sem utilidade. NÃO tratar 'está no TCIA' como equivalente a licença aberta.",
+   "ontologia": "PARCIAL",
+   "independencia": {
+    "imagem": "RADCURE: PLAUSÍVEL independente — CTs de simulação de cabeça-pescoço do UHN Toronto, 2005-2017; nenhuma sobreposição conhecida com coleções torácicas. NSCLC-Cetuximab: PLAUSÍVEL independente — CTs de tórax de ensaio NCTN dos EUA, 2007-2011; porém pacientes de ensaios NCTN aparecem em múltiplos datasets derivados, e não busquei sobreposição de identificadores. TROTS: independente (Erasmus MC), irrelevante. Em nenhum caso 'não encontrei overlap' — eu não consegui testar overlap em caso algum, porque nenhum dos três está baixável para inspeção.",
+    "exame": "INCONCLUSIVO nos três. Sem acesso às imagens, não é possível comparar StudyInstanceUID, datas, fabricante/protocolo de aquisição ou hashes de pixel contra o nosso dado. Não verificável com os dados disponíveis.",
+    "instituicao": "RADCURE: DEMONSTRADA como instituição única e nomeada — 'University Health Network (UHN) in Toronto, Canada'. NSCLC-Cetuximab: DEMONSTRADO que é multi-institucional (NCTN/RTOG, ~centenas de centros dos EUA) — o que corta os dois lados: reduz o risco de ser a mesma instituição que a nossa, mas impede afirmar que NENHUM centro coincide com a origem do nosso dado. TROTS: DEMONSTRADA (Erasmus MC Rotterdam). Em todos: independência institucional só é afirmável se soubermos a instituição de origem do NOSSO dado — isso não foi verificado nesta frente.",
+    "anotacao": "INCONCLUSIVO nos três. Não há lista de anotadores, nem número de anotadores, nem identificação de quem contornou. Não fabricar essa informação. RADCURE tem o dado mais próximo de uma garantia de processo ('reviewed at weekly quality assurance rounds'), mas isso descreve QA, não identidade de anotador.",
+    "linhagem_de_anotacao": "INCONCLUSIVO nos três, e este é o eixo mais fraco. RADCURE: contornos clínicos de 2005-2017 de um grande centro — nada na documentação exclui que parte tenha vindo de auto-contorno atlas-based ou de modelo comercial editado; a linhagem do rótulo NÃO é declarada. NSCLC-Cetuximab: idem, contornos clínicos de dezenas de centros ao longo de 4 anos, sem declaração de método. TROTS: idem. Nenhum dos três permite afirmar que o rótulo não descende de um modelo que tocou o nosso pipeline — só é possível dizer que não há evidência de que descenda, o que não é a mesma coisa."
+   },
+   "pendencias": [
+    "NSCLC-Cetuximab — BLOQUEIO 1 (decide tudo): obter a lista literal de ROIs dos RTSTRUCT. Ação concreta e barata: escrever ao help@cancerimagingarchive.net perguntando explicitamente 'os RTSTRUCT da coleção NSCLC-Cetuximab (DOI 10.7937/TCIA.2018.jze75u7v) contêm ROI de esôfago, e em quantos dos 490 casos?'. Isso é uma pergunta, não uma inferência — não responder por dedução.",
+    "NSCLC-Cetuximab — BLOQUEIO 2: confirmar se o NCTN/NCORP Data Archive ainda entrega as IMAGENS (e não só os dados clínicos) após 08/07/2025, e qual PHS/dbGaP se aplica. Verificar se temos requerente elegível (nível professor efetivo / cientista sênior) e signatário institucional.",
+    "NSCLC-Cetuximab — ler o Methods de 'Independent External Validation of Radiation-Induced Esophagitis Prediction ... Using RTOG 0617 Trial Data' (IJROBP, S036030162501853X) via acesso institucional: ele diz se o esôfago veio contornado ou foi re-segmentado. É a evidência mais direta que existe e eu não consegui abrir (403).",
+    "RTOG 0617 — o protocolo oficial (https://irochouston.mdanderson.org/rpc/credentialing/files/0617.pdf) está com os content streams CORROMPIDOS no servidor do IROC Houston: pypdf, pymupdf e pdfplumber extraem 0 texto útil das 113 páginas. Conseguir uma cópia íntegra (NRG Oncology, biblioteca institucional) para citar literalmente a exigência de contorno e a restrição de dose ao esôfago. A frase circulante 'mean esophagus dose < 34 Gy' aparece só em fontes secundárias e NÃO foi confirmada em fonte primária.",
+    "RADCURE — medir nos próprios dados a extensão craniocaudal do ROI 'Esophagus' e o limite inferior da CT. Sem isso, não se pode afirmar utilidade para esôfago torácico. Antes disso, RADCURE não deve ser descrito como 'dataset de esôfago'.",
+    "RADCURE — confirmar com o TCIA se o botão 'Download' das linhas de imagem ainda funciona ou se o acesso já migrou integralmente para dbGaP/General Commons (manifests 'GC_manifest_RADCURE_20260326.csv' sugerem migração).",
+    "Todos — nenhum teste de sobreposição (imagem/exame/paciente) contra o nosso dado foi possível. Enquanto os dados não forem baixados, os cinco eixos de independência não podem passar de PLAUSÍVEL/INCONCLUSIVO."
+   ],
+   "nao_verificavel": [
+    "Se os RTSTRUCT do NSCLC-Cetuximab contêm ROI de esôfago — nenhuma fonte primária lista as estruturas e os dados não são baixáveis para inspeção.",
+    "Em quantos dos 490 casos do RTOG-0617 haveria esôfago, e com que consistência de nomenclatura entre centros.",
+    "O texto literal do protocolo RTOG 0617 sobre contorno obrigatório e restrição de dose ao esôfago — o PDF oficial no host do IROC está corrompido.",
+    "A extensão craniocaudal do contorno de esôfago no RADCURE e o limite caudal da CT de simulação — não documentado em nenhuma fonte consultada.",
+    "Se os contornos clínicos do RADCURE tiveram origem em auto-contorno (atlas ou DL) posteriormente editado — a linhagem do rótulo não é declarada.",
+    "Se o NCTN/NCORP Data Archive entrega hoje as imagens do RTOG-0617, e qual o prazo/《PHS》 do pedido dbGaP.",
+    "Se algum protocolo do TROTS contém esôfago — o artigo de dados não enumera estruturas; a documentação detalhada está dentro do próprio pacote de dados (referência [19] do artigo), que não foi baixado.",
+    "Qualquer sobreposição de pacientes, exames ou imagens entre estes três candidatos e o nosso dado — nenhum teste foi executado.",
+    "Identidade, número e protocolo dos anotadores em qualquer um dos três — não há informação publicada; não foi feito contato com organizadores e nenhuma resposta de organizador é reportada aqui."
+   ]
+  }
+ ],
+ "vereditos": [
+  {
+   "alvo": "Pediatric-CT-SEG (TCIA, DOI 10.7937/TCIA.X0H0-1706; Jordan et al., Med Phys 2022, PMC9090951) — frente 29B-pediatric",
+   "veredito": "PARCIAL",
+   "objecoes": [
+    "FALSA DEMONSTRAÇÃO (a mais grave): 'linhagem_de_anotacao: DEMONSTRADA para o esôfago' é INFERÊNCIA, não demonstração. Reli o full text em PMC9090951: o artigo diz 'Four expert medical analysts retrospectively and manually contoured 25 structures' e, em separado, 'Lung, skin, and bone contours were obtained semi-automatically using the Eclipse SmartSegmentation software'. Ele NUNCA diz quais são as 25, NUNCA lista o esôfago como manual, e o total é 'up to 29 anatomical organ structures' — 'up to' é MÁXIMO por paciente, não uma partição fixa. A aritmética 29−Lung_L−Lung_R−Skin−Bones=25 é do investigador, não do artigo, e exige duas premissas não verificadas: que 'bone' seja exatamente 1 estrutura no RTSTRUCT e que 'lung' sejam exatamente 2. A página wiki do TCIA ainda menciona 'bone contouring efforts' por equipe da Marquette University — ou seja, um quinto grupo de contribuintes fora dos '4 expert medical analysts', o que quebra ainda mais o mapeamento 4-analistas/25-estruturas. Tentei recuperar a lista completa da Tabela 2 em fonte primária e NÃO consegui (a página da tabela no PMC caiu em reCAPTCHA; a página TCIA e a wiki não enumeram as 29). Rebaixar para PLAUSÍVEL/PARCIAL até alguém abrir os ROI names de um RTSTRUCT baixado.",
+    "FONTE SECUNDÁRIA ONDE HÁ PRIMÁRIA: a confirmação de que o nome de contorno é literalmente 'Esophagus' veio de um organ_mapper.json de repositório terceiro. A fonte primária existe e é trivial: os próprios ROI Names dentro do RTSTRUCT DICOM (ou a Tabela 2). Verifiquei os repositórios terceiros citáveis (pangyuteng/pediatric-ct-seg, UM2ii/Better-PediatricCT-segmentation) e NENHUM enumera estruturas nem discute qualidade de rótulo — a corroboração alegada é mais fraca do que a investigação sugere. (O par 'Esophagus | 353' em si eu reconfirmei via full text do PMC; esse número fica de pé.)",
+    "EIXOS DADOS COMO RESOLVIDOS SEM EVIDÊNCIA POSITIVA: 'imagem: DEMONSTRADA' e 'exame: DEMONSTRADA' são disjunção populacional por idade — inferência, não checagem. A própria investigação admite isso no texto e mesmo assim carimba DEMONSTRADA. Sob a regra do VRmed (só A com evidência POSITIVA), disjunção etária é forte contra overlap de PACIENTE, mas não é evidência positiva de nada e, pior, não cobre o risco que realmente importa aqui (ver objeção seguinte). Rótulo correto: PLAUSÍVEL-ALTO.",
+    "VIA DE CONTAMINAÇÃO NÃO CONSIDERADA: o eixo 5 foi fechado apenas contra o TotalSegmentator — e mesmo esse, por leitura de resumo, não da seção de métodos (confiança média assumida pela própria investigação). Ficaram abertas duas rotas reais: (a) corpora agregados de modelos-fundação que varrem coleções do TCIA em bloco — o corpus do MedSAM é declaradamente curado a partir de TCIA/Kaggle/Grand-Challenge/MICCAI, e o mesmo padrão vale para SAM-Med3D, SegVol e STU-Net/AbdomenAtlas; busquei e NÃO achei confirmação nem exclusão de que Pediatric-CT-SEG esteja dentro deles, ou seja, a rota está simplesmente ABERTA; (b) pesos pediátricos públicos treinados NO PRÓPRIO Pediatric-CT-SEG — o V-Net de Adamson et al. (299 destes 359 exames), o nnU-Net pediátrico e o fine-tune adulto→pediátrico de 'Children Are Not Small Adults' (UM2ii), e o PSAT (arXiv 2507.05764). Se o pipeline do VRmed encostar em qualquer peso SAM-family, universal ou pediátrico, este dataset vira TREINO, não teste — e o eixo 1/2 'demonstrado por idade' não protege contra isso, porque a contaminação entra pelos PESOS, não pelo paciente. Rota (c), menor mas real: Varian Medical Systems é membro do consórcio e os contornos passaram por Eclipse SmartSegmentation/ProKnow; independência de anotador não é independência de ferramenta/convenção se o pool adulto vier de fluxo Varian de RT.",
+    "RISCO OPERACIONAL SUBDIMENSIONADO (verificado na página TCIA, verbatim): a v1 tinha '103 RTSTRUCT series incorrectly contained 2 files, where one file had skin contours with errors and one file had corrected skin contours' (v1: 615 séries / 63,46 GB; v2: 718 séries / 65,69 GB). A investigação cita isso de passagem e não o transforma em pendência. Qualquer espelho, cache ou snapshot do IDC preso à v1 entrega conjuntos de estrutura duplicados/ambíguos silenciosamente. Pendência que faltou: fixar a versão (v2, 2022-03-31) e validar a contagem de RTSTRUCT por sujeito após o download.",
+    "PONTO ONDE A INVESTIGAÇÃO FOI TÍMIDA A FAVOR DELA MESMA (reforço, não refutação): reli Thibodeau-Antonacci et al. (PMC12149715). Os números exatos são DSC 0,47 ± 0,18 na coorte de validação e 0,48 ± 0,24 na de teste — e a coorte de validação tem MEDIANA DE 14,9 ANOS (IQR 10,3–17,3), quase adulta. Isso mata a única saída para B que restava: 'estratificar uma subcoorte 15-16 anos como proxy de adulto'. Nem em adolescentes o modelo adulto se recupera no esôfago. Também confirmei em fonte primária o teto in-domain (Adamson et al., PMC9007850: esôfago DSC mediano 0,70, média 0,68 ± 0,11, treinado em 299 destes exames) e a instabilidade etária interna (pâncreas 0,383 vs 0,531 no cruzamento ≤8 / ≥9 anos), e os números de domain shift do MIDL 2024 (53,1% em 0-3 anos, 62,9% em 4-6) — com a ressalva, correta na investigação, de que são médias multi-órgão sobre 19 classes e não há garantia de que o esôfago esteja entre elas.",
+    "LEGENDA INVENTADA: o mapeamento A-E foi declarado pelo próprio investigador com confiança baixa. Isso não é defeito da análise, mas o orquestrador não deve tratar 'C' como valor comparável às outras frentes sem reconverter pela decisão textual (não é teste principal, não é teste secundário de desempenho adulto, não descartar — serve como bancada de domain shift)."
+   ],
+   "correcao": "Manter C, mas C CONDICIONAL, e corrigir três rótulos de evidência. (1) linhagem_de_anotacao para o esôfago: DEMONSTRADA -> PLAUSÍVEL (a atribuição manual do esôfago é aritmética do investigador sobre 'up to 29' vs '25 manuais', não afirmação do artigo; resolver abrindo os ROI Names de um RTSTRUCT v2 baixado — custo: minutos, não requer os 66 GB inteiros). (2) independencia.imagem e independencia.exame: DEMONSTRADA -> PLAUSÍVEL-ALTO (disjunção etária é inferência; nenhuma checagem de UID/hash foi feita). (3) O eixo 5 NÃO está fechado: fechá-lo exige inventariar, do lado do VRmed, a procedência de todo peso pré-treinado (TotalSegmentator, nnU-Net público, SAM-family/MedSAM/SegVol/SAM-Med3D, qualquer modelo comercial) — se qualquer um deles tiver corpus agregado de TCIA ou for pediátrico derivado deste dataset, Pediatric-CT-SEG deixa de ser bancada e vira dado visto, e o status cai para D até a procedência ser documentada. Pendências novas: (a) fixar e verificar a versão v2 no download (a v1 tem 103 séries com RTSTRUCT duplicado); (b) inventário de proveniência dos pesos do VRmed. A conclusão de fundo fica mais forte, não mais fraca: com teto in-domain de 0,70 no esôfago e DSC 0,47 de modelo adulto mesmo em coorte de mediana 14,9 anos, não existe subcoorte deste dataset que sirva como teste de esôfago adulto — a porta para A e para B está fechada por evidência positiva, e o que resta é exatamente o uso C.",
+   "status_final": "C"
+  },
+  {
+   "alvo": "StructSeg 2019 — Task 3 (Thoracic OAR, CT de torax, Zhejiang Cancer Hospital / UCAS)",
+   "veredito": "PARCIAL",
+   "objecoes": [
+    "CONFIRMADO (nao refutado): /Download/ retorna HTTP 403 para nao-autenticado (verificado agora por fetch direto, 2026-09-10) e structseg-challenge.org + www.structseg-challenge.org retornam NXDOMAIN contra 8.8.8.8 (nslookup executado agora). O nucleo de 'acesso bloqueado' resiste.",
+    "OBJECAO 1 — 'demonstrado' que e inferencia (a mais grave). Achado 5 declara 'Ordem de rotulos DEMONSTRADA como 1=Lung_L, 2=Lung_R, 3=Heart, 4=Esophagus, 5=Trachea, 6=Spinal_Cord' com confianca ALTA. Isso e falso como 'demonstrado'. As duas unicas fontes que enunciam ordem explicitamente dizem o CONTRARIO: (a) a pagina oficial /Dataset/ lista em prosa 'lungs, spinal cord, esophagus, heart, and trachea'; (b) a pagina de uma equipe PARTICIPANTE que teve os dados (https://daisylabs.github.io/project/2019-structseg-task3/, 8o lugar na Task 3) lista textualmente 'in order: 1 left lung, 2 right lung, 3 spinal cord, 4 esophagus, 5 heart, 6 trachea' — mesma ordem do openmedlab. A ordem defendida pela investigacao vem de UM README de terceiro (zhilothebest) mais uma inferencia de plausibilidade volumetrica sobre a tabela do openmedlab. A inferencia e boa (label3=691cm3 so pode ser coracao; label5=55cm3 so pode ser traqueia), mas inferencia nao e demonstracao — e aqui ela contradiz a fonte primaria e uma fonte de participante. Veredito correto: CONFLITO NAO RESOLVIDO, so resoluvel medindo volumes nos proprios .nii.gz — o que exige o acesso que nao se tem. Circularidade nao explicitada.",
+    "OBJECAO 2 — via de contaminacao NAO CONSIDERADA, e e a decisiva. A investigacao testou linhagem apenas contra TotalSegmentator v1/v2. Mas os 50 casos publicos da Task 3 ja estao DENTRO do corpus de TREINO de modelos universais publicados: (a) Hermes / 'Training Like a Medical Resident' (arXiv 2306.02416): 'SS T has 6 OARs annotated on CT scans from 50 lung cancer patients... We split the scans into 75%/5%/20% for training/validation/testing' — StructSeg Tho e dado UPSTREAM de treino; (b) Iris / 'Show and Segment' (arXiv 2503.19359), Table 5: 'StrustSeg Tho, 6 classes, 50 cases', mesmo split 75/5/20. Consequencia: qualquer modelo VRmed que herde pesos, pre-treino, destilacao ou pseudo-rotulos de familia de fundacao medica tem chance concreta de ja ter visto esses exatos 50 volumes. Usar StructSeg Task 3 como TEST deixa de ser hold-out. A investigacao nao checou este eixo e portanto nao pode afirmar independencia de treino do 'nosso' modelo. (Checado e NEGATIVO para SAT-DS e SA-Med2D-20M: StructSeg nao aparece nas listas desses dois.)",
+    "OBJECAO 3 — segunda via de contaminacao nao considerada, interna ao proprio desafio. A pagina oficial /Dataset/ diz, para pulmao, que '50 GTV annotations of the SAME 50 lung cancer patients' CT scans will be provided' (Task 4). Logo Task 3 e Task 4 compartilham pacientes e IMAGENS. O registro IEEE DataPort 10.21227/h75x-gt46 ('StructSeg2019 GTV Segmentation', Tasks 2 e 4, Jun Shi) — que a investigacao descarta como 'nao e deste dataset' — contem plausivelmente as MESMAS CTs da Task 3 com outro rotulo. Isso significa (i) risco de overlap para quem usar Task 3 e Task 4 como conjuntos distintos, e (ii) uma possivel rota de acesso as imagens que a investigacao encerrou cedo demais em vez de checar o conteudo do url.txt.",
+    "OBJECAO 4 — o 'sinal documental forte' de licenca e mais fraco do que a investigacao afirma. Existe uma v2 do design doc (Zenodo 10.5281/zenodo.3931230, mesmos autores, 2020) cuja pagina declara que o desafio foi 'withdrawn from MICCAI 2020 due to COVID-19 pandemic situation'. Ou seja: o 'CC BY NC SA' esta escrito num documento de desenho de um desafio QUE NUNCA ACONTECEU e cujos dados nunca foram distribuidos. E declaracao de intencao nao operativa, para uma edicao inexistente. Usa-la como 'sinal documental forte' sobre 2019 e esticar. A licenca de 2019 continua UNKNOWN — nisso a investigacao acerta — mas a confianca 'alta' atribuida ao achado 2 esta acima da evidencia.",
+    "OBJECAO 5 — corolario do item anterior: o achado 16 esta parcialmente errado no sentido OPOSTO ao que a investigacao teme. Se o StructSeg 2020 foi retirado e seus 60 pacientes nunca foram liberados, nao existe risco pratico de duplicacao cruzada 2019x2020 — nao ha 2020 publico com que duplicar. O risco real de overlap nao e entre edicoes, e entre tarefas (Task 3 x Task 4, objecao 3) e com corpora de fundacao (objecao 2).",
+    "OBJECAO 6 — fonte secundaria usada onde havia melhor. O achado 5 apoia formato E ordem de rotulos no README de zhilothebest e diz que 'dois terceiros independentes concordam'. Eles NAO concordam justamente no ponto load-bearing: concordam no formato (.nii.gz, data/label por paciente) e divergem na ordem. E o openmedlab e usado como corroborante no achado 4 e como fonte errada no achado 5, sem criterio declarado de quando confiar nele. Fonte melhor disponivel e nao usada: pagina de equipe participante (DAISYlabs) e repositorios de participantes (ngxbac/StructSeg2019).",
+    "OBJECAO 7 — 'nao ha mirror oficial' esta afirmado com forca acima do verificado. O correto e 'nao encontrei mirror'. De fato existem redistribuicoes derivadas em circulacao (os splits pre-processados de Hermes/Iris), e nao foi feita varredura de HuggingFace/GitHub/mirrors chineses. Isso nao melhora a situacao juridica — usar mirror pirata e pior que nao usar — mas a frase como escrita e uma nao-verificacao vendida como verificacao.",
+    "OBJECAO 8 — 'linhagem_de_anotacao ... TotalSegmentator v1: DEMONSTRADA' e argumento de ausencia. Que 'StructSeg' nao apareca no apendice S2 e forte, mas o que se demonstra e 'nao documentado', nao 'nao ocorreu'; e o eixo temporal (2019 anterior a 2022) so prova que StructSeg nao descende do TotalSegmentator — nunca foi essa a direcao de risco. A direcao de risco e o modelo do VRmed descender de algo que viu StructSeg (objecao 2), e esse eixo ficou em branco.",
+    "OBJECAO 9 — nenhum eixo de independencia tem evidencia POSITIVA. Imagem: PLAUSIVEL por geografia, sem UID/hash. Exame: INCONCLUSIVO, assumido pela propria investigacao. Anotacao: INCONCLUSIVO, anotadores nunca contados (o formulario BIAS pergunta o numero e os organizadores respondem outra coisa). Instituicao: 'DEMONSTRADA' apenas no sentido negativo de 'as outras coortes declaram outra instituicao' — e distincao institucional declarada, nao independencia de paciente verificada. Pela regra do VRmed (so A com evidencia positiva), isso sozinho ja tira A e B."
+   ],
+   "correcao": "Correcoes a aplicar na ficha: (1) achado 5 — rebaixar de 'ordem DEMONSTRADA / confianca alta' para 'ORDEM EM CONFLITO / NAO RESOLVIDA': fonte primaria (/Dataset/) e fonte de participante (DAISYlabs) dizem 3=spinal_cord, 4=esophagus, 5=heart, 6=trachea; um README de terceiro mais inferencia volumetrica dizem 3=heart, 4=esophagus, 5=trachea, 6=spinal_cord; a inferencia volumetrica e o argumento mais forte mas nao e documentacao, e a verificacao exige o dado que nao se tem. Manter o alerta de armadilha (trocar coracao com medula silenciosamente) e elevar de 'armadilha' para 'bloqueador': sem acesso nao ha como fixar o mapeamento. (2) Acrescentar eixo de contaminacao ausente — os 50 casos publicos sao dado de TREINO em Hermes (arXiv 2306.02416, 'SS T ... 50 lung cancer patients ... 75%/5%/20%') e Iris (arXiv 2503.19359, Table 5 'StrustSeg Tho, 6 classes, 50 cases'); portanto StructSeg Task 3 nao e hold-out valido contra nenhum modelo de fundacao medica nem contra a literatura que treinou nele. SAT-DS e SA-Med2D-20M verificados como NEGATIVOS. (3) Acrescentar overlap intra-desafio: Task 3 e Task 4 usam os MESMOS 50 pacientes por declaracao primaria; o registro IEEE DataPort de GTV provavelmente carrega as mesmas imagens. (4) achado 2 — rebaixar confianca: o 'CC BY NC SA' vem de design doc de um desafio retirado do MICCAI 2020 (Zenodo 3931230: 'withdrawn from MICCAI 2020 due to COVID-19'), logo nunca operativo; licenca de 2019 permanece UNKNOWN sem sinal forte. (5) achado 16 — inverter: sem StructSeg 2020 publico, nao ha risco de duplicacao entre edicoes; o risco esta em (2) e (3). (6) Trocar 'nao ha mirror' por 'nao encontrei mirror; existem derivados pre-processados em circulacao'. (7) linhagem TotalSegmentator: manter como 'nao documentado', nao como 'demonstrado'; a direcao de risco relevante e a inversa e nao foi investigada. Status: qualquer coisa acima de D e otimista — acesso nao demonstrado (403 + NXDOMAIN), licenca UNKNOWN com sinal NC/SA e testemunho de nao-redistribuicao, protocolo de anotacao inexistente, numero de anotadores UNKNOWN, ontologia PARCIAL sem atlas, mapeamento de classes em conflito, teste oficial nunca liberado e servidor de avaliacao extinto, e contaminacao de treino verificada em modelos universais. Uso defensavel hoje: nenhum, nem como test interno; no maximo citacao bibliografica.",
+   "status_final": "D"
+  },
+  {
+   "alvo": "TotalSegmentator v2 (linhagem) — tentativa de refutação por fonte primária",
+   "veredito": "PARCIAL",
+   "objecoes": [
+    "REFUTADO o eixo 'instituicao'. A investigacao marca 'v1: instituicao unica declarada (University Hospital Basel)' e usa isso como premissa central para dizer que overlap de imagem com BTCV/SegTHOR e 'IMPLAUSIVEL'. O primario contradiz: no proprio preprint, 'Figure 2 shows the distribution of CT image types, age distribution and distribution over SITES (each site is anonymised with a letter) where the images were acquired' — ou seja, os autores declaram multiplos sitios ja no v1 e nunca os nomeiam. E a pagina Zenodo do dataset publico (que contem exatamente os sujeitos de treino/validacao do v1) descreve as imagens como cobrindo 'a wide range of different pathologies, scanners, sequences and INSTITUTIONS' (plural). 'we randomly sampled CT images from our PACS' nao equivale a single-center: um PACS hospitalar armazena exames importados de fora. Correcao: independencia.instituicao no v1 = UNKNOWN (composicao por sitio nunca publicada), nao 'unica'; e o argumento de implausibilidade de overlap de imagem perde sua premissa mais forte (continua sem evidencia de overlap, mas agora tambem sem base positiva para chama-lo de implausivel).",
+    "'DEMONSTRADO' que e inferencia (1): a linhagem do esofago NAO vem de dois modelos. A investigacao afirma 'esofago aparece nas classes de DOIS modelos (Task 17 BTCV e Task 55 SegTHOR)' e conclui linhagem 'a partir de BTCV e SegTHOR'. O suplemento so lista classes por modelo; nao diz qual modelo semeou qual classe. A aritmetica do proprio artigo desfaz a conjuncao: 13 (Task 17) + 24 costelas + 25 vertebras + 5 lobos + 4 (Task 55) = 71 entradas listadas, mas o texto diz 'This gave us a first segmentation for 68 classes'. A unica reconciliacao consistente e 71 menos as duplicatas (aorta, esofago) menos 'heart' (que foi para o pipeline de camaras cardiacas) = 68 — isto e, cada classe duplicada foi semeada UMA vez. Logo o esofago descende de UM dos dois modelos, e o artigo nao diz qual. Consequencia direta: o achado sobre a 'convencao de contorno de OAR de radioterapia do SegTHOR' herdada pelo esofago vira, na melhor hipotese, 50/50 — pode ser a convencao abdominal do BTCV. A linhagem sobrevive ('semeado por modelo treinado em BTCV OU SegTHOR'); a inferencia de protocolo especifico nao.",
+    "Item classificado como 'nao verificavel' que a fonte primaria RESPONDE — e a resposta e pior para o TotalSegmentator. A investigacao lista 'numero de anotadores primarios' como nao verificavel. O preprint diz: 'we managed to finish the segmentation in roughly 8 weeks with 1 person working on it on average'. Com a propria convencao de jornada do artigo (8 h/dia, 5 dias/semana), sao ~320 h para 1204 exames x 104 classes = ~16 min por exame e ~9 s por estrutura, ja incluindo a triagem por PNG de renderizacao 3D. Some-se 'After 1 or 2 iterations of the active learning the predictions of most segmentations did not need further refinement'. Portanto a frase 'revisao manual de 100% dos exames' e verdadeira mas tem teto quantificado em segundos por estrutura. O eixo de anotacao nao e 'independencia parcial, grau desconhecido' de forma simetrica: ha evidencia POSITIVA de que a correcao humana no esofago foi marginal. A investigacao foi generosa aqui, nao dura.",
+    "Circularidade que a investigacao nao viu, no benchmark dos proprios autores. O preprint: 'As additional evaluation we compared our model to a nnU-Net trained on the dataset from the Multi-Atlas Labeling Beyond the Cranial Vault Challenge (nnU-Net Task 17). With this model we predicted our test set and compared the results to our model.' O ground truth desse test set, nas 13 classes comparadas (esofago incluido), foi semeado pelo MESMO modelo Task 17. Alem disso o test set do v1 sao 65 sujeitos sorteados dos mesmos 1204, mesmo anotador, mesmo pipeline. Conclusao que falta no dossie: qualquer Dice de esofago publicado pelo TotalSegmentator e uma metrica de auto-consistencia com a semente, nao de acuracia contra referencia independente — e nao deve ser citado pelo VRmed como piso de desempenho.",
+    "Via de contaminacao NAO considerada, e e a unica verificavel de todas: overlap de imagem entre o modelo pip e o dataset publico do proprio TotalSegmentator. O v2 doc diz 'same subjects as in v1 for training and validation (we did not publish the additional subjects...)' e o README diz 'The exact split of the dataset can be found in the file meta.csv inside of the dataset'. Ou seja, a maioria dos 1228 sujeitos publicos ESTA no treino dos pesos que o pip baixa. Se o VRmed avaliar o TotalSegmentator (ou qualquer modelo comparado a ele) sobre o dataset Zenodo sem filtrar pela coluna de split, isso e train-on-test literal. A investigacao trata o meta.csv como pendencia documental ('util para documentar o que E auditavel'), nao como guarda obrigatoria. Deve virar bloqueio de pipeline.",
+    "Lacuna na taxonomia de 4 categorias: falta a exposicao transitiva via PESOS. Os modelos semeadores sao nnU-Nets ajustadas exatamente aos splits publicos de treino do BTCV (30 casos) e do SegTHOR (40 casos) — que sao os unicos splits com rotulo publico e portanto os unicos que o VRmed poderia usar para avaliar. Nesses casos especificos a convencao herdada nao e generica: o ancestral memorizou aquelas fronteiras caso a caso. A prescricao da investigacao ('nunca como vazamento de imagem') esta super-corrigida: e correto que nenhum pixel do BTCV/SegTHOR entrou no treino do TotalSegmentator, e e igualmente correto que as imagens-alvo da avaliacao foram vistas pelo ancestral. Nomear como 'exposicao transitiva via pesos' (categoria 5), nao apagar.",
+    "Deriva factual menor, mas indica citacao de doc desatualizado como se fosse corrente: a investigacao diz que 'vertebrae_body' e non-commercial. Isso vem do resources/improvements_in_v2.md (2023); o README atual lista vertebrae_body dentro de 'Openly available for any usage (Apache-2.0 license)'. Nao afeta o esofago. Em contrapartida a investigacao deixou passar evidencia positiva a favor: o README marca com '*' os modelos que 'are not trained on the full totalsegmentator dataset but on some small other datasets' — a task 'total' NAO esta marcada, o que reforca que o esofago vem do dataset TS e nao de dataset externo reempacotado.",
+    "Status: 'C' e defensavel, mas apenas porque a investigacao ja restringe o papel a baseline. Como esta escrito, o letter e ambiguo quanto ao uso. Se o papel for comparador tecnico licenciado: C. Se o papel for ground truth / referencia de validacao externa para o esofago: D — a dependencia de anotacao (agora com teto de correcao quantificado em ~9 s/estrutura) invalida a interpretacao do numero. O status precisa ser condicionado ao papel, nao emitido solto.",
+    "Nao consegui refutar (e verifiquei em primario, sustentam-se): licenca Apache-2.0 do repo e da task 'total' com 'esophagus' (id 15) na lista de classes; PyPI 2.18.0 publicado 2026-08-12 sob Apache 2.0; Zenodo record 10047292 v2.0.1 CC-BY-4.0, 1228 sujeitos, 'The paper describes v1 of the dataset'; texto literal do suplemento A com esofago nas classes de Task 17 e Task 55; 1139 -> 1559 imagens e 'we did not publish the additional subjects'; 'more images from GE scanners and other institutions'; ausencia de artigo revisado por pares ou model card do v2."
+   ],
+   "status_final": "C",
+   "correcao": "Manter C, mas condicionado ao papel e com tres eixos reescritos.\n\n1) independencia.instituicao (v1): trocar 'instituicao unica declarada (Basel)' por UNKNOWN. Fonte primaria contraria: Figura 2 do preprint declara 'distribution over sites (each site is anonymised with a letter)' e a pagina Zenodo do mesmo conjunto de sujeitos fala em 'institutions' no plural. Consequencia: o argumento 'overlap de imagem com BTCV/SegTHOR e implausivel' perde a premissa; o correto e 'sem evidencia de overlap e sem base para estimar plausibilidade' — nao usar mais a implausibilidade como conforto.\n\n2) linhagem_de_anotacao: trocar 'semeado por Task 17 E Task 55' por 'semeado por UM de Task 17 (BTCV) ou Task 55 (SegTHOR); qual, nao esta documentado'. Justificativa aritmetica no suplemento (71 classes listadas vs '68 classes' com primeira segmentacao; duplicatas aorta/esofago contadas uma vez e 'heart' redirecionado). Em consequencia, rebaixar o achado sobre heranca da convencao OAR do SegTHOR de 'media' para 'especulativo (50/50)'.\n\n3) independencia.anotacao: trocar 'grau residual nao verificavel' por 'derivacao predominante do modelo semeador, com teto de correcao humana quantificado'. Numero a registrar: 'roughly 8 weeks with 1 person working on it on average' para 1204 exames x 104 classes = ~16 min/exame, ~9 s/estrutura, com triagem por PNG de renderizacao 3D e o proprio texto admitindo 'when evaluating segmentations only based on 3D renderings minor errors can be missed'. Um anotador primario, sem estudo inter-observador. Para uma estrutura fina como o esofago, isso e evidencia positiva de baixa correcao, nao mera ausencia de metrica.\n\nAcrescentar ao dossie:\n4) Achado novo (circularidade do benchmark do autor): 'we compared our model to a nnU-Net trained on ... (nnU-Net Task 17). With this model we predicted our test set' — GT semeado pelo mesmo Task 17, test set de 65 sujeitos sorteados dos mesmos 1204. Regra para o VRmed: nao citar o Dice de esofago do artigo como piso de desempenho; e uma metrica de auto-consistencia.\n\n5) Categoria 5 na taxonomia — exposicao transitiva via pesos: os modelos semeadores foram ajustados aos splits publicos de treino do BTCV (30) e do SegTHOR (40), que sao justamente os unicos casos com rotulo publico disponiveis para avaliacao. Substituir a regra 'nunca chamar de vazamento de imagem' por 'nenhum pixel de BTCV/SegTHOR entrou no treino do TotalSegmentator; porem as imagens de avaliacao candidatas foram vistas pelo modelo ancestral — declarar como exposicao transitiva via pesos'.\n\n6) Bloqueio de pipeline (era so pendencia): ao usar o dataset Zenodo v2.0.1, filtrar obrigatoriamente pela coluna de split do meta.csv e avaliar apenas no split de teste. Treino e validacao publicos estao dentro dos 1559 do modelo pip ('same subjects as in v1 for training and validation'); avaliar sobre eles e train-on-test verificavel — a unica contaminacao deste dossie que e ao mesmo tempo real e checavel hoje.\n\n7) Correcao factual: vertebrae_body consta hoje como Apache-2.0 no README (a lista non-commercial citada veio do improvements_in_v2.md de 2023). Nada muda para o esofago.\n\nLetra final: C como BASELINE tecnico licenciado e comparador. D se o papel pretendido for ground truth ou referencia de validacao externa para o esofago. Nunca A: independencia de anotacao tem evidencia positiva CONTRA, ontologia segue PARCIAL (sem protocolo de delineacao dos dois lados) e nao existe fonte revisada por pares do v2."
+  },
+  {
+   "alvo": "FRENTE 29C — NSCLC-Cetuximab (RTOG-0617), RADCURE e TROTS: existe contorno de esôfago utilizável, sob que acesso e com que independência?",
+   "veredito": "PARCIAL",
+   "status_final": "C",
+   "objecoes": [
+    "CONFIRMADO (reproduzi de fonte primária): baixei RADCURE_OAR_contour_mapping_v04_20241219.csv e parseei com csv.DictReader — 3.337 linhas de dados, coluna 'Esophagus' preenchida em 2.708 (ESOPHAGUS 2654 / OESOPHAGUS 27 / esophagus 19 / Esophagus 7 / EESOPHAGUS 1; 629 vazias). Bate dígito por dígito. Este é o único achado 'demonstrado' da frente que sobrevive integralmente. CSV local: C:\\Users\\vinic\\AppData\\Local\\Temp\\claude\\C--Users-vinic-Downloads-InnerVision\\25590899-20fd-4398-869f-48a0e90bae78\\scratchpad\\radcure_map.csv",
+    "REFUTADO — 'o PDF do protocolo RTOG 0617 está com os content streams CORROMPIDOS... pypdf, pymupdf e pdfplumber extraem 0 texto útil das 113 páginas'. Falso como afirmado. Baixei o mesmo PDF (HTTP 200, 776.477 bytes) e o PyMuPDF extraiu 19.568 caracteres em 113 páginas, com 'esophag' em 3 páginas. Página 10 sai legível: 'Esophageal injury can be reduced by limiting the volume of esophagus in the radiation field or the mean esophageal dose.58' + 'Table 3: Esophageal injury after high-dose radiation therapy for NSCLC'. A extração é degradada (a seção 6 de planejamento não saiu), mas 'zero texto útil' é uma afirmação verificável e errada — e ela transforma uma pendência tratável ('recuperar as páginas 25-35 por OCR do render, ou pelo apêndice do protocolo no Lancet Oncol 2015') em impossibilidade declarada.",
+    "REFUTADO — eixo de independência 'imagem' do RADCURE marcado PLAUSÍVEL com a justificativa 'nenhuma sobreposição conhecida'. Existe sobreposição conhecida, documentada e quantificável, dentro do próprio arquivo que a investigação parseou: a primeira coluna do CSV é 'OPC-Radiomics' e cruza 603 pacientes RADCURE com IDs OPC-000xx (419 deles com esôfago). A página oficial do TCIA confirma em texto: RADCURE 'is a superset of ... (OPC-Radiomics)' e 'this dataset replaces the OPC-Radiomics dataset'. Ou seja: 18% das CTs do RADCURE circularam durante anos como coleção TCIA separada. 'Não encontrei overlap' aqui não é ausência de evidência — é evidência ignorada que estava aberta na mesa.",
+    "VIA DE CONTAMINAÇÃO NÃO CONSIDERADA (a mais grave). A investigação só testou overlap contra 'o NOSSO dado'. Falta o canal por pesos pré-treinados: (a) o próprio artigo PMC13312076 que ela cita como prova de ruído de rótulo TREINA modelos de auto-segmentação de 19 OARs (incl. esôfago) EM RADCURE — logo RADCURE é corpus de treino de modelos públicos de H&N, não terreno neutro; (b) OPC-Radiomics (=603 pacientes do RADCURE) esteve em download público por anos e está em corpora de pré-treino de CT; (c) o RTOG-0617 já alimenta trabalho de 'foundational AI' publicado (BJR Open 2024, PMID 39568594, 449 pacientes). Se o pipeline VRmed usa qualquer backbone público de CT ou qualquer modelo de OAR de H&N, nenhum dos dois é validação externa — é teste sobre dado potencialmente visto. Esse eixo não aparece em lugar nenhum do dossiê.",
+    "FONTE SECUNDÁRIA ONDE HAVIA PRIMÁRIA ABERTA — o item do IJROBP. A investigação assume 403 e usa 'conteúdo obtido via resumo do motor de busca', colocando texto sintetizado por LLM dentro de um campo 'trecho' (que num dossiê significa citação literal). O registro primário estava aberto no Europe PMC e eu o puxei: PMID 40752651, DOI 10.1016/j.ijrobp.2025.07.1445, IJROBP 124(1):206-214, 2026, Monti/Palma/Caroprese/Cella (CNR Nápoles), título real 'External Validation of Dose Patterns and Dosimetric Predictors for Radiation-Induced Esophagitis In Non-Small Cell Lung Cancer'. O título e o PII citados no dossiê (S036030162501853X) NÃO correspondem a esse registro — quase certamente é o abstract de congresso, não o artigo revisado. Os números (495→326, UME-Dmean) conferem, então o conteúdo se sustenta; a citação, não. E o abstract continua sem dizer se o esôfago veio contornado — o bloqueio 1 permanece de pé.",
+    "DEIXADO COMO 'INCONCLUSIVO' O QUE ERA BARATO RESOLVER — 'RADCURE: regime exato do download hoje: inconclusivo, precisa de confirmação com o helpdesk'. Não precisa. A API pública do NBIA (services.cancerimagingarchive.net/nbia-api/services/v1/getCollectionValues) devolve 156 coleções e NÃO contém NSCLC-Cetuximab, nem RADCURE, nem OPC-Radiomics; getSeries?Collection=NSCLC-Cetuximab devolve HTTP 200 com corpo vazio. Isso é evidência positiva, obtida em um curl, de que as três estão fora do índice público — o botão 'Download' na página do RADCURE não resolve para download público. Resolve o ponto no sentido pessimista, não no otimista.",
+    "STATUS OTIMISTA POR AGREGAÇÃO — o 'C' único esconde dois candidatos que falham em eixos disjuntos e não se somam. NSCLC-Cetuximab não é 'C com pendências': confirmei na fonte primária que (i) o access point está 'Unavailable', (ii) 'TCIA ceased hosting of controlled access datasets as of July 8, 2025', (iii) a política exige que o requerente 'must be at a level equivalent to a tenure-track professor, or senior scientist' e veta pedido por pós-doc/estudante, (iv) a rota NCTN exige conta + 'Collaborative Agreement'. Isso não é pendência informacional — é elegibilidade estrutural do requerente, que nenhum e-mail ao helpdesk resolve. Somado ao esôfago NÃO demonstrado, são dois bloqueios independentes e duros: o candidato é D, não C. O 'merece o esforço de UMA pergunta ao helpdesk' inverte a ordem — a pergunta cara (temos PI elegível e signatário institucional?) é interna e vem antes.",
+    "PRECISÃO DO ÚNICO NÚMERO DURO — 2.708 é sobre 3.337 linhas do arquivo de mapeamento, mas a coleção tem 3.346 sujeitos (página oficial). Nove pacientes não têm linha no mapeamento. A cobertura correta é 2.708/3.346 = 81,0%, e o arquivo prova que existe um ROI com nome mapeável para 'Esophagus', não que a máscara seja não-vazia ou completa. Citar '2.708 de 3.337' já embute uma escolha de denominador.",
+    "CONFIRMADO — TROTS = E. Baixei o PDF do Data in Brief (7 páginas, 20.754 caracteres extraídos limpos): 'sophag' aparece 0 vez; 'facial' 4 vezes; 'grey levels' presente. Nenhum protocolo torácico. Veredito correto e bem sustentado. (Ressalva menor: a busca por 0 ocorrência no artigo de dados não exclui esôfago cervical dentro dos .mat — a própria investigação diz isso, e está certa em não deixar isso mudar o veredito.)",
+    "ANTI-OBJEÇÃO, EM FAVOR DA INVESTIGAÇÃO — a armadilha que ela marcou é real e reincidente. Ao pesquisar 'NSCLC-Cetuximab RTSTRUCT esophagus' o motor voltou a me servir a lista de estruturas do NSCLC-Radiomics como se fosse do Cetuximab. Quem repetir esta frente vai levar a mesma isca. Manter esse aviso no dossiê."
+   ],
+   "correcao": "Não aceitar o 'C' agregado. Dividir: (1) NSCLC-Cetuximab → D, não C — esôfago não demonstrado E acesso estruturalmente bloqueado (fora do índice NBIA público, TCIA parou de hospedar em 08/07/2025, dbGaP exige requerente nível professor efetivo/cientista sênior + signatário institucional). Só volta a C se o VRmed demonstrar internamente que tem PI elegível e signatário; a pergunta ao helpdesk sobre a lista de ROIs é a segunda pergunta, não a primeira. (2) RADCURE → C mantido, mas com rótulo de uso restrito: 'sonda de domain shift', nunca 'dataset de esôfago', e nunca antes de medir nos próprios dados a extensão craniocaudal do ROI Esophagus e o limite caudal da CT. Além disso, excluir ou marcar os 603 pacientes com ID OPC-Radiomics em qualquer comparação, e registrar que RADCURE é corpus de TREINO de modelos públicos de auto-segmentação de OAR de H&N. (3) TROTS → E confirmado. (4) Corrigir três afirmações do dossiê: 'PDF do protocolo com 0 texto útil' (falso — extrai 19.568 caracteres, incl. a frase sobre esôfago na p.10), 'nenhuma sobreposição conhecida' para RADCURE (falso — 603 pacientes cruzados com OPC-Radiomics no próprio CSV, e o TCIA diz que RADCURE substitui OPC-Radiomics), e a citação do IJROBP (o registro real é PMID 40752651 / DOI 10.1016/j.ijrobp.2025.07.1445 / IJROBP 124(1):206-214 / Monti, Palma, Caroprese, Cella — não o PII S036030162501853X). (5) Acrescentar ao dossiê o eixo de independência ausente: contaminação por corpus de pré-treino, não só por sobreposição com 'o nosso dado'. Nenhum dos três pode chegar a A: falta evidência POSITIVA de independência (não testável sem baixar), falta linhagem de anotação declarada, e o acesso é bloqueante em 2 de 3."
+  }
+ ]
+}

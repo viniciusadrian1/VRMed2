@@ -1,0 +1,83 @@
+{
+ "fase": "29",
+ "status": "CONCLUIDA",
+ "test_atual": {
+  "n": 0,
+  "estado": "PROTEGIDO"
+ },
+ "candidatos": [
+  {
+   "nome": "StructSeg 2019 - Task 3 (OAR toracico)",
+   "status": "D",
+   "impedimentos_para_A": [
+    "independencia.imagem=PLAUSIVEL",
+    "independencia.exame=INCONCLUSIVO",
+    "independencia.anotacao=INCONCLUSIVO",
+    "independencia.linhagem_anotacao=INCONCLUSIVO",
+    "ontologia=PARCIAL",
+    "acesso=INDISPONIVEL",
+    "licenca_classe=UNKNOWN",
+    "overlap=DETECTADO"
+   ]
+  },
+  {
+   "nome": "Pediatric-CT-SEG (TCIA)",
+   "status": "C",
+   "impedimentos_para_A": [
+    "independencia.instituicao=INCONCLUSIVO",
+    "independencia.anotacao=INCONCLUSIVO",
+    "ontologia=PARCIAL"
+   ]
+  },
+  {
+   "nome": "RADCURE (TCIA)",
+   "status": "C",
+   "impedimentos_para_A": [
+    "independencia.imagem=PLAUSIVEL",
+    "independencia.exame=INCONCLUSIVO",
+    "independencia.anotacao=INCONCLUSIVO",
+    "independencia.linhagem_anotacao=INCONCLUSIVO",
+    "ontologia=UNKNOWN",
+    "acesso=DUA",
+    "licenca_classe=RESTRITA",
+    "overlap=DETECTADO"
+   ]
+  },
+  {
+   "nome": "NSCLC-Cetuximab / RTOG-0617 (TCIA)",
+   "status": "C",
+   "impedimentos_para_A": [
+    "independencia.imagem=INCONCLUSIVO",
+    "independencia.exame=INCONCLUSIVO",
+    "independencia.instituicao=INCONCLUSIVO",
+    "independencia.anotacao=INCONCLUSIVO",
+    "independencia.linhagem_anotacao=INCONCLUSIVO",
+    "ontologia=UNKNOWN",
+    "anotacao_tipo=UNKNOWN",
+    "acesso=DUA",
+    "licenca_classe=RESTRITA"
+   ]
+  },
+  {
+   "nome": "TROTS (Erasmus MC)",
+   "status": "D",
+   "impedimentos_para_A": [
+    "independencia.imagem=PLAUSIVEL",
+    "independencia.exame=INCONCLUSIVO",
+    "independencia.anotacao=INCONCLUSIVO",
+    "independencia.linhagem_anotacao=INCONCLUSIVO",
+    "ontologia=INCOMPATIVEL",
+    "anotacao_tipo=UNKNOWN"
+   ]
+  }
+ ],
+ "aprovados_A": [],
+ "pendencias": [
+  "linhagem de anotacao do TotalSegmentator v2 permanece INCONCLUSIVA — nao ha artigo, model card nem lista de treino por caso do v2",
+  "os ~420 sujeitos adicionais do treino v2 NAO foram publicados",
+  "nenhum candidato tem os cinco eixos de independencia demonstrados"
+ ],
+ "decisao": "C — nao existe TEST externo adequado neste momento; com recomendacao forte de D (TEST proprio). Os dois candidatos B herdados da Fase 28 foram REBAIXADOS: StructSeg para D (acesso bloqueado, licenca NC/SA, contaminacao em modelos de fundacao) e Pediatric-CT-SEG para C (adequacao ao adulto refutada por evidencia positiva). A=0 e B=0.",
+ "regra_A": "cinco eixos de independencia DEMONSTRADA (imagem, exame, instituicao, anotacao, linhagem_anotacao) + ontologia COMPATIVEL + anotacao humana documentada + acesso viavel + licenca nao bloqueante, sem overlap e sem conflito metodologico critico",
+ "timestamp": "2026-09-11T01:40:40Z"
+}

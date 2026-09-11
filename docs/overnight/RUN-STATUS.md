@@ -514,3 +514,48 @@ journal e reclassificadas.
 **Testes:** 110/110 nos arquivos (11 novos) + 220/220 nos autotestes. A regra do status A virou
 **código**, com controle positivo (um candidato perfeito **tem de** poder ser A) e negativo
 (cada eixo quebrado sozinho **tem de** impedir). Varredura: 65 documentos, 0 violações.
+
+---
+
+## Fase 29 — auditoria de candidatos a TEST (2026-09-10)
+
+**DECISÃO: C — não existe TEST externo adequado neste momento**, com recomendação forte de
+**D (TEST próprio)**. **A = 0 · B = 0 · C = 3 · D = 2.** TEST continua **0 e protegido**.
+
+**Os dois candidatos B da Fase 28 caíram, ambos por evidência positiva:**
+
+| candidato | de | para | por quê |
+|---|---|---|---|
+| **StructSeg 2019 T3** | B | **D** | acesso **demonstradamente bloqueado** (`/Download/` HTTP 403, domínio NXDOMAIN); licença 2019 UNKNOWN com sinal **CC BY NC SA** no design doc de 2020; ordem das classes em conflito não resolvido; e os 50 casos são **treino** de Hermes e Iris |
+| **Pediatric-CT-SEG** | B | **C** | adequação ao adulto **refutada por medição**: modelo adulto rende **DSC 0,47 ± 0,18** no esôfago daquele dataset (teto in-domain 0,70). Uso condicional: bancada de *domain shift*, nunca TEST adulto |
+
+**RADCURE** ganhou um achado duro: o CSV oficial tem **2.708 de 3.337** linhas com esôfago — mas
+é coorte de cabeça-pescoço, acesso sob DUA, e **é superset do OPC-Radiomics** e corpus de treino
+de modelos públicos de OAR.
+
+### 29D — linhagem do TotalSegmentator v2, com vocabulário restritivo
+
+| conceito | estado |
+|---|---|
+| **image overlap** com BTCV/SegTHOR | **NÃO DEMONSTRADO** — o suplemento descreve uso de *modelos*, não das imagens |
+| **patient overlap** | **NÃO VERIFICÁVEL** — nenhum identificador publicado |
+| **annotation lineage overlap** | **DEMONSTRADO para o v1** — esôfago pré-segmentado por Task 17 (BTCV) e Task 55 (SegTHOR) |
+| **model-derived annotation dependence** | **DEMONSTRADO** — 68 das 104 classes, esôfago entre elas |
+| o mesmo para o **v2** | **INCONCLUSIVO** — sem artigo, sem model card; treino foi de 1139→1559 e os ~420 adicionais **não foram publicados** |
+
+**Pode-se concluir:** SegTHOR e BTCV não servem de TEST para um pipeline cujo baseline descende
+deles; e o GT do TotalSegmentator **não é anotação humana de novo** para o esôfago.
+**Não se pode concluir:** que haja compartilhamento de imagens, nem que o v2 esteja limpo ou
+contaminado.
+
+**Distinção que protege o projeto:** o modelo próprio do VRmed (26B) foi treinado nas máscaras do
+4D-Lung, **não em saída do TotalSegmentator**. A linhagem afeta o **baseline de comparação**, não
+o treino do modelo.
+
+### Regra do A, agora com cinco eixos
+
+Independência decomposta em **imagem · exame · instituição · anotação · linhagem_anotacao**, os
+cinco exigidos em `DEMONSTRADA`. `PLAUSIVEL` não basta.
+
+**Testes:** 125/125 nos arquivos (15 novos) + 230/230 nos autotestes. `git status` mostra
+**apenas arquivos novos** — nada modificado. Varredura: 66 documentos, 0 violações.
