@@ -49,23 +49,24 @@ type Availability = "checking" | "real" | "placeholder";
 const POSE_PROVISORIA: [number, number, number] = [0, 1.3, -0.8];
 
 /**
- * Escala e altura do modelo em metros, a partir do tamanho real declarado.
+ * Escala que devolve ao modelo o tamanho real declarado da estrutura.
  *
  * `normalizeContent` deixa todo modelo com o MAIOR eixo medindo exatamente 2
- * unidades. Então a escala que devolve o tamanho real é `real / 2`, e a altura
- * sai do eixo Y da caixa já normalizada.
+ * unidades, então a conta é direta: `real / 2`.
+ *
+ * A ALTURA não sai daqui. Ela é medida pelo `EntradaXR` no objeto já escalado,
+ * no primeiro quadro da sessão. Derivá-la de `modelBounds` seria pedir
+ * problema: aquela medida é tirada em coordenadas de MUNDO e, dentro de uma
+ * sessão, já vem multiplicada pela escala que este próprio valor aplicou —
+ * trocar de modelo sem sair do modo realimentaria o cálculo.
  *
  * Fora de AR/VR nada disso se aplica: numa tela plana o modelo ocupa a
  * viewport, que é o comportamento certo, e "tamanho real" não quer dizer nada.
  * Sem tamanho declarado, cai no comportamento antigo (escala 1).
  */
-function escalaReal(
-  tamanhoRealCm: number | undefined,
-  bounds: { size: [number, number, number] } | null,
-): { escala: number; alturaReal: number } | null {
-  if (!tamanhoRealCm || !bounds) return null;
-  const escala = tamanhoRealCm / 100 / 2;
-  return { escala, alturaReal: bounds.size[1] * escala };
+function escalaReal(tamanhoRealCm: number | undefined): number | null {
+  if (!tamanhoRealCm) return null;
+  return tamanhoRealCm / 100 / 2;
 }
 
 function ModelStateApplier({
@@ -114,10 +115,9 @@ export function OrganModel() {
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
   const organ = getOrganById(organId);
-  const modelBounds = useVRMedStore((s) => s.modelBounds);
   // Em AR e VR o metro é real; na tela plana, não. Só dentro da sessão o
   // modelo sai da normalização e passa a ter o tamanho que a estrutura tem.
-  const real = inSession ? escalaReal(organ?.tamanhoRealCm, modelBounds) : null;
+  const escala = inSession ? escalaReal(organ?.tamanhoRealCm) : null;
 
   const rootRef = useRef<THREE.Group>(null);
   const contentRef = useRef<THREE.Group>(null);
@@ -250,7 +250,7 @@ export function OrganModel() {
       <group
         ref={rootRef}
         position={inSession ? POSE_PROVISORIA : [0, 0, 0]}
-        scale={real ? real.escala : 1}
+        scale={escala ?? 1}
         onClick={handleModelClick}
         onPointerOver={(event) => {
           event.stopPropagation();
@@ -295,11 +295,7 @@ export function OrganModel() {
        * o reset devolveria o órgão à pose do OUTRO modo.
        */}
       {inSession && modelReady && (
-        <EntradaXR
-          key={modo}
-          target={rootRef}
-          alturaReal={real ? real.alturaReal : 0}
-        />
+        <EntradaXR key={modo} target={rootRef} />
       )}
 
       {!inSession && transformMode !== "none" && modelReady && rootRef.current && (
