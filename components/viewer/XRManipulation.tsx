@@ -360,12 +360,9 @@ const QUADROS_DE_ESPERA = 90;
  */
 function PoseDeEntrada({
   target,
-  alturaReal,
   onPronto,
 }: {
   target: RefObject<THREE.Group | null>;
-  /** Altura do modelo em metros, já em escala real. */
-  alturaReal: number;
   onPronto: () => void;
 }) {
   const origem = useXR((state) => state.origin);
@@ -418,6 +415,17 @@ function PoseDeEntrada({
     }
     frente.normalize();
 
+    // A altura é MEDIDA no objeto como ele está, com a escala real já
+    // aplicada, em vez de derivada do tamanho declarado. Uma medida no que
+    // existe não tem como divergir do que a pessoa vê.
+    const caixa = new THREE.Box3().setFromObject(model);
+    const alturaReal = caixa.max.y - caixa.min.y;
+    if (!Number.isFinite(alturaReal) || alturaReal <= 0) {
+      // Modelo ainda sem geometria (caixa vazia): tenta no próximo quadro.
+      if (desistir) encerrar();
+      return;
+    }
+
     const apoiado = alturaReal >= ALTURA_PARA_APOIAR_NO_CHAO;
     const distancia = apoiado
       ? THREE.MathUtils.clamp(
@@ -460,21 +468,15 @@ function PoseDeEntrada({
  */
 export function EntradaXR({
   target,
-  alturaReal,
 }: {
   target: RefObject<THREE.Group | null>;
-  alturaReal: number;
 }) {
   const [posicionado, setPosicionado] = useState(false);
 
   return (
     <>
       {!posicionado && (
-        <PoseDeEntrada
-          target={target}
-          alturaReal={alturaReal}
-          onPronto={() => setPosicionado(true)}
-        />
+        <PoseDeEntrada target={target} onPronto={() => setPosicionado(true)} />
       )}
       {posicionado && <XRManipulation target={target} />}
     </>
