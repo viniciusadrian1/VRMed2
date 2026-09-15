@@ -85,6 +85,10 @@ for (const it of itens) {
 
   // A mesma conta do visualizador: `normalizeContent` deixa o maior eixo com
   // 2 unidades, e a escala de XR devolve `tamanhoRealCm` a esse maior eixo.
+  // ponytail: o visualizador mede vértice a vértice; `medirGLB` gira os cantos
+  // da caixa de cada malha, que incha em nó com rotação fora dos eixos (hoje só
+  // o rim: 4,65 contra 4,42, mesmo maior eixo, então a altura sai igual).
+  // Se um arquivo novo trocar de maior eixo por isso, medir por vértice aqui.
   const maior = Math.max(cru.x, cru.y, cru.z);
   const alturaM = (cru.y / maior) * (it.cm / 100);
   const apoia = alturaM >= ALTURA_PARA_APOIAR_NO_CHAO;

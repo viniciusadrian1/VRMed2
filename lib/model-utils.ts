@@ -296,6 +296,35 @@ export function detectStructures(content: THREE.Object3D): StructurePoint[] {
 }
 
 /**
+ * Roda `medir` com o conteúdo posto como se o PAI estivesse na origem, sem
+ * escala nem rotação, e devolve a pose do pai intacta.
+ *
+ * `Box3.setFromObject` e `localToWorld` usam a matriz de mundo, que carrega a
+ * pose dos ancestrais. O conteúdo de um modelo é medido logo que carrega, e o
+ * pai pode já estar escalado, movido ou girado: sessão de AR/VR aberta antes de
+ * o GLB terminar de carregar, gizmo do 2D usado antes de trocar de órgão, giro
+ * feito no VR. Medido em mundo, em AR/VR todo órgão virava 2 m e descentrado,
+ * e os cortes e pontos do 2D ficavam na altura dos olhos de quem saiu do VR.
+ * Com a matriz do pai trocada pela identidade durante a medida, o resultado
+ * não depende de onde o pai está.
+ */
+export function medirNoEspacoDoPai<T>(
+  content: THREE.Object3D,
+  medir: () => T,
+): T {
+  const pai = content.parent;
+  const matrizDoPai = pai?.matrixWorld.clone();
+  pai?.matrixWorld.identity();
+  content.updateMatrixWorld(true);
+  try {
+    return medir();
+  } finally {
+    if (pai && matrizDoPai) pai.matrixWorld.copy(matrizDoPai);
+    content.updateMatrixWorld(true);
+  }
+}
+
+/**
  * Centraliza e escala o conteúdo para caber em um cubo de ~2 unidades.
  *
  * É idempotente: zera a transformação antes de medir, para que medir um
@@ -309,9 +338,15 @@ export function normalizeContent(content: THREE.Object3D): void {
   content.scale.setScalar(1);
   content.position.set(0, 0, 0);
   content.updateMatrix();
-  content.updateMatrixWorld(true);
 
-  const box = new THREE.Box3().setFromObject(content);
+  // No espaço do pai (ver `medirNoEspacoDoPai`) e `precise`: vértice a vértice. A caixa rápida gira os 8 cantos da caixa de
+  // cada malha e incha a medida quando um nó do GLB tem rotação fora dos eixos
+  // (o rim: 4,65 contra 4,42 no maior eixo). O tamanho real de AR/VR
+  // (`tamanhoRealCm`) foi medido por vértice, então tem de ser igual aqui.
+  // Custa uma passada pelos vértices, uma vez por carga.
+  const box = medirNoEspacoDoPai(content, () =>
+    new THREE.Box3().setFromObject(content, true),
+  );
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z) || 1;

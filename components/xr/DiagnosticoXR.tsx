@@ -13,6 +13,11 @@ function metros(v: number): string {
   return Number.isFinite(v) ? `${v.toFixed(2).replace(".", ",")} m` : "—";
 }
 
+/** m → "14,0 cm": o tamanho do modelo, na unidade de `tamanhoRealCm`. */
+function cm(v: number): string {
+  return Number.isFinite(v) ? `${(v * 100).toFixed(1).replace(".", ",")} cm` : "—";
+}
+
 /**
  * Painel de diagnóstico da pose, só com `?debug=xr` na URL.
  *
@@ -30,6 +35,8 @@ function metros(v: number): string {
  *    acima dos olhos, o erro está na altura usada, e a linha "fonte" diz qual.
  *  - "fonte": real (rastreio firme), estimada (o headset chutou) ou suposta
  *    (nenhuma pose veio). Só "real" é confiável.
+ *  - "maior eixo" é a mesma grandeza de `tamanhoRealCm` em `lib/organs.ts`:
+ *    os dois têm de bater. Se não baterem, a escala está sendo aplicada errado.
  *  - a versão confirma que o óculos está rodando o código novo, e não um
  *    bundle em cache.
  *
@@ -65,14 +72,15 @@ export function DiagnosticoXR({
         `órgão agora: ${metros(orgaoAgora)}`,
         `olhos na colocação: ${metros(d.olhosAcimaDoChao)}`,
         `fonte: ${d.fonte} · estimadas descartadas: ${d.posesEstimadasDescartadas}`,
-        `modelo: ${metros(d.alturaModelo)} · ${d.apoiado ? "apoiado" : "flutuando"} · a ${metros(d.distancia)}`,
+        `maior eixo: ${cm(d.maiorEixo)} · altura: ${cm(d.alturaModelo)}`,
+        `${d.apoiado ? "apoiado" : "flutuando"} · centro a ${metros(d.distancia)}`,
       ].join("\n"),
     );
   });
 
   return (
     <group position={position} rotation={[0, -0.35, 0]}>
-      <Panel width={0.62} height={0.3} opacity={0.85} />
+      <Panel width={0.62} height={0.34} opacity={0.85} />
       <Text3D position={[0, 0, 0.005]} size={0.026} maxWidth={0.58}>
         {texto}
       </Text3D>

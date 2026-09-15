@@ -21,6 +21,7 @@ import {
   detectStructures,
   getModelBounds,
   identifyStructure,
+  medirNoEspacoDoPai,
   normalizeContent,
   prepareModel,
 } from "@/lib/model-utils";
@@ -55,10 +56,7 @@ const POSE_PROVISORIA: [number, number, number] = [0, 1.3, -0.8];
  * unidades, então a conta é direta: `real / 2`.
  *
  * A ALTURA não sai daqui. Ela é medida pelo `EntradaXR` no objeto já escalado,
- * no primeiro quadro da sessão. Derivá-la de `modelBounds` seria pedir
- * problema: aquela medida é tirada em coordenadas de MUNDO e, dentro de uma
- * sessão, já vem multiplicada pela escala que este próprio valor aplicou —
- * trocar de modelo sem sair do modo realimentaria o cálculo.
+ * ao entrar na sessão.
  *
  * Fora de AR/VR nada disso se aplica: numa tela plana o modelo ocupa a
  * viewport, que é o comportamento certo, e "tamanho real" não quer dizer nada.
@@ -79,6 +77,9 @@ function ModelStateApplier({
   const wireframe = useVRMedStore((s) => s.wireframe);
   const bounds = useVRMedStore((s) => s.modelBounds);
   const invalidate = useThree((s) => s.invalidate);
+  const inSession = useXR(
+    (state) => state.mode === "immersive-vr" || state.mode === "immersive-ar",
+  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -86,11 +87,16 @@ function ModelStateApplier({
     applyModelState(
       root,
       layers,
-      computeClippingPlanes(clipping, bounds),
+      // Os planos de corte são de MUNDO e partem dos bounds medidos no 2D, com
+      // o modelo na origem. Em AR/VR o órgão nasce na altura dos olhos, longe
+      // da origem: o corte axial em 0 escondia o órgão inteiro, e os outros
+      // cortavam no lugar errado. Não há controle de corte dentro da sessão,
+      // então ele fica desligado nela e volta ao sair.
+      inSession ? [] : computeClippingPlanes(clipping, bounds),
       wireframe,
     );
     invalidate();
-  }, [layers, clipping, wireframe, bounds, invalidate, rootRef]);
+  }, [layers, clipping, wireframe, bounds, invalidate, rootRef, inSession]);
 
   return null;
 }
@@ -160,14 +166,17 @@ export function OrganModel() {
     const content = contentRef.current;
     if (!content) return;
     normalizeContent(content);
-    setModelBounds(getModelBounds(content));
+    // Bounds e pontos também no espaço do root: com a sessão aberta ele está
+    // escalado e na altura dos olhos, e medidos em mundo os cortes e pontos
+    // ficariam lá depois de voltar ao 2D.
+    setModelBounds(medirNoEspacoDoPai(content, () => getModelBounds(content)));
     // Sistemas agrupam camadas por tecido (material); órgãos, por malha.
     const def = getOrganById(organId);
     const layerBy = def?.layerBy ?? "mesh";
     setLayers(prepareModel(content, layerBy));
     // Os pontos só aparecem em modelos cujas malhas têm nomes anatômicos
     // reais (a função decide); os demais não recebem marcadores.
-    setStructures(detectStructures(content));
+    setStructures(medirNoEspacoDoPai(content, () => detectStructures(content)));
     setModelReady(true);
   }, [organId, setLayers, setStructures, setModelBounds]);
 
