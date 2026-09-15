@@ -9,8 +9,17 @@ Dois modos do plano multi-modo do grupo implementados DENTRO do app web
 (decisão: sem Unity). `/sala` = quarto 3D com rádio lo-fi sintetizado,
 flashcards (base curada + geração por IA), hub de modos e livro-tutor.
 `/duelo` = quiz 1x1 contra bot (3 dificuldades, 100/200 pts, avatar médico
-procedural); online fica para a fase 2. Detalhes e pendências:
-`docs/PLANO-MULTIMODO.md`.
+procedural). Detalhes e pendências: `docs/PLANO-MULTIMODO.md`.
+
+**Duelo online (2026-09-15):** dois óculos pela internet, só com Wi-Fi, sem
+notebook. Um cria a sala (código de 4 dígitos na lousa/painel), o outro digita
+num teclado 3D. O site no Render é o árbitro: `app/api/duelo/route.ts`
+(SSE + POST; WebSocket não cabe numa rota do Next 16) sobre as regras puras de
+`lib/duelo-salas.ts`; no óculos, `components/duelo/useDueloOnline.ts`. Ganha o
+acerto com menor tempo de reação medido no óculos (janela de 600 ms), não quem
+tem a internet mais rápida. **Salas vivem na memória do processo:** exige UMA
+instância no Render e um deploy derruba as partidas abertas — não publicar
+durante o evento. Checagens: `npx -y tsx scripts/verificar-duelo-salas.ts`.
 
 **Unity como bancada de assets (2026-09-01):** o grupo quer trocar o AMBIENTE do
 Duelo por um cenário que só abre no Unity (.unitypackage). Fluxo: importar no

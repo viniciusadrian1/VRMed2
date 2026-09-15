@@ -14,6 +14,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
 import { DueloGame, type Ambiente } from "./DueloGame";
 import { AmbienteHospital } from "./AmbienteHospital";
+import { useDueloOnline, type DueloOnline } from "./useDueloOnline";
 
 const FLOOR_Y = -1.3;
 
@@ -52,7 +53,7 @@ function PalcoDuelo() {
   );
 }
 
-function CenaDuelo({ ambiente }: { ambiente: Ambiente }) {
+function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnline }) {
   const inSession = useXR((state) => Boolean(state.session));
   const escola = ambiente === "escola";
 
@@ -94,7 +95,7 @@ function CenaDuelo({ ambiente }: { ambiente: Ambiente }) {
             </Text3D>
           }
         >
-          <DueloGame ambiente={ambiente} />
+          <DueloGame ambiente={ambiente} online={online} />
         </Suspense>
       </ErrorBoundary>
 
@@ -119,6 +120,9 @@ export function DueloApp() {
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
   const [ambiente, setAmbiente] = useState<Ambiente>("escola");
+  // Fora do <Canvas key={ambiente}>: trocar de ambiente remonta o canvas, e a
+  // partida online não pode cair por isso.
+  const online = useDueloOnline();
 
   const store = obterXRStore();
 
@@ -183,9 +187,9 @@ export function DueloApp() {
               </p>
             )}
             <p className="max-w-lg px-4 text-center text-[11px] text-white/50">
-              Duelo de conhecimento médico — funciona também no desktop com o
-              mouse ou o teclado (1–3 escolhe a dificuldade, 1–4/A–D responde,
-              Enter repete).
+              Duelo de conhecimento médico — contra um bot ou contra um amigo,
+              cada um no seu óculos. No desktop: 1–3 escolhe o bot, 4 cria uma
+              sala, 5 entra numa sala, 1–4/A–D responde, Enter repete.
             </p>
           </div>
         </>
@@ -194,7 +198,7 @@ export function DueloApp() {
       <Canvas
         key={ambiente}
         role="application"
-        aria-label="Duelo 1×1 em 3D. Menu: teclas 1 a 3 escolhem a dificuldade; na rodada, 1 a 4 ou A a D respondem; ao final, Enter joga de novo."
+        aria-label="Duelo 1×1 em 3D. Menu: teclas 1 a 3 escolhem a dificuldade, 4 cria uma sala online e 5 entra numa sala pelo código; na rodada, 1 a 4 ou A a D respondem; ao final, Enter joga de novo."
         shadows={false}
         dpr={1}
         frameloop="always"
@@ -208,7 +212,7 @@ export function DueloApp() {
         onCreated={({ gl }) => gl.setClearColor("#101820")}
       >
         <XR store={store}>
-          <CenaDuelo ambiente={ambiente} />
+          <CenaDuelo ambiente={ambiente} online={online} />
         </XR>
       </Canvas>
     </main>
