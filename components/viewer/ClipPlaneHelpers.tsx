@@ -71,6 +71,10 @@ export function ClipPlaneHelpers() {
             position={position}
             rotation={HELPER_ROTATION[axis]}
             renderOrder={999}
+            // Fica dentro do root do modelo, que ouve cliques: sem isto o quad
+            // (invisível depois do fade) roubaria o clique da estrutura, a
+            // anotação e a oclusão dos pontos.
+            raycast={() => null}
           >
             <planeGeometry args={[3, 3]} />
             <meshBasicMaterial

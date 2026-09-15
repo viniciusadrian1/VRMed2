@@ -37,10 +37,32 @@ export function SessionList({ sessions }: { sessions: StudySession[] }) {
   const [renameTarget, setRenameTarget] = useState<StudySession | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<StudySession | null>(null);
+  const [resumeTarget, setResumeTarget] = useState<StudySession | null>(null);
 
-  const handleResume = (session: StudySession) => {
+  const doResume = (session: StudySession) => {
     resumeSession(session);
     router.push("/viewer");
+  };
+
+  // Retomar substitui a conversa (global) e as anotações do órgão pelas do
+  // snapshot, e o store persistido é sobrescrito. Só pede confirmação quando
+  // algo atual não está na sessão — senão nada se perde. As anotações são
+  // comparadas pelo conteúdo, não só pelo id: updateAnnotation mantém o id ao
+  // editar texto, cor ou hideLabel, e essa edição também se perderia. A ordem
+  // das chaves bate porque o snapshot e o patch usam spread do mesmo objeto.
+  const handleResume = (session: StudySession) => {
+    const { chat, annotationsByOrgan } = useVRMedStore.getState();
+    const snapChat = new Set(session.chat.map((m) => m.id));
+    const snapAnn = new Map(
+      session.annotations.map((a) => [a.id, JSON.stringify(a)]),
+    );
+    const perde =
+      chat.some((m) => !snapChat.has(m.id)) ||
+      (annotationsByOrgan[session.organId] ?? []).some(
+        (a) => snapAnn.get(a.id) !== JSON.stringify(a),
+      );
+    if (perde) setResumeTarget(session);
+    else doResume(session);
   };
 
   const confirmRename = () => {
@@ -183,6 +205,36 @@ export function SessionList({ sessions }: { sessions: StudySession[] }) {
               }}
             >
               Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo de retomar (quando há conversa ou anotações que se perderiam) */}
+      <Dialog
+        open={resumeTarget !== null}
+        onOpenChange={(open) => !open && setResumeTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Retomar sessão?</DialogTitle>
+            <DialogDescription>
+              Retomar substitui a conversa atual com o tutor e as anotações
+              atuais de {resumeTarget?.organName}. Salve a sessão atual antes
+              se quiser mantê-las.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setResumeTarget(null)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                if (resumeTarget) doResume(resumeTarget);
+                setResumeTarget(null);
+              }}
+            >
+              Retomar
             </Button>
           </DialogFooter>
         </DialogContent>

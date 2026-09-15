@@ -34,6 +34,7 @@ export function SaveSessionButton() {
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedName, setSavedName] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   if (!organId || !organ) return null;
 
@@ -41,39 +42,51 @@ export function SaveSessionButton() {
     if (next) {
       setName(`Estudo de ${organ.name} — ${formatDate(Date.now())}`);
       setSavedName(null);
+      setError(null);
     }
     setOpen(next);
   };
 
   const handleSave = async () => {
     setSaving(true);
-    let screenshot: string | undefined;
-    const captured = viewerBridge.capture();
-    if (captured) {
-      try {
-        screenshot = await downscaleDataUrl(captured);
-      } catch {
-        screenshot = captured;
+    setError(null);
+    // O finally garante que o botão não fica preso em "Salvando…": com o
+    // localStorage cheio, a gravação do persist lança dentro de saveSession.
+    try {
+      let screenshot: string | undefined;
+      const captured = viewerBridge.capture();
+      if (captured) {
+        try {
+          screenshot = await downscaleDataUrl(captured);
+        } catch {
+          screenshot = captured;
+        }
       }
+      const finalName = name.trim() || `Estudo de ${organ.name}`;
+      saveSession({
+        name: finalName,
+        organId,
+        organName: organ.name,
+        viewer: { layers, clipping, xray },
+        screenshot,
+      });
+      setSavedName(finalName);
+    } catch {
+      setError(
+        "Armazenamento cheio — exclua sessões antigas no Histórico e tente de novo.",
+      );
+    } finally {
+      setSaving(false);
     }
-    const finalName = name.trim() || `Estudo de ${organ.name}`;
-    saveSession({
-      name: finalName,
-      organId,
-      organName: organ.name,
-      viewer: { layers, clipping, xray },
-      screenshot,
-    });
-    setSaving(false);
-    setSavedName(finalName);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        {/* Abaixo de sm só o ícone, para as ações da barra caberem no celular. */}
+        <Button variant="outline" size="sm" aria-label="Salvar sessão">
           <Save />
-          Salvar sessão
+          <span className="hidden sm:inline">Salvar sessão</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -110,6 +123,11 @@ export function SaveSessionButton() {
                 onChange={(event) => setName(event.target.value)}
               />
             </div>
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
             <DialogFooter>
               <Button variant="ghost" onClick={() => setOpen(false)}>
                 Cancelar

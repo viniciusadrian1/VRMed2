@@ -9,15 +9,13 @@ import { DiagnosticoXR } from "@/components/xr/DiagnosticoXR";
 import * as THREE from "three";
 import { track } from "@/lib/analytics";
 import { clamp } from "@/lib/format";
+import { NOME_DO_ROOT } from "@/lib/model-utils";
 import { useVRMedStore } from "@/lib/store";
 import { viewerBridge } from "@/lib/viewer-bridge";
 import { useMounted } from "@/hooks/use-mounted";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AnnotationHotspots } from "./AnnotationSystem";
-import { ClipPlaneHelpers } from "./ClipPlaneHelpers";
 import { OrganModel } from "./OrganModel";
 import { SafeEnvironment } from "./SafeEnvironment";
-import { StructureHotspots } from "./StructureHotspots";
 
 const DEFAULT_CAMERA: [number, number, number] = [3.2, 2.3, 4.6];
 const MIN_DISTANCE = 1.7;
@@ -35,12 +33,19 @@ function CameraRig() {
   const camera = useThree((s) => s.camera);
   const controls = useThree((s) => s.controls) as unknown as OrbitLike | null;
   const invalidate = useThree((s) => s.invalidate);
+  const scene = useThree((s) => s.scene);
   const goal = useRef<{ pos: THREE.Vector3; look: THREE.Vector3 } | null>(null);
 
   useEffect(() => {
     if (!controls) return;
 
     viewerBridge.resetCamera = () => {
+      // "Resetar vista" também desfaz o gizmo: sem isso nenhum controle
+      // devolvia o modelo movido, girado ou escalado à pose original.
+      const root = scene.getObjectByName(NOME_DO_ROOT);
+      root?.position.set(0, 0, 0);
+      root?.rotation.set(0, 0, 0);
+      root?.scale.setScalar(1);
       goal.current = {
         pos: new THREE.Vector3(...DEFAULT_CAMERA),
         look: new THREE.Vector3(0, 0, 0),
@@ -49,7 +54,10 @@ function CameraRig() {
     };
 
     viewerBridge.frameTo = (point) => {
+      // Pontos e anotações estão no espaço do root; a câmera precisa de mundo.
+      // Converter aqui cobre todos os chamadores.
       const look = new THREE.Vector3(...point);
+      scene.getObjectByName(NOME_DO_ROOT)?.localToWorld(look);
       const direction = new THREE.Vector3()
         .subVectors(camera.position, controls.target)
         .normalize();
@@ -68,7 +76,7 @@ function CameraRig() {
       controls.update();
       invalidate();
     };
-  }, [camera, controls, invalidate]);
+  }, [camera, controls, invalidate, scene]);
 
   useFrame(() => {
     if (!goal.current || !controls) return;
@@ -201,9 +209,6 @@ function SceneContents() {
       ) : (
         <>
           <SafeEnvironment />
-          <ClipPlaneHelpers />
-          <StructureHotspots />
-          <AnnotationHotspots />
           <ContactShadows
             position={[0, -1.25, 0]}
             opacity={0.4}

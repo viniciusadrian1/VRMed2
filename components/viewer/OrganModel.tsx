@@ -8,7 +8,7 @@ import {
   useState,
   type RefObject,
 } from "react";
-import { useThree, type ThreeEvent } from "@react-three/fiber";
+import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { TransformControls } from "@react-three/drei";
 import { useXR } from "@react-three/xr";
 import * as THREE from "three";
@@ -22,14 +22,18 @@ import {
   getModelBounds,
   identifyStructure,
   medirNoEspacoDoPai,
+  NOME_DO_ROOT,
   normalizeContent,
   prepareModel,
 } from "@/lib/model-utils";
 import { TEXTO_PADRAO_ANOTACAO } from "@/lib/quiz";
 import { useVRMedStore } from "@/lib/store";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AnnotationHotspots } from "./AnnotationSystem";
+import { ClipPlaneHelpers } from "./ClipPlaneHelpers";
 import { GLBModel } from "./GLBModel";
 import { PlaceholderOrgan } from "./PlaceholderOrgan";
+import { StructureHotspots } from "./StructureHotspots";
 import { EntradaXR } from "./XRManipulation";
 
 type Availability = "checking" | "real" | "placeholder";
@@ -81,22 +85,35 @@ function ModelStateApplier({
     (state) => state.mode === "immersive-vr" || state.mode === "immersive-ar",
   );
 
+  // Planos no espaço do root (o dos bounds) e as cópias em MUNDO que os
+  // materiais recebem. O three só aceita corte em mundo; medidos no root, os
+  // planos acompanham o gizmo em vez de cortar na pose antiga.
+  const planosNoRoot = useRef<THREE.Plane[]>([]);
+  const planosNoMundo = useRef<THREE.Plane[]>([]);
+
   useEffect(() => {
     const root = rootRef.current;
     if (!root || !bounds || layers.length === 0) return;
-    applyModelState(
-      root,
-      layers,
-      // Os planos de corte são de MUNDO e partem dos bounds medidos no 2D, com
-      // o modelo na origem. Em AR/VR o órgão nasce na altura dos olhos, longe
-      // da origem: o corte axial em 0 escondia o órgão inteiro, e os outros
-      // cortavam no lugar errado. Não há controle de corte dentro da sessão,
-      // então ele fica desligado nela e volta ao sair.
-      inSession ? [] : computeClippingPlanes(clipping, bounds),
-      wireframe,
-    );
+    // Não há controle de corte dentro da sessão de AR/VR, então ele fica
+    // desligado nela e volta ao sair.
+    planosNoRoot.current = inSession ? [] : computeClippingPlanes(clipping, bounds);
+    planosNoMundo.current = planosNoRoot.current.map((plano) => plano.clone());
+    applyModelState(root, layers, planosNoMundo.current, wireframe);
     invalidate();
   }, [layers, clipping, wireframe, bounds, invalidate, rootRef, inSession]);
+
+  // Leva os planos para o mundo a cada quadro, antes de desenhar. Os materiais
+  // guardam estas mesmas instâncias de Plane, então mudar o valor não
+  // recompila shader. No frameloop "demand" o TransformControls já pede o
+  // quadro enquanto arrasta.
+  useFrame(() => {
+    const root = rootRef.current;
+    if (!root || planosNoMundo.current.length === 0) return;
+    root.updateWorldMatrix(true, false);
+    planosNoMundo.current.forEach((plano, i) =>
+      plano.copy(planosNoRoot.current[i]).applyMatrix4(root.matrixWorld),
+    );
+  });
 
   return null;
 }
@@ -160,6 +177,21 @@ export function OrganModel() {
       cancelled = true;
     };
   }, [organId, setModelKind]);
+
+  // Zera a pose do root ao trocar de órgão e ao voltar ao 2D. O gizmo mexe
+  // direto no Object3D e `position`/`scale` não mudam entre órgãos, então o
+  // R3F não reaplica as props (e `rotation` nem é prop): o próximo órgão
+  // nasceria girado, movido ou escalado. Dentro da sessão quem manda na pose é
+  // o `EntradaXR`.
+  useEffect(() => {
+    if (inSession) return;
+    const root = rootRef.current;
+    if (!root) return;
+    root.position.set(0, 0, 0);
+    root.rotation.set(0, 0, 0);
+    root.scale.setScalar(1);
+    invalidate();
+  }, [organId, inSession, invalidate]);
 
   // Disparado quando o conteúdo 3D termina de montar/carregar.
   const handleReady = useCallback(() => {
@@ -235,9 +267,15 @@ export function OrganModel() {
     event.stopPropagation();
 
     if (annotationMode) {
+      // Gravada no espaço do root, como os pontos: `event.point` é mundo e,
+      // com o modelo movido pelo gizmo, a anotação ficaria fora dele ao
+      // recarregar. Anotações antigas (root na origem) continuam valendo.
+      const ponto = rootRef.current
+        ? rootRef.current.worldToLocal(event.point.clone())
+        : event.point;
       addAnnotation(organId, {
         id: genId(),
-        position: [event.point.x, event.point.y, event.point.z],
+        position: [ponto.x, ponto.y, ponto.z],
         text: TEXTO_PADRAO_ANOTACAO,
         color: "#0f4c81",
         hideLabel: false,
@@ -258,6 +296,7 @@ export function OrganModel() {
     <>
       <group
         ref={rootRef}
+        name={NOME_DO_ROOT}
         position={inSession ? POSE_PROVISORIA : [0, 0, 0]}
         scale={escala ?? 1}
         onClick={handleModelClick}
@@ -293,6 +332,18 @@ export function OrganModel() {
           )}
         </group>
         <ModelStateApplier rootRef={rootRef} />
+        {/*
+         * Dentro do root, e não como irmãos: bounds, pontos e anotações são
+         * medidos no espaço dele, então marcadores e quad do corte seguem o
+         * gizmo. Html é DOM, invisível na sessão.
+         */}
+        {!inSession && (
+          <>
+            <ClipPlaneHelpers />
+            <StructureHotspots />
+            <AnnotationHotspots />
+          </>
+        )}
       </group>
 
       {/*

@@ -84,6 +84,9 @@ export function createUtterance(
   return utterance;
 }
 
+/** Intervalo do keep-alive da fala atual (ver `speak`). */
+let keepAlive = 0;
+
 /**
  * Inicia a narração de um texto. Cancela qualquer fala anterior e adia o
  * início alguns milissegundos: o Chrome descarta a fala quando `speak()` é
@@ -93,13 +96,25 @@ export function speak(text: string, options: SpeakOptions = {}): void {
   if (!isSpeechSupported()) return;
   window.speechSynthesis.cancel();
   window.setTimeout(() => {
-    window.speechSynthesis.speak(createUtterance(text, options));
+    const synth = window.speechSynthesis;
+    synth.speak(createUtterance(text, options));
+    // Contorna a limitação do Chrome que interrompe a síntese após ~15 s. Fica
+    // no módulo, e não no painel, para a narração seguir com o painel fechado.
+    window.clearInterval(keepAlive);
+    keepAlive = window.setInterval(() => {
+      if (!synth.speaking) return window.clearInterval(keepAlive);
+      if (!synth.paused) {
+        synth.pause();
+        synth.resume();
+      }
+    }, 10_000);
   }, 80);
 }
 
 /** Interrompe imediatamente qualquer narração em andamento. */
 export function cancelSpeech(): void {
   if (isSpeechSupported()) {
+    window.clearInterval(keepAlive);
     window.speechSynthesis.cancel();
   }
 }

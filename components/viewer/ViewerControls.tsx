@@ -97,7 +97,10 @@ export function ViewerControls() {
   };
 
   return (
-    <div className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-border bg-card py-3">
+    // overflow-y-auto: com o celular deitado (~300px de altura) os botões de
+    // baixo ficavam cortados e inalcançáveis; o x-hidden evita a barra
+    // horizontal de ~1px que surge quando o eixo y vira auto.
+    <div className="flex w-14 shrink-0 flex-col items-center gap-1 overflow-y-auto overflow-x-hidden border-r border-border bg-card py-3">
       <ToolButton
         label="Resetar vista"
         icon={<RotateCcw />}

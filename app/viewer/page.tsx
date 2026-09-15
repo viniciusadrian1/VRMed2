@@ -19,12 +19,15 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { track } from "@/lib/analytics";
 import { getOrganById } from "@/lib/organs";
 import { useVRMedStore } from "@/lib/store";
+import { cancelSpeech } from "@/lib/tts";
 
 /** Estado inicial exibido quando nenhum órgão foi selecionado. */
 function EmptyViewerState() {
   return (
-    <div className="absolute inset-0 z-10 grid place-items-center p-6">
-      <div className="flex max-w-sm flex-col items-center gap-4 rounded-2xl border border-border bg-card/90 p-8 text-center shadow-lg backdrop-blur-sm">
+    // Só o cartão captura cliques: a camada transparente cobria o canvas
+    // inteiro e engolia o toque em "Tutor de IA", "Ferramentas" e no seletor.
+    <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center p-6">
+      <div className="pointer-events-auto flex max-w-sm flex-col items-center gap-4 rounded-2xl border border-border bg-card/90 p-8 text-center shadow-lg backdrop-blur-sm">
         <span className="grid size-14 place-items-center rounded-2xl bg-accent text-accent-foreground">
           <Box className="size-7" />
         </span>
@@ -51,7 +54,14 @@ export default function ViewerPage() {
   const organ = getOrganById(organId);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  // Trilho (84) + barra (56) + Ferramentas (340) + chat (400) = 880px, mais
+  // o canvas. Abaixo disso, os dois painéis juntos zeravam o canvas e
+  // cortavam o X e o Enviar do chat (tablet em retrato, celular deitado).
+  const cabemDois = useMediaQuery("(min-width: 1200px)");
   const [toolsOpen, setToolsOpen] = useState(false);
+  // Com o chat aberto onde não cabem os dois, o Ferramentas só se esconde:
+  // `toolsOpen` segue verdadeiro e ele volta sozinho ao fechar o chat.
+  const ferramentasVisiveis = toolsOpen && (cabemDois || !isChatOpen);
   const didInit = useRef(false);
 
   // Abre o painel de ferramentas automaticamente uma vez, no desktop.
@@ -61,6 +71,10 @@ export default function ViewerPage() {
       setToolsOpen(true);
     }
   }, [isDesktop]);
+
+  // Para a narração ao trocar de órgão ou sair do viewer. Fica na página, e
+  // não no painel de Ferramentas, para a voz seguir com o painel fechado.
+  useEffect(() => () => cancelSpeech(), [organId]);
 
   // Telemetria: tempo de permanência registrado ao sair de cada órgão.
   useEffect(() => {
@@ -106,12 +120,15 @@ export default function ViewerPage() {
                     Modelo de demonstração
                   </Badge>
                 )}
-                {!toolsOpen && (
+                {!ferramentasVisiveis && (
                   <Button
                     variant="secondary"
                     size="sm"
                     className="shadow-md"
-                    onClick={() => setToolsOpen(true)}
+                    onClick={() => {
+                      setToolsOpen(true);
+                      if (!cabemDois) setChatOpen(false);
+                    }}
                   >
                     <PanelRightOpen />
                     Ferramentas
@@ -138,7 +155,10 @@ export default function ViewerPage() {
             )}
           </div>
 
-          <ToolsPanel open={toolsOpen} onClose={() => setToolsOpen(false)} />
+          <ToolsPanel
+            open={ferramentasVisiveis}
+            onClose={() => setToolsOpen(false)}
+          />
           <ChatPanel />
         </div>
       </TooltipProvider>

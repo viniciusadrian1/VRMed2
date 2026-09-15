@@ -325,7 +325,18 @@ export const useVRMedStore = create<VRMedState>()(
           screenshot: input.screenshot,
           quizResult: input.quizResult,
         };
-        set((s) => ({ sessions: [session, ...s.sessions] }));
+        // O persist grava no localStorage de forma síncrona dentro do `set`.
+        // Se a cota estourar (screenshot em base64), desfaz a inclusão: senão
+        // a sessão existiria só em memória e todo `set` seguinte que aumentasse
+        // o estado persistido também lançaria.
+        try {
+          set((s) => ({ sessions: [session, ...s.sessions] }));
+        } catch (err) {
+          set((s) => ({
+            sessions: s.sessions.filter((x) => x.id !== session.id),
+          }));
+          throw err;
+        }
         return session;
       },
       renameSession: (id, name) =>
@@ -351,6 +362,8 @@ export const useVRMedStore = create<VRMedState>()(
           wireframe: false,
           transformMode: "none",
           annotationMode: false,
+          // Como em setCurrentOrgan: o rótulo era de uma malha do modelo anterior.
+          inspectedLabel: null,
           chat: session.chat.map((m) => ({ ...m })),
           annotationsByOrgan: {
             ...s.annotationsByOrgan,
