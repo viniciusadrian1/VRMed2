@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin, createXRStore } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
@@ -17,7 +19,7 @@ const FLOOR_Y = -1.3;
  * O navegador do Quest cacheia builds antigas de forma agressiva; sem este
  * carimbo, já testamos versão velha achando que era a nova.
  */
-const ARENA_BUILD = "v9 · analógico suave";
+const ARENA_BUILD = "v10 · botões livres do órgão";
 
 /**
  * Palco da Arena: plataforma circular com anéis concêntricos e brilho sob o
@@ -151,6 +153,19 @@ export function ArenaScene() {
     [store],
   );
 
+  /**
+   * Suporte a VR do aparelho (null enquanto pergunta). Sem isso, no celular
+   * ou no desktop o "Entrar em VR" falhava a cada toque com erro técnico em
+   * inglês e pedia para fotografar e enviar à equipe — sem ter havido falha.
+   */
+  const [vrOk, setVrOk] = useState<boolean | null>(null);
+  useEffect(() => {
+    // setState só no retorno da promessa (nunca síncrono no corpo do efeito).
+    (navigator.xr?.isSessionSupported("immersive-vr") ?? Promise.resolve(false))
+      .then((ok) => setVrOk(ok))
+      .catch(() => setVrOk(false));
+  }, []);
+
   const enterVR = useCallback(() => {
     setXrError(null);
     store.enterVR().catch((error: unknown) => {
@@ -172,11 +187,16 @@ export function ArenaScene() {
       */}
       {!inSession && (
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col">
-          <header className="flex items-center gap-2.5 p-6">
-            <span className="size-2.5 rounded-full bg-[#5896c8]" />
-            <span className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
+          {/* Única saída da página fora do VR (o overlay é pointer-events-none,
+              daí o pointer-events-auto) — no PWA instalado não há "voltar". */}
+          <header className="p-6">
+            <Link
+              href="/viewer"
+              className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-medium text-white backdrop-blur hover:bg-black/70"
+            >
+              <ArrowLeft className="size-4" />
               VRmed
-            </span>
+            </Link>
           </header>
 
           <div className="mt-auto flex flex-col items-center gap-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-6 pb-16 pt-28 text-center">
@@ -187,13 +207,27 @@ export function ArenaScene() {
               Encontre as estruturas anatômicas contra o relógio — 60 segundos
               dentro do corpo humano.
             </p>
-            <button
-              type="button"
-              onClick={enterVR}
-              className="pointer-events-auto mt-1 rounded-full bg-[#5896c8] px-12 py-4 text-lg font-semibold text-[#0b1220] shadow-[0_0_45px_rgba(88,150,200,0.45)] transition-transform hover:scale-105"
-            >
-              Entrar em VR
-            </button>
+            {vrOk === false ? (
+              <p className="pointer-events-auto mt-1 max-w-md text-sm text-white/70">
+                {/* Sem HTTPS o navigator.xr some até no Quest (teste por
+                    http://192.168.x.x): mandar "abrir no Quest" quem já está
+                    nele esconderia a causa real. window é seguro aqui: só
+                    renderiza depois de mounted. */}
+                {window.isSecureContext
+                  ? "Este aparelho ou navegador não suporta VR. Abra esta página no navegador do Meta Quest."
+                  : "O VR só funciona em HTTPS (ou localhost). Abra esta página pelo endereço https://."}
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={enterVR}
+                disabled={vrOk !== true}
+                className="pointer-events-auto mt-1 rounded-full bg-[#5896c8] px-12 py-4 text-lg font-semibold text-[#0b1220] shadow-[0_0_45px_rgba(88,150,200,0.45)] transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+              >
+                Entrar em VR
+              </button>
+            )}
+            {/* Só chega aqui com suporte confirmado (incluindo HTTPS): aí sim é falha a relatar. */}
             {xrError && (
               <p
                 role="alert"

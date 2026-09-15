@@ -220,6 +220,9 @@ export function ArenaGame() {
   const endRound = useCallback(() => {
     setPhase("resultado");
     setShowHint(false);
+    // Devolve o órgão à pose original já no resultado: aproximado, ele cobre
+    // o painel e ficaria assim para a próxima pessoa depois do timeout.
+    setRoundId((id) => id + 1);
     sinceResult.current = 0;
     setBest((previous) => Math.max(previous, score));
     playEnd();

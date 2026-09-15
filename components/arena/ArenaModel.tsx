@@ -63,6 +63,13 @@ export function ArenaModel({
     const root = pivot.current;
     if (!group || !root) return;
 
+    // Mede com o spinner na identidade: se o modelo troca enquanto a vitrine
+    // gira (ocioso → Começar), o giro entraria em `local` e a dica apontaria
+    // para o lado errado do órgão — o reset por rodada, mais abaixo, só zera o
+    // spinner depois que as estruturas já foram capturadas.
+    spinner.current?.rotation.set(0, 0, 0);
+    spinner.current?.position.set(0, 0, 0);
+
     normalizeContent(group);
     group.updateWorldMatrix(true, true);
 
@@ -171,7 +178,15 @@ export function ArenaModel({
       {/* O conteúdo é centrado na origem pelo normalizeContent, então o
           spinner gira o modelo em torno do próprio centro. */}
       <group ref={spinner}>
-        <group ref={content} onClick={handleClick}>
+        {/* Fora da partida o órgão fica transparente ao laser: o ponteiro só
+            entrega o clique à interseção mais próxima, e um órgão aproximado
+            na frente do painel engoliria o "Começar"/"Jogar de novo" (desenhados
+            por cima com depthTest desligado, mas atrás dele no raio). */}
+        <group
+          ref={content}
+          onClick={handleClick}
+          pointerEvents={interactive ? "auto" : "none"}
+        >
           <primitive object={scene} />
         </group>
       </group>
