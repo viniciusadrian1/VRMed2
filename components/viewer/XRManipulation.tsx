@@ -2,7 +2,7 @@
 
 import { useRef, useState, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useXR, useXRInputSourceState } from "@react-three/xr";
+import { useXRInputSourceState } from "@react-three/xr";
 import * as THREE from "three";
 
 /** Limites de escala, relativos ao tamanho original do modelo. */
@@ -17,16 +17,16 @@ const STICK_DEADZONE = 0.2;
  * polegar cruza a borda da zona morta — a sensação de travado/aos trancos —
  * e não há controle fino perto do centro.
  */
-function shapedAxis(value: number): number {
+export function shapedAxis(value: number): number {
   const magnitude = Math.abs(value);
   if (magnitude < STICK_DEADZONE) return 0;
   const t = (magnitude - STICK_DEADZONE) / (1 - STICK_DEADZONE);
   return Math.sign(value) * t * t;
 }
 /** Giro pelo analógico (rad/s com o eixo no máximo). */
-const SPIN_SPEED = 3.2;
+export const SPIN_SPEED = 3.2;
 /** Tombamento (pitch) pelo analógico esquerdo (rad/s no máximo). */
-const PITCH_SPEED = 2.4;
+export const PITCH_SPEED = 2.4;
 /** Aproximar/afastar pelo analógico (m/s com o eixo no máximo). */
 const APPROACH_SPEED = 1.3;
 /** Distância cabeça→órgão permitida (m): nem dentro do rosto, nem longe demais. */
@@ -112,8 +112,20 @@ interface Snapshot {
  */
 export function XRManipulation({
   target,
+  aoResetar,
 }: {
   target: RefObject<THREE.Group | null>;
+  /**
+   * O que A/X faz com a POSIÇÃO. Sem isto, volta ao instantâneo inicial — o
+   * certo nas cenas com lugar fixo (clínica, arena, mapa de achados). O
+   * visualizador passa "trazer para a frente de quem olha agora".
+   * A escala volta ao valor inicial nos dois casos.
+   */
+  aoResetar?: (
+    model: THREE.Group,
+    gl: THREE.WebGLRenderer,
+    frame: XRFrame | undefined,
+  ) => void;
 }) {
   const leftController = useXRInputSourceState("controller", "left");
   const rightController = useXRInputSourceState("controller", "right");
@@ -153,9 +165,13 @@ export function XRManipulation({
       isPressed(rightController, "a-button") ||
       isPressed(leftController, "x-button")
     ) {
-      model.position.copy(home.current.position);
-      model.quaternion.copy(home.current.quaternion);
       model.scale.copy(home.current.scale);
+      if (aoResetar) {
+        aoResetar(model, state.gl, frame);
+      } else {
+        model.position.copy(home.current.position);
+        model.quaternion.copy(home.current.quaternion);
+      }
       grabOffset.current = null;
       pinch.current = null;
       return;
@@ -263,8 +279,9 @@ export function XRManipulation({
       Math.abs(rightSpin) >= Math.abs(leftSpin) ? rightSpin : leftSpin;
 
     if (spin !== 0) {
-      // Sinal invertido: analógico para a direita gira a face do modelo
-      // para a direita do jogador (sentido natural de "girar a vitrine").
+      // Analógico para a direita traz para a frente o lado que estava à
+      // direita de quem joga — como puxar a borda direita de uma vitrine
+      // giratória em sua direção. O duelo usa o mesmo sentido.
       model.rotateOnWorldAxis(WORLD_Y, -spin * delta * SPIN_SPEED);
     }
 
@@ -272,11 +289,17 @@ export function XRManipulation({
       // Tomba em torno do eixo "direita da câmera" projetado na horizontal:
       // o movimento acompanha o ponto de vista do jogador, de onde quer que
       // ele esteja olhando. Empurrar para frente tomba o topo para longe.
+      //
+      // O sinal estava invertido em relação a este comentário: com o eixo
+      // "direita da câmera" e yAxis negativo para a frente, `-pitch` dava
+      // ângulo positivo e trazia o topo PARA PERTO. Corrigido junto com o
+      // duelo, que agora usa o analógico do mesmo jeito — os dois modos
+      // tinham de responder igual ao mesmo gesto.
       TMP_DIR.setFromMatrixColumn(state.camera.matrixWorld, 0);
       TMP_DIR.y = 0;
       if (TMP_DIR.lengthSq() > 0.0001) {
         TMP_DIR.normalize();
-        model.rotateOnWorldAxis(TMP_DIR, -pitch * delta * PITCH_SPEED);
+        model.rotateOnWorldAxis(TMP_DIR, pitch * delta * PITCH_SPEED);
       }
     }
 
@@ -300,9 +323,8 @@ export function XRManipulation({
   return null;
 }
 
-
 /* ------------------------------------------------------------------------- */
-/* Entrada num modo imersivo: escala real e pose de partida                    */
+/* Entrada num modo imersivo: pose de partida à frente de quem olha            */
 /* ------------------------------------------------------------------------- */
 
 /**
@@ -317,9 +339,7 @@ const ALTURA_PARA_APOIAR_NO_CHAO = 1.0;
  * Quanto o centro do modelo flutuante fica abaixo da linha dos olhos.
  *
  * Cinco centímetros a meio metro de distância são ~6° para baixo: o olhar
- * desce um pouco, como quem observa algo na mão. A primeira tentativa usava
- * 18 cm e ficou longe demais para baixo, porque 18 cm valiam metade de um
- * órgão inteiro depois que a escala passou a ser real.
+ * desce um pouco, como quem observa algo na mão.
  */
 const ABAIXO_DOS_OLHOS = 0.05;
 /** Distância do modelo flutuante: proporcional ao tamanho, com piso e teto. */
@@ -332,32 +352,140 @@ const CHAO_DISTANCIA_MIN = 1.2;
 const CHAO_DISTANCIA_MAX = 2.5;
 /**
  * Quadros de tolerância esperando o rastreio reportar a cabeça. Passado esse
- * limite a manipulação é liberada assim mesmo, com a pose que já estava
- * aplicada: melhor um órgão no lugar aproximado do que um órgão que ninguém
- * consegue agarrar porque o rastreio não respondeu.
+ * limite o modelo é colocado assim mesmo, supondo alguém de pé olhando para a
+ * frente da sessão — e a manipulação é liberada. Melhor um órgão no lugar
+ * aproximado do que um órgão que ninguém consegue agarrar.
  */
 const QUADROS_DE_ESPERA = 90;
+/** Altura dos olhos suposta quando o rastreio nunca responde (pessoa de pé). */
+const OLHOS_SUPOSTOS = 1.55;
+
+// Reutilizados: a colocação roda uma vez, mas o reset pode rodar a cada A/X.
+const TMP_CABECA = new THREE.Vector3();
+const TMP_FRENTE = new THREE.Vector3();
+const TMP_CHAO = new THREE.Vector3();
+
+interface PoseDaCabeca {
+  /** Posição dos olhos, em coordenadas de MUNDO. */
+  cabeca: THREE.Vector3;
+  /** Direção horizontal do olhar, normalizada, em MUNDO. */
+  frente: THREE.Vector3;
+  /** Y de mundo do chão da sessão. */
+  chaoY: number;
+}
 
 /**
- * Coloca o modelo à frente de QUEM ESTÁ OLHANDO, uma vez, no início da sessão.
+ * Onde está a cabeça de quem usa o headset, em coordenadas de MUNDO.
  *
- * Dois problemas que isto resolve, e os dois vêm de pose fixa:
+ * POR QUE A CÂMERA DE XR, E NÃO `getViewerPose` + A ORIGEM DA SESSÃO
  *
- *  - **Altura.** A pose supunha alguém de pé. Aberto sentado, o modelo ficava
- *    acima da linha dos olhos. A altura dos olhos varia quase meio metro entre
- *    sentado e de pé.
- *  - **Direção.** Num estande a pessoa começa virada para qualquer lado. Uma
- *    posição fixa em relação ao chão pode nascer atrás dela.
+ * A primeira versão lia a pose do `XRFrame` e a convertia para o mundo com a
+ * matriz do `XROrigin`, obtida por `useXR((s) => s.origin)`. Esse valor só é
+ * gravado no store no PRIMEIRO quadro de XR, e o componente só o enxerga no
+ * render seguinte. O posicionamento rodava justamente nesse primeiro quadro,
+ * com o valor antigo — a própria cena, de matriz identidade, que é o que a
+ * origem vale fora da sessão. Na prática a conversão não fazia nada:
  *
- * A pose vem do `XRFrame`, não da câmera do three: a câmera só recebe a pose
- * do quadro ANTERIOR e, no primeiro quadro da sessão, ainda está onde o modo
- * 2D a deixou. `getViewerPose` é a fonte autoritativa e já vale no primeiro
- * quadro; enquanto ela não vier (rastreio iniciando), espera.
+ *   - em AR a origem fica em y=0, então pular não mudava nada — e o bug não
+ *     aparecia nos testes de AR;
+ *   - em VR a origem fica no chão da grade, 1,30 m abaixo. Sem a conversão, o
+ *     órgão flutuante nascia ~1,25 m acima dos olhos, alto demais para ser
+ *     encontrado, e o corpo inteiro, que deveria apoiar no chão, flutuava
+ *     1,30 m acima dele.
+ *
+ * A câmera de XR resolve as duas coisas de uma vez. O `@react-three/xr` a
+ * pendura como filha do `XROrigin`, e o three grava nela a pose deste quadro
+ * ANTES de chamar o `useFrame`. `getWorldPosition` já devolve a pose composta
+ * com a origem, sem conversão manual e sem depender de estado do React. O chão
+ * sai do mesmo lugar: o pai dela é a própria origem.
+ *
+ * `getViewerPose` continua, mas só como sinal de que o rastreio está valendo
+ * neste quadro; sem ele a câmera poderia guardar uma pose velha ou nula.
+ */
+function poseDaCabeca(
+  gl: THREE.WebGLRenderer,
+  frame: XRFrame | undefined,
+): PoseDaCabeca | null {
+  const espaco = gl.xr.getReferenceSpace();
+  if (!frame || !espaco || !frame.getViewerPose(espaco)) return null;
+
+  const camera = gl.xr.getCamera();
+  const origem = camera.parent;
+  if (!origem) return null;
+
+  const cabeca = camera.getWorldPosition(TMP_CABECA);
+  const frente = camera.getWorldDirection(TMP_FRENTE);
+  frente.y = 0;
+  // Olhando quase reto para cima ou para baixo: sem direção horizontal
+  // confiável. Quem chamou tenta de novo no próximo quadro.
+  if (frente.lengthSq() < 1e-4) return null;
+  frente.normalize();
+
+  return { cabeca, frente, chaoY: origem.getWorldPosition(TMP_CHAO).y };
+}
+
+/**
+ * Coloca o modelo à frente da cabeça: flutuando na linha dos olhos se for
+ * pequeno, apoiado no chão se for do tamanho de uma pessoa, e virado de frente
+ * para quem olha.
  *
  * Só a componente HORIZONTAL do olhar é usada. Quem entra olhando para o chão
  * continua recebendo o modelo à frente e na altura certa — com a direção crua
  * ele seria enterrado no piso.
  */
+function colocarAFrente(model: THREE.Object3D, pose: PoseDaCabeca): boolean {
+  // Zera a rotação ANTES de medir. A altura que decide entre flutuar e apoiar
+  // é a do modelo em pé; um modelo tombado no 2D (pelo gizmo de rotação, que
+  // não é prop e atravessa a entrada na sessão) ou girado pelas mãos antes de
+  // um reset mediria outra coisa. A rotação final é reaplicada logo abaixo.
+  model.rotation.set(0, 0, 0);
+  // A altura é MEDIDA no objeto como ele está, com a escala real já aplicada.
+  const caixa = new THREE.Box3().setFromObject(model);
+  const alturaReal = caixa.max.y - caixa.min.y;
+  if (!Number.isFinite(alturaReal) || alturaReal <= 0) return false;
+
+  const apoiado = alturaReal >= ALTURA_PARA_APOIAR_NO_CHAO;
+  const distancia = apoiado
+    ? THREE.MathUtils.clamp(
+        alturaReal * CHAO_DISTANCIA_POR_ALTURA,
+        CHAO_DISTANCIA_MIN,
+        CHAO_DISTANCIA_MAX,
+      )
+    : THREE.MathUtils.clamp(
+        alturaReal * FLUTUANTE_DISTANCIA_POR_ALTURA,
+        FLUTUANTE_DISTANCIA_MIN,
+        FLUTUANTE_DISTANCIA_MAX,
+      );
+
+  const alvo = pose.cabeca.clone().addScaledVector(pose.frente, distancia);
+  // O modelo é normalizado com o centro na origem do grupo, então apoiar no
+  // chão é pôr o CENTRO a meia altura acima dele.
+  alvo.y = apoiado
+    ? pose.chaoY + alturaReal / 2
+    : pose.cabeca.y - ABAIXO_DOS_OLHOS;
+
+  if (model.parent) model.parent.worldToLocal(alvo);
+  model.position.copy(alvo);
+  // O +Z do modelo aponta de volta para a cabeça: a pessoa começa vendo a
+  // frente do órgão, não as costas.
+  model.rotation.set(0, Math.atan2(-pose.frente.x, -pose.frente.z), 0);
+  return true;
+}
+
+/** Pose suposta para quando o rastreio nunca responde: de pé, olhando para −Z. */
+function poseSuposta(gl: THREE.WebGLRenderer): PoseDaCabeca {
+  const origem = gl.xr.getCamera().parent;
+  const base = origem
+    ? origem.getWorldPosition(new THREE.Vector3())
+    : new THREE.Vector3();
+  return {
+    cabeca: new THREE.Vector3(base.x, base.y + OLHOS_SUPOSTOS, base.z),
+    frente: new THREE.Vector3(0, 0, -1),
+    chaoY: base.y,
+  };
+}
+
+/** Coloca o modelo uma vez, no início da sessão, e avisa quando terminou. */
 function PoseDeEntrada({
   target,
   onPronto,
@@ -365,7 +493,6 @@ function PoseDeEntrada({
   target: RefObject<THREE.Group | null>;
   onPronto: () => void;
 }) {
-  const origem = useXR((state) => state.origin);
   const quadros = useRef(0);
   const feito = useRef(false);
 
@@ -375,83 +502,18 @@ function PoseDeEntrada({
     if (!model) return;
 
     quadros.current += 1;
-    const desistir = quadros.current > QUADROS_DE_ESPERA;
-    const encerrar = () => {
+    const pose = poseDaCabeca(state.gl, frame);
+    const colocou = pose
+      ? colocarAFrente(model, pose)
+      : quadros.current > QUADROS_DE_ESPERA &&
+        colocarAFrente(model, poseSuposta(state.gl));
+
+    // Mesmo sem conseguir colocar (caixa ainda vazia), libera a manipulação
+    // depois de um tempo: travar o controle seria pior que o lugar errado.
+    if (colocou || quadros.current > QUADROS_DE_ESPERA * 2) {
       feito.current = true;
       onPronto();
-    };
-
-    const espaco = state.gl.xr.getReferenceSpace();
-    const pose = frame && espaco ? frame.getViewerPose(espaco) : null;
-    if (!pose) {
-      if (desistir) encerrar();
-      return;
     }
-
-    const p = pose.transform.position;
-    const o = pose.transform.orientation;
-    const cabeca = new THREE.Vector3(p.x, p.y, p.z);
-    const frente = new THREE.Vector3(0, 0, -1).applyQuaternion(
-      new THREE.Quaternion(o.x, o.y, o.z, o.w),
-    );
-
-    // Do espaço de referência do WebXR para o mundo. O XROrigin é a origem da
-    // sessão ao nível do CHÃO: em AR ele está em y=0, em VR no chão da cena.
-    // Por isso o y dele serve para as duas coisas — converter a pose e saber
-    // onde o piso está, sem a cena precisar informar nada.
-    let chaoY = 0;
-    if (origem) {
-      cabeca.applyMatrix4(origem.matrixWorld);
-      frente.transformDirection(origem.matrixWorld);
-      chaoY = new THREE.Vector3().setFromMatrixPosition(origem.matrixWorld).y;
-    }
-
-    frente.y = 0;
-    if (frente.lengthSq() < 1e-4) {
-      // Olhando quase reto para cima ou para baixo: sem direção horizontal
-      // confiável. Tenta no próximo quadro.
-      if (desistir) encerrar();
-      return;
-    }
-    frente.normalize();
-
-    // A altura é MEDIDA no objeto como ele está, com a escala real já
-    // aplicada, em vez de derivada do tamanho declarado. Uma medida no que
-    // existe não tem como divergir do que a pessoa vê.
-    const caixa = new THREE.Box3().setFromObject(model);
-    const alturaReal = caixa.max.y - caixa.min.y;
-    if (!Number.isFinite(alturaReal) || alturaReal <= 0) {
-      // Modelo ainda sem geometria (caixa vazia): tenta no próximo quadro.
-      if (desistir) encerrar();
-      return;
-    }
-
-    const apoiado = alturaReal >= ALTURA_PARA_APOIAR_NO_CHAO;
-    const distancia = apoiado
-      ? THREE.MathUtils.clamp(
-          alturaReal * CHAO_DISTANCIA_POR_ALTURA,
-          CHAO_DISTANCIA_MIN,
-          CHAO_DISTANCIA_MAX,
-        )
-      : THREE.MathUtils.clamp(
-          alturaReal * FLUTUANTE_DISTANCIA_POR_ALTURA,
-          FLUTUANTE_DISTANCIA_MIN,
-          FLUTUANTE_DISTANCIA_MAX,
-        );
-
-    const alvo = cabeca.clone().addScaledVector(frente, distancia);
-    // O modelo é normalizado com o centro na origem do grupo, então apoiar no
-    // chão é pôr o CENTRO a meia altura acima dele.
-    alvo.y = apoiado ? chaoY + alturaReal / 2 : cabeca.y - ABAIXO_DOS_OLHOS;
-
-    if (model.parent) model.parent.worldToLocal(alvo);
-    model.position.copy(alvo);
-
-    // Vira o modelo de frente para quem olha: o +Z dele tem de apontar de
-    // volta para a cabeça, senão a pessoa pode começar vendo as costas.
-    model.rotation.set(0, Math.atan2(-frente.x, -frente.z), 0);
-
-    encerrar();
   });
 
   return null;
@@ -461,10 +523,15 @@ function PoseDeEntrada({
  * Entrada num modo imersivo: posiciona o modelo e só então libera a
  * manipulação.
  *
- * A ordem importa. O `XRManipulation` guarda a pose inicial no primeiro quadro
- * em que roda, para o botão de reset (A/X) devolver o modelo ao ponto de
- * partida. Se ele montasse antes do posicionamento, o reset levaria o modelo
- * para onde ele estava no modo 2D.
+ * A ordem importa. O `XRManipulation` guarda a escala inicial no primeiro
+ * quadro em que roda; se montasse antes do posicionamento, guardaria a pose
+ * provisória.
+ *
+ * O botão A/X, aqui, TRAZ O MODELO PARA A FRENTE DE QUEM ESTÁ USANDO AGORA,
+ * em vez de devolvê-lo a um instantâneo. Num estande é isso que "a próxima
+ * pessoa começa do mesmo jeito" quer dizer: a pessoa seguinte pode estar
+ * sentada, ou de pé, ou virada para outro lado. Um instantâneo medido na
+ * cabeça de quem veio antes deixaria o órgão no lugar certo para outra pessoa.
  */
 export function EntradaXR({
   target,
@@ -478,7 +545,14 @@ export function EntradaXR({
       {!posicionado && (
         <PoseDeEntrada target={target} onPronto={() => setPosicionado(true)} />
       )}
-      {posicionado && <XRManipulation target={target} />}
+      {posicionado && (
+        <XRManipulation
+          target={target}
+          aoResetar={(model, gl, frame) => {
+            colocarAFrente(model, poseDaCabeca(gl, frame) ?? poseSuposta(gl));
+          }}
+        />
+      )}
     </>
   );
 }
