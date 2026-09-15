@@ -359,6 +359,42 @@ const CHAO_DISTANCIA_MAX = 2.5;
 const QUADROS_DE_ESPERA = 90;
 /** Altura dos olhos suposta quando o rastreio nunca responde (pessoa de pé). */
 const OLHOS_SUPOSTOS = 1.55;
+/**
+ * Depois da primeira pose REAL, por quanto tempo o modelo continua sendo
+ * recolocado na linha dos olhos antes de parar (s).
+ *
+ * Colocar uma vez só, no primeiro quadro, confiava num único número. Logo ao
+ * entrar no modo imersivo o rastreio ainda está se acomodando e a altura pode
+ * pular. Três quartos de segundo cobrem isso e passam despercebidos: a pessoa
+ * vê o órgão já parado à frente dela.
+ */
+const ACOMODACAO_S = 0.75;
+
+/**
+ * Marca da versão desta lógica de pose, exibida no painel de diagnóstico.
+ * Serve para uma pergunta só: "o óculos está rodando o código novo?". O cache
+ * do Turbopack e o do navegador do Quest já serviram código velho mais de uma
+ * vez neste projeto. Aumente o número a cada mudança nesta seção.
+ */
+export const VERSAO_POSE = "pose-4";
+
+/**
+ * O que a última colocação decidiu, para o painel `?debug=xr` ler.
+ * Mutável e fora do React de propósito: é escrito dentro do `useFrame`, onde
+ * um setState por quadro seria desperdício.
+ */
+export const diagnosticoPose = {
+  /** De onde veio a altura dos olhos usada: pose real, estimada ou suposta. */
+  fonte: "—" as "real" | "estimada" | "suposta" | "—",
+  /** Poses descartadas por serem estimadas (`emulatedPosition`). */
+  posesEstimadasDescartadas: 0,
+  olhosAcimaDoChao: NaN,
+  alturaModelo: NaN,
+  distancia: NaN,
+  apoiado: false,
+  /** O objeto posicionado, para o painel medir a altura dele ao vivo. */
+  modelo: null as THREE.Object3D | null,
+};
 
 // Reutilizados: a colocação roda uma vez, mas o reset pode rodar a cada A/X.
 const TMP_CABECA = new THREE.Vector3();
@@ -405,9 +441,21 @@ interface PoseDaCabeca {
 function poseDaCabeca(
   gl: THREE.WebGLRenderer,
   frame: XRFrame | undefined,
+  aceitarEstimada = false,
 ): PoseDaCabeca | null {
   const espaco = gl.xr.getReferenceSpace();
-  if (!frame || !espaco || !frame.getViewerPose(espaco)) return null;
+  const viewer = frame && espaco ? frame.getViewerPose(espaco) : null;
+  if (!viewer) return null;
+  // `emulatedPosition` quer dizer que o headset NÃO sabe onde a cabeça está e
+  // devolveu uma estimativa. Isso acontece justamente nos primeiros quadros
+  // depois de entrar no modo imersivo, antes do rastreio se firmar. Nem o
+  // three nem o @react-three/xr filtram: a câmera recebe a estimativa como se
+  // fosse real. Colocar o órgão nessa altura e congelar era o que o deixava
+  // alto demais para quem está sentado — a estimativa não sabe disso.
+  if (viewer.emulatedPosition && !aceitarEstimada) {
+    diagnosticoPose.posesEstimadasDescartadas += 1;
+    return null;
+  }
 
   const camera = gl.xr.getCamera();
   const origem = camera.parent;
@@ -464,6 +512,12 @@ function colocarAFrente(model: THREE.Object3D, pose: PoseDaCabeca): boolean {
     ? pose.chaoY + alturaReal / 2
     : pose.cabeca.y - ABAIXO_DOS_OLHOS;
 
+  diagnosticoPose.olhosAcimaDoChao = pose.cabeca.y - pose.chaoY;
+  diagnosticoPose.alturaModelo = alturaReal;
+  diagnosticoPose.distancia = distancia;
+  diagnosticoPose.apoiado = apoiado;
+  diagnosticoPose.modelo = model;
+
   if (model.parent) model.parent.worldToLocal(alvo);
   model.position.copy(alvo);
   // O +Z do modelo aponta de volta para a cabeça: a pessoa começa vendo a
@@ -495,6 +549,8 @@ function PoseDeEntrada({
 }) {
   const quadros = useRef(0);
   const feito = useRef(false);
+  /** Instante da primeira colocação com pose REAL; abre a janela de acomodação. */
+  const primeiraReal = useRef<number | null>(null);
 
   useFrame((state, _delta, frame) => {
     if (feito.current) return;
@@ -502,17 +558,39 @@ function PoseDeEntrada({
     if (!model) return;
 
     quadros.current += 1;
-    const pose = poseDaCabeca(state.gl, frame);
-    const colocou = pose
-      ? colocarAFrente(model, pose)
-      : quadros.current > QUADROS_DE_ESPERA &&
-        colocarAFrente(model, poseSuposta(state.gl));
-
-    // Mesmo sem conseguir colocar (caixa ainda vazia), libera a manipulação
-    // depois de um tempo: travar o controle seria pior que o lugar errado.
-    if (colocou || quadros.current > QUADROS_DE_ESPERA * 2) {
+    const encerrar = () => {
       feito.current = true;
       onPronto();
+    };
+
+    // Com pose real: recoloca a cada quadro durante a acomodação, e só então
+    // para. A última colocação é a que fica.
+    const real = poseDaCabeca(state.gl, frame);
+    if (real && colocarAFrente(model, real)) {
+      diagnosticoPose.fonte = "real";
+      const agora = state.clock.elapsedTime;
+      primeiraReal.current ??= agora;
+      if (agora - primeiraReal.current >= ACOMODACAO_S) encerrar();
+      return;
+    }
+
+    // Já houve pose real e ela sumiu no meio da acomodação: fica com a última.
+    if (primeiraReal.current !== null) {
+      if (quadros.current > QUADROS_DE_ESPERA) encerrar();
+      return;
+    }
+
+    // Nunca veio pose real. Depois da espera, a estimativa do headset ainda é
+    // melhor que uma altura inventada; sem nem ela, supõe alguém de pé.
+    if (quadros.current > QUADROS_DE_ESPERA) {
+      const estimada = poseDaCabeca(state.gl, frame, true);
+      const colocou = estimada
+        ? colocarAFrente(model, estimada)
+        : colocarAFrente(model, poseSuposta(state.gl));
+      diagnosticoPose.fonte = estimada ? "estimada" : "suposta";
+      // Mesmo sem conseguir colocar (caixa ainda vazia), libera a manipulação
+      // depois de um tempo: travar o controle seria pior que o lugar errado.
+      if (colocou || quadros.current > QUADROS_DE_ESPERA * 2) encerrar();
     }
   });
 
@@ -549,7 +627,12 @@ export function EntradaXR({
         <XRManipulation
           target={target}
           aoResetar={(model, gl, frame) => {
-            colocarAFrente(model, poseDaCabeca(gl, frame) ?? poseSuposta(gl));
+            colocarAFrente(
+              model,
+              poseDaCabeca(gl, frame) ??
+                poseDaCabeca(gl, frame, true) ??
+                poseSuposta(gl),
+            );
           }}
         />
       )}

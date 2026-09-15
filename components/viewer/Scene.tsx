@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
+import { DiagnosticoXR } from "@/components/xr/DiagnosticoXR";
 import * as THREE from "three";
 import { track } from "@/lib/analytics";
 import { clamp } from "@/lib/format";
@@ -146,6 +147,9 @@ function SceneContents() {
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
   const emAR = modo === "immersive-ar";
+  // `?debug=xr`: painel com a altura dos olhos e do órgão, lido dentro do óculos.
+  const debugXR =
+    new URLSearchParams(window.location.search).get("debug") === "xr";
 
   return (
     <>
@@ -158,6 +162,7 @@ function SceneContents() {
        */}
       <XROrigin position={emAR ? [0, 0, 0] : [0, FLOOR_Y, 0]}>
         <SairDoVR position={[-0.45, 1.25, -0.5]} />
+        {debugXR && inSession && <DiagnosticoXR />}
       </XROrigin>
 
       {/*
