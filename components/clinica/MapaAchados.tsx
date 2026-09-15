@@ -120,6 +120,10 @@ export function MapaAchados({
   }, [scene, achados, matZona]);
 
   const clicou = (event: ThreeEvent<MouseEvent>) => {
+    // Arrasto de órbita não é clique; 8 px é a folga de toque do navegador
+    // (abaixo disso ainda é toque). Só o evento do R3F traz `delta` próprio;
+    // no VR (pointer-events) o getter lança erro, por isso o hasOwn.
+    if (Object.hasOwn(event, "delta") && event.delta > 8) return;
     const rotulo = event.object.userData.rotulo as string | undefined;
     if (rotulo) {
       event.stopPropagation();

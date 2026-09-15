@@ -9,7 +9,7 @@ import {
   useState,
   type RefObject,
 } from "react";
-import { Canvas, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { XR, XROrigin, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
@@ -45,17 +45,30 @@ const CORTES = {
 type Corte = keyof typeof CORTES | "nenhum";
 // normalizeContent deixa o modelo em ±1 e o pivô escala 1,4 → cabe em ±1,5.
 const ALCANCE = 1.5;
+// Inversa da pose inicial do pivô (meia-volta em Y, escala 1,4 — a mesma do
+// JSX): leva o plano da pose inicial para a pose atual do modelo.
+const POSE_INICIAL_INV = new THREE.Matrix4()
+  .compose(
+    new THREE.Vector3(),
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI, 0)),
+    new THREE.Vector3(1.4, 1.4, 1.4),
+  )
+  .invert();
+const TMP_M = new THREE.Matrix4();
 
 /** Modelo do paciente: carrega, prepara materiais, corte e envelope. */
 function ModeloPaciente({
   glb,
   plano,
+  planoBase,
   mostrarEnvelope,
   onIdentify,
   onCarregado,
 }: {
   glb: string;
   plano: RefObject<THREE.Plane>;
+  /** Plano calculado para a pose inicial do pivô (o painel escreve aqui). */
+  planoBase: RefObject<THREE.Plane>;
   mostrarEnvelope: boolean;
   onIdentify: (label: string) => void;
   onCarregado: (info: { temCamaras: boolean }) => void;
@@ -78,6 +91,17 @@ function ModeloPaciente({
     });
     group.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return;
+      // O raycast do three não filtra `visible` nem `clippingPlanes`. Filtrar
+      // aqui serve ao R3F e ao pointer do XR: o R3F só guarda o hit mais
+      // próximo de cada malha, e com corte ele é a parede da frente (cortada),
+      // escondendo a parede de trás, que é a que aparece.
+      obj.raycast = (rc, out) => {
+        if (!obj.visible) return; // envelope oculto não bloqueia o clique
+        const i0 = out.length;
+        THREE.Mesh.prototype.raycast.call(obj, rc, out);
+        for (let i = out.length - 1; i >= i0; i--)
+          if (plano.current.distanceToPoint(out[i].point) < 0) out.splice(i, 1); // lado removido pelo corte
+      };
       const mat = obj.material as THREE.MeshStandardMaterial;
       if (!("roughness" in mat)) return;
       // Com câmaras no GLB, o rótulo `heart` é o envelope epicárdico: fica
@@ -109,17 +133,25 @@ function ModeloPaciente({
     });
   }, [mostrarEnvelope, scene]);
 
+  // O corte acompanha o modelo agarrado/girado/escalado em VR (os planos de
+  // material são de mundo). No 2D o pivô fica na pose inicial e plano = base.
+  useFrame(() => {
+    const p = pivot.current;
+    if (!p) return;
+    p.updateWorldMatrix(true, false);
+    plano.current
+      .copy(planoBase.current)
+      .applyMatrix4(TMP_M.multiplyMatrices(p.matrixWorld, POSE_INICIAL_INV));
+  });
+
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
-    // O raycast do three não filtra `visible` nem `clippingPlanes`: pula o
-    // envelope oculto e as faces do lado removido pelo corte. Em VR o
-    // pointer-events entrega `intersections` vazio → usa o próprio hit.
-    const hits = event.intersections.length ? event.intersections : [event];
-    const hit = hits.find(
-      (h) => h.object.visible && plano.current.distanceToPoint(h.point) >= 0,
-    );
-    if (!hit) return;
+    // Arrasto de órbita não é clique; 8 px é a folga de toque do navegador
+    // (abaixo disso ainda é toque). Só o evento do R3F traz `delta` próprio;
+    // no VR (pointer-events) o getter lança erro, por isso o hasOwn.
+    if (Object.hasOwn(event, "delta") && event.delta > 8) return;
+    // Malha oculta e face cortada já saem no raycast (efeito acima).
     event.stopPropagation();
-    onIdentify(identifyStructure(hit.object));
+    onIdentify(identifyStructure(event.object));
   };
 
   return (
@@ -140,6 +172,7 @@ function CenaClinica({
   mapaGlb,
   achados,
   plano,
+  planoBase,
   mostrarEnvelope,
   onIdentify,
   onCarregado,
@@ -149,6 +182,7 @@ function CenaClinica({
   mapaGlb: string | null;
   achados: AchadosPulmao | null;
   plano: RefObject<THREE.Plane>;
+  planoBase: RefObject<THREE.Plane>;
   mostrarEnvelope: boolean;
   onIdentify: (label: string) => void;
   onCarregado: (info: { temCamaras: boolean }) => void;
@@ -182,7 +216,10 @@ function CenaClinica({
         <meshBasicMaterial color="#0a1017" side={THREE.BackSide} />
       </mesh>
 
+      {/* key pelo arquivo exibido: trocar de modo remonta o boundary, senão o
+          erro de um GLB prenderia o fallback também na outra reconstrução. */}
       <ErrorBoundary
+        key={achados && mapaGlb ? mapaGlb : glb}
         fallback={
           <Text3D position={[0, 0.2, 0]} size={0.1} color="#e06a5c">
             Falha ao carregar o caso — recarregue a página
@@ -206,6 +243,7 @@ function CenaClinica({
             <ModeloPaciente
               glb={glb}
               plano={plano}
+              planoBase={planoBase}
               mostrarEnvelope={mostrarEnvelope}
               onIdentify={onIdentify}
               onCarregado={onCarregado}
@@ -251,10 +289,12 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
   const [mostrarEnvelope, setMostrarEnvelope] = useState(true);
 
   // Um plano só, compartilhado pelos materiais (ref: o React Compiler proíbe
-  // mutar valores de useMemo); os estados o reposicionam no efeito.
+  // mutar valores de useMemo). Os estados posicionam o `planoBase` (pose
+  // inicial do pivô) e o ModeloPaciente copia para `plano` na pose atual.
   const plano = useRef(new THREE.Plane(new THREE.Vector3(0, -1, 0), 100));
+  const planoBase = useRef(new THREE.Plane(new THREE.Vector3(0, -1, 0), 100));
   useEffect(() => {
-    const p = plano.current;
+    const p = planoBase.current;
     if (corte === "nenhum") {
       p.constant = 100; // fora do modelo: nada é cortado
       return;
@@ -380,7 +420,8 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
 
       {!inSession && (
         <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-3">
-          {caso.achados && caso.mapaGlb && (
+          {/* Só com o JSON carregado: sem ele o "Mapa" cairia na reconstrução sem aviso. */}
+          {achados && caso.mapaGlb && (
             <div className="pointer-events-auto flex overflow-hidden rounded-full border border-white/15 bg-black/50 text-xs font-medium backdrop-blur">
               {(
                 [
@@ -456,6 +497,7 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
             mapaGlb={caso.mapaGlb ?? null}
             achados={modo === "mapa" ? achados : null}
             plano={plano}
+            planoBase={planoBase}
             mostrarEnvelope={mostrarEnvelope}
             onIdentify={setLabel}
             onCarregado={aoCarregar}

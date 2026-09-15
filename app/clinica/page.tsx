@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ClinicaApp } from "@/components/clinica/ClinicaApp";
 
@@ -14,5 +15,11 @@ export const metadata: Metadata = {
  * visualizador de estudo. Se a Clínica quebrar, o resto do VRmed fica de pé.
  */
 export default function ClinicaPage() {
-  return <ClinicaApp />;
+  // O ClinicaApp lê ?caso com useSearchParams: sem Suspense o build de
+  // produção falha nesta rota pré-renderizada.
+  return (
+    <Suspense fallback={null}>
+      <ClinicaApp />
+    </Suspense>
+  );
 }

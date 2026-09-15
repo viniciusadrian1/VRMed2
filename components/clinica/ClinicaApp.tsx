@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ScanLine, ShieldAlert } from "lucide-react";
 import { ClinicaViewer } from "./ClinicaViewer";
 
@@ -28,7 +29,13 @@ export interface CasoClinico {
 export function ClinicaApp() {
   const [casos, setCasos] = useState<CasoClinico[] | null>(null);
   const [erro, setErro] = useState(false);
-  const [selecionado, setSelecionado] = useState<CasoClinico | null>(null);
+  // O caso aberto vive na URL (?caso=slug): o voltar do navegador/Android
+  // fecha o caso e volta à lista, e o F5 reabre o mesmo caso.
+  const slug = useSearchParams().get("caso");
+  const selecionado = casos?.find((c) => c.slug === slug) ?? null;
+  // Se o card empilhou a entrada ?caso nesta visita, "Casos" volta no
+  // histórico; vindo de link direto ou F5, só limpa a URL (sem duplicar /clinica).
+  const empilhou = useRef(false);
 
   useEffect(() => {
     let cancelado = false;
@@ -50,11 +57,23 @@ export function ClinicaApp() {
 
   if (selecionado) {
     return (
-      <main className="relative h-dvh w-full overflow-hidden bg-[#101820]">
+      <main
+        id="conteudo-principal"
+        className="relative h-dvh w-full overflow-hidden bg-[#101820]"
+      >
         <ClinicaViewer caso={selecionado} />
         <button
           type="button"
-          onClick={() => setSelecionado(null)}
+          onClick={() => {
+            if (empilhou.current) {
+              // Sem zerar o ref: depois do Avançar a lista continua logo atrás.
+              // O "Pular para o conteúdo" empilha #conteudo-principal por cima
+              // do caso (fragmento repetido substitui, então é no máximo um).
+              window.history.go(window.location.hash ? -2 : -1);
+            } else {
+              window.history.replaceState(null, "", "/clinica");
+            }
+          }}
           className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-medium text-white backdrop-blur hover:bg-black/70"
         >
           <ArrowLeft className="size-4" />
@@ -81,7 +100,8 @@ export function ClinicaApp() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-5 py-10">
+      {/* Alvo do "Pular para o conteúdo" depois do header (que fica dentro do main). */}
+      <div id="conteudo-principal" className="mx-auto max-w-5xl px-5 py-10">
         <h1 className="font-serif text-3xl font-medium tracking-tight">
           Casos em 3D a partir de exames reais
         </h1>
@@ -113,7 +133,14 @@ export function ClinicaApp() {
             <button
               key={caso.slug}
               type="button"
-              onClick={() => setSelecionado(caso)}
+              onClick={() => {
+                empilhou.current = true;
+                window.history.pushState(
+                  null,
+                  "",
+                  `?caso=${encodeURIComponent(caso.slug)}`,
+                );
+              }}
               className="rounded-xl border border-border bg-card p-5 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md"
             >
               <h2 className="font-serif text-lg font-medium">{caso.titulo}</h2>
