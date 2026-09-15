@@ -16,15 +16,26 @@ import { ORGANS } from "@/lib/organs";
 import { playEnd, playHit, playMiss, playStart, playTick } from "@/lib/arena-audio";
 import { Oponente, type HumorOponente } from "./Oponente";
 import { PITCH_SPEED, SPIN_SPEED, shapedAxis } from "@/components/viewer/XRManipulation";
+import {
+  CONTAGEM_MS,
+  RODADA_MS,
+  TOTAL_RODADAS,
+  type RodadaOnline,
+  type VisaoSala,
+} from "@/lib/duelo-salas";
+import type { DueloOnline } from "./useDueloOnline";
 
 /**
- * Duelo 1x1 (Modo 2 do plano multi-modo) — v1 contra BOT.
+ * Duelo 1x1 (Modo 2 do plano multi-modo): contra BOT ou contra outra pessoa.
  *
  * 8 rodadas alternando: órgão inteiro (100 pts) e estrutura da laringe
- * marcada (200 pts). Quem responde certo primeiro pontua — o bot "responde"
- * após um atraso sorteado pela dificuldade. Online real fica para a fase 2
- * (WebSocket); a máquina de estados já separa "quem pontuou" de "como a
- * resposta chegou", então o oponente remoto entra no lugar do bot.
+ * marcada (200 pts). Quem responde certo primeiro pontua.
+ *
+ *  - Contra bot, tudo roda aqui: o bot "responde" após um atraso sorteado.
+ *  - Online, cada pessoa no seu óculos: o servidor (`app/api/duelo`) é o
+ *    árbitro de relógio, placar e acertos, e esta tela só espelha a sala nos
+ *    mesmos estados que a partida contra bot usa. O pareamento é por um código
+ *    de 4 dígitos que um cria e o outro digita num teclado 3D.
  */
 
 const LARINGE = "/models/organs/larynx.glb";
@@ -40,8 +51,8 @@ const ORGAOS_DUELO = ORGANS.filter((o) => o.id !== "pulmao");
 const LOUSA_X = 0.36;
 const LOUSA_Z = -1.06;
 
-const TOTAL_RODADAS = 8;
-const TEMPO_RODADA = 18;
+// Mesmas regras nos dois modos: vêm das salas online.
+const TEMPO_RODADA = RODADA_MS / 1000;
 
 export type Dificuldade = "iniciante" | "residente" | "especialista";
 export type Ambiente = "escola" | "hospital";
@@ -68,19 +79,29 @@ const BOTS: Record<
 // Ordem iniciante/residente/especialista = teclas 1/2/3 (mesma ordem dos menus 3D).
 const NIVEIS = Object.keys(BOTS) as Dificuldade[];
 
-type Fase = "menu" | "contagem" | "rodada" | "feedback" | "fim";
+/**
+ * "sala": criou a sala e espera o amigo. "codigo": digitando o código.
+ * "encerrada": o adversário saiu ou a conexão com a partida caiu.
+ */
+type Fase =
+  | "menu"
+  | "contagem"
+  | "rodada"
+  | "feedback"
+  | "fim"
+  | "sala"
+  | "codigo"
+  | "encerrada";
 
-interface Rodada {
-  tipo: "orgao" | "estrutura";
-  pontos: 100 | 200;
-  /** Resposta correta (pt-BR, como aparece nos botões). */
-  alvo: string;
-  opcoes: string[];
-  /** Só para tipo "orgao": caminho do GLB. */
-  modelo?: string;
-  /** Só para tipo "estrutura": marcador no espaço local do spinner. */
-  marcador?: [number, number, number];
-}
+/**
+ * Mesma forma nos dois modos: online, quem cria a sala sorteia as rodadas e o
+ * servidor as repassa ao outro. `alvo` é a resposta correta como aparece nos
+ * botões; `modelo` só no tipo "orgao"; `marcador` só no tipo "estrutura", no
+ * espaço local do spinner.
+ */
+type Rodada = RodadaOnline;
+
+const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "Apagar", "0", "Voltar"];
 
 /** Sorteia quando e se o bot acerta a rodada (fora do componente: o lint de
  *  pureza do React não aceita Math.random no escopo de render). */
@@ -186,6 +207,72 @@ function BotaoLousa({
       <Text3D size={size} color={cor} maxWidth={width}>
         {texto}
       </Text3D>
+    </group>
+  );
+}
+
+/**
+ * Telas do online (sala criada, partida encerrada). Mesma estrutura nos dois
+ * ambientes: `linhas` são textos de cima para baixo e `botoes` os alvos
+ * clicáveis. Na escola vai em giz na lousa; no hospital, no painel à direita.
+ */
+function TelaOnline({
+  hosp,
+  linhas,
+  botoes,
+}: {
+  hosp: boolean;
+  linhas: { texto: string; tamanho?: number; cor?: string }[];
+  botoes: { texto: string; onClick: () => void }[];
+}) {
+  return hosp ? (
+    <group position={HOSP_UI} rotation={HOSP_ROT}>
+      <Panel width={1.7} height={1.4} />
+      {linhas.map((l, i) => (
+        <Text3D
+          key={i}
+          position={[0, 0.5 - i * 0.2, 0.01]}
+          size={(l.tamanho ?? 1) * 0.07}
+          color={l.cor}
+          maxWidth={1.5}
+        >
+          {l.texto}
+        </Text3D>
+      ))}
+      {botoes.map((b, i) => (
+        <Button3D
+          key={b.texto}
+          label={b.texto}
+          width={1.2}
+          height={0.2}
+          position={[0, -0.3 - i * 0.26, 0.01]}
+          onClick={b.onClick}
+        />
+      ))}
+    </group>
+  ) : (
+    <group>
+      {linhas.map((l, i) => (
+        <Text3D
+          key={i}
+          position={[LOUSA_X, 0.17 - i * 0.1, LOUSA_Z]}
+          size={(l.tamanho ?? 1) * 0.042}
+          color={l.cor ?? "#f2f5ec"}
+          maxWidth={1.05}
+        >
+          {l.texto}
+        </Text3D>
+      ))}
+      {botoes.map((b, i) => (
+        <BotaoLousa
+          key={b.texto}
+          texto={b.texto}
+          position={[LOUSA_X, -0.3 - i * 0.1, LOUSA_Z]}
+          size={0.05}
+          width={0.8}
+          onClick={b.onClick}
+        />
+      ))}
     </group>
   );
 }
@@ -353,7 +440,13 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
   );
 }
 
-export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
+export function DueloGame({
+  ambiente = "escola",
+  online,
+}: {
+  ambiente?: Ambiente;
+  online: DueloOnline;
+}) {
   const hosp = ambiente === "hospital";
   // A laringe carrega já no menu (Suspense) — as rodadas de 200 pts saem
   // das estruturas nomeadas reais dela.
@@ -397,6 +490,30 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   const botPlano = useRef({ em: 99, acerta: false, respondeu: false });
   const rodada = rodadas[indice];
 
+  /* ---- duelo online ---- */
+  const [codigoDigitado, setCodigoDigitadoState] = useState("");
+  // Espelho síncrono, como `faseRef`: dois toques antes do re-render liam o
+  // código velho e o primeiro dígito sumia.
+  const codigoRef = useRef("");
+  const setCodigoDigitado = (novo: string) => {
+    codigoRef.current = novo;
+    setCodigoDigitadoState(novo);
+  };
+  /** Alternativa certa já enviada, esperando o veredito do servidor. */
+  const [enviado, setEnviado] = useState<string | null>(null);
+  const [outroConectado, setOutroConectado] = useState(true);
+  const [revanche, setRevanche] = useState({ eu: false, outro: false });
+  const [adversarioSaiu, setAdversarioSaiu] = useState(false);
+  /** Última sala recebida e o instante local em que chegou. */
+  const visaoRef = useRef<{ v: VisaoSala; recebidoEm: number } | null>(null);
+  const partidaVista = useRef(-1);
+  const indiceVisto = useRef(-1);
+  const eventoVisto = useRef(-1);
+  /** Quando a pergunta apareceu NESTE óculos: base do tempo de reação. */
+  const inicioLocal = useRef(0);
+  const emSala = online.sala !== null;
+  const nomeOponente = emSala ? "Adversário" : BOTS[dificuldade].nome.split(" (")[0];
+
   const comecar = (nivel: Dificuldade) => {
     setDificuldade(nivel);
     setRodadas(montarRodadas(estruturas));
@@ -417,9 +534,124 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     setTempoRestante(TEMPO_RODADA);
     setErroJogador(false);
     setErrados([]);
+    setEnviado(null);
     botPlano.current = planejarBot(BOTS[dificuldade]);
     setFase("rodada");
   };
+
+  const criarSala = () => {
+    online.limparErro();
+    setFase("sala");
+    online.criar(montarRodadas(estruturas));
+  };
+
+  const abrirTeclado = () => {
+    online.limparErro();
+    setCodigoDigitado("");
+    setFase("codigo");
+  };
+
+  const tecla = (valor: string) => {
+    if (valor === "Voltar") return voltarAoMenu();
+    const tinhaErro = online.erro !== null;
+    online.limparErro();
+    const atual = codigoRef.current;
+    if (valor === "Apagar") return setCodigoDigitado(atual.slice(0, -1));
+    if (online.conexao === "conectando") return;
+    if (atual.length >= 4) {
+      // Código recusado ainda no visor: um dígito novo começa outro código,
+      // em vez de só apagar o aviso e não fazer nada.
+      if (tinhaErro) setCodigoDigitado(valor);
+      return;
+    }
+    const novo = atual + valor;
+    setCodigoDigitado(novo);
+    // Entra sozinho no quarto dígito: no VR, cada clique a menos conta.
+    if (novo.length === 4) online.entrar(novo);
+  };
+
+  const voltarAoMenu = () => {
+    online.sair();
+    setCodigoDigitado("");
+    setAdversarioSaiu(false);
+    setFase("menu");
+  };
+
+  const pedirRevanche = () => {
+    if (revanche.eu) return;
+    setRevanche((r) => ({ ...r, eu: true }));
+    online.revanche(montarRodadas(estruturas));
+  };
+
+  // Online: cada atualização da sala vira os estados que a tela já usa na
+  // partida contra bot. Sons e humor do avatar só disparam quando o evento é
+  // novo (`seq`), para não repetir a cada atualização da mesma rodada.
+  useEffect(() => {
+    if (!online.sala) return;
+    partidaVista.current = -1;
+    indiceVisto.current = -1;
+    eventoVisto.current = -1;
+
+    return online.assinar((v, recebidoEm) => {
+      visaoRef.current = { v, recebidoEm };
+      if (v.partida !== partidaVista.current) {
+        partidaVista.current = v.partida;
+        setRodadas(v.rodadas);
+      }
+      setPontosJogador(v.eu.pontos);
+      setPontosBot(v.outro?.pontos ?? 0);
+      setOutroConectado(v.outro?.conectado ?? true);
+      setRevanche({ eu: v.eu.querRevanche, outro: v.outro?.querRevanche ?? false });
+      setAdversarioSaiu(v.saiu === "outro");
+
+      const nova: Fase = v.fase === "aguardando" ? "sala" : v.fase;
+      const anterior = faseRef.current;
+      const rodadaNova =
+        nova === "rodada" && (anterior !== "rodada" || v.indice !== indiceVisto.current);
+      indiceVisto.current = v.indice;
+      setIndice(v.indice);
+
+      if (nova === "contagem" && anterior !== "contagem") {
+        setContagem(Math.max(1, Math.ceil(v.restanteMs / 1000)));
+        setHumorBot("idle");
+        playTick();
+      }
+      if (rodadaNova) {
+        if (anterior === "contagem") playStart();
+        rodadaEncerrada.current = false;
+        travadoAte.current = 0;
+        inicioLocal.current = recebidoEm;
+        setTempoRestante(Math.ceil(v.restanteMs / 1000));
+        setErroJogador(false);
+        setErrados([]);
+        setEnviado(null);
+        setHumorBot("idle");
+      }
+      if (nova !== "rodada") rodadaEncerrada.current = true;
+
+      const ultimo = v.ultimo;
+      if (nova === "feedback" && ultimo && ultimo.seq !== eventoVisto.current) {
+        eventoVisto.current = ultimo.seq;
+        if (ultimo.tipo === "tempo") {
+          setFeedback(`Tempo esgotado — era: ${ultimo.alvo}`);
+          setHumorBot("idle");
+        } else if (ultimo.quem === "eu") {
+          playHit();
+          setFeedback(`Você pontuou! +${ultimo.pontos}`);
+          setHumorBot("erra");
+        } else {
+          playMiss();
+          setFeedback(`Adversário pontuou: ${ultimo.alvo}`);
+          setHumorBot("comemora");
+        }
+      }
+      if (nova === "fim" && anterior !== "fim") playEnd();
+      setFase(nova);
+    });
+    // `setFase` escreve no ref antes do estado; recriá-la a cada render não
+    // muda nada para a assinatura.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online.sala, online.assinar]);
 
   const encerrarRodada = (texto: string, humor: HumorOponente) => {
     rodadaEncerrada.current = true;
@@ -433,6 +665,29 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     if (faseRef.current !== "rodada" || rodadaEncerrada.current) return;
     if (relogio.current < travadoAte.current) return;
     if (errados.includes(opcao)) return;
+    if (emSala && opcao === rodada.alvo) {
+      // Online o ponto é do servidor: aqui só trava as alternativas e envia
+      // o tempo de reação medido neste óculos. O "Você pontuou!" vem com o
+      // veredito, porque o adversário pode ter reagido antes.
+      rodadaEncerrada.current = true;
+      setEnviado(opcao);
+      playTick();
+      const indiceDoClique = indice;
+      void online
+        .responder(indice, opcao, performance.now() - inicioLocal.current)
+        .then((resultado) => {
+          if (
+            resultado !== "certo" &&
+            faseRef.current === "rodada" &&
+            indiceVisto.current === indiceDoClique
+          ) {
+            // Falhou o envio: destrava para tentar de novo.
+            rodadaEncerrada.current = false;
+            setEnviado(null);
+          }
+        });
+      return;
+    }
     if (opcao === rodada.alvo) {
       playHit();
       setPontosJogador((p) => p + rodada.pontos);
@@ -458,6 +713,17 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       if (fase === "menu") {
         const i = "123".indexOf(k);
         if (i >= 0 && k) comecar(NIVEIS[i]);
+        else if (k === "4") criarSala();
+        else if (k === "5") abrirTeclado();
+        return;
+      }
+      if (fase === "codigo") {
+        if (/^\d$/.test(k)) tecla(k);
+        else if (k === "backspace") tecla("Apagar");
+        return;
+      }
+      if (fase === "fim" && k === "enter" && emSala) {
+        pedirRevanche();
         return;
       }
       if (fase === "rodada" && rodada) {
@@ -475,6 +741,31 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   // Cronômetro, contagem regressiva e o "raciocínio" do bot — tudo num
   // useFrame, empurrando para o React só quando um valor visível muda.
   useFrame((_, delta) => {
+    if (emSala) {
+      // Online o relógio é o do servidor: recalculado a cada quadro a partir
+      // do prazo recebido, não acumula erro nem congela com o óculos fora da
+      // cabeça. Nenhuma transição acontece aqui — quem muda a fase é a sala.
+      const atual = visaoRef.current;
+      const faseAgora = faseRef.current;
+      const duracaoMs =
+        faseAgora === "contagem" ? CONTAGEM_MS : faseAgora === "rodada" ? RODADA_MS : 0;
+      if (!atual || !duracaoMs) return;
+      relogio.current =
+        (duracaoMs - atual.v.restanteMs + (performance.now() - atual.recebidoEm)) / 1000;
+      if (faseAgora === "contagem") {
+        const restante = 3 - Math.floor(relogio.current);
+        if (restante !== contagem && restante > 0) {
+          setContagem(restante);
+          playTick();
+        }
+        return;
+      }
+      const restante = Math.max(0, Math.ceil(TEMPO_RODADA - relogio.current));
+      if (restante !== tempoRestante) setTempoRestante(restante);
+      if (erroJogador && relogio.current >= travadoAte.current) setErroJogador(false);
+      return;
+    }
+
     relogio.current += delta;
     const faseAgora = faseRef.current;
 
@@ -535,29 +826,173 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
 
   /* ----------------------------------------------------------- render */
 
+  const avisoConexao =
+    online.conexao === "reconectando"
+      ? "Reconectando…"
+      : emSala && !outroConectado
+        ? "Adversário desconectado…"
+        : null;
+
+  if (emSala && (online.conexao === "perdida" || fase === "encerrada")) {
+    return (
+      <TelaOnline
+        hosp={hosp}
+        linhas={[
+          { texto: "Partida encerrada", tamanho: 1.8 },
+          {
+            texto: adversarioSaiu
+              ? "O adversário saiu da partida."
+              : "A conexão com a partida caiu.",
+            cor: "#ffc9bd",
+          },
+        ]}
+        botoes={[{ texto: "Voltar ao menu", onClick: voltarAoMenu }]}
+      />
+    );
+  }
+
+  if (fase === "sala") {
+    const status = !online.sala
+      ? (online.erro ?? "Criando sala…")
+      : online.conexao === "conectado"
+        ? "Aguardando o adversário…"
+        : online.conexao === "reconectando"
+          ? "Reconectando…"
+          : "Conectando…";
+    return (
+      <TelaOnline
+        hosp={hosp}
+        linhas={
+          online.sala
+            ? [
+                { texto: "Código da sala" },
+                { texto: online.sala.split("").join(" "), tamanho: 3 },
+                {
+                  texto: "No outro óculos, toque em Entrar numa sala e digite este código",
+                  tamanho: 0.8,
+                  cor: "#cfe0cd",
+                },
+                { texto: status },
+              ]
+            : [{ texto: status, cor: online.erro ? "#ffc9bd" : undefined }]
+        }
+        botoes={[{ texto: online.erro ? "Voltar" : "Cancelar", onClick: voltarAoMenu }]}
+      />
+    );
+  }
+
+  if (fase === "codigo") {
+    const visor = (codigoDigitado + "____").slice(0, 4).split("").join(" ");
+    const aviso =
+      online.erro ?? (online.conexao === "conectando" ? "Entrando na sala…" : " ");
+    if (hosp) {
+      return (
+        <group position={HOSP_UI} rotation={HOSP_ROT}>
+          <Panel width={1.7} height={1.85} position={[0, -0.2, 0]} />
+          <Text3D position={[0, 0.6, 0.01]} size={0.065}>
+            Digite o código da sala
+          </Text3D>
+          <Text3D position={[0, 0.43, 0.01]} size={0.14} color="#7de8ff">
+            {visor}
+          </Text3D>
+          <Text3D
+            position={[0, 0.28, 0.01]}
+            size={0.05}
+            color={online.erro ? "#ffb0a0" : ARENA_COLORS.muted}
+            maxWidth={1.5}
+          >
+            {aviso}
+          </Text3D>
+          {TECLAS.map((t, i) => (
+            <Button3D
+              key={t}
+              label={t}
+              width={t.length > 1 ? 0.46 : 0.4}
+              height={0.2}
+              position={[((i % 3) - 1) * 0.5, 0.1 - Math.floor(i / 3) * 0.26, 0.01]}
+              color={t === "Voltar" ? "#5c6b7a" : ARENA_COLORS.primary}
+              onClick={() => tecla(t)}
+            />
+          ))}
+        </group>
+      );
+    }
+    return (
+      <group>
+        <Text3D position={[LOUSA_X, 0.2, LOUSA_Z]} size={0.04} color="#cfe0cd">
+          Digite o código da sala
+        </Text3D>
+        <Text3D position={[LOUSA_X, 0.11, LOUSA_Z]} size={0.09} color="#f2f5ec">
+          {visor}
+        </Text3D>
+        <Text3D
+          position={[LOUSA_X, 0.035, LOUSA_Z]}
+          size={0.03}
+          color={online.erro ? "#ffc9bd" : "#cfe0cd"}
+          maxWidth={1.05}
+        >
+          {aviso}
+        </Text3D>
+        {TECLAS.map((t, i) => (
+          <BotaoLousa
+            key={t}
+            texto={t}
+            position={[
+              LOUSA_X + ((i % 3) - 1) * 0.24,
+              -0.06 - Math.floor(i / 3) * 0.11,
+              LOUSA_Z,
+            ]}
+            size={t.length > 1 ? 0.042 : 0.075}
+            width={0.22}
+            cor={t === "Voltar" ? "#cfe0cd" : "#f2f5ec"}
+            onClick={() => tecla(t)}
+          />
+        ))}
+      </group>
+    );
+  }
+
   if (fase === "menu") {
     if (hosp) {
       return (
         <group position={HOSP_UI} rotation={HOSP_ROT}>
-          <Panel width={1.7} height={1.4}>
-            <Text3D position={[0, 0.5, 0.01]} size={0.14}>
-              Duelo 1×1
-            </Text3D>
-            <Text3D position={[0, 0.28, 0.01]} size={0.055} color={ARENA_COLORS.muted} maxWidth={1.5}>
-              Identifique órgãos (100 pts) e estruturas (200 pts) antes do oponente
-            </Text3D>
-            {(Object.keys(BOTS) as Dificuldade[]).map((nivel, i) => (
-              <Button3D
-                key={nivel}
-                label={BOTS[nivel].nome}
-                width={1.4}
-                height={0.22}
-                position={[0, -0.02 - i * 0.28, 0.01]}
-                color={nivel === "especialista" ? ARENA_COLORS.danger : ARENA_COLORS.primary}
-                onClick={() => comecar(nivel)}
-              />
-            ))}
-          </Panel>
+          <Panel width={1.7} height={1.85} position={[0, -0.2, 0]} />
+          <Text3D position={[0, 0.5, 0.01]} size={0.14}>
+            Duelo 1×1
+          </Text3D>
+          <Text3D position={[0, 0.28, 0.01]} size={0.055} color={ARENA_COLORS.muted} maxWidth={1.5}>
+            Identifique órgãos (100 pts) e estruturas (200 pts) antes do oponente
+          </Text3D>
+          {(Object.keys(BOTS) as Dificuldade[]).map((nivel, i) => (
+            <Button3D
+              key={nivel}
+              label={BOTS[nivel].nome}
+              width={1.4}
+              height={0.22}
+              position={[0, -0.02 - i * 0.28, 0.01]}
+              color={nivel === "especialista" ? ARENA_COLORS.danger : ARENA_COLORS.primary}
+              onClick={() => comecar(nivel)}
+            />
+          ))}
+          <Text3D position={[0, -0.77, 0.01]} size={0.05} color={ARENA_COLORS.muted}>
+            Contra um amigo, cada um no seu óculos:
+          </Text3D>
+          <Button3D
+            label="Criar sala"
+            width={0.72}
+            height={0.2}
+            position={[-0.39, -0.97, 0.01]}
+            color={ARENA_COLORS.success}
+            onClick={criarSala}
+          />
+          <Button3D
+            label="Entrar numa sala"
+            width={0.72}
+            height={0.2}
+            position={[0.39, -0.97, 0.01]}
+            color={ARENA_COLORS.success}
+            onClick={abrirTeclado}
+          />
         </group>
       );
     }
@@ -585,9 +1020,25 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
             onClick={() => comecar(nivel)}
           />
         ))}
-        <Text3D position={[LOUSA_X, -0.42, LOUSA_Z]} size={0.042} color="#cfe0cd">
-          Online em breve — hoje você joga contra um bot
+        <Text3D position={[LOUSA_X, -0.345, LOUSA_Z]} size={0.028} color="#cfe0cd">
+          Contra um amigo, cada um no seu óculos:
         </Text3D>
+        <BotaoLousa
+          texto="Criar sala"
+          position={[LOUSA_X - 0.27, -0.425, LOUSA_Z]}
+          cor="#bfe8cf"
+          size={0.05}
+          width={0.5}
+          onClick={criarSala}
+        />
+        <BotaoLousa
+          texto="Entrar numa sala"
+          position={[LOUSA_X + 0.27, -0.425, LOUSA_Z]}
+          cor="#bfe8cf"
+          size={0.05}
+          width={0.5}
+          onClick={abrirTeclado}
+        />
       </group>
     );
   }
@@ -614,34 +1065,58 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
   if (fase === "fim") {
     const venceu = pontosJogador > pontosBot;
     const empate = pontosJogador === pontosBot;
+    const titulo = venceu
+      ? "Você venceu!"
+      : empate
+        ? "Empate!"
+        : emSala
+          ? "Adversário venceu"
+          : "O bot venceu";
+    // Online: "de novo" é revanche (só começa quando os dois pedem) e o
+    // segundo botão sai da sala. Contra bot, fica como era.
+    const rotuloDeNovo = !emSala
+      ? "Jogar de novo"
+      : revanche.eu
+        ? "Aguardando o adversário…"
+        : revanche.outro
+          ? "Aceitar revanche"
+          : "Revanche";
+    const deNovo = emSala ? pedirRevanche : () => comecar(dificuldade);
+    const rotuloSegundo = emSala ? "Sair do duelo" : "Trocar dificuldade";
+    const segundo = emSala ? voltarAoMenu : () => setFase("menu");
     if (hosp) {
       return (
         <group position={HOSP_UI} rotation={HOSP_ROT}>
+          {avisoConexao && (
+            <Text3D position={[0, 0.7, 0.01]} size={0.05} color="#ffb0a0">
+              {avisoConexao}
+            </Text3D>
+          )}
           <Panel width={1.7} height={1.2}>
             <Text3D
               position={[0, 0.38, 0.01]}
               size={0.15}
               color={venceu ? ARENA_COLORS.success : empate ? ARENA_COLORS.primary : ARENA_COLORS.danger}
             >
-              {venceu ? "Você venceu!" : empate ? "Empate!" : "O bot venceu"}
+              {titulo}
             </Text3D>
             <Text3D position={[0, 0.12, 0.01]} size={0.085}>
-              {`Você ${pontosJogador} × ${pontosBot} ${BOTS[dificuldade].nome.split(" (")[0]}`}
+              {`Você ${pontosJogador} × ${pontosBot} ${nomeOponente}`}
             </Text3D>
             <Button3D
-              label="Jogar de novo"
+              label={rotuloDeNovo}
               width={1.3}
               height={0.22}
               position={[0, -0.16, 0.01]}
               color={ARENA_COLORS.success}
-              onClick={() => comecar(dificuldade)}
+              onClick={deNovo}
             />
             <Button3D
-              label="Trocar dificuldade"
+              label={rotuloSegundo}
               width={1.3}
               height={0.2}
               position={[0, -0.44, 0.01]}
-              onClick={() => setFase("menu")}
+              onClick={segundo}
             />
           </Panel>
         </group>
@@ -649,30 +1124,35 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
     }
     return (
       <group>
+        {avisoConexao && (
+          <Text3D position={[LOUSA_X, 0.235, LOUSA_Z]} size={0.028} color="#ffc9bd">
+            {avisoConexao}
+          </Text3D>
+        )}
         <Text3D
           position={[LOUSA_X, 0.12, LOUSA_Z]}
           size={0.1}
           color={venceu ? "#bfe8cf" : empate ? "#f2f5ec" : "#ffc9bd"}
         >
-          {venceu ? "Você venceu!" : empate ? "Empate!" : "O bot venceu"}
+          {titulo}
         </Text3D>
         <Text3D position={[LOUSA_X, -0.02, LOUSA_Z]} size={0.055} color="#f2f5ec">
-          {`Você ${pontosJogador} × ${pontosBot} ${BOTS[dificuldade].nome.split(" (")[0]}`}
+          {`Você ${pontosJogador} × ${pontosBot} ${nomeOponente}`}
         </Text3D>
         <BotaoLousa
-          texto="Jogar de novo"
+          texto={rotuloDeNovo}
           position={[LOUSA_X, -0.17, LOUSA_Z]}
           cor="#bfe8cf"
           size={0.065}
           width={1.1}
-          onClick={() => comecar(dificuldade)}
+          onClick={deNovo}
         />
         <BotaoLousa
-          texto="Trocar dificuldade"
+          texto={rotuloSegundo}
           position={[LOUSA_X, -0.31, LOUSA_Z]}
           size={0.055}
           width={1.1}
-          onClick={() => setFase("menu")}
+          onClick={segundo}
         />
       </group>
     );
@@ -704,6 +1184,11 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       {hosp ? (
         <group position={HOSP_UI} rotation={HOSP_ROT}>
           <Panel width={1.7} height={1.45} position={[0, -0.05, 0]}>
+            {avisoConexao && (
+              <Text3D position={[0, 0.8, 0.01]} size={0.05} color="#ffb0a0">
+                {avisoConexao}
+              </Text3D>
+            )}
             <Text3D position={[-0.55, 0.55, 0.01]} size={0.06} color="#bfe8cf">
               {`Você: ${pontosJogador}`}
             </Text3D>
@@ -733,7 +1218,13 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
                     width={1.55}
                     height={0.18}
                     position={[0, 0.1 - i * 0.22, 0.01]}
-                    color={erroJogador || errados.includes(opcao) ? "#5c6b7a" : ARENA_COLORS.primary}
+                    color={
+                      enviado === opcao
+                        ? ARENA_COLORS.success
+                        : erroJogador || errados.includes(opcao)
+                          ? "#5c6b7a"
+                          : ARENA_COLORS.primary
+                    }
                     onClick={() => responder(opcao)}
                   />
                 ))}
@@ -752,6 +1243,11 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
         </group>
       ) : (
         <>
+          {avisoConexao && (
+            <Text3D position={[LOUSA_X, 0.245, LOUSA_Z]} size={0.028} color="#ffc9bd">
+              {avisoConexao}
+            </Text3D>
+          )}
           <Text3D position={[LOUSA_X - 0.38, 0.2, LOUSA_Z]} size={0.04} color="#bfe8cf">
             {`Você: ${pontosJogador}`}
           </Text3D>
@@ -785,7 +1281,13 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
                   key={opcao}
                   texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
                   position={[LOUSA_X, -0.09 - i * 0.1, LOUSA_Z]}
-                  cor={erroJogador || errados.includes(opcao) ? "#8fae94" : "#f8fbef"}
+                  cor={
+                    enviado === opcao
+                      ? "#bfe8cf"
+                      : erroJogador || errados.includes(opcao)
+                        ? "#8fae94"
+                        : "#f8fbef"
+                  }
                   size={0.052}
                   width={1.1}
                   onClick={() => responder(opcao)}
@@ -829,7 +1331,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       {hosp ? (
         <Oponente
           humor={humorBot}
-          nome={BOTS[dificuldade].nome.split(" (")[0]}
+          nome={nomeOponente}
           pontos={pontosBot}
           position={[-0.45, -1.3, -1.9]}
           // O corpo é modelado de frente para +z; o jogador está em +z.
@@ -838,7 +1340,7 @@ export function DueloGame({ ambiente = "escola" }: { ambiente?: Ambiente }) {
       ) : (
         <Oponente
           humor={humorBot}
-          nome={BOTS[dificuldade].nome.split(" (")[0]}
+          nome={nomeOponente}
           pontos={pontosBot}
           position={[-0.81, -1.54, 1.07]}
           rotationY={Math.PI}
