@@ -22,29 +22,33 @@ import type { OrganCategory, OrganDefinition } from "@/types";
  * corpo inteiro da miologia, porque o visualizador normaliza todo modelo para
  * um cubo de 2 unidades e a diferença de tamanho entre as estruturas se perdia.
  *
- * A escala real não sai dos arquivos. Medindo a caixa delimitadora crua dos
- * 18 `.glb` (maior eixo, via `scripts/check-bounds.mjs`), as unidades não batem
- * entre si:
+ * A escala real não sai dos arquivos. Só os seis sistemas estão em metros; os
+ * outros doze vêm em unidades arbitrárias (o Sketchfab e o ZBrush reescalam na
+ * exportação) — inclusive os que parecem milímetros: a laringe dá ~1,1 mm por
+ * unidade, a orelha interna ~2,1 mm. A escala tem de ser declarada, e fica
+ * declarada aqui, em um lugar só, visível e corrigível.
  *
- *   sistemas (6)        1,696 a 1,700   → metros, corpo de 1,70 m
- *   inner_ear              17,52        → milímetros
- *   larynx                 78,48        → milímetros
- *   larynx_muscles         63,07        → milímetros
- *   parapharyngeal        144,26        → milímetros
- *   coracao                 9,19        → nem metro nem milímetro
- *   rim                     4,65        → nem metro nem milímetro
- *   pharynx                 2,17        → nem metro nem milímetro
- *   figado saudável         1,23  ·  figado patológico  0,70  → nem entre si
+ * **O que o número mede, exatamente:** o comprimento real, em cm, do que ocupa
+ * o MAIOR eixo da caixa do arquivo INTEIRO — todas as malhas, vértice a
+ * vértice. `normalizeContent` põe esse eixo em 2 unidades e o visualizador o
+ * devolve a `tamanhoRealCm`. Não é "o tamanho do órgão" do livro: o arquivo do
+ * coração traz o arco da aorta, então o maior eixo vai do ápice à ponta dos
+ * ramos do arco, e é esse vão que tem de medir o valor real. A primeira versão
+ * usou o tamanho do órgão isolado e deixou quase tudo 20 a 40% pequeno (o
+ * pulmão com tamanho de criança, o estômago com 4 cm).
  *
- * Nenhum arquivo declara a unidade que usa, e o fígado saudável e o patológico
- * discordam entre si. Não há como derivar do arquivo; a escala tem de ser
- * declarada, e fica declarada aqui, em um lugar só, visível e corrigível.
+ * **Como foram obtidos:** para cada arquivo, o conteúdo foi identificado em
+ * vistas ortográficas; pelo menos dois marcos anatômicos independentes foram
+ * medidos em unidades cruas (ex.: largura e comprimento base-ápice do
+ * coração) e comparados a valores de adulto da literatura (Gray's Anatomy,
+ * StatPearls, estudos morfométricos), cada um dando um fator cm/unidade; os
+ * fatores tinham de concordar, e o resultado passou por duas conferências
+ * independentes. O comentário de cada entrada diz o que o maior eixo cobre:
+ * se alguém recortar o arquivo (tirar o ureter do rim, a traqueia do pulmão),
+ * o número tem de ser refeito.
  *
- * **O que estes números são:** a maior dimensão da estrutura no adulto, em
- * centímetros, em valor de referência de literatura anatômica, usada só para
- * dimensionar o modelo em AR e VR. Nos seis sistemas o número apenas concorda
- * com o que o arquivo já trazia (1,70 m); nas quatro regiões em milímetros,
- * idem.
+ * **O que estes números são:** valores de referência de anatomia adulta,
+ * usados só para dimensionar o modelo em AR e VR.
  *
  * **O que estes números NÃO são:** medição de nenhum caso, dado de pesquisa,
  * nem afirmação sobre o caso de origem do modelo. Eles não entram em métrica
@@ -65,7 +69,8 @@ export const ORGANS: OrganDefinition[] = [
     pathologicalPath: "/models/pathological/coracao.glb",
     pathologyName: "Hipertrofia ventricular",
     blurb: "Bomba muscular com quatro câmaras e o sistema valvar.",
-    tamanhoRealCm: 12,
+    // Ápice → ponta dos ramos do arco aórtico (coração com os vasos da base).
+    tamanhoRealCm: 14,
   },
   {
     id: "pulmao",
@@ -76,7 +81,8 @@ export const ORGANS: OrganDefinition[] = [
     pathologicalPath: "/models/pathological/pulmao.glb",
     pathologyName: "Enfisema pulmonar",
     blurb: "Órgão das trocas gasosas, da traqueia aos alvéolos.",
-    tamanhoRealCm: 30,
+    // Base do pulmão → topo da via aérea: os dois pulmões + laringe e traqueia.
+    tamanhoRealCm: 42,
   },
   {
     id: "figado",
@@ -87,7 +93,8 @@ export const ORGANS: OrganDefinition[] = [
     pathologicalPath: "/models/pathological/figado.glb",
     pathologyName: "Cirrose hepática",
     blurb: "Maior glândula do corpo, central no metabolismo.",
-    tamanhoRealCm: 22,
+    // Diâmetro anteroposterior do fígado inteiro, com os ligamentos.
+    tamanhoRealCm: 21.5,
   },
   {
     id: "cerebro",
@@ -96,6 +103,7 @@ export const ORGANS: OrganDefinition[] = [
     category: "nervoso",
     modelPath: "/models/healthy/cerebro.glb",
     blurb: "Centro de processamento do sistema nervoso.",
+    // Polo frontal → polo occipital.
     tamanhoRealCm: 17,
   },
   {
@@ -105,7 +113,8 @@ export const ORGANS: OrganDefinition[] = [
     category: "urinario",
     modelPath: "/models/healthy/rim.glb",
     blurb: "Filtragem do sangue e regulação hidroeletrolítica.",
-    tamanhoRealCm: 11,
+    // Ápice da suprarrenal → corte do ureter (rim com suprarrenal, vasos e ureter).
+    tamanhoRealCm: 15,
   },
   {
     id: "estomago",
@@ -114,7 +123,8 @@ export const ORGANS: OrganDefinition[] = [
     category: "digestorio",
     modelPath: "/models/healthy/estomago.glb",
     blurb: "Reservatório muscular da digestão inicial.",
-    tamanhoRealCm: 25,
+    // Boca → reto: apesar do nome, o arquivo traz o trato digestório inteiro.
+    tamanhoRealCm: 70,
   },
 ];
 
@@ -134,6 +144,8 @@ export const SYSTEMS: OrganDefinition[] = [
     layerBy: "material",
     modelPath: "/models/systems/myology.glb",
     blurb: "Sistema muscular completo, em corpo inteiro.",
+    // Estatura, sola → topo da cabeça. Os seis sistemas vêm em metros e em
+    // pé; o valor só confirma o que o arquivo já traz.
     tamanhoRealCm: 170,
   },
   {
@@ -197,42 +209,48 @@ export const REGIONS: OrganDefinition[] = [
     name: "Laringe",
     modelPath: "/models/organs/larynx.glb",
     blurb: "Cartilagens, membranas e ligamentos da laringe.",
-    tamanhoRealCm: 8,
+    // Corno maior do hioide → coto de traqueia abaixo da cricoide.
+    tamanhoRealCm: 8.8,
   },
   {
     id: "larynx_muscles",
     name: "Laringe — músculos e ligamentos",
     modelPath: "/models/organs/larynx_muscles.glb",
     blurb: "Laringe com a musculatura e os ligamentos associados.",
-    tamanhoRealCm: 6,
+    // Ápice da epiglote → coto de traqueia.
+    tamanhoRealCm: 9,
   },
   {
     id: "pharynx",
     name: "Faringe e assoalho da boca",
     modelPath: "/models/organs/pharynx.glb",
     blurb: "Faringe, musculatura suprahióidea e assoalho bucal.",
-    tamanhoRealCm: 15,
+    // Escama do temporal → manúbrio (hemissecção de cabeça e pescoço).
+    tamanhoRealCm: 23.5,
   },
   {
     id: "parapharyngeal",
     name: "Espaço parafaríngeo",
     modelPath: "/models/organs/parapharyngeal.glb",
     blurb: "Espaço parafaríngeo e suas relações anatômicas.",
-    tamanhoRealCm: 14,
+    // Occipital (lambda) → abertura piriforme: hemicabeça, eixo anteroposterior.
+    tamanhoRealCm: 17.5,
   },
   {
     id: "inner_ear",
     name: "Orelha interna",
     modelPath: "/models/organs/inner_ear.glb",
     blurb: "Cóclea, vestíbulo e canais semicirculares.",
-    tamanhoRealCm: 2,
+    // Plano-bússola de orientação → nervos; inclui a orelha média.
+    tamanhoRealCm: 3.7,
   },
   {
     id: "pelvis_ligaments",
     name: "Ligamentos da pelve feminina",
     modelPath: "/models/organs/pelvis_ligaments.glb",
     blurb: "Ligamentos e estruturas de sustentação da pelve feminina.",
-    tamanhoRealCm: 28,
+    // Ponta a ponta dos cotos dos fêmures (entre as cristas ilíacas, ~29 cm).
+    tamanhoRealCm: 37,
   },
 ];
 

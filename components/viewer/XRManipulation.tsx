@@ -29,8 +29,13 @@ export const SPIN_SPEED = 3.2;
 export const PITCH_SPEED = 2.4;
 /** Aproximar/afastar pelo analógico (m/s com o eixo no máximo). */
 const APPROACH_SPEED = 1.3;
-/** Distância cabeça→órgão permitida (m): nem dentro do rosto, nem longe demais. */
-const MIN_HEAD_DISTANCE = 0.45;
+/**
+ * Distância cabeça→órgão permitida (m): nem dentro do rosto, nem longe demais.
+ * O mínimo acompanha o vão mínimo de nascimento (`FLUTUANTE_VAO_MIN`): acima
+ * dele, o primeiro toque no analógico empurraria para longe um órgão que
+ * acabou de nascer mais perto.
+ */
+const MIN_HEAD_DISTANCE = 0.28;
 const MAX_HEAD_DISTANCE = 5;
 
 // Reutilizados a cada quadro para não alocar vetores a 72–90 Hz.
@@ -311,10 +316,13 @@ export function XRManipulation({
       const distance = direction.length() || 1;
       direction.normalize();
       // yAxis é negativo com o analógico para frente → aproxima.
+      // Os limites só impedem de passar deles; não empurram. Quem já está mais
+      // perto que o mínimo (inclinou a cabeça para a frente) e mexe o
+      // analógico não vê o órgão pular para longe.
       const next = THREE.MathUtils.clamp(
         distance + approach * delta * APPROACH_SPEED,
-        MIN_HEAD_DISTANCE,
-        MAX_HEAD_DISTANCE,
+        Math.min(MIN_HEAD_DISTANCE, distance),
+        Math.max(MAX_HEAD_DISTANCE, distance),
       );
       model.position.copy(head).addScaledVector(direction, next);
     }
@@ -342,14 +350,34 @@ const ALTURA_PARA_APOIAR_NO_CHAO = 1.0;
  * desce um pouco, como quem observa algo na mão.
  */
 const ABAIXO_DOS_OLHOS = 0.05;
-/** Distância do modelo flutuante: proporcional ao tamanho, com piso e teto. */
-const FLUTUANTE_DISTANCIA_POR_ALTURA = 2.2;
-const FLUTUANTE_DISTANCIA_MIN = 0.45;
-const FLUTUANTE_DISTANCIA_MAX = 1.1;
-/** Distância do modelo apoiado: longe o bastante para caber no campo de visão. */
-const CHAO_DISTANCIA_POR_ALTURA = 1.3;
-const CHAO_DISTANCIA_MIN = 1.2;
-const CHAO_DISTANCIA_MAX = 2.5;
+/*
+ * DISTÂNCIA DE NASCIMENTO
+ *
+ * Medida como VÃO: dos olhos até a face do modelo voltada para eles, e não até
+ * o centro. A regra antiga olhava só a altura e ignorava a profundidade — um
+ * fígado fundo nascia com a face mais perto que um coração raso — e deixava
+ * tudo longe demais (coração a 45 cm, corpo inteiro a 2,2 m). O centro fica em
+ * `profundidade/2 + vão`.
+ */
+/**
+ * Vão mínimo do modelo flutuante (m): a distância de quem lê o celular na mão.
+ * Abaixo disso o conflito vergência-acomodação cansa (o foco das lentes é
+ * fixo) e, girando o modelo, a superfície chegaria perto do plano near (0,1 m).
+ */
+const FLUTUANTE_VAO_MIN = 0.28;
+/**
+ * Vão por metro do maior eixo do modelo flutuante. Com 0,8 o maior eixo ocupa
+ * ~64° do campo de visão do Quest 3 (~110° × 96°): cabe inteiro sem mexer a
+ * cabeça. É o que manda nos grandes (pulmão, estômago).
+ */
+const FLUTUANTE_VAO_POR_MAIOR_EIXO = 0.8;
+/**
+ * Vão do modelo apoiado por metro de desnível entre os olhos e o ponto mais
+ * distante na vertical (os pés, ou o topo para quem está com os olhos baixos).
+ * Com 1,0 esse ponto fica a 45° do olhar, dentro dos ~48° do Quest 3. Se no
+ * headset sobrar folga nos pés, 0,9 aproxima mais (48°).
+ */
+const CHAO_VAO_POR_DESNIVEL = 1.0;
 /**
  * Quadros de tolerância esperando o rastreio reportar a cabeça. Passado esse
  * limite o modelo é colocado assim mesmo, supondo alguém de pé olhando para a
@@ -376,7 +404,7 @@ const ACOMODACAO_S = 0.75;
  * do Turbopack e o do navegador do Quest já serviram código velho mais de uma
  * vez neste projeto. Aumente o número a cada mudança nesta seção.
  */
-export const VERSAO_POSE = "pose-4";
+export const VERSAO_POSE = "pose-5";
 
 /**
  * O que a última colocação decidiu, para o painel `?debug=xr` ler.
@@ -390,6 +418,8 @@ export const diagnosticoPose = {
   posesEstimadasDescartadas: 0,
   olhosAcimaDoChao: NaN,
   alturaModelo: NaN,
+  /** Maior eixo em metros: a mesma grandeza de `tamanhoRealCm` no catálogo. */
+  maiorEixo: NaN,
   distancia: NaN,
   apoiado: false,
   /** O objeto posicionado, para o painel medir a altura dele ao vivo. */
@@ -461,7 +491,15 @@ function poseDaCabeca(
   const origem = camera.parent;
   if (!origem) return null;
 
-  const cabeca = camera.getWorldPosition(TMP_CABECA);
+  // A posição vem da pose do VIEWER (o ponto entre os olhos), não da câmera:
+  // durante o `useFrame` o three ainda deixou na câmera de XR a pose do olho
+  // esquerdo, ~3 cm ao lado. A 30 cm isso tirava o órgão ~6° do centro. A
+  // pose do viewer está no espaço de referência, que é o da origem.
+  const p = viewer.transform.position;
+  origem.updateWorldMatrix(true, false);
+  const cabeca = TMP_CABECA.set(p.x, p.y, p.z).applyMatrix4(origem.matrixWorld);
+  // A direção pode continuar vindo da câmera: os dois olhos olham para o
+  // mesmo lado.
   const frente = camera.getWorldDirection(TMP_FRENTE);
   frente.y = 0;
   // Olhando quase reto para cima ou para baixo: sem direção horizontal
@@ -473,6 +511,28 @@ function poseDaCabeca(
 }
 
 /**
+ * Tamanho do modelo EM PÉ, em metros de mundo, com a escala real já aplicada.
+ * `null` enquanto a caixa estiver vazia (geometria ainda não montada).
+ *
+ * Zera a rotação ANTES de medir. A altura que decide entre flutuar e apoiar é
+ * a do modelo em pé; um modelo tombado no 2D (pelo gizmo de rotação, que não é
+ * prop e atravessa a entrada na sessão) ou girado pelas mãos antes de um reset
+ * mediria outra coisa. A rotação final é reaplicada por `colocarAFrente`.
+ *
+ * Vértice a vértice, como `normalizeContent`: a caixa rápida incha em arquivo
+ * com nó girado (o rim) e o painel mostraria um tamanho diferente do catálogo.
+ * Numa passada pelos vértices um corpo inteiro custa alguns milissegundos, então
+ * a medida é tirada UMA vez por montagem de `EntradaXR` e reaproveitada.
+ */
+function medirEmPe(model: THREE.Object3D): THREE.Vector3 | null {
+  model.rotation.set(0, 0, 0);
+  const tamanho = new THREE.Box3()
+    .setFromObject(model, true)
+    .getSize(new THREE.Vector3());
+  return Number.isFinite(tamanho.y) && tamanho.y > 0 ? tamanho : null;
+}
+
+/**
  * Coloca o modelo à frente da cabeça: flutuando na linha dos olhos se for
  * pequeno, apoiado no chão se for do tamanho de uma pessoa, e virado de frente
  * para quem olha.
@@ -481,29 +541,23 @@ function poseDaCabeca(
  * continua recebendo o modelo à frente e na altura certa — com a direção crua
  * ele seria enterrado no piso.
  */
-function colocarAFrente(model: THREE.Object3D, pose: PoseDaCabeca): boolean {
-  // Zera a rotação ANTES de medir. A altura que decide entre flutuar e apoiar
-  // é a do modelo em pé; um modelo tombado no 2D (pelo gizmo de rotação, que
-  // não é prop e atravessa a entrada na sessão) ou girado pelas mãos antes de
-  // um reset mediria outra coisa. A rotação final é reaplicada logo abaixo.
-  model.rotation.set(0, 0, 0);
-  // A altura é MEDIDA no objeto como ele está, com a escala real já aplicada.
-  const caixa = new THREE.Box3().setFromObject(model);
-  const alturaReal = caixa.max.y - caixa.min.y;
-  if (!Number.isFinite(alturaReal) || alturaReal <= 0) return false;
-
+function colocarAFrente(
+  model: THREE.Object3D,
+  pose: PoseDaCabeca,
+  tamanho: THREE.Vector3,
+): void {
+  const alturaReal = tamanho.y;
+  const olhos = pose.cabeca.y - pose.chaoY;
   const apoiado = alturaReal >= ALTURA_PARA_APOIAR_NO_CHAO;
-  const distancia = apoiado
-    ? THREE.MathUtils.clamp(
-        alturaReal * CHAO_DISTANCIA_POR_ALTURA,
-        CHAO_DISTANCIA_MIN,
-        CHAO_DISTANCIA_MAX,
-      )
-    : THREE.MathUtils.clamp(
-        alturaReal * FLUTUANTE_DISTANCIA_POR_ALTURA,
-        FLUTUANTE_DISTANCIA_MIN,
-        FLUTUANTE_DISTANCIA_MAX,
+  const vao = apoiado
+    ? Math.max(olhos, alturaReal - olhos) * CHAO_VAO_POR_DESNIVEL
+    : Math.max(
+        FLUTUANTE_VAO_MIN,
+        Math.max(tamanho.x, tamanho.y, tamanho.z) * FLUTUANTE_VAO_POR_MAIOR_EIXO,
       );
+  // O modelo nasce virado para a cabeça, então a profundidade dele no olhar é
+  // o eixo Z medido em pé.
+  const distancia = tamanho.z / 2 + vao;
 
   const alvo = pose.cabeca.clone().addScaledVector(pose.frente, distancia);
   // O modelo é normalizado com o centro na origem do grupo, então apoiar no
@@ -512,8 +566,9 @@ function colocarAFrente(model: THREE.Object3D, pose: PoseDaCabeca): boolean {
     ? pose.chaoY + alturaReal / 2
     : pose.cabeca.y - ABAIXO_DOS_OLHOS;
 
-  diagnosticoPose.olhosAcimaDoChao = pose.cabeca.y - pose.chaoY;
+  diagnosticoPose.olhosAcimaDoChao = olhos;
   diagnosticoPose.alturaModelo = alturaReal;
+  diagnosticoPose.maiorEixo = Math.max(tamanho.x, tamanho.y, tamanho.z);
   diagnosticoPose.distancia = distancia;
   diagnosticoPose.apoiado = apoiado;
   diagnosticoPose.modelo = model;
@@ -523,7 +578,6 @@ function colocarAFrente(model: THREE.Object3D, pose: PoseDaCabeca): boolean {
   // O +Z do modelo aponta de volta para a cabeça: a pessoa começa vendo a
   // frente do órgão, não as costas.
   model.rotation.set(0, Math.atan2(-pose.frente.x, -pose.frente.z), 0);
-  return true;
 }
 
 /** Pose suposta para quando o rastreio nunca responde: de pé, olhando para −Z. */
@@ -542,9 +596,12 @@ function poseSuposta(gl: THREE.WebGLRenderer): PoseDaCabeca {
 /** Coloca o modelo uma vez, no início da sessão, e avisa quando terminou. */
 function PoseDeEntrada({
   target,
+  tamanho,
   onPronto,
 }: {
   target: RefObject<THREE.Group | null>;
+  /** Tamanho em pé, medido uma vez e compartilhado com o reset do A/X. */
+  tamanho: RefObject<THREE.Vector3 | null>;
   onPronto: () => void;
 }) {
   const quadros = useRef(0);
@@ -562,11 +619,14 @@ function PoseDeEntrada({
       feito.current = true;
       onPronto();
     };
+    tamanho.current ??= medirEmPe(model);
+    const medida = tamanho.current;
 
     // Com pose real: recoloca a cada quadro durante a acomodação, e só então
     // para. A última colocação é a que fica.
     const real = poseDaCabeca(state.gl, frame);
-    if (real && colocarAFrente(model, real)) {
+    if (real && medida) {
+      colocarAFrente(model, real, medida);
       diagnosticoPose.fonte = "real";
       const agora = state.clock.elapsedTime;
       primeiraReal.current ??= agora;
@@ -583,14 +643,16 @@ function PoseDeEntrada({
     // Nunca veio pose real. Depois da espera, a estimativa do headset ainda é
     // melhor que uma altura inventada; sem nem ela, supõe alguém de pé.
     if (quadros.current > QUADROS_DE_ESPERA) {
-      const estimada = poseDaCabeca(state.gl, frame, true);
-      const colocou = estimada
-        ? colocarAFrente(model, estimada)
-        : colocarAFrente(model, poseSuposta(state.gl));
-      diagnosticoPose.fonte = estimada ? "estimada" : "suposta";
-      // Mesmo sem conseguir colocar (caixa ainda vazia), libera a manipulação
-      // depois de um tempo: travar o controle seria pior que o lugar errado.
-      if (colocou || quadros.current > QUADROS_DE_ESPERA * 2) encerrar();
+      if (medida) {
+        const estimada = poseDaCabeca(state.gl, frame, true);
+        colocarAFrente(model, estimada ?? poseSuposta(state.gl), medida);
+        diagnosticoPose.fonte = estimada ? "estimada" : "suposta";
+        encerrar();
+      } else if (quadros.current > QUADROS_DE_ESPERA * 2) {
+        // Caixa ainda vazia: libera a manipulação assim mesmo. Travar o
+        // controle seria pior que o lugar errado.
+        encerrar();
+      }
     }
   });
 
@@ -617,21 +679,35 @@ export function EntradaXR({
   target: RefObject<THREE.Group | null>;
 }) {
   const [posicionado, setPosicionado] = useState(false);
+  // Uma medida por montagem. O tamanho em pé não muda na sessão: o reset
+  // devolve a escala inicial antes de colocar, e este componente remonta a
+  // cada modelo e a cada sessão. Medir no reset seria refazer a passada pelos
+  // vértices a CADA quadro com A/X apertado — o botão é lido por nível, não
+  // por borda —, e num corpo inteiro isso trava o Quest.
+  const tamanho = useRef<THREE.Vector3 | null>(null);
 
   return (
     <>
       {!posicionado && (
-        <PoseDeEntrada target={target} onPronto={() => setPosicionado(true)} />
+        <PoseDeEntrada
+          target={target}
+          tamanho={tamanho}
+          onPronto={() => setPosicionado(true)}
+        />
       )}
       {posicionado && (
         <XRManipulation
           target={target}
           aoResetar={(model, gl, frame) => {
+            tamanho.current ??= medirEmPe(model);
+            const medida = tamanho.current;
+            if (!medida) return;
             colocarAFrente(
               model,
               poseDaCabeca(gl, frame) ??
                 poseDaCabeca(gl, frame, true) ??
                 poseSuposta(gl),
+              medida,
             );
           }}
         />
