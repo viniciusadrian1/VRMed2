@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { XR, XROrigin, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
@@ -56,6 +56,27 @@ function PalcoDuelo() {
 function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnline }) {
   const inSession = useXR((state) => Boolean(state.session));
   const escola = ambiente === "escola";
+  // Tela em pé, o órgão vai para cima da lousa/do painel (ver DueloGame).
+  // Escola: câmera e alvo sobem 0,2m juntos — a cena desce inteira, sem mudar a
+  // composição, e o órgão sai de baixo do seletor e do botão de VR do canto.
+  // Hospital: o painel de 1,7m não cabe na largura com a câmera do VR, então
+  // ela recua e centraliza no painel.
+  const retrato = useThree((s) => s.size.width < s.size.height);
+  const get = useThree((s) => s.get);
+  // A prop `camera` do Canvas só vale na criação, e o Canvas não remonta ao
+  // trocar de ambiente (a partida contra o bot vive no DueloGame) nem ao girar
+  // o celular: a câmera é reposicionada aqui. Na sessão XR quem manda é o óculos.
+  useEffect(() => {
+    if (inSession) return;
+    const [x, y, z] = escola
+      ? retrato
+        ? [0.28, 0.15, 1.0]
+        : [0.28, -0.05, 1.0]
+      : retrato
+        ? [0.72, 0.35, 3.6]
+        : [0, 0.3, 2.55];
+    get().camera.position.set(x, y, z);
+  }, [escola, retrato, inSession, get]);
 
   return (
     <>
@@ -73,9 +94,14 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
       <hemisphereLight args={["#dfe9f2", "#141a22", 1]} />
 
       <PalcoDuelo />
-      <Suspense fallback={null}>
-        {escola ? <CenarioDuelo /> : <AmbienteHospital />}
-      </Suspense>
+      {/* Cenário é enfeite: se um GLB dele falhar, o jogo segue sem a sala em
+          vez de o erro subir pelo Canvas e derrubar a rota inteira. `key`
+          para a troca de ambiente dar nova chance ao outro cenário. */}
+      <ErrorBoundary key={ambiente} fallback={null}>
+        <Suspense fallback={null}>
+          {escola ? <CenarioDuelo /> : <AmbienteHospital />}
+        </Suspense>
+      </ErrorBoundary>
       <mesh>
         <sphereGeometry args={[28, 24, 16]} />
         <meshBasicMaterial color="#0a1017" side={THREE.BackSide} />
@@ -104,7 +130,15 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
           makeDefault
           enableDamping
           dampingFactor={0.08}
-          target={escola ? [0.36, -0.2, -1.06] : [0.35, 0.1, -0.5]}
+          target={
+            escola
+              ? retrato
+                ? [0.36, 0, -1.06]
+                : [0.36, -0.2, -1.06]
+              : retrato
+                ? [0.72, 0.35, -0.5]
+                : [0.35, 0.1, -0.5]
+          }
           minDistance={escola ? 0.8 : 1.5}
           maxDistance={9}
           maxPolarAngle={Math.PI * 0.55}
@@ -120,8 +154,8 @@ export function DueloApp() {
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
   const [ambiente, setAmbiente] = useState<Ambiente>("escola");
-  // Fora do <Canvas key={ambiente}>: trocar de ambiente remonta o canvas, e a
-  // partida online não pode cair por isso.
+  // Fora do <Canvas>: a conexão da partida online não pode depender da árvore
+  // 3D (erro de modelo, remontagem do canvas).
   const online = useDueloOnline();
 
   const store = obterXRStore();
@@ -141,7 +175,7 @@ export function DueloApp() {
   if (!mounted) return null;
 
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-[#101820]">
+    <main id="conteudo-principal" className="relative h-dvh w-full overflow-hidden bg-[#101820]">
       {!inSession && (
         <>
           <Link
@@ -151,7 +185,12 @@ export function DueloApp() {
             <ArrowLeft className="size-4" />
             VRmed
           </Link>
-          <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-3">
+          {/* Controles no canto de cima: embaixo, no meio, eles cobriam as
+              alternativas e os botões 3D (celular deitado, navegador do Quest)
+              e o toque trocava o ambiente ou entrava no VR. A coluna deixa o
+              toque passar: quando o erro quebra linha ela fica com 320px e,
+              no celular, cobria o link VRmed e o arraste da órbita. */}
+          <div className="pointer-events-none absolute right-4 top-4 z-20 flex flex-col items-end gap-2">
             {/* Seletor de ambiente do duelo */}
             <div className="pointer-events-auto flex overflow-hidden rounded-full border border-white/15 bg-black/50 text-sm font-medium backdrop-blur">
               {(
@@ -177,28 +216,29 @@ export function DueloApp() {
             <button
               type="button"
               onClick={enterVR}
-              className="pointer-events-auto rounded-full bg-[#5896c8] px-8 py-3 font-semibold text-[#0b1220] shadow-lg transition-transform hover:scale-105"
+              className="pointer-events-auto rounded-full bg-[#5896c8] px-6 py-2 font-semibold text-[#0b1220] shadow-lg transition-transform hover:scale-105"
             >
               Entrar em VR
             </button>
             {xrError && (
-              <p className="pointer-events-auto max-w-md rounded-lg border border-red-400/40 bg-red-950/70 px-4 py-2 text-xs text-red-200">
+              <p className="pointer-events-auto max-w-xs rounded-lg border border-red-400/40 bg-red-950/70 px-4 py-2 text-xs text-red-200">
                 Não foi possível iniciar o VR: {xrError}
               </p>
             )}
-            <p className="max-w-lg px-4 text-center text-[11px] text-white/50">
-              Duelo de conhecimento médico — contra um bot ou contra um amigo,
-              cada um no seu óculos. No desktop: 1–3 escolhe o bot, 4 cria uma
-              sala, 5 entra numa sala, 1–4/A–D responde, Enter repete.
-            </p>
           </div>
+          {/* Só a dica fica embaixo, e ela deixa o clique passar para o canvas. */}
+          <p className="pointer-events-none absolute inset-x-0 bottom-6 z-10 mx-auto max-w-lg px-4 text-center text-[11px] text-white/50">
+            Duelo de conhecimento médico — contra um bot ou contra um amigo,
+            cada um no seu óculos. No desktop: 1–3 escolhe o bot, 4 cria uma
+            sala, 5 entra numa sala, 1–4/A–D responde, Enter repete, Esc volta
+            ao menu.
+          </p>
         </>
       )}
 
       <Canvas
-        key={ambiente}
         role="application"
-        aria-label="Duelo 1×1 em 3D. Menu: teclas 1 a 3 escolhem a dificuldade, 4 cria uma sala online e 5 entra numa sala pelo código; na rodada, 1 a 4 ou A a D respondem; ao final, Enter joga de novo."
+        aria-label="Duelo 1×1 em 3D. Menu: teclas 1 a 3 escolhem a dificuldade, 4 cria uma sala online e 5 entra numa sala pelo código; na rodada, 1 a 4 ou A a D respondem; ao final, Enter joga de novo; Esc volta ao menu."
         shadows={false}
         dpr={1}
         frameloop="always"
