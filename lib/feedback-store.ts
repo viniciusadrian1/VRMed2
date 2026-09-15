@@ -21,11 +21,16 @@ export async function appendFeedback(entry: FeedbackPayload): Promise<void> {
 export async function readAllFeedback(): Promise<FeedbackPayload[]> {
   try {
     const content = await fs.readFile(FEEDBACK_FILE, "utf8");
+    // O arquivo guarda cada clique; a pesquisa conta respostas avaliadas.
+    // Como a lista já está invertida, o primeiro registro visto de cada
+    // messageId é a avaliação mais recente (troca 👍/👎, clique repetido).
+    const vistos = new Set<string>();
     return content
       .split("\n")
       .filter((line) => line.trim().length > 0)
       .map((line) => JSON.parse(line) as FeedbackPayload)
-      .reverse();
+      .reverse()
+      .filter((f) => !vistos.has(f.messageId) && !!vistos.add(f.messageId));
   } catch (error) {
     // O arquivo ainda não existe — nenhum feedback registrado.
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];

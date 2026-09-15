@@ -31,10 +31,16 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
   const [tags, setTags] = useState<FeedbackTag[]>([]);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [erro, setErro] = useState(false);
+  // Nota que o formulário vai enviar: o 👎 abre como "down", mas o "Comentar"
+  // depois de um 👍 não pode transformar o elogio em avaliação negativa.
+  const [nota, setNota] = useState<"up" | "down">("down");
 
   const messageIndex = chat.findIndex((item) => item.id === message.id);
   const userPrompt = messageIndex > 0 ? chat[messageIndex - 1].content : "";
 
+  // Rejeita em qualquer resposta não-ok (429 do limite, 400, 500): antes só a
+  // falha de rede era tratada e a avaliação sumia enquanto a UI agradecia.
   const sendFeedback = (
     rating: "up" | "down",
     selectedTags: FeedbackTag[],
@@ -42,33 +48,45 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
   ) => {
     const payload: Omit<FeedbackPayload, "timestamp"> = {
       messageId: message.id,
-      userPrompt,
+      // Mesmo teto de /api/feedback: o store guarda a pergunta inteira, que o
+      // chat-client só corta para o tutor, e acima disso a avaliação dava 400.
+      userPrompt: userPrompt.slice(0, 8000),
       aiResponse: message.content,
       rating,
       tags: selectedTags,
       comment: commentText,
       currentOrgan: organId ?? "",
     };
-    void fetch("/api/feedback", {
+    setErro(false);
+    track("chat_response_rated", { rating, organ: organId });
+    return fetch("/api/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-    }).catch(() => {
-      /* feedback é best-effort — falhas de rede não afetam o estudo */
+    }).then((response) => {
+      if (!response.ok) throw new Error();
     });
-    track("chat_response_rated", { rating, organ: organId });
   };
 
   const handlePositive = () => {
+    // Clique repetido no 👍 não vira outro registro nem gasta o limite do IP.
+    if (message.feedback === "up") return;
+    const anterior = message.feedback ?? null;
     setChatFeedback(message.id, "up");
-    sendFeedback("up", [], "");
+    sendFeedback("up", [], "").catch(() => {
+      setChatFeedback(message.id, anterior);
+      setErro(true);
+    });
   };
 
   const handleSubmitDetailed = () => {
-    setChatFeedback(message.id, "down");
-    sendFeedback("down", tags, comment.trim());
-    setSubmitted(true);
-    setOpen(false);
+    sendFeedback(nota, tags, comment.trim())
+      .then(() => {
+        setChatFeedback(message.id, nota);
+        setSubmitted(true);
+        setOpen(false);
+      })
+      .catch(() => setErro(true));
   };
 
   const toggleTag = (tag: FeedbackTag) => {
@@ -105,15 +123,30 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
           <Button
             variant={message.feedback === "down" ? "default" : "ghost"}
             size="icon-sm"
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setNota("down");
+              setOpen(true);
+            }}
             aria-label="Resposta com problemas"
           >
             <ThumbsDown />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setNota(message.feedback ?? "down");
+              setOpen(true);
+            }}
+          >
             <MessageSquarePlus />
             Comentar
           </Button>
+          {erro && (
+            <p role="alert" className="w-full text-xs text-destructive">
+              Não foi possível enviar a avaliação. Tente de novo.
+            </p>
+          )}
         </div>
       </PopoverAnchor>
       <PopoverContent align="start" className="w-80">
@@ -138,6 +171,8 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
         <Textarea
           value={comment}
           onChange={(event) => setComment(event.target.value)}
+          // Mesmo teto do schema em /api/feedback: acima disso a rota dá 400.
+          maxLength={2000}
           placeholder="Comentário (opcional)"
           className="mt-3 min-h-20 text-sm"
         />
