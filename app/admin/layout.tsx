@@ -42,7 +42,7 @@ export default function AdminLayout({
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-5 py-8">{children}</main>
+      <main id="conteudo-principal" className="mx-auto max-w-5xl px-5 py-8">{children}</main>
     </div>
   );
 }

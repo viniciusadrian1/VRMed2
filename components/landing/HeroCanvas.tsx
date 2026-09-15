@@ -46,6 +46,10 @@ function CoracaoModel() {
 export function HeroCanvas({ active }: { active: boolean }) {
   return (
     <Canvas
+      // O OrbitControls grava touch-action:none inline neste div e prendia a
+      // rolagem da landing no celular. O !important devolve o arrasto vertical
+      // à página; o horizontal continua girando o coração.
+      className="touch-pan-y!"
       shadows
       dpr={[1, 1.5]}
       frameloop={active ? "always" : "demand"}

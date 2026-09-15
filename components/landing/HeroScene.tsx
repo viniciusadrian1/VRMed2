@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import dynamic from "next/dynamic";
 import { useInView, useReducedMotion } from "framer-motion";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Carrega o three.js/R3F sob demanda: mantém a landing leve no primeiro carregamento.
@@ -23,7 +24,18 @@ export function HeroScene() {
 
   return (
     <div ref={ref} className="size-full">
-      <HeroCanvas active={inView && !reduce} />
+      {/* Se o GLB, o Draco ou o chunk do canvas falharem, o erro fica preso no
+          quadro do hero. Sem isso ele subia até app/error.tsx e a landing
+          inteira (CTAs, catálogo, rodapé) virava a tela de erro. */}
+      <ErrorBoundary
+        fallback={
+          <div className="grid size-full place-items-center text-sm text-muted-foreground">
+            Prévia 3D indisponível
+          </div>
+        }
+      >
+        <HeroCanvas active={inView && !reduce} />
+      </ErrorBoundary>
     </div>
   );
 }
