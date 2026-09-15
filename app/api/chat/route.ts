@@ -82,7 +82,16 @@ export async function POST(request: Request) {
 
   if (!completion) {
     // Erros do SDK da OpenAI carregam .status (429 = ocupado/rate limit).
-    const status = (erro as { status?: number } | undefined)?.status;
+    const { status, code } =
+      (erro as { status?: number; code?: string } | undefined) ?? {};
+    // Cota esgotada também vem como 429, mas não passa sozinha: dizer
+    // "tente em instantes" faria o estudante insistir à toa.
+    if (status === 429 && code === "insufficient_quota") {
+      return Response.json(
+        { error: "O tutor de IA está indisponível neste servidor." },
+        { status: 503 },
+      );
+    }
     if (status === 429) {
       return Response.json(
         {

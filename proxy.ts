@@ -23,7 +23,11 @@ export function proxy(request: NextRequest) {
   const header = request.headers.get("authorization");
   if (header?.startsWith("Basic ")) {
     try {
-      const decoded = atob(header.slice(6));
+      // Navegadores mandam "usuário:senha" em UTF-8; atob devolve um caractere
+      // por byte, e uma senha com acento ("coração") nunca bateria.
+      const decoded = new TextDecoder().decode(
+        Uint8Array.from(atob(header.slice(6)), (c) => c.charCodeAt(0)),
+      );
       const provided = decoded.slice(decoded.indexOf(":") + 1);
       if (provided === password) {
         return NextResponse.next();

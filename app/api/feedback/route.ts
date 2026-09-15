@@ -24,7 +24,9 @@ export async function POST(request: Request) {
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
   const now = Date.now();
   const recent = (hits.get(ip) ?? []).filter((t) => now - t < 60_000);
-  if (recent.length >= 10) {
+  // ponytail: 60/min por IP público — uma turma inteira sai pelo mesmo NAT da
+  // faculdade. O payload já é limitado pelo Zod e os admins deduplicam por messageId.
+  if (recent.length >= 60) {
     return Response.json(
       { error: "Muitos envios; aguarde um minuto." },
       { status: 429 },

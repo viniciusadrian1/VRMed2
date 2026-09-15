@@ -52,7 +52,10 @@ export default async function AdminFeedbackPage() {
                   <Badge variant="secondary">{entry.currentOrgan}</Badge>
                 )}
                 <span className="ml-auto text-xs text-muted-foreground">
-                  {new Date(entry.timestamp).toLocaleString("pt-BR")}
+                  {/* Server Component: no Render o processo roda em UTC. */}
+                  {new Date(entry.timestamp).toLocaleString("pt-BR", {
+                    timeZone: "America/Sao_Paulo",
+                  })}
                 </span>
               </div>
 
