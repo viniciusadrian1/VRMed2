@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useXRInputSourceState } from "@react-three/xr";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { Text3D, Panel, Button3D, ARENA_COLORS } from "@/components/arena/ui3d";
@@ -14,6 +15,7 @@ import type { StructurePoint } from "@/types";
 import { ORGANS } from "@/lib/organs";
 import { playEnd, playHit, playMiss, playStart, playTick } from "@/lib/arena-audio";
 import { Oponente, type HumorOponente } from "./Oponente";
+import { PITCH_SPEED, SPIN_SPEED, shapedAxis } from "@/components/viewer/XRManipulation";
 
 /**
  * Duelo 1x1 (Modo 2 do plano multi-modo) — v1 contra BOT.
@@ -188,7 +190,31 @@ function BotaoLousa({
   );
 }
 
-/** Modelo da rodada girando devagar; estrutura-alvo ganha um marcador pulsante. */
+/** Velocidade do giro automático (rad/s): uma volta a cada ~18 s. */
+const GIRO_AUTOMATICO = 0.35;
+/**
+ * Depois de soltar o analógico, quanto tempo o giro automático espera para
+ * voltar (s). Sem a pausa ele retomaria no mesmo instante e tiraria de vista a
+ * estrutura que a pessoa acabou de trazer para a frente.
+ */
+const PAUSA_DO_GIRO_AUTOMATICO = 1.5;
+/** Limite do tombamento (rad, ~69°): além disso o órgão vira de cabeça para baixo. */
+const TOMBO_MAXIMO = 1.2;
+
+/**
+ * Modelo da rodada girando devagar; estrutura-alvo ganha um marcador pulsante.
+ *
+ * O analógico gira o órgão, igual ao visualizador. Motivo: nas rodadas da
+ * laringe o marcador pode estar do lado de trás, e o giro automático leva até
+ * ~9 s para trazê-lo — metade da rodada esperando o modelo virar. Com o
+ * analógico a pessoa traz a estrutura para a frente na hora:
+ *
+ *  - qualquer analógico ⇄ gira o órgão como um torno;
+ *  - qualquer analógico ↕ tomba o órgão para mostrar o topo ou a base.
+ *
+ * Enquanto o analógico está em uso o giro automático pausa. No computador,
+ * sem controle, nada muda.
+ */
 function ModeloRodada({ rodada }: { rodada: Rodada }) {
   const caminho = rodada.tipo === "orgao" ? rodada.modelo! : LARINGE;
   const gltf = useGLTF(caminho, "/draco/");
@@ -199,8 +225,20 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
   // normalização engolia o scale={0.85} e a rotação orbitava o pivô cru do
   // GLB em vez do centro do modelo.
   const spinner = useRef<THREE.Group>(null);
+  /**
+   * Tombamento fica num grupo POR FORA do giro. Assim o giro continua sendo um
+   * torno em volta do eixo do próprio órgão, e o tombo acontece no eixo da sala
+   * — empurrar para a frente sempre afasta o topo, qualquer que seja o lado
+   * virado para a pessoa. No mesmo grupo, depois de meia volta o comando
+   * inverteria.
+   */
+  const tombo = useRef<THREE.Group>(null);
   const content = useRef<THREE.Group>(null);
   const marcador = useRef<THREE.Mesh>(null);
+  const esquerdo = useXRInputSourceState("controller", "left");
+  const direito = useXRInputSourceState("controller", "right");
+  /** Instante do último uso do analógico, para pausar o giro automático. */
+  const ultimoToque = useRef(-Infinity);
 
   // Normalização calculada no espaço PRÓPRIO do clone, ainda solto da cena
   // (useMemo roda antes de montar). O normalizeContent media em coordenadas
@@ -229,6 +267,7 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
     const g = content.current;
     if (!g) return;
     if (spinner.current) spinner.current.rotation.y = 0;
+    if (tombo.current) tombo.current.rotation.x = 0;
     g.updateWorldMatrix(true, true);
     prepareModel(g, "mesh");
     // O modelo do Duelo não é clicável (diferente da Arena) — sem isto, as
@@ -245,7 +284,50 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
   }, [scene, rodada]);
 
   useFrame((state, delta) => {
-    if (spinner.current) spinner.current.rotation.y += delta * 0.35;
+    // Mesmo teto de passo do visualizador: ao recolocar o headset, o primeiro
+    // delta vem com segundos acumulados e o órgão daria voltas sozinho.
+    const dt = Math.min(delta, 1 / 30);
+    const agora = state.clock.elapsedTime;
+
+    // Por analógico vale só o eixo DOMINANTE, como no visualizador: ninguém
+    // empurra perfeitamente para o lado, e o resto de "frente" tombaria o
+    // órgão sem querer.
+    let giro = 0;
+    let inclinacao = 0;
+    for (const lado of [direito, esquerdo]) {
+      const pad = lado?.gamepad?.["xr-standard-thumbstick"];
+      const x = pad?.xAxis ?? 0;
+      const y = pad?.yAxis ?? 0;
+      if (Math.abs(x) >= Math.abs(y)) {
+        const g = shapedAxis(x);
+        if (Math.abs(g) > Math.abs(giro)) giro = g;
+      } else {
+        const t = shapedAxis(y);
+        if (Math.abs(t) > Math.abs(inclinacao)) inclinacao = t;
+      }
+    }
+
+    if (giro !== 0 || inclinacao !== 0) {
+      ultimoToque.current = agora;
+      // Mesmo sentido do visualizador: analógico para a direita traz para a
+      // frente o lado que estava à direita de quem joga.
+      if (spinner.current) spinner.current.rotation.y -= giro * dt * SPIN_SPEED;
+      // yAxis é negativo com o analógico para a frente: somar afasta o topo.
+      // O visualizador responde igual (o sinal dele foi corrigido junto).
+      if (tombo.current) {
+        tombo.current.rotation.x = THREE.MathUtils.clamp(
+          tombo.current.rotation.x + inclinacao * dt * PITCH_SPEED,
+          -TOMBO_MAXIMO,
+          TOMBO_MAXIMO,
+        );
+      }
+    } else if (
+      spinner.current &&
+      agora - ultimoToque.current > PAUSA_DO_GIRO_AUTOMATICO
+    ) {
+      spinner.current.rotation.y += dt * GIRO_AUTOMATICO;
+    }
+
     if (marcador.current) {
       const s = 1 + 0.25 * Math.sin(state.clock.elapsedTime * 5);
       marcador.current.scale.setScalar(s);
@@ -254,16 +336,18 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
 
   return (
     <group scale={0.85}>
-      <group ref={spinner}>
-        <group ref={content} position={ajuste.pos} scale={ajuste.escala}>
-          <primitive object={scene} />
+      <group ref={tombo}>
+        <group ref={spinner}>
+          <group ref={content} position={ajuste.pos} scale={ajuste.escala}>
+            <primitive object={scene} />
+          </group>
+          {rodada.marcador && (
+            <mesh ref={marcador} position={rodada.marcador} raycast={() => null}>
+              <sphereGeometry args={[0.09, 16, 12]} />
+              <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
+            </mesh>
+          )}
         </group>
-        {rodada.marcador && (
-          <mesh ref={marcador} position={rodada.marcador} raycast={() => null}>
-            <sphereGeometry args={[0.09, 16, 12]} />
-            <meshBasicMaterial color="#ffd166" toneMapped={false} transparent opacity={0.9} />
-          </mesh>
-        )}
       </group>
     </group>
   );
