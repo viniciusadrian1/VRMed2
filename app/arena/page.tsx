@@ -15,7 +15,10 @@ export const metadata: Metadata = {
  */
 export default function ArenaPage() {
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-[#101820]">
+    <main
+      id="conteudo-principal"
+      className="relative h-dvh w-full overflow-hidden bg-[#101820]"
+    >
       <ArenaScene />
     </main>
   );

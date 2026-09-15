@@ -55,7 +55,7 @@ const cards: BentoItem[] = [
     title: "Duelo 1×1",
     href: "/duelo",
     description:
-      "Quiz de anatomia contra bot em três dificuldades; online em breve.",
+      "Quiz de anatomia contra bot em três dificuldades ou 1×1 online, cada um no seu óculos, pelo código da sala.",
   },
   {
     icon: Glasses,

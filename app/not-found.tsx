@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <div className="vrmed-radial grid min-h-dvh place-items-center px-5">
+    <main
+      id="conteudo-principal"
+      className="vrmed-radial grid min-h-dvh place-items-center px-5"
+    >
       <div className="flex max-w-md flex-col items-center gap-6 text-center">
         <Logo />
         <div className="flex flex-col items-center gap-2">
@@ -33,6 +36,6 @@ export default function NotFound() {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

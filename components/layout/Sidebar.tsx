@@ -41,10 +41,15 @@ export function SideRail() {
 
   return (
     <aside className="hidden w-[84px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
-      <div className="flex h-16 items-center justify-center border-b border-sidebar-border">
+      <div className="flex h-16 shrink-0 items-center justify-center border-b border-sidebar-border">
         <Logo withText={false} />
       </div>
-      <nav aria-label="Navegação principal" className="flex flex-col gap-1 p-2.5">
+      {/* Celular deitado passa de md com só ~300px de altura: a lista rola e o
+          logo fica fixo, senão Sala, Duelo e Histórico eram cortados. */}
+      <nav
+        aria-label="Navegação principal"
+        className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2.5"
+      >
         {NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           return (

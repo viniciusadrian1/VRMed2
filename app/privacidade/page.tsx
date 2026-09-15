@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
+import { RevisarConsentimento } from "@/components/analytics/RevisarConsentimento";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade",
@@ -25,7 +26,7 @@ export default function PrivacyPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-5 py-12">
+      <main id="conteudo-principal" className="mx-auto max-w-3xl px-5 py-12">
         <h1 className="font-serif text-4xl font-medium tracking-tight">
           Política de Privacidade
         </h1>
@@ -92,6 +93,7 @@ export default function PrivacyPage() {
               possível recusar a qualquer momento — a aplicação continua
               plenamente funcional sem a telemetria.
             </p>
+            <RevisarConsentimento />
           </section>
 
           <section>

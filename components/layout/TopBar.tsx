@@ -27,7 +27,10 @@ export function TopBar({ title, description, actions }: TopBarProps) {
         )}
       </div>
 
-      <div className="flex items-center gap-1">
+      {/* min-w-0: por segurança, o grupo de ações não alarga o header além da
+          tela quando uma página injeta ações demais (o que resolve de fato no
+          celular é os botões mostrarem só o ícone abaixo de sm). */}
+      <div className="flex min-w-0 items-center gap-1">
         {actions}
         <Button
           variant="ghost"
