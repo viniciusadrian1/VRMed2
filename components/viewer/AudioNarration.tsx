@@ -37,7 +37,15 @@ export function AudioNarration() {
 
   const [description, setDescription] = useState<OrganDescription | null>(null);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<PlayStatus>("idle");
+  // A fala sobrevive ao painel fechado: ao reabrir, parte do estado real do
+  // sintetizador. Sem risco de hidratação — o painel nunca renderiza no SSR.
+  const [status, setStatus] = useState<PlayStatus>(() =>
+    isSpeechSupported() && window.speechSynthesis.speaking
+      ? window.speechSynthesis.paused
+        ? "paused"
+        : "playing"
+      : "idle",
+  );
   const [rate, setRate] = useState(1);
 
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
@@ -100,23 +108,27 @@ export function AudioNarration() {
     }
   }, [organId]);
 
-  // Interrompe a narração ao trocar de órgão ou desmontar.
+  // Ao trocar de órgão ou desmontar, para só o áudio de fallback. A voz do
+  // navegador NÃO é cancelada aqui: fechar o painel (no celular, para ver o
+  // modelo) cortava a narração. Quem a cancela ao trocar de órgão ou sair é
+  // a página do viewer (app/viewer/page.tsx).
   useEffect(() => {
     return () => {
-      cancelSpeech();
       audioRef.current?.pause();
       setStatus("idle");
     };
   }, [organId]);
 
-  // Contorna a limitação do Chrome que interrompe a síntese após ~15 s.
+  // O keep-alive do Chrome vive em lib/tts. Aqui só devolve a UI ao estado
+  // ocioso quando a fala termina com o painel fechado (o onEnd era da
+  // instância desmontada).
   useEffect(() => {
     if (status !== "playing" || !useSpeech) return;
-    const keepAlive = window.setInterval(() => {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.resume();
-    }, 10_000);
-    return () => window.clearInterval(keepAlive);
+    const id = window.setInterval(() => {
+      const synth = window.speechSynthesis;
+      if (!synth.speaking && !synth.pending) setStatus("idle");
+    }, 500);
+    return () => window.clearInterval(id);
   }, [status, useSpeech]);
 
   // Mantém a velocidade do áudio de fallback sincronizada.

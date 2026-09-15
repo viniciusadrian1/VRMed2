@@ -74,10 +74,11 @@ function ChatPanelContent() {
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
     // Lê o estado mais recente da store (evita um `chat` desatualizado em
-    // envios rápidos e sucessivos).
-    const history = [...useVRMedStore.getState().chat, userMessage].map(
-      (message) => ({ role: message.role, content: message.content }),
-    );
+    // envios rápidos e sucessivos). O set do zustand é síncrono, então a
+    // pergunta já está aí — reanexá-la mandaria o turno "user" em dobro.
+    const history = useVRMedStore
+      .getState()
+      .chat.map((message) => ({ role: message.role, content: message.content }));
 
     const assistantId = genId();
     addChatMessage({
@@ -106,8 +107,18 @@ function ChatPanelContent() {
         controller.signal,
       );
     } catch (error) {
-      // Abortos (troca de órgão, fechar painel, limpar) não são erros.
-      if (controller.signal.aborted) return;
+      // Abortos (troca de órgão, fechar painel, limpar) não são erros. Mas o
+      // placeholder ainda vazio não pode ficar: seria persistido como um turno
+      // do tutor sem texto (e iria para as sessões e o PDF). A leitura via
+      // getState() vale mesmo com o painel já desmontado; resposta parcial
+      // fica, porque é conteúdo real.
+      if (controller.signal.aborted) {
+        const atual = useVRMedStore.getState().chat;
+        if (atual.some((m) => m.id === assistantId && !m.content.trim())) {
+          setChat(atual.filter((m) => m.id !== assistantId));
+        }
+        return;
+      }
       const message =
         error instanceof Error
           ? error.message

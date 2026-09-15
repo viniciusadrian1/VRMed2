@@ -50,15 +50,18 @@ export function XRButton({ modo = "vr" }: { modo?: keyof typeof MODOS }) {
       .catch(() => setSupported(false));
   }, [sessao]);
 
+  // Abaixo de sm só o ícone: com o texto, as ações da barra superior passavam
+  // da largura do celular e empurravam o tema e "Sobre o projeto" para fora.
   const button = (
     <Button
       variant={supported ? "default" : "outline"}
       size="sm"
       disabled={supported !== true}
       onClick={entrar}
+      aria-label={rotulo}
     >
       <Icone />
-      {rotulo}
+      <span className="hidden sm:inline">{rotulo}</span>
     </Button>
   );
 

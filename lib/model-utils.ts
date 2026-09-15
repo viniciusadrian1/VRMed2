@@ -375,7 +375,13 @@ export function getModelBounds(content: THREE.Object3D): ModelBounds {
   };
 }
 
-/** Localização do corte de um eixo, em coordenadas do mundo. */
+/**
+ * Nome do grupo raiz do modelo (o que o gizmo move). Pontos, anotações e cortes
+ * vivem no espaço dele; quem precisa de mundo converte a partir deste nó.
+ */
+export const NOME_DO_ROOT = "vrmed-root";
+
+/** Localização do corte de um eixo, no espaço do root do modelo. */
 export function getClipCut(
   axis: ClipAxis,
   position: number,

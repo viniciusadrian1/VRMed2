@@ -19,12 +19,16 @@ export function InspectBar() {
   if (!hasModel || annotationMode) return null;
 
   return (
+    // Faixa na largura toda (e não left-1/2, que limitava a pílula a metade do
+    // canvas), acima do botão flutuante "Tutor de IA" (bottom-5): no celular a
+    // pílula ficava sob ele e o X abria o chat. Só a pílula captura clique,
+    // para a faixa não bloquear o OrbitControls.
     <div
-      className="pointer-events-auto absolute bottom-5 left-1/2 -translate-x-1/2"
+      className="pointer-events-none absolute inset-x-0 bottom-20 flex justify-center px-4"
       aria-live="polite"
     >
       {inspectedLabel ? (
-        <div className="flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-3 pr-1 shadow-lg">
+        <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full border border-border bg-card py-1 pl-3 pr-1 shadow-lg">
           <MousePointerClick className="size-4 shrink-0 text-primary" />
           <span className="text-sm">
             <span className="text-muted-foreground">Estrutura: </span>
@@ -40,7 +44,7 @@ export function InspectBar() {
           </Button>
         </div>
       ) : (
-        <div className="flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground shadow-sm backdrop-blur-sm">
+        <div className="flex max-w-full items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground shadow-sm backdrop-blur-sm">
           <MousePointerClick className="size-3.5" />
           Clique numa estrutura para identificá-la
         </div>

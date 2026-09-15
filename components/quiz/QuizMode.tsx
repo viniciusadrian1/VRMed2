@@ -137,14 +137,21 @@ export function QuizMode() {
       durationMs: Date.now() - startedAt.current,
       createdAt: Date.now(),
     };
-    addQuizResult(quizResult);
-    if (organId && organ) {
-      saveSession({
-        name: `Quiz — ${organ.name} — ${formatDate(Date.now())}`,
-        organId,
-        organName: organ.name,
-        quizResult,
-      });
+    // Com o armazenamento do navegador cheio, gravar lança QuotaExceededError.
+    // O resultado ainda aparece na tela: perder o histórico é menos ruim que
+    // prender o estudante na última pergunta sem ver a nota.
+    try {
+      addQuizResult(quizResult);
+      if (organId && organ) {
+        saveSession({
+          name: `Quiz — ${organ.name} — ${formatDate(Date.now())}`,
+          organId,
+          organName: organ.name,
+          quizResult,
+        });
+      }
+    } catch (erro) {
+      console.warn("[quiz] resultado não gravado no histórico", erro);
     }
     track("quiz_completed", {
       organ: organId,
