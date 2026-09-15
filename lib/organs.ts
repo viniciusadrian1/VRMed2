@@ -35,7 +35,7 @@ import type { OrganCategory, OrganDefinition } from "@/types";
  * coração traz o arco da aorta, então o maior eixo vai do ápice à ponta dos
  * ramos do arco, e é esse vão que tem de medir o valor real. A primeira versão
  * usou o tamanho do órgão isolado e deixou quase tudo 20 a 40% pequeno (o
- * pulmão com tamanho de criança, o estômago com 4 cm).
+ * pulmão com tamanho de criança, o trato digestório com 25 cm).
  *
  * **Como foram obtidos:** para cada arquivo, o conteúdo foi identificado em
  * vistas ortográficas; pelo menos dois marcos anatômicos independentes foram
@@ -118,12 +118,13 @@ export const ORGANS: OrganDefinition[] = [
   },
   {
     id: "estomago",
-    name: "Estômago",
+    name: "Sistema digestório",
     kind: "organ",
     category: "digestorio",
     modelPath: "/models/healthy/estomago.glb",
-    blurb: "Reservatório muscular da digestão inicial.",
-    // Boca → reto: apesar do nome, o arquivo traz o trato digestório inteiro.
+    blurb: "Trato digestório completo, da boca ao reto.",
+    // Boca → reto: o trato digestório inteiro. O `id` e o arquivo continuam
+    // "estomago" (nome antigo do item) para não quebrar sessões salvas.
     tamanhoRealCm: 70,
   },
 ];

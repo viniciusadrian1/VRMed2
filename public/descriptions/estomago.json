@@ -1,6 +1,9 @@
 {
-  "name": "Estômago",
-  "shortDescription": "Reservatório muscular do trato digestório onde se inicia a digestão das proteínas.",
-  "fullDescription": "O estômago é uma dilatação muscular do trato gastrointestinal, situada entre o esôfago e o duodeno, na região superior esquerda do abdome. Apresenta regiões anatômicas distintas — cárdia, fundo, corpo e piloro — e duas curvaturas, a maior e a menor. Sua parede é composta por várias camadas, com destaque para a mucosa interna, dotada de glândulas gástricas, e uma musculatura espessa disposta em três orientações, que permite movimentos de mistura. As células da mucosa secretam o suco gástrico, rico em ácido clorídrico e na enzima pepsina, responsável pela digestão inicial das proteínas; secretam também o muco protetor, que impede a autodigestão da parede. O estômago armazena temporariamente o alimento, transformando-o em uma massa semilíquida chamada quimo, liberada de forma controlada para o intestino delgado através do esfíncter pilórico.",
-  "sources": ["Gray's Anatomy, 42ª ed.", "Moore — Anatomia Orientada para a Clínica", "Cleveland Clinic"]
+  "name": "Sistema digestório",
+  "shortDescription": "Tubo contínuo da boca ao ânus que digere o alimento e absorve os nutrientes.",
+  "fullDescription": "O sistema digestório é formado por um tubo muscular contínuo, o trato gastrointestinal, e por órgãos acessórios. Este modelo mostra o trato: a cavidade oral e a faringe, representadas de forma simplificada; o esôfago, que desce pelo tórax até o abdome; o estômago; o intestino delgado, com duodeno, jejuno e íleo; e o intestino grosso, com o ceco e o apêndice vermiforme, os colos ascendente, transverso, descendente e sigmoide, e o reto. Ao longo do trajeto, a digestão combina ação mecânica — mastigação e ondas peristálticas da musculatura lisa — com ação química das secreções: a saliva inicia a digestão do amido, o suco gástrico a das proteínas, e no duodeno a bile e o suco pancreático completam a digestão de gorduras, carboidratos e proteínas. A maior parte dos nutrientes é absorvida no intestino delgado, cuja mucosa forma pregas e vilosidades que ampliam a superfície de absorção. O intestino grosso absorve água e eletrólitos e forma as fezes, eliminadas pelo reto e pelo canal anal. Os órgãos acessórios — glândulas salivares, fígado, vesícula biliar e pâncreas — ficam fora do tubo e lançam nele suas secreções; eles não fazem parte deste modelo.",
+  "sources": [
+    "Gray's Anatomy, 42ª ed.",
+    "Moore — Anatomia Orientada para a Clínica"
+  ]
 }
