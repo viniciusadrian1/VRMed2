@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useEffect, useMemo } from "react";
+import { useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
-import { useXR, XROrigin } from "@react-three/xr";
-import { SairDoVR } from "@/components/xr/SairDoVR";
+import { useXR } from "@react-three/xr";
 import * as THREE from "three";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SalaInterativos } from "./SalaInterativos";
 
 /**
@@ -164,11 +165,15 @@ function Quarto() {
 
       {/* Mesa, cadeira e teclado (GLBs do grupo). O Canvas do R3F 9 suspende a
           página inteira quando um useGLTF suspende sem boundary local; com este
-          Suspense o quarto procedural, as luzes e a UI DOM aparecem na hora. */}
+          Suspense o quarto procedural, as luzes e a UI DOM aparecem na hora.
+          O Suspense não pega falha de download: sem boundary, um GLB que não
+          baixa trocava a sala inteira pelo fallback. Um boundary por GLB: se
+          fosse um só, o teclado (decoração) que falha levava mesa e cadeira
+          junto e deixava monitor, rádio e livro flutuando. */}
       <Suspense fallback={null}>
-        <MesaGLB />
-        <CadeiraGLB />
-        <TecladoMouseGLB />
+        <ErrorBoundary fallback={null}><MesaGLB /></ErrorBoundary>
+        <ErrorBoundary fallback={null}><CadeiraGLB /></ErrorBoundary>
+        <ErrorBoundary fallback={null}><TecladoMouseGLB /></ErrorBoundary>
       </Suspense>
 
       {/* Planta no canto */}
@@ -219,6 +224,32 @@ function Quarto() {
 }
 
 /**
+ * Câmera 2D enquadrada pelo aspecto da tela; o headset usa a própria câmera.
+ * A posição fixa do VR sentado deixava baralho, livro e rádio fora do quadro
+ * no celular e no navegador 2D do Quest.
+ */
+function EnquadrarCamera2D() {
+  const get = useThree((s) => s.get);
+  const retrato = useThree((s) => s.size.width < s.size.height);
+  useEffect(() => {
+    // ponytail: dois enquadramentos (retrato/paisagem), medidos por projeção.
+    // Em retrato fica a 3,18 m do alvo, dentro do maxDistance 3,4. Só roda de
+    // novo ao girar a tela, então o orbit do usuário não reseta a cada resize.
+    // get() como no DueloApp: mutar a câmera vinda do useThree quebra a regra
+    // react-hooks/immutability.
+    const camera = get().camera as THREE.PerspectiveCamera;
+    if (retrato) camera.position.set(0, 1.8, 1.2);
+    else camera.position.set(0, 1.5, -0.3);
+    // Com fov 55 a carta de flashcards abria fora da tela no retrato (o
+    // maxDistance 3,4 não deixa recuar) e o 4:3 do Quest cortava a borda dela.
+    // Na sessão XR o three usa a projeção do óculos; ao sair, isto remonta.
+    camera.fov = retrato ? 85 : 62;
+    camera.updateProjectionMatrix();
+  }, [get, retrato]);
+  return null;
+}
+
+/**
  * Conteúdo 3D da Sala (dentro do <XR>): quarto + itens interativos + luzes.
  * OrbitControls só fora da sessão (regra do projeto: disputa a câmera do headset).
  */
@@ -227,14 +258,7 @@ export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
 
   return (
     <>
-      {/* Origem (pés) no CENTRO DO ASSENTO da cadeira (cadeira ocupa z −1,55..−0,75,
-          encosto do lado +z; mesa começa em z ≈ −1,5). Antes ficava em z −0,55,
-          atrás do encosto: qualquer passo à frente punha a cabeça dentro dele.
-          Quem senta de verdade fica sentado na cadeira; quem fica de pé fica
-          "no lugar" dela, olhando a mesa de cima. */}
-      <XROrigin position={[0, 0, -1.15]}>
-        <SairDoVR position={[-0.8, 1.05, -0.2]} />
-      </XROrigin>
+      {/* XROrigin + "Sair do VR" moram no SalaApp, fora do ErrorBoundary. */}
 
       {/* Luz: quente da luminária + fria fraca da janela + ambiente baixa. */}
       <ambientLight intensity={0.45} color="#f5ead8" />
@@ -255,16 +279,19 @@ export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
       <SalaInterativos onAbrirTutorDom={onAbrirTutorDom} />
 
       {!inSession && (
-        <OrbitControls
-          makeDefault
-          enableDamping
-          dampingFactor={0.08}
-          target={[0, 1.05, -1.85]}
-          minDistance={0.4}
-          maxDistance={3.4}
-          // Não deixa a câmera atravessar o chão nem o teto.
-          maxPolarAngle={Math.PI * 0.55}
-        />
+        <>
+          <EnquadrarCamera2D />
+          <OrbitControls
+            makeDefault
+            enableDamping
+            dampingFactor={0.08}
+            target={[0, 1.1, -1.9]}
+            minDistance={0.4}
+            maxDistance={3.4}
+            // Não deixa a câmera atravessar o chão nem o teto.
+            maxPolarAngle={Math.PI * 0.55}
+          />
+        </>
       )}
     </>
   );
