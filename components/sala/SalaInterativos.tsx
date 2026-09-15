@@ -9,6 +9,7 @@ import { Text3D, Panel, Button3D, ARENA_COLORS } from "@/components/arena/ui3d";
 import { proximaEstacao, pararRadio } from "@/lib/lofi";
 import * as spotify from "@/lib/spotify";
 import { streamChatResponse } from "@/lib/chat-client";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 /**
  * Os quatro itens interativos da mesa: rádio, computador (hub), flashcards e
@@ -157,15 +158,15 @@ function Radio() {
       });
   };
 
-  const rotulo = aviso
-    ? aviso
-    : viaSpotify
-      ? reproducao
-        ? `${reproducao.tocando ? "Tocando:" : "Pausado:"} ${reproducao.faixa} — ${reproducao.artista}`
-        : "Spotify conectado — dê play no celular ou no Quest"
-      : nome
-        ? `Tocando: ${nome}`
-        : "Rádio lo-fi — clique para ligar";
+  // O aviso fica sempre visível acima do rádio (abaixo, no JSX); no rótulo de
+  // hover ele sairia duplicado.
+  const rotulo = viaSpotify
+    ? reproducao
+      ? `${reproducao.tocando ? "Tocando:" : "Pausado:"} ${reproducao.faixa} — ${reproducao.artista}`
+      : "Spotify conectado — dê play no celular ou no Quest"
+    : nome
+      ? `Tocando: ${nome}`
+      : "Rádio lo-fi — clique para ligar";
 
   return (
     <group position={[0.68, 0.765, -2.1]}>
@@ -198,6 +199,16 @@ function Radio() {
             onClick={() => comando(spotify.proximaFaixa)}
           />
         </group>
+      )}
+      {/* Fora do hover: mirando os botões o rótulo do rádio nunca aparece
+          (são irmãos do Interativo), e o erro de Premium/dispositivo sumia em
+          5 s sem ser desenhado — o botão parecia morto. Fora do grupo do
+          Spotify também: no 401 o chamar() desconecta antes de lançar, os
+          botões somem e o aviso precisa continuar explicando o porquê. */}
+      {aviso && (
+        <Text3D position={[0, 0.38, 0.05]} size={0.026} maxWidth={0.6} color={ARENA_COLORS.danger}>
+          {aviso}
+        </Text3D>
       )}
       <Interativo
         rotulo={rotulo}
@@ -306,9 +317,11 @@ function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
 
       {/* Painel-hub flutuante acima do monitor, a ~1 m dos olhos (origem no
           assento em z −1,15; com o painel a 0,3 m do monitor ele ficava colado
-          no rosto). */}
+          no rosto). No plano do monitor e 10 cm mais alto: atrás dele (z −0,35)
+          a fileira de baixo ficava na sombra do monitor e o laser do controle
+          clicava no monitor, fechando o hub em vez de navegar. */}
       {aberto && (
-        <group position={[0, 0.62, -0.35]} scale={0.8}>
+        <group position={[0, 0.72, 0]} scale={0.8}>
           <Panel width={1.15} height={0.78}>
             <Text3D position={[0, 0.28, 0.01]} size={0.06}>
               Modos do VRmed
@@ -553,11 +566,13 @@ function Flashcards({ aberto: painel, onAbrir, onFechar }: PropsPainel) {
               setTema(null);
             }}
           />
+          {/* Acima da carta: embaixo (y −0,6) o botão caía atrás do livro na
+              linha de visão, e o clique ia para o livro (abria o tutor). */}
           <Button3D
             label={statusIA === "gerando" ? "Gerando…" : "+4 com IA"}
             width={0.4}
             height={0.1}
-            position={[0, -0.6, 0]}
+            position={[0, 0.46, 0]}
             color="#7c5cbf"
             onClick={() => {
               if (statusIA === "gerando") return;
@@ -576,7 +591,7 @@ function Flashcards({ aberto: painel, onAbrir, onFechar }: PropsPainel) {
             }}
           />
           {statusIA && statusIA !== "gerando" && (
-            <Text3D position={[0, -0.72, 0]} size={0.028} color={ARENA_COLORS.muted}>
+            <Text3D position={[0, 0.56, 0]} size={0.028} color={ARENA_COLORS.muted}>
               {statusIA}
             </Text3D>
           )}
@@ -728,17 +743,24 @@ export function SalaInterativos({
       {/* Suspense por item que usa useGLTF: sem boundary local, o Canvas do
           R3F 9 suspende a página inteira até o GLB baixar. Flashcards não usa
           GLB. O estado `aberto` vive aqui, então envolver o item inteiro não
-          perde estado. */}
-      <Suspense fallback={null}>
-        <Radio />
-      </Suspense>
-      <Suspense fallback={null}>
-        <Computador {...props("hub")} />
-      </Suspense>
+          perde estado. O ErrorBoundary por item cobre a FALHA do download
+          (o Suspense só cobre a espera): o item some, a sala continua. */}
+      <ErrorBoundary fallback={null}>
+        <Suspense fallback={null}>
+          <Radio />
+        </Suspense>
+      </ErrorBoundary>
+      <ErrorBoundary fallback={null}>
+        <Suspense fallback={null}>
+          <Computador {...props("hub")} />
+        </Suspense>
+      </ErrorBoundary>
       <Flashcards {...props("flashcards")} />
-      <Suspense fallback={null}>
-        <Livro onAbrirTutorDom={onAbrirTutorDom} {...props("tutor")} />
-      </Suspense>
+      <ErrorBoundary fallback={null}>
+        <Suspense fallback={null}>
+          <Livro onAbrirTutorDom={onAbrirTutorDom} {...props("tutor")} />
+        </Suspense>
+      </ErrorBoundary>
     </group>
   );
 }

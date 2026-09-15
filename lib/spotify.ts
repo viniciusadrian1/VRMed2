@@ -145,7 +145,10 @@ export async function concluirLogin(): Promise<"ok" | "erro" | "nada"> {
   const verifier = sessionStorage.getItem(`${CHAVE}.verifier`);
   sessionStorage.removeItem(`${CHAVE}.verifier`);
   window.history.replaceState(null, "", window.location.pathname);
-  if (!code || !verifier) return "erro";
+  // Code sem verifier com tokens já gravados é retorno obsoleto (o Voltar do
+  // navegador reabre o /authorize e o Spotify redireciona de novo): ignorar,
+  // senão a tela mostrava "login não terminou" com a conta conectada.
+  if (!code || !verifier) return conectado() ? "nada" : "erro";
   const tokens = await pedirTokens({
     grant_type: "authorization_code",
     code,

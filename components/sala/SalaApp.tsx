@@ -10,8 +10,9 @@ import {
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Send, X } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
-import { XR } from "@react-three/xr";
+import { XR, XROrigin } from "@react-three/xr";
 import { obterXRStore } from "@/lib/xr-store";
+import { SairDoVR } from "@/components/xr/SairDoVR";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
@@ -48,10 +49,15 @@ export function SalaApp() {
   useEffect(() => {
     if (!spotify.spotifyConfigurado()) return;
     const sincronizar = () => setSpotifyEstado(spotify.conectado() ? "conectado" : "desconectado");
-    void spotify.concluirLogin().then((resultado) => {
-      if (resultado === "erro") setSpotifyEstado("erro");
-      else sincronizar();
-    });
+    void spotify
+      .concluirLogin()
+      .then((resultado) => {
+        if (resultado === "erro") setSpotifyEstado("erro");
+        else sincronizar();
+      })
+      // Rede caindo na troca do code: o verifier e a URL já foram limpos, então
+      // sem este aviso o login falhava em silêncio.
+      .catch(() => setSpotifyEstado("erro"));
     window.addEventListener(spotify.EVENTO_SPOTIFY, sincronizar);
     return () => window.removeEventListener(spotify.EVENTO_SPOTIFY, sincronizar);
   }, []);
@@ -117,7 +123,7 @@ export function SalaApp() {
   if (!mounted) return null;
 
   return (
-    <main className="relative h-dvh w-full overflow-hidden bg-[#1a140d]">
+    <main id="conteudo-principal" className="relative h-dvh w-full overflow-hidden bg-[#1a140d]">
       {!inSession && (
         <>
           <Link
@@ -257,13 +263,24 @@ export function SalaApp() {
         shadows={false}
         dpr={1}
         frameloop="always"
-        // No ponto de vista do VR sentado (olhos ~1,2m sobre o XROrigin):
-        // a câmera antiga, 1m atrás e 40cm acima, escondia painéis altos.
+        // Só o enquadramento inicial: fora do VR o EnquadrarCamera2D (SalaScene)
+        // ajusta posição e fov pelo aspecto da tela, senão no celular só o
+        // monitor cabia no quadro.
         camera={{ position: [0, 1.2, -1.15], fov: 55 }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => gl.setClearColor("#1a140d")}
       >
         <XR store={store}>
+          {/* Origem (pés) no CENTRO DO ASSENTO da cadeira (cadeira ocupa z −1,55..−0,75,
+              encosto do lado +z; mesa começa em z ≈ −1,5). Antes ficava em z −0,55,
+              atrás do encosto: qualquer passo à frente punha a cabeça dentro dele.
+              Quem senta de verdade fica sentado na cadeira; quem fica de pé fica
+              "no lugar" dela, olhando a mesa de cima.
+              Fica FORA do boundary (como no Duelo e na Clínica): se a cena cair no
+              fallback, o "Sair do VR" continua existindo dentro do headset. */}
+          <XROrigin position={[0, 0, -1.15]}>
+            <SairDoVR position={[-0.8, 1.05, -0.2]} />
+          </XROrigin>
           {/* Sem o boundary, qualquer erro na árvore 3D (ex.: carta de IA
               malformada) subia até o error.tsx e derrubava a rota inteira. */}
           <ErrorBoundary
