@@ -1,10 +1,19 @@
 "use client";
 
-import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useXRInputSourceState } from "@react-three/xr";
+import {
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useXR, useXRInputSourceState } from "@react-three/xr";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D, Panel, Button3D, ARENA_COLORS } from "@/components/arena/ui3d";
 import {
   detectStructures,
@@ -302,7 +311,14 @@ const TOMBO_MAXIMO = 1.2;
  * Enquanto o analógico está em uso o giro automático pausa. No computador,
  * sem controle, nada muda.
  */
-function ModeloRodada({ rodada }: { rodada: Rodada }) {
+function ModeloRodada({
+  rodada,
+  prontoRef,
+}: {
+  rodada: Rodada;
+  /** Vira true quando o modelo desta rodada aparece (o relógio do bot espera). */
+  prontoRef: RefObject<boolean>;
+}) {
   const caminho = rodada.tipo === "orgao" ? rodada.modelo! : LARINGE;
   const gltf = useGLTF(caminho, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
@@ -368,7 +384,9 @@ function ModeloRodada({ rodada }: { rodada: Rodada }) {
     // grupo-pai deslocado, puxava o ponto para a origem do MUNDO: o
     // detectStructures escolhe o vértice mais distante da origem e o afasta
     // 3% dela — na sala, o marcador caía sobre a cartilagem vizinha.
-  }, [scene, rodada]);
+    // Só roda depois que o GLB chegou (se ainda baixa, o Suspense segura).
+    prontoRef.current = true;
+  }, [scene, rodada, prontoRef]);
 
   useFrame((state, delta) => {
     // Mesmo teto de passo do visualizador: ao recolocar o headset, o primeiro
@@ -448,6 +466,11 @@ export function DueloGame({
   online: DueloOnline;
 }) {
   const hosp = ambiente === "hospital";
+  // Tela em pé fora do VR: ao lado da lousa/painel o modelo da rodada cai fora
+  // da largura da tela, então ele sobe para cima deles. No óculos nada muda.
+  const retrato = useThree((s) => s.size.width < s.size.height);
+  const naSessao = useXR((s) => Boolean(s.session));
+  const empilhar = retrato && !naSessao;
   // A laringe carrega já no menu (Suspense) — as rodadas de 200 pts saem
   // das estruturas nomeadas reais dela.
   const laringe = useGLTF(LARINGE, "/draco/");
@@ -488,6 +511,9 @@ export function DueloGame({
   // "rodada" no closure) — sem o ref, os dois pontuavam na mesma rodada.
   const rodadaEncerrada = useRef(false);
   const botPlano = useRef({ em: 99, acerta: false, respondeu: false });
+  // Contra o bot, cronômetro e bot só andam com o modelo da rodada na tela: em
+  // wifi lento o especialista pontuava antes de o órgão terminar de baixar.
+  const modeloPronto = useRef(false);
   const rodada = rodadas[indice];
 
   /* ---- duelo online ---- */
@@ -531,6 +557,8 @@ export function DueloGame({
     relogio.current = 0;
     travadoAte.current = 0;
     rodadaEncerrada.current = false;
+    // O layout effect do novo modelo só roda no commit seguinte.
+    modeloPronto.current = false;
     setTempoRestante(TEMPO_RODADA);
     setErroJogador(false);
     setErrados([]);
@@ -703,13 +731,29 @@ export function DueloGame({
   // Atalho de teclado para DESKTOP (no headset não há teclado — lá joga-se com
   // laser/olhar). Sem array de deps de propósito: re-registra a cada render e
   // enxerga fase/rodada/dificuldade atuais (comecar/responder já são recriadas
-  // por render). `"123".indexOf("")` retorna 0 — daí o `&& k`. Escape NÃO é
-  // mapeado (no VR ele encerra a sessão). Reaproveita responder(), que já trava
-  // rodada encerrada/lockout, então não duplica pontuação.
+  // por render). `"123".indexOf("")` retorna 0 — daí o `&& k`. Escape volta ao
+  // menu só FORA da sessão XR (no VR ele encerra a sessão): sem ele, as telas
+  // abertas pelas teclas 4/5 não tinham saída pelo teclado. Reaproveita
+  // responder(), que já trava rodada encerrada/lockout, então não duplica
+  // pontuação.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
       const k = e.key.toLowerCase();
+      if (
+        k === "escape" &&
+        !naSessao &&
+        (fase === "sala" ||
+          fase === "codigo" ||
+          fase === "encerrada" ||
+          fase === "fim" ||
+          (emSala && online.conexao === "perdida"))
+      ) {
+        // Contra o bot, sala nula: sair() só limpa o estado — equivale a
+        // "Trocar dificuldade". Online, sai da sala como "Cancelar"/"Sair do duelo".
+        voltarAoMenu();
+        return;
+      }
       if (fase === "menu") {
         const i = "123".indexOf(k);
         if (i >= 0 && k) comecar(NIVEIS[i]);
@@ -766,8 +810,9 @@ export function DueloGame({
       return;
     }
 
-    relogio.current += delta;
     const faseAgora = faseRef.current;
+    if (faseAgora === "rodada" && !modeloPronto.current) return;
+    relogio.current += delta;
 
     if (faseAgora === "contagem") {
       const restante = 3 - Math.floor(relogio.current);
@@ -1164,20 +1209,45 @@ export function DueloGame({
       {/* Suspense LOCAL: em wifi lento, um GLB de rodada ainda em voo não pode
           apagar placar, cronômetro e botões — só o modelo espera. */}
       {/* Escola: órgão ao lado da lousa. Hospital: flutuando à esquerda do
-          painel, na altura do peito (1,5m do chão). */}
+          painel, na altura do peito (1,5m do chão). Tela em pé fora do VR:
+          acima da lousa/do painel (a câmera da escola sobe e a do hospital
+          recua, ver DueloApp). */}
       <group
-        position={hosp ? [-1.05, 0.2, -0.5] : [-0.78, -0.15, -0.95]}
-        scale={hosp ? 0.6 : 0.36}
+        position={
+          hosp
+            ? empilhar
+              ? [0.72, 1.2, -0.5]
+              : [-1.05, 0.2, -0.5]
+            : empilhar
+              ? [LOUSA_X, 0.42, -0.95]
+              : [-0.78, -0.15, -0.95]
+        }
+        scale={hosp ? (empilhar ? 0.4 : 0.6) : empilhar ? 0.26 : 0.36}
       >
-        <Suspense
+        {/* Boundary LOCAL, novo a cada rodada: um GLB que falha tira só o
+            modelo — pergunta, alternativas e placar seguem, e a partida não
+            acaba. Libera o relógio do bot, que esperava o modelo. */}
+        <ErrorBoundary
+          key={indice}
+          onError={() => {
+            modeloPronto.current = true;
+          }}
           fallback={
             <Text3D position={[0, 0, 0]} size={0.11} color={ARENA_COLORS.muted}>
-              Carregando…
+              Modelo indisponível
             </Text3D>
           }
         >
-          <ModeloRodada rodada={rodada} />
-        </Suspense>
+          <Suspense
+            fallback={
+              <Text3D position={[0, 0, 0]} size={0.11} color={ARENA_COLORS.muted}>
+                Carregando…
+              </Text3D>
+            }
+          >
+            <ModeloRodada rodada={rodada} prontoRef={modeloPronto} />
+          </Suspense>
+        </ErrorBoundary>
       </group>
 
       {/* Placar, cronômetro, pergunta, alternativas e feedback */}

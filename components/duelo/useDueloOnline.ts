@@ -53,8 +53,8 @@ async function enviar(corpo: object): Promise<{ ok: boolean; dados: Record<strin
 /**
  * Conexão do óculos com o duelo online.
  *
- * Mora no `DueloApp`, FORA do `<Canvas>`: trocar de ambiente remonta o canvas,
- * e a partida não pode cair por isso.
+ * Mora no `DueloApp`, FORA do `<Canvas>`: a conexão pertence à página, não à
+ * cena 3D, e nada que aconteça dentro do canvas pode derrubar a partida.
  *
  * Sair da página (inclusive pelo botão "Sair do VR", que troca de página) é
  * sair do duelo: o adversário é avisado na hora, sem esperar o limite de
@@ -77,6 +77,8 @@ export function useDueloOnline(): DueloOnline {
   const saidaPendente = useRef<{ sala: string; timer: ReturnType<typeof setTimeout> } | null>(
     null,
   );
+  /** Sala da qual `sair()` já avisou o servidor: a desmontagem não repete. */
+  const saidaAvisada = useRef<string | null>(null);
 
   useEffect(() => {
     if (!sala) return;
@@ -138,7 +140,7 @@ export function useDueloOnline(): DueloOnline {
       // para que uma remontagem imediata com a mesma sala o cancele.
       const timer = setTimeout(() => {
         saidaPendente.current = null;
-        avisarSaida();
+        if (saidaAvisada.current !== sala) avisarSaida();
       }, 0);
       saidaPendente.current = { sala, timer };
     };
@@ -215,7 +217,10 @@ export function useDueloOnline(): DueloOnline {
 
   const sair = useCallback(() => {
     pedido.current += 1;
-    if (sala) void enviar({ acao: "sair", jogador: meuId(), sala });
+    if (sala) {
+      saidaAvisada.current = sala;
+      void enviar({ acao: "sair", jogador: meuId(), sala });
+    }
     ultima.current = null;
     setSala(null);
     setConexao("fora");
