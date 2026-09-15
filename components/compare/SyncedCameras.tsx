@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { invalidate as invalidarTodos, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { Vec3 } from "@/types";
@@ -58,6 +58,10 @@ export function SyncedCameras({
     ];
     syncRef.current.epoch += 1;
     localEpoch.current = syncRef.current.epoch;
+    // Com frameloop="demand" o outro canvas só roda useFrame se receber
+    // quadros; o invalidate da store vale só para esta raiz. O global, sem
+    // argumento, acorda todas as raízes (aqui só existem os dois canvas).
+    invalidarTodos();
   };
 
   // Quando o outro canvas avança o epoch, este acompanha a câmera.

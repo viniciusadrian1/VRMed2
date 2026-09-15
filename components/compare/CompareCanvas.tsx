@@ -14,6 +14,7 @@ import * as THREE from "three";
 import { normalizeContent } from "@/lib/model-utils";
 import { useMounted } from "@/hooks/use-mounted";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SafeEnvironment } from "@/components/viewer/SafeEnvironment";
 import { ComparePlaceholder } from "./ComparePlaceholder";
 import { SyncedCameras, type CameraSyncState } from "./SyncedCameras";
@@ -69,10 +70,22 @@ function CompareModel({
   }, [path, onResolved]);
 
   if (state === "real") {
+    // Se o download cair depois do HEAD ou o Draco falhar, recai no modelo de
+    // demonstração (com o selo honesto) em vez de derrubar a página. O clear
+    // tira o erro do cache do useGLTF para a próxima montagem tentar de novo.
     return (
-      <Suspense fallback={null}>
-        <CompareGLB path={path} />
-      </Suspense>
+      <ErrorBoundary
+        key={path}
+        fallback={<ComparePlaceholder variant={variant} />}
+        onError={() => {
+          useGLTF.clear(path);
+          onResolved?.("placeholder");
+        }}
+      >
+        <Suspense fallback={null}>
+          <CompareGLB path={path} />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
   return <ComparePlaceholder variant={variant} />;

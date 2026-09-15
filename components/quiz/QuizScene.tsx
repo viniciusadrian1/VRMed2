@@ -9,6 +9,7 @@ import { getOrganById } from "@/lib/organs";
 import { cn } from "@/lib/utils";
 import { useMounted } from "@/hooks/use-mounted";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PlaceholderOrgan } from "@/components/viewer/PlaceholderOrgan";
 import { SafeEnvironment } from "@/components/viewer/SafeEnvironment";
 import type { Annotation } from "@/types";
@@ -43,10 +44,19 @@ function QuizModel({ path }: { path: string }) {
   }, [path]);
 
   if (state === "real") {
+    // Se o download cair depois do HEAD ou o Draco falhar, recai no modelo de
+    // demonstração em vez de derrubar a página (e o progresso do quiz). O
+    // clear tira o erro do cache do useGLTF para a próxima montagem tentar de novo.
     return (
-      <Suspense fallback={null}>
-        <QuizGLB path={path} />
-      </Suspense>
+      <ErrorBoundary
+        key={path}
+        fallback={<PlaceholderOrgan />}
+        onError={() => useGLTF.clear(path)}
+      >
+        <Suspense fallback={null}>
+          <QuizGLB path={path} />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
   return <PlaceholderOrgan />;
