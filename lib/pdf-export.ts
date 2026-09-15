@@ -29,6 +29,53 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
+/*
+ * A fonte padrão do jsPDF (helvetica/times) só cobre WinAnsi. Um único
+ * caractere fora dele (β, ≥, →, CO₂) faz o jsPDF gravar a linha INTEIRA em
+ * UTF-16 e ela sai embaralhada. Trocamos os símbolos comuns por equivalentes
+ * e o resto vira "?". Latin-1 e os extras do WinAnsi (—, •, “ ”, …) passam.
+ * ponytail: mapa curto; embutir uma TTF Unicode (addFileToVFS/addFont) se
+ * aparecerem muitos outros símbolos.
+ */
+const SUBSTITUTOS: Record<string, string> = {
+  "α": "alfa",
+  "β": "beta",
+  "γ": "gama",
+  "δ": "delta",
+  "μ": "µ",
+  "⁻": "-",
+  "⁺": "+",
+  "−": "-", // U+2212, o sinal de menos tipográfico: sem ele "−90 mV" perde o sinal
+  "‐": "-", // hífen
+  "‑": "-", // hífen sem quebra
+  // Separadores de linha/parágrafo viram quebra real (splitTextToSize corta em \n).
+  " ": "\n",
+  " ": "\n",
+  "≥": ">=",
+  "≤": "<=",
+  "≠": "!=",
+  "≈": "~",
+  "→": "->",
+  "←": "<-",
+  "↔": "<->",
+  "↑": "(aumento)",
+  "↓": "(redução)",
+};
+const SOBRESCRITOS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+const WINANSI_EXTRA = "€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ";
+
+function toWinAnsi(text: string): string {
+  // [\s\S] em vez de ".": o ponto não casa U+2028/U+2029, que passariam
+  // intactos e voltariam a forçar UTF-16. (A flag "s" exige alvo ES2018.)
+  return text.replace(/[\s\S]/gu, (c) => {
+    if (c <= "\xff" || WINANSI_EXTRA.includes(c)) return c;
+    if (c >= "₀" && c <= "₉") return String(c.charCodeAt(0) - 0x2080);
+    const sobrescrito = SOBRESCRITOS.indexOf(c);
+    if (sobrescrito >= 0) return String(sobrescrito);
+    return SUBSTITUTOS[c] ?? "?";
+  });
+}
+
 /**
  * Exporta uma sessão de estudo como PDF.
  *
@@ -61,7 +108,7 @@ export function exportSessionToPdf(session: StudySession): void {
     doc.setFontSize(size);
     setText(doc, options.color ?? TEXT);
     const lineHeight = size * 1.42;
-    for (const line of doc.splitTextToSize(content, CONTENT_W)) {
+    for (const line of doc.splitTextToSize(toWinAnsi(content), CONTENT_W)) {
       ensureSpace(lineHeight);
       doc.text(line, MARGIN, y);
       y += lineHeight;
@@ -95,7 +142,7 @@ export function exportSessionToPdf(session: StudySession): void {
   doc.setFont("times", "bold");
   doc.setFontSize(25);
   setText(doc, TEXT);
-  for (const line of doc.splitTextToSize(session.name, CONTENT_W)) {
+  for (const line of doc.splitTextToSize(toWinAnsi(session.name), CONTENT_W)) {
     doc.text(line, MARGIN, y);
     y += 30;
   }

@@ -27,6 +27,14 @@ export function SplitView({ organ, synced, syncRef }: SplitViewProps) {
     [],
   );
 
+  // Fim do arrasto também no pointercancel, senão dragging fica preso em true.
+  const stopDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    dragging.current = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -48,12 +56,18 @@ export function SplitView({ organ, synced, syncRef }: SplitViewProps) {
         </span>
       </div>
 
-      {/* Divisor arrastável */}
+      {/* Divisor arrastável. touch-none: sem ele o navegador toma o arrasto
+          por rolagem e cancela o ponteiro depois de poucos pixels. O ::before
+          alarga a área de toque para ~30 px sem engrossar o traço visível. */}
       <div
         role="separator"
         aria-orientation="vertical"
         aria-label="Arraste para redimensionar"
-        className="z-10 w-1.5 shrink-0 cursor-col-resize bg-border transition-colors hover:bg-primary"
+        aria-valuenow={Math.round(ratio * 100)}
+        aria-valuemin={22}
+        aria-valuemax={78}
+        tabIndex={0}
+        className="relative z-10 w-1.5 shrink-0 cursor-col-resize touch-none bg-border outline-none transition-colors before:absolute before:inset-y-0 before:-inset-x-3 before:content-[''] hover:bg-primary focus-visible:bg-primary"
         onPointerDown={(event) => {
           dragging.current = true;
           event.currentTarget.setPointerCapture(event.pointerId);
@@ -63,9 +77,13 @@ export function SplitView({ organ, synced, syncRef }: SplitViewProps) {
           const rect = containerRef.current.getBoundingClientRect();
           setRatio(clamp((event.clientX - rect.left) / rect.width, 0.22, 0.78));
         }}
-        onPointerUp={(event) => {
-          dragging.current = false;
-          event.currentTarget.releasePointerCapture(event.pointerId);
+        onPointerUp={stopDrag}
+        onPointerCancel={stopDrag}
+        onKeyDown={(event) => {
+          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+          event.preventDefault();
+          const delta = event.key === "ArrowLeft" ? -0.05 : 0.05;
+          setRatio((r) => clamp(r + delta, 0.22, 0.78));
         }}
       />
 
