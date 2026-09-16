@@ -54,6 +54,22 @@ type Availability = "checking" | "real" | "placeholder";
 const POSE_PROVISORIA: [number, number, number] = [0, 1.3, -0.8];
 
 /**
+ * Abertura pelo analógico esquerdo no VR: puxar para trás separa as partes,
+ * empurrar para a frente junta, e soltar deixa onde está. Com o eixo no
+ * máximo, abre por inteiro em ~1,5 s — rápido o bastante para não cansar,
+ * devagar o bastante para ver cada osso sair do lugar.
+ */
+const SEGUNDOS_PARA_ABRIR = 1.5;
+const CONTROLE_DA_ABERTURA = {
+  mover: (eixo: number, delta: number) => {
+    const { explosao, setExplosao } = useVRMedStore.getState();
+    setExplosao(explosao + (eixo * delta) / SEGUNDOS_PARA_ABRIR);
+  },
+  // A/X fecha junto com o reset: a próxima pessoa começa do modelo inteiro.
+  fechar: () => useVRMedStore.getState().setExplosao(0),
+};
+
+/**
  * Escala que devolve ao modelo o tamanho real declarado da estrutura.
  *
  * `normalizeContent` deixa todo modelo com o MAIOR eixo medindo exatamente 2
@@ -267,12 +283,22 @@ export function OrganModel() {
     event.stopPropagation();
 
     if (annotationMode) {
+      let mundo = event.point.clone();
+      const loja = useVRMedStore.getState();
+      if (loja.explosao > 0.001) {
+        // Anotações vivem na pose FECHADA (é nela que aparecem). Com o crânio
+        // aberto o clique acertou o osso deslocado: guarda o ponto no osso,
+        // fecha — o GLBModel aplica a pose na hora, o `set` é síncrono — e
+        // relê a posição com o osso no lugar.
+        const noOsso = event.object.worldToLocal(mundo);
+        loja.setExplosao(0);
+        event.object.updateWorldMatrix(true, false);
+        mundo = event.object.localToWorld(noOsso);
+      }
       // Gravada no espaço do root, como os pontos: `event.point` é mundo e,
       // com o modelo movido pelo gizmo, a anotação ficaria fora dele ao
       // recarregar. Anotações antigas (root na origem) continuam valendo.
-      const ponto = rootRef.current
-        ? rootRef.current.worldToLocal(event.point.clone())
-        : event.point;
+      const ponto = rootRef.current ? rootRef.current.worldToLocal(mundo) : mundo;
       addAnnotation(organId, {
         id: genId(),
         position: [ponto.x, ponto.y, ponto.z],
@@ -323,7 +349,11 @@ export function OrganModel() {
               }}
             >
               <Suspense fallback={null}>
-                <GLBModel path={organ.modelPath} onReady={handleReady} />
+                <GLBModel
+                  path={organ.modelPath}
+                  onReady={handleReady}
+                  explosao={organ.explosao}
+                />
               </Suspense>
             </ErrorBoundary>
           )}
@@ -355,7 +385,11 @@ export function OrganModel() {
        * o reset devolveria o órgão à pose do OUTRO modo.
        */}
       {inSession && modelReady && (
-        <EntradaXR key={modo} target={rootRef} />
+        <EntradaXR
+          key={modo}
+          target={rootRef}
+          explosao={organ.explosao ? CONTROLE_DA_ABERTURA : undefined}
+        />
       )}
 
       {!inSession && transformMode !== "none" && modelReady && rootRef.current && (

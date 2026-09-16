@@ -28,6 +28,9 @@ function Slider({
       {values.map((_, i) => (
         <SliderPrimitive.Thumb
           key={i}
+          // O papel "slider" fica no polegar, não na raiz: sem repassar o
+          // rótulo, leitores de tela anunciavam só "controle deslizante".
+          aria-label={props["aria-label"]}
           className="block size-4 rounded-full border-2 border-primary bg-background shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none"
         />
       ))}

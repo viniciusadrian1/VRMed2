@@ -78,8 +78,6 @@ export const ORGANS: OrganDefinition[] = [
     kind: "organ",
     category: "respiratorio",
     modelPath: "/models/healthy/pulmao.glb",
-    pathologicalPath: "/models/pathological/pulmao.glb",
-    pathologyName: "Enfisema pulmonar",
     blurb: "Órgão das trocas gasosas, da traqueia aos alvéolos.",
     // Base do pulmão → topo da via aérea: os dois pulmões + laringe e traqueia.
     tamanhoRealCm: 42,
@@ -112,6 +110,10 @@ export const ORGANS: OrganDefinition[] = [
     kind: "organ",
     category: "urinario",
     modelPath: "/models/healthy/rim.glb",
+    // Par do Comparar no lugar do pulmão, que nunca recebeu o modelo com
+    // enfisema (o enfisema real está na Clínica, a partir de TC).
+    pathologicalPath: "/models/pathological/rim.glb",
+    pathologyName: "Doença renal policística",
     blurb: "Filtragem do sangue e regulação hidroeletrolítica.",
     // Ápice da suprarrenal → corte do ureter (rim com suprarrenal, vasos e ureter).
     tamanhoRealCm: 15,
@@ -253,6 +255,18 @@ export const REGIONS: OrganDefinition[] = [
     // Ponta a ponta dos cotos dos fêmures (entre as cristas ilíacas, ~29 cm).
     tamanhoRealCm: 37,
   },
+  {
+    id: "cranio",
+    name: "Crânio",
+    modelPath: "/models/organs/cranio.glb",
+    blurb: "Ossos do crânio e da face, que se separam para estudo um a um.",
+    // Vértice → mento, com a mandíbula. O arquivo já vem em centímetros, e os
+    // outros dois eixos batem com um crânio adulto: 13,9 cm de largura e
+    // 17,6 cm de comprimento.
+    tamanhoRealCm: 20.8,
+    // A animação do arquivo abre de 0 a 4 s e fecha de 4 a 8 s.
+    explosao: { ateSegundos: 4, rotulo: "Separar os ossos" },
+  },
 ];
 
 /** Catálogo completo: sistemas + anatomia regional + órgãos individuais. */
@@ -273,17 +287,17 @@ export const COMPARISON_NOTES: Record<string, string[]> = {
     "Aumento da demanda de oxigênio pelo miocárdio.",
     "Maior rigidez da parede, prejudicando o enchimento diastólico.",
   ],
-  pulmao: [
-    "Destruição das paredes alveolares e perda de septos.",
-    "Alvéolos dilatados que se fundem em espaços maiores.",
-    "Perda da elasticidade do tecido pulmonar.",
-    "Aprisionamento de ar e redução da área de troca gasosa.",
-  ],
   figado: [
     "Substituição progressiva do parênquima por tecido fibroso.",
     "Formação de nódulos de regeneração.",
     "Superfície irregular e consistência endurecida.",
     "Comprometimento difuso das funções metabólicas.",
+  ],
+  rim: [
+    "Numerosos cistos cheios de líquido ocupam e substituem o parênquima.",
+    "Rim muito aumentado de volume e de contorno irregular (aqui os dois são exibidos do mesmo tamanho, sem a proporção real).",
+    "Perda progressiva de néfrons funcionais, com queda da filtração.",
+    "Associa-se a hipertensão arterial e pode evoluir para insuficiência renal.",
   ],
 };
 

@@ -35,6 +35,37 @@ function defaultClipping(): ClippingState {
 }
 
 /** Storage seguro para SSR: sem janela, vira um armazenamento inerte. */
+/**
+ * Armazenamento do persist que só grava quando a parte persistida mudou.
+ *
+ * O persist do zustand serializa e grava o estado INTEIRO a cada `set`, até
+ * quando o campo alterado nem é persistido. A abertura do crânio chama `set` a
+ * cada quadro no VR (72–90 Hz): eram centenas de KB de chat e sessões com
+ * screenshot virando JSON e indo para o localStorage na thread principal,
+ * dentro do orçamento do quadro. Toda ação que mexe em algo persistido cria
+ * objetos novos, então comparar por referência basta.
+ */
+function armazenamentoQueSoGravaMudancas() {
+  const json = createJSONStorage(() =>
+    typeof window !== "undefined" ? window.localStorage : ssrSafeStorage,
+  );
+  if (!json) return json;
+  let ultimaFatia: Record<string, unknown> | null = null;
+  return {
+    ...json,
+    setItem: (nome: string, valor: { state: unknown; version?: number }) => {
+      const fatia = valor.state as Record<string, unknown>;
+      const anterior = ultimaFatia;
+      if (anterior && Object.keys(fatia).every((k) => Object.is(fatia[k], anterior[k]))) {
+        return;
+      }
+      // Estourando a cota, lança antes de memorizar: a próxima tentativa grava.
+      json.setItem(nome, valor);
+      ultimaFatia = fatia;
+    },
+  };
+}
+
 const ssrSafeStorage: StateStorage = {
   getItem: () => null,
   setItem: () => {},
@@ -98,6 +129,11 @@ interface VRMedState {
   /* --- gizmo de manipulação --- */
   transformMode: TransformMode;
   setTransformMode: (mode: TransformMode) => void;
+
+  /* --- abertura de modelos que se separam (o crânio) --- */
+  /** 0 = fechado, 1 = todo aberto. Não persiste: todo modelo abre fechado. */
+  explosao: number;
+  setExplosao: (valor: number) => void;
 
   /* --- anotações por órgão (persistido) --- */
   /** Modo de adição: quando ativo, clicar no modelo cria um hotspot. */
@@ -167,6 +203,7 @@ export const useVRMedStore = create<VRMedState>()(
           transformMode: "none",
           annotationMode: false,
           inspectedLabel: null,
+          explosao: 0,
         }),
       modelKind: null,
       setModelKind: (kind) => set({ modelKind: kind }),
@@ -254,6 +291,12 @@ export const useVRMedStore = create<VRMedState>()(
 
       transformMode: "none",
       setTransformMode: (mode) => set({ transformMode: mode }),
+      explosao: 0,
+      setExplosao: (valor) => {
+        const limitado = Math.min(1, Math.max(0, valor));
+        // Travado em 0 ou 1 com o analógico ainda empurrado: nada a avisar.
+        if (limitado !== get().explosao) set({ explosao: limitado });
+      },
 
       annotationMode: false,
       setAnnotationMode: (on) => set({ annotationMode: on }),
@@ -364,6 +407,7 @@ export const useVRMedStore = create<VRMedState>()(
           annotationMode: false,
           // Como em setCurrentOrgan: o rótulo era de uma malha do modelo anterior.
           inspectedLabel: null,
+          explosao: 0,
           chat: session.chat.map((m) => ({ ...m })),
           annotationsByOrgan: {
             ...s.annotationsByOrgan,
@@ -378,9 +422,7 @@ export const useVRMedStore = create<VRMedState>()(
     {
       name: "vrmed-store",
       version: 1,
-      storage: createJSONStorage(() =>
-        typeof window !== "undefined" ? window.localStorage : ssrSafeStorage,
-      ),
+      storage: armazenamentoQueSoGravaMudancas(),
       // Apenas dados duráveis são persistidos; o estado vivo do 3D é recriado.
       partialize: (state) => ({
         analyticsConsent: state.analyticsConsent,

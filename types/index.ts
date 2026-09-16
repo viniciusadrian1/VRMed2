@@ -67,6 +67,17 @@ export interface OrganDefinition {
    * pesquisa. Ver o comentário em `lib/organs.ts`.
    */
   tamanhoRealCm?: number;
+  /**
+   * Modelo que se separa em partes (o crânio que "explode" em ossos) por uma
+   * animação que vem no próprio `.glb`. O controle não toca a animação: ele
+   * escolhe o instante dela — 0 fechado, `ateSegundos` todo aberto. Depois
+   * desse instante o clipe costuma voltar a fechar, então ele nunca passa dali.
+   */
+  explosao?: {
+    ateSegundos: number;
+    /** Rótulo do controle na tela, ex.: "Separar os ossos". */
+    rotulo: string;
+  };
 }
 
 /* -------------------------------------------------------------------------- */

@@ -108,7 +108,8 @@ interface Snapshot {
  *  - **Analógico ⇄ (qualquer um)** — gira o órgão como um torno (yaw).
  *  - **Analógico direito ↕** — traz para perto do rosto / afasta.
  *  - **Analógico esquerdo ↕** — tomba o órgão (pitch), para alcançar
- *    estruturas no topo ou embaixo.
+ *    estruturas no topo ou embaixo. Num modelo que se separa em partes (o
+ *    crânio), abre e fecha em vez de tombar (`aoExplodir`).
  *  - **Botão A ou X** — devolve o modelo à posição original (essencial num
  *    estande: a próxima pessoa sempre começa do mesmo jeito).
  *
@@ -118,6 +119,7 @@ interface Snapshot {
 export function XRManipulation({
   target,
   aoResetar,
+  aoExplodir,
 }: {
   target: RefObject<THREE.Group | null>;
   /**
@@ -131,6 +133,12 @@ export function XRManipulation({
     gl: THREE.WebGLRenderer,
     frame: XRFrame | undefined,
   ) => void;
+  /**
+   * Com isto, o analógico esquerdo ↕ abre e fecha o modelo em vez de tombá-lo.
+   * `eixo` é positivo com o analógico puxado para trás. O tombo faz falta
+   * pouco num modelo assim: dá para virá-lo com a mão.
+   */
+  aoExplodir?: (eixo: number, delta: number) => void;
 }) {
   const leftController = useXRInputSourceState("controller", "left");
   const rightController = useXRInputSourceState("controller", "right");
@@ -290,7 +298,9 @@ export function XRManipulation({
       model.rotateOnWorldAxis(WORLD_Y, -spin * delta * SPIN_SPEED);
     }
 
-    if (pitch !== 0) {
+    if (pitch !== 0 && aoExplodir) {
+      aoExplodir(pitch, delta);
+    } else if (pitch !== 0) {
       // Tomba em torno do eixo "direita da câmera" projetado na horizontal:
       // o movimento acompanha o ponto de vista do jogador, de onde quer que
       // ele esteja olhando. Empurrar para frente tomba o topo para longe.
@@ -596,13 +606,20 @@ function poseSuposta(gl: THREE.WebGLRenderer): PoseDaCabeca {
 /** Coloca o modelo uma vez, no início da sessão, e avisa quando terminou. */
 function PoseDeEntrada({
   target,
-  tamanho,
+  tamanhoRef,
   onPronto,
+  fechar,
 }: {
   target: RefObject<THREE.Group | null>;
   /** Tamanho em pé, medido uma vez e compartilhado com o reset do A/X. */
-  tamanho: RefObject<THREE.Vector3 | null>;
+  tamanhoRef: RefObject<THREE.Vector3 | null>;
   onPronto: () => void;
+  /**
+   * Fecha um modelo que se separa antes de medir. Aberto no 2D, o crânio
+   * media o dobro, nascia longe e o A/X o recolocava FECHADO naquela
+   * distância — a medida é reaproveitada no reset.
+   */
+  fechar?: () => void;
 }) {
   const quadros = useRef(0);
   const feito = useRef(false);
@@ -619,8 +636,11 @@ function PoseDeEntrada({
       feito.current = true;
       onPronto();
     };
-    tamanho.current ??= medirEmPe(model);
-    const medida = tamanho.current;
+    if (!tamanhoRef.current) {
+      fechar?.();
+      tamanhoRef.current = medirEmPe(model);
+    }
+    const medida = tamanhoRef.current;
 
     // Com pose real: recoloca a cada quadro durante a acomodação, e só então
     // para. A última colocação é a que fica.
@@ -675,8 +695,14 @@ function PoseDeEntrada({
  */
 export function EntradaXR({
   target,
+  explosao,
 }: {
   target: RefObject<THREE.Group | null>;
+  /** Modelo que se separa: o analógico abre e fecha, e o A/X fecha. */
+  explosao?: {
+    mover: (eixo: number, delta: number) => void;
+    fechar: () => void;
+  };
 }) {
   const [posicionado, setPosicionado] = useState(false);
   // Uma medida por montagem. O tamanho em pé não muda na sessão: o reset
@@ -691,14 +717,17 @@ export function EntradaXR({
       {!posicionado && (
         <PoseDeEntrada
           target={target}
-          tamanho={tamanho}
+          tamanhoRef={tamanho}
           onPronto={() => setPosicionado(true)}
+          fechar={explosao?.fechar}
         />
       )}
       {posicionado && (
         <XRManipulation
           target={target}
+          aoExplodir={explosao?.mover}
           aoResetar={(model, gl, frame) => {
+            explosao?.fechar();
             tamanho.current ??= medirEmPe(model);
             const medida = tamanho.current;
             if (!medida) return;
