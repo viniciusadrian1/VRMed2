@@ -31,7 +31,13 @@ import { DotPattern } from "@/components/ui/dot-pattern";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { ScanBeam } from "@/components/ui/scan-beam";
 import { WordReveal } from "@/components/ui/word-reveal";
-import { getComparableOrgans, ORGANS, REGIONS, SYSTEMS } from "@/lib/organs";
+import {
+  ALL_MODELS,
+  getComparableOrgans,
+  ORGANS,
+  REGIONS,
+  SYSTEMS,
+} from "@/lib/organs";
 
 /* -------------------------------------------------------------------------- */
 /* Dados estáticos da página                                                   */
@@ -44,7 +50,8 @@ const HERO_STATS: {
   suffix?: string;
   text?: string;
 }[] = [
-  { icon: Boxes, value: 18, label: "Modelos 3D" },
+  // Contado do catálogo: número escrito à mão ficava velho a cada modelo novo.
+  { icon: Boxes, value: ALL_MODELS.length, label: "Modelos 3D" },
   { icon: Sparkles, text: "IA", label: "Tutor com fontes" },
   { icon: MonitorSmartphone, text: "VR", label: "No navegador" },
   { icon: Languages, value: 100, suffix: "%", label: "Em português" },
@@ -88,7 +95,7 @@ const SHOWCASE_ITEMS: ShowItem[] = [
     bullets: [
       "Câmeras espelhadas para comparação precisa",
       "Legendas com as diferenças anatômicas chave",
-      "Fígado com par patológico real; coração e pulmão em preparação",
+      "Fígado e rim com par patológico real; coração em preparação",
     ],
     cta: { href: "/compare", label: "Comparar modelos" },
     visual: <CompareMockup />,

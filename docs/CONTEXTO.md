@@ -156,8 +156,13 @@ depende dela; o resto funciona sem).
 Definidos em `lib/organs.ts`. A landing lê direto de lá, então os números se mantêm corretos
 sozinhos. **Não fabricar estatísticas** (é projeto de pesquisa):
 
-- **18 modelos** = 6 sistemas (corpo inteiro) + 6 regiões (anatomia nomeada) + 6 órgãos
-- **3 órgãos** têm par patológico para o modo Comparar: coração, pulmão, fígado
+- **19 modelos** = 6 sistemas (corpo inteiro) + 7 regiões (anatomia nomeada) + 6 órgãos
+- **3 órgãos** têm par patológico cadastrado para o modo Comparar: coração, fígado e rim
+  (policístico, desde 2026-09-16, no lugar do pulmão). Só fígado e rim têm o arquivo; o coração
+  mostra o modelo de demonstração até chegar o modelo com hipertrofia.
+- **Crânio que se abre** (`cranio`, 2026-09-16): a animação do próprio GLB separa os ossos
+  (0–4 s abre, 4–8 s fecha). Na tela, o controle "Separar os ossos"; no VR, o analógico
+  esquerdo (puxar abre, empurrar fecha; A/X fecha). Campo `explosao` no catálogo.
 - VR pelo navegador (WebXR), 100% pt-BR, tutor de IA citando apenas fontes médicas reconhecidas
 
 ### Peso dos modelos (medido) — decisivo para VR
@@ -168,6 +173,8 @@ sozinhos. **Não fabricar estatísticas** (é projeto de pesquisa):
 | `coracao.glb` | 11k (malha única) | ✅ ideal para o "uau" visual |
 | `splanchnology.glb` | 303k | ⚠️ limítrofe |
 | `myology.glb` | **982k** | ❌ **proibido em VR** — não sustenta 72–90fps estéreo |
+| `cranio.glb` | **1,13M** (25 malhas: 22 ossos + dentes superiores e inferiores; 3,3 MB com Draco) | ⚠️ pedido para o Quest pela abertura; **testar no óculos** |
+| `pathological/rim.glb` | **1,43M** (4,8 MB com Draco) | só no Comparar (2D) |
 
 Só **regiões** e **órgãos** têm malhas com nomes anatômicos reais (`layerBy: "mesh"`).
 Os **sistemas** usam `layerBy: "material"` → as camadas são tecidos, e `detectStructures()`

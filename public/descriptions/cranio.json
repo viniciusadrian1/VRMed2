@@ -1,0 +1,9 @@
+{
+  "name": "Crânio",
+  "shortDescription": "Conjunto de ossos que protege o encéfalo e forma o esqueleto da face.",
+  "fullDescription": "O crânio é formado pelo neurocrânio, que envolve e protege o encéfalo, e pelo viscerocrânio, o esqueleto da face. O neurocrânio tem oito ossos: o frontal, os dois parietais, os dois temporais, o occipital, o esfenoide e o etmoide. Na face estão, entre outros, as maxilas, os zigomáticos, os nasais, os lacrimais, os palatinos, as conchas nasais inferiores, o vômer e a mandíbula. No adulto, quase todos esses ossos ficam unidos por suturas imóveis, como a coronal, entre o frontal e os parietais, a sagital, entre os dois parietais, e a lambdóidea, entre os parietais e o occipital. A mandíbula é a exceção: articula-se com os temporais pelas articulações temporomandibulares, que permitem abrir a boca e mastigar. O crânio abriga o encéfalo, as órbitas, a cavidade nasal e a cavidade oral, e seus forames dão passagem a nervos e vasos. Neste modelo os ossos podem ser separados, para estudar a forma de cada um e como eles se encaixam.",
+  "sources": [
+    "Gray's Anatomy, 42ª ed.",
+    "Moore — Anatomia Orientada para a Clínica"
+  ]
+}

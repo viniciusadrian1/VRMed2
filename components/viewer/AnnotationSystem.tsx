@@ -18,8 +18,10 @@ export function AnnotationHotspots() {
   const organId = useVRMedStore((s) => s.currentOrganId);
   const byOrgan = useVRMedStore((s) => s.annotationsByOrgan);
   const annotations = organId ? (byOrgan[organId] ?? []) : [];
+  // Anotações ficam presas à pose fechada: com o modelo aberto, some até fechar.
+  const aberto = useVRMedStore((s) => s.explosao > 0.001);
 
-  if (!organId || annotations.length === 0) return null;
+  if (!organId || aberto || annotations.length === 0) return null;
 
   return (
     <>

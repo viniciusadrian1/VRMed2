@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { ALL_MODELS } from "@/lib/organs";
 
 // Imagem de pré-visualização ao compartilhar o link (Open Graph / Twitter).
 export const alt = "VRmed — Estudo de anatomia em 3D e realidade virtual";
@@ -61,7 +62,7 @@ export default function OpengraphImage() {
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
-          {["18 modelos 3D", "VR no navegador", "100% em português"].map(
+          {[`${ALL_MODELS.length} modelos 3D`, "VR no navegador", "100% em português"].map(
             (chip) => (
               <span
                 key={chip}

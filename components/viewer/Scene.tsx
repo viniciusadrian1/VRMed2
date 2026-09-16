@@ -6,6 +6,8 @@ import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
 import { DiagnosticoXR } from "@/components/xr/DiagnosticoXR";
+import { Text3D } from "@/components/arena/ui3d";
+import { getOrganById } from "@/lib/organs";
 import * as THREE from "three";
 import { track } from "@/lib/analytics";
 import { clamp } from "@/lib/format";
@@ -155,6 +157,9 @@ function SceneContents() {
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
   const emAR = modo === "immersive-ar";
+  const explodivel = useVRMedStore((s) =>
+    Boolean(getOrganById(s.currentOrganId)?.explosao),
+  );
   // `?debug=xr`: painel com a altura dos olhos e do órgão, lido dentro do óculos.
   const debugXR =
     new URLSearchParams(window.location.search).get("debug") === "xr";
@@ -170,6 +175,12 @@ function SceneContents() {
        */}
       <XROrigin position={emAR ? [0, 0, 0] : [0, FLOOR_Y, 0]}>
         <SairDoVR position={[-0.45, 1.25, -0.5]} />
+        {/* Sem esta dica ninguém descobre o gesto: não há botão na cena. */}
+        {inSession && explodivel && (
+          <Text3D position={[-0.45, 1.14, -0.5]} size={0.02} maxWidth={0.34}>
+            Analógico esquerdo: puxe para abrir, empurre para fechar
+          </Text3D>
+        )}
         {debugXR && inSession && <DiagnosticoXR />}
       </XROrigin>
 
@@ -210,7 +221,9 @@ function SceneContents() {
         <>
           <SafeEnvironment />
           <ContactShadows
-            position={[0, -1.25, 0]}
+            // Aberto a 100%, o crânio desce até y -1,98 (a normalização mede
+            // fechado): o chão da sombra vai para baixo dele.
+            position={[0, explodivel ? -2.05 : -1.25, 0]}
             opacity={0.4}
             scale={9}
             blur={2.8}

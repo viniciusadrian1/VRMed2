@@ -21,8 +21,11 @@ export function StructureHotspots() {
   const annotationMode = useVRMedStore((s) => s.annotationMode);
   const inspectedLabel = useVRMedStore((s) => s.inspectedLabel);
   const setInspectedLabel = useVRMedStore((s) => s.setInspectedLabel);
+  // Os pontos são medidos no modelo fechado: com as partes separadas eles
+  // ficariam no ar, longe do osso que marcam.
+  const aberto = useVRMedStore((s) => s.explosao > 0.001);
 
-  if (!organId || !show || annotationMode || structures.length === 0) {
+  if (!organId || !show || annotationMode || aberto || structures.length === 0) {
     return null;
   }
 

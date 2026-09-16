@@ -5,6 +5,7 @@ import { Box, MessageSquare, PanelRightOpen, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { InspectBar } from "@/components/viewer/InspectBar";
+import { ExplosaoControl } from "@/components/viewer/ExplosaoControl";
 import { ModelPicker } from "@/components/viewer/ModelPicker";
 import { SaveSessionButton } from "@/components/viewer/SaveSessionButton";
 import { Scene } from "@/components/viewer/Scene";
@@ -141,6 +142,9 @@ export default function ViewerPage() {
 
             {/* Identificação de estruturas por clique */}
             <InspectBar />
+
+            {/* Abertura de modelos que se separam (o crânio) */}
+            <ExplosaoControl />
 
             {/* Botão flutuante de acesso ao tutor de IA */}
             {!isChatOpen && (
