@@ -77,6 +77,42 @@ Se der erro, abra o console do navegador do Quest em `chrome://inspect` pelo com
 
 ---
 
+## Tarja branca "rodando em segundo plano" ao sair
+
+Faixa nativa do Quest Browser com **Retomar / Sair** (contexto em `docs/CONTEXTO.md`). Para
+confirmar se a correção resolveu, ou para colher dados se a faixa voltar:
+
+1. De preferência use o **deploy do Render** (HTTPS e build de produção, igual ao do evento).
+   A Opção A (`npm run dev:vr`) também serve, mas roda o React em modo de desenvolvimento.
+2. No Quest, abra **`https://…/viewer?debug=xrlog`**. Aparece uma barrinha verde no canto
+   inferior esquerdo; a flag fica gravada.
+3. Repita cada saída **5 vezes**, anotando se a faixa apareceu:
+
+   | # | Entrar | Sair por |
+   |---|---|---|
+   | a | `/viewer` → Entrar em **VR** | botão 3D **Sair do VR** |
+   | b | `/viewer` → Entrar em **AR** | botão 3D **Sair do AR** |
+   | c | `/duelo` (escola e hospital) | botão 3D **Sair do VR** |
+   | d | `/sala` → Entrar em VR | computador → um dos modos do hub |
+   | e | qualquer cena | botão **Meta** → **Sair/Quit** do sistema |
+   | f | qualquer cena | botão **Meta** → **Retomar** e depois o botão 3D |
+   | g | qualquer cena | botão **Meta** → clicar na página 2D → **Entrar** de novo |
+
+4. **Se a faixa aparecer**, toque em **"Marcar: tarja apareceu"** (antes de qualquer outra
+   coisa) e depois em **Copiar**, ou em **Registro** para ler na tela. Com o cabo, também dá para
+   ler em `chrome://inspect` no computador, filtrando `[xrlog]`.
+5. O que olhar no registro, perto da marca:
+   - `evento 'end' (SEM end da página…)` → quem encerrou foi o sistema;
+   - `sessões=#N:visible-blurred` ou `quadros-parados` com a página 2D visível → sobrou sessão viva;
+   - `offerSession(…)` → alguma oferta ainda está sendo feita (não deveria haver nenhuma);
+   - `topo:` → se algum elemento **da página** cobre o topo (a faixa nativa não aparece ali).
+6. Teste de controle: faça as mesmas saídas em
+   `https://threejs.org/examples/webxr_vr_cubes.html`. Se a faixa aparecer lá também, é bug do
+   Quest Browser.
+7. Ao terminar: **Desligar** no painel, ou abrir `?debug=off`.
+
+---
+
 ## Modelos e performance
 
 Use **Laringe** (18k triângulos) ou **Coração** (11k) para testar.

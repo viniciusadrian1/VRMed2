@@ -8,6 +8,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import { XR, XROrigin, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
 import { obterXRStore } from "@/lib/xr-store";
+import { entrarNoXR } from "@/lib/xr-sessao";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -167,7 +168,7 @@ export function DueloApp() {
 
   const enterVR = useCallback(() => {
     setXrError(null);
-    store.enterVR().catch((error: unknown) => {
+    entrarNoXR(store, () => store.enterVR()).catch((error: unknown) => {
       setXrError(error instanceof Error ? error.message : String(error));
     });
   }, [store]);

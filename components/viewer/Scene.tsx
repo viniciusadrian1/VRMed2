@@ -14,6 +14,7 @@ import { clamp } from "@/lib/format";
 import { NOME_DO_ROOT } from "@/lib/model-utils";
 import { useVRMedStore } from "@/lib/store";
 import { viewerBridge } from "@/lib/viewer-bridge";
+import { entrarNoXR } from "@/lib/xr-sessao";
 import { useMounted } from "@/hooks/use-mounted";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrganModel } from "./OrganModel";
@@ -250,7 +251,16 @@ export function Scene() {
   const mounted = useMounted();
   // emulate:false desativa o emulador de headset (e o botão "Enter XR" que ele
   // injeta) — o WebXR real continua funcionando em dispositivos compatíveis.
-  const xrStore = useMemo(() => createXRStore({ emulate: false }), []);
+  // offerSession/enterGrantedSession desligados: ver lib/xr-store.ts.
+  const xrStore = useMemo(
+    () =>
+      createXRStore({
+        emulate: false,
+        offerSession: false,
+        enterGrantedSession: false,
+      }),
+    [],
+  );
   // Numa sessão XR a renderização precisa ser contínua ("always"). O modo
   // "demand" (usado no 2D para economizar GPU) não é suportado pelo WebXR
   // e deixaria o headset com a tela preta.
@@ -258,12 +268,16 @@ export function Scene() {
 
   // Registra a entrada em VR/AR na ponte e mede a duração das sessões.
   useEffect(() => {
-    viewerBridge.enterVR = () => {
-      void xrStore.enterVR();
+    // Sem sobrepor pedidos nem pedir por cima de uma sessão pausada (ver
+    // lib/xr-sessao.ts). A falha vai para o console: antes era uma rejeição
+    // sem tratamento.
+    const entrar = (pedir: () => Promise<unknown>) => {
+      entrarNoXR(xrStore, pedir).catch((erro: unknown) =>
+        console.warn("[xr] não foi possível entrar na sessão imersiva", erro),
+      );
     };
-    viewerBridge.enterAR = () => {
-      void xrStore.enterAR();
-    };
+    viewerBridge.enterVR = () => entrar(() => xrStore.enterVR());
+    viewerBridge.enterAR = () => entrar(() => xrStore.enterAR());
     let enteredAt = 0;
     // Guardado na entrada: ao sair, `state.mode` já voltou a null e não dá
     // mais para saber de qual dos dois modos a sessão era.
