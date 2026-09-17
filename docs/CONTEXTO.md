@@ -225,6 +225,43 @@ Auditoria completa de 7 dimensões (2026-06-12) + correções aplicadas:
 
 ---
 
+## Tarja branca ao sair do VR/AR (2026-09-16)
+
+**Sintoma (relato, intermitente):** depois de sair do VR ou do AR no Quest 3, às vezes surge no
+topo uma faixa branca "aplicação executada em segundo plano" com **Retomar / Sair**. Os botões
+não respondem e a faixa bloqueia a interface.
+
+**O que ela é:** interface **nativa do Quest Browser**, não do VRmed. Nenhum elemento do app tem
+esse texto, e a página não recebe os cliques dela. O navegador a mostra quando exibe a página 2D
+e acha que ainda existe uma sessão imersiva ou uma oferta de sessão (three.js#29457, ata do W3C
+Immersive Web de 2024-03-25, immersive-web/webxr#1365). **Não foi reproduzida em aparelho**: o
+diagnóstico veio do código e dessas fontes.
+
+**Chamadas de WebXR que o app fazia sem clique ou deixava sem dono, todas fechadas:**
+
+| Caminho | Correção |
+|---|---|
+| `createXRStore` chama `navigator.xr.offerSession` (extensão própria do Quest) ao montar e **a cada fim de sessão**, e entra sozinho em `sessiongranted` | `offerSession: false, enterGrantedSession: false` nas 3 stores (`lib/xr-store.ts`, `viewer/Scene.tsx`, `arena/ArenaScene.tsx`) |
+| Cena 3D desmontando com a sessão viva: o R3F e o `<XR>` não encerram a sessão (`WebXRManager.dispose` é vazio) | cleanup no `SairDoVR` chama `end()`, adiado um tique para ignorar o remonte do StrictMode e do Fast Refresh em dev |
+| Hub da Sala navegando com a sessão viva (`window.location.href`) | `sairENavegar`: `end()` primeiro e navegação só depois |
+| "Sair do VR" com clique duplo; "Entrar em VR" com clique duplo ou por cima de uma sessão pausada pelo botão Meta | `sairENavegar` (uma vez só) e `entrarNoXR` (sem pedidos sobrepostos, encerra a viva antes) em `lib/xr-sessao.ts` |
+
+**Checagem sem headset:** `npx -y tsx scripts/verificar-ciclo-xr.ts`, que também falha se uma cena
+nova criar store sem as opções, navegar direto ou chamar `store.enterVR()` sem `entrarNoXR`.
+
+**Registro de diagnóstico no aparelho (`lib/xr-log.ts`):** vem desligado. Para ligar, abrir
+`/viewer?debug=xrlog`; também funciona em `/sala`, `/duelo`, `/clinica` e `/arena`, mas não nas
+outras páginas. A flag fica gravada no aparelho. O registro anota:
+- quem pediu e quem encerrou cada sessão, com "a página chamou end" ou "SEM end da página";
+- ofertas pendentes e quadros de XR parados;
+- o que há no topo da página no momento em que se toca **"Marcar: tarja apareceu"**.
+
+Para desligar, usar o botão **Desligar** ou abrir `?debug=off`. Para remover do projeto, apagar o
+arquivo e o import dele em `components/xr/SairDoVR.tsx`. O passo a passo no óculos está em
+`docs/TESTAR-VR.md`.
+
+---
+
 ## Pegadinhas que já custaram tempo
 
 - **Cache do Turbopack:** ao editar variáveis CSS em `app/globals.css`, um cache antigo de

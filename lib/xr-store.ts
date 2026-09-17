@@ -30,6 +30,15 @@ export function obterXRStore() {
     depthSensing: false,
     frameRate: false,
     foveation: 0.5,
+    // Entrada SÓ pelos botões do app. Por padrão a biblioteca chama
+    // navigator.xr.offerSession — extensão própria do Quest Browser, que
+    // registra uma oferta de sessão no navegador — ao montar o Canvas e de
+    // novo a CADA fim de sessão, inclusive no meio do "Sair" da tarja nativa,
+    // e ainda entra sozinha em sessão concedida ('sessiongranted'). O app não
+    // usa nada disso, e eram as únicas chamadas de WebXR que ele fazia sem
+    // clique depois de sair. Ver lib/xr-sessao.ts.
+    offerSession: false,
+    enterGrantedSession: false,
   });
   return store;
 }

@@ -10,6 +10,7 @@ import { proximaEstacao, pararRadio } from "@/lib/lofi";
 import * as spotify from "@/lib/spotify";
 import { streamChatResponse } from "@/lib/chat-client";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { sairENavegar } from "@/lib/xr-sessao";
 
 /**
  * Os quatro itens interativos da mesa: rádio, computador (hub), flashcards e
@@ -281,7 +282,8 @@ const MODOS_HUB = [
 ];
 
 function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
-  const inSession = useXR((state) => Boolean(state.session));
+  const session = useXR((state) => state.session);
+  const inSession = Boolean(session);
 
   return (
     <group position={[0, 0.765, -2.08]}>
@@ -336,11 +338,10 @@ function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
                 width={0.52}
                 height={0.13}
                 position={[i % 2 === 0 ? -0.28 : 0.28, 0.12 - Math.floor(i / 2) * 0.16, 0.01]}
-                onClick={() => {
-                  // Navegar derruba a sessão VR (comportamento do navegador);
-                  // no headset o aviso abaixo explica isso antes do clique.
-                  window.location.href = modo.href;
-                }}
+                // Encerra a sessão e SÓ DEPOIS navega: navegar com ela viva
+                // deixava a derrubada para o descarte da página (ver
+                // lib/xr-sessao.ts). O aviso abaixo continua valendo.
+                onClick={() => sairENavegar(session, modo.href)}
               />
             ))}
           </Panel>

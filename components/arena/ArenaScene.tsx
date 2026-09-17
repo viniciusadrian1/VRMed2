@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin, createXRStore } from "@react-three/xr";
+import { entrarNoXR } from "@/lib/xr-sessao";
 import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
@@ -144,6 +145,15 @@ export function ArenaScene() {
         // O padrão do aparelho já é 72; o ganho não paga o risco.
         frameRate: false,
         foveation: 0.5,
+        // Entrada SÓ pelos botões do app. Por padrão a biblioteca chama
+        // navigator.xr.offerSession — extensão própria do Quest Browser, que
+        // registra uma oferta de sessão no navegador — ao montar o Canvas e de
+        // novo a CADA fim de sessão, inclusive no meio do "Sair" da tarja nativa,
+        // e ainda entra sozinha em sessão concedida ('sessiongranted'). O app não
+        // usa nada disso, e eram as únicas chamadas de WebXR que ele fazia sem
+        // clique depois de sair. Ver lib/xr-sessao.ts.
+        offerSession: false,
+        enterGrantedSession: false,
       }),
     [],
   );
@@ -168,7 +178,7 @@ export function ArenaScene() {
 
   const enterVR = useCallback(() => {
     setXrError(null);
-    store.enterVR().catch((error: unknown) => {
+    entrarNoXR(store, () => store.enterVR()).catch((error: unknown) => {
       const message =
         error instanceof Error ? error.message : String(error ?? "erro");
       setXrError(message);

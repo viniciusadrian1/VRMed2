@@ -20,6 +20,7 @@ import {
   prepareModel,
 } from "@/lib/model-utils";
 import { obterXRStore } from "@/lib/xr-store";
+import { entrarNoXR } from "@/lib/xr-sessao";
 import { XRManipulation } from "@/components/viewer/XRManipulation";
 import { SafeEnvironment } from "@/components/viewer/SafeEnvironment";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -334,7 +335,7 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
 
   const enterVR = useCallback(() => {
     setXrError(null);
-    store.enterVR().catch((error: unknown) => {
+    entrarNoXR(store, () => store.enterVR()).catch((error: unknown) => {
       setXrError(error instanceof Error ? error.message : String(error));
     });
   }, [store]);

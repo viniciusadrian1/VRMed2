@@ -12,6 +12,7 @@ import { ArrowLeft, BookOpen, Send, X } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin } from "@react-three/xr";
 import { obterXRStore } from "@/lib/xr-store";
+import { entrarNoXR } from "@/lib/xr-sessao";
 import { SairDoVR } from "@/components/xr/SairDoVR";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -72,7 +73,7 @@ export function SalaApp() {
 
   const enterVR = useCallback(() => {
     setXrError(null);
-    store.enterVR().catch((error: unknown) => {
+    entrarNoXR(store, () => store.enterVR()).catch((error: unknown) => {
       setXrError(error instanceof Error ? error.message : String(error));
     });
   }, [store]);
