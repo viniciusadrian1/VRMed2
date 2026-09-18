@@ -21,6 +21,35 @@ tem a internet mais rápida. **Salas vivem na memória do processo:** exige UMA
 instância no Render e um deploy derruba as partidas abertas — não publicar
 durante o evento. Checagens: `npx -y tsx scripts/verificar-duelo-salas.ts`.
 
+**Apresentação do duelo (2026-09-17) — "parecer um jogo, não um protótipo":** as REGRAS já
+eram boas; o que denunciava protótipo era a encenação (tudo acontecia trocando string em
+`Text3D`). O que mudou, tudo em apresentação — `lib/duelo-salas.ts` e `app/api/duelo/route.ts`
+não foram tocados:
+
+- **Vocabulário sonoro** (`lib/arena-audio.ts`, reescrito): um som por evento. Antes o MEU erro e
+  o ponto DO ADVERSÁRIO tocavam o mesmo som, o tempo esgotar era mudo e vitória/derrota/empate
+  eram idênticos. Agora há síntese em camadas (transiente de ruído + corpo + variação de ±25
+  cents), tique da contagem em tríade, tensão nos últimos 5 s, som de clique/hover na UI e
+  `desbloquearAudio()` num gesto real — sem ele o duelo online corria mudo, porque o primeiro som
+  vinha do servidor. Checagem: `npx -y tsx scripts/verificar-audio-duelo.ts`.
+- **Háptica** (`lib/xr-haptica.ts`, novo): `pulsar()` no hover, clique, acerto, erro e ponto do
+  adversário. API de gamepad, não de sessão — não encosta no ciclo WebXR.
+- **Placar de duelo único** `VOCÊ 300 × 200 NOME` com fita de uma marca por rodada, no topo do
+  painel/lousa. Antes os meus pontos eram um canto e os dele flutuavam sobre o avatar, 1,7 m
+  ATRÁS de mim na escola. O telão do hospital nunca mais apaga.
+- **Revelação da resposta:** as alternativas ficam na tela no feedback — a certa acende, a que a
+  pessoa errou fica coral. Antes viravam uma frase e quem errou nunca via qual era.
+- **Alvo de clique:** o `BotaoLousa` ganhou `altura` própria. As teclas do código se sobrepunham
+  3 cm (passo 0,11 com alvo de 0,14) e as alternativas tinham 1,2 mm de folga.
+- Barra de tempo drenando, contagem com cartão de apresentação (quem × quem, regras e dica do
+  analógico), "+pontos" saindo do órgão, pausa curta do modelo no acerto, transição de entrada
+  de cada tela (`Entrada`, só escala/profundidade — opacidade cai no array de material do troika)
+  e tela de fim com retrospecto medido na própria partida (acertos, maior sequência, reação
+  média, o que revisar).
+- **Espaço de cor corrigido** em `ui3d.tsx`: a textura dos painéis nascia em `NoColorSpace` e o
+  app inteiro (Arena, Sala, Duelo) desenhava lavado. Ao corrigir, as cores autoradas olhando o
+  resultado errado foram reautoradas no mesmo passe.
+
 **Unity como bancada de assets (2026-09-01):** o grupo quer trocar o AMBIENTE do
 Duelo por um cenário que só abre no Unity (.unitypackage). Fluxo: importar no
 projeto Unity ("Tutorial no Editor do Guia de Configuração") → exportar GLB via

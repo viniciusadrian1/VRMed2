@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useRef, type ReactNode, type RefObject } from "react";
 import { Text } from "@react-three/drei";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useXRInputSourceState } from "@react-three/xr";
 import { preloadFont } from "troika-three-text";
 import * as THREE from "three";
+import { playClique, playHover } from "@/lib/arena-audio";
+import { pulsar } from "@/lib/xr-haptica";
 
 /**
  * Primitivas de interface em espaço 3D para a Arena.
@@ -38,21 +41,34 @@ if (typeof window !== "undefined") {
     {
       font: ARENA_FONT,
       characters:
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ·×ÁÂÃÀÇÉÊÍÓÔÕÚáâãàçéêíóôõú.,:!?()-<>↓…—+/",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ·×ÁÂÃÀÇÉÊÍÓÔÕÚáâãàçéêíóôõú.,:!?()-<>↓…—+/_",
     },
     () => {},
   );
 }
 
-/** Paleta da Arena — mesma linguagem clínica do resto do app. */
+/**
+ * Paleta da Arena — mesma linguagem clínica do resto do app.
+ *
+ * `panel` é o fundo da cena (clearColor da Arena), não a cor dos painéis: ele
+ * passa pelo gerenciamento de cor do three e SEMPRE foi desenhado certo. Com
+ * os painéis agora em sRGB de verdade (ver `panelTexture`), eles ficaram no
+ * tom autorado — então o fundo desceu um degrau para as placas voltarem a
+ * parecer superfícies FLUTUANDO sobre a sala, e não recortes do mesmo cinza.
+ */
 export const ARENA_COLORS = {
   primary: "#5896c8",
-  panel: "#101820",
+  panel: "#0b1118",
   text: "#f3f6f8",
   muted: "#9fb3c4",
   success: "#4fae89",
   danger: "#e06a5c",
 } as const;
+
+/** Botão sem resposta: cinza-azulado dessaturado, longe do azul de ação. */
+const COLOR_DESABILITADO = "#39454f";
+/** Rótulo do botão desabilitado — legível, mas claramente apagado. */
+const TEXTO_DESABILITADO = "#7b8894";
 
 /**
  * Material-base do texto. Com `outlineWidth`, o troika expõe `material` como
@@ -61,6 +77,10 @@ export const ARENA_COLORS = {
  * transparência à frente (a divisória de vidro do hospital apagava metade do
  * painel do Duelo). Os derivados herdam depthTest/toneMapped por protótipo; a
  * cor vira propriedade própria de cada texto (o troika cuida disso).
+ *
+ * É o mesmo array que impede animar OPACIDADE de texto: `material-opacity`
+ * também cairia no array. Quem anima entrada de tela usa `Entrada` (escala e
+ * profundidade), nunca opacidade.
  */
 const TEXT_MATERIAL = new THREE.MeshBasicMaterial({
   transparent: true,
@@ -125,7 +145,7 @@ function panelTexture(
   aspect: number,
   fill: string,
   stroke: string,
-  fillBottom = "#070b10",
+  fillBottom = "#0d151d",
 ): THREE.CanvasTexture {
   const key = `${aspect.toFixed(1)}|${fill}|${stroke}|${fillBottom}`;
   const cached = panelTextureCache.get(key);
@@ -151,16 +171,47 @@ function panelTexture(
   ctx.stroke();
 
   const texture = new THREE.CanvasTexture(canvas);
+  /**
+   * O canvas é pintado em sRGB, mas a CanvasTexture nasce em `NoColorSpace`:
+   * o renderer tratava esses bytes como LINEARES e aplicava a conversão de
+   * saída por cima, clareando tudo (`#101820` chegava à tela como `#45545f`).
+   * Cada painel e cada botão do app estavam lavados — o mesmo motivo pelo qual
+   * AmbienteHospital e SalaScene já marcam `SRGBColorSpace` nas texturas deles.
+   */
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 4;
   panelTextureCache.set(key, texture);
   return texture;
+}
+
+/**
+ * Base escura do gradiente, derivada da PRÓPRIA cor do botão.
+ *
+ * O valor fixo antigo (`#2d5a80`) era um azul: qualquer botão que passasse
+ * outra cor (o "×" cinza da Sala, o verde da resposta certa) ganhava um pé
+ * azul que não tinha nada a ver com o topo. Multiplicar no espaço linear
+ * escurece qualquer matiz mantendo o tom — e o resultado é cacheado, porque
+ * ele vira chave da textura.
+ */
+const sombraCache = new Map<string, string>();
+function sombra(cor: string, fator = 0.55): string {
+  const chave = `${cor}|${fator}`;
+  let hex = sombraCache.get(chave);
+  if (!hex) {
+    hex = `#${new THREE.Color(cor).multiplyScalar(fator).getHexString()}`;
+    sombraCache.set(chave, hex);
+  }
+  return hex;
 }
 
 /** Painel de fundo arredondado, para dar leitura ao texto sobre qualquer cena. */
 export function Panel({
   width,
   height,
-  color = "#0d141c",
+  // Reautorado junto com a correção de espaço de cor: o `#0d141c` antigo foi
+  // escolhido olhando o resultado lavado e, desenhado certo, virava um buraco
+  // preto no headset. `#16212c` devolve a placa ao cinza-azulado pretendido.
+  color = "#16212c",
   opacity = 0.92,
   position,
   children,
@@ -195,7 +246,8 @@ export function Panel({
 /**
  * Botão 3D: reage ao laser do controle (ou da mão) e ao gatilho.
  * Cresce um pouco sob o ponteiro — o único aviso visual de que é clicável
- * para quem nunca usou um headset.
+ * para quem nunca usou um headset — e responde com som e vibração, que em VR
+ * confirmam o toque melhor que qualquer animação.
  */
 export function Button3D({
   label,
@@ -204,6 +256,10 @@ export function Button3D({
   height = 0.3,
   position,
   color = ARENA_COLORS.primary,
+  icone = false,
+  selo,
+  destaque = null,
+  desabilitado = false,
 }: {
   label: string;
   onClick: () => void;
@@ -211,14 +267,34 @@ export function Button3D({
   height?: number;
   position?: [number, number, number];
   color?: string;
+  /**
+   * Triângulo de "play" à esquerda do rótulo. Era desenhado SEMPRE — inclusive
+   * no dígito "7" do teclado 3D e no "Apagar" —, o que ensinava o jogador a
+   * ignorar a iconografia. Agora é opt-in, e só onde significa "começa aqui".
+   */
+  icone?: boolean;
+  /** Letra da alternativa (A/B/C/D) num quadradinho à esquerda do rótulo. */
+  selo?: string;
+  /** Revelação da resposta: verde na certa, coral na que a pessoa errou. */
+  destaque?: "certo" | "errado" | null;
+  /** Fora da rodada o botão continua na tela, mas não responde. */
+  desabilitado?: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
   const hovered = useRef(false);
   const scale = useRef(1);
+  const esquerdo = useXRInputSourceState("controller", "left");
+  const direito = useXRInputSourceState("controller", "right");
 
   useFrame((_, delta) => {
     if (!group.current) return;
-    const target = hovered.current ? 1.08 : 1;
+    const ativo = hovered.current && !desabilitado;
+    // `destaque` continua valendo com o botão desabilitado: é a revelação.
+    // A resposta certa cresce um pouco (1.04) e FICA — sem piscar, que a 72 Hz
+    // dentro do headset é desconfortável e ainda esconde o texto em metade dos
+    // quadros. O hover continua mandando mais que o destaque enquanto o
+    // ponteiro está em cima.
+    const target = ativo ? 1.08 : destaque === "certo" ? 1.04 : 1;
     // Suaviza a resposta para não "pular" com o tremor da mão.
     scale.current += (target - scale.current) * Math.min(1, delta * 12);
     group.current.scale.setScalar(scale.current);
@@ -226,17 +302,48 @@ export function Button3D({
 
   const stop = (event: ThreeEvent<PointerEvent>) => event.stopPropagation();
 
+  // Verde e coral mais claros que os da paleta: na revelação a placa certa
+  // precisa saltar de relance a 3 m, e o `success` normal fica escuro demais
+  // ao lado do `danger` (que é bem mais luminoso).
+  // O destaque vem ANTES de `desabilitado`: na revelação as alternativas
+  // ficam mudas e imóveis (não respondem a clique nem a hover), mas a certa
+  // precisa continuar acesa — senão o cinza apagaria justamente a informação
+  // pela qual a tela existe.
+  const corFundo =
+    destaque === "certo"
+      ? "#3fd49a"
+      : destaque === "errado"
+        ? "#f0796a"
+        : desabilitado
+          ? COLOR_DESABILITADO
+          : color;
+  const corTexto = desabilitado && !destaque ? TEXTO_DESABILITADO : ARENA_COLORS.text;
+  // Ícone e selo ocupam a esquerda da placa; sem eles o rótulo volta ao centro.
+  const seloLado = height * 0.52;
+  const rotuloX = selo ? height * 0.2 : icone ? height * 0.14 : 0;
+
   return (
     <group
       ref={group}
       position={position}
       onClick={(event) => {
         event.stopPropagation();
+        if (desabilitado) return;
+        // Som e vibração ANTES do callback: quem chama pode trocar de tela no
+        // mesmo quadro, e o retorno do toque tem que sair de qualquer jeito.
+        playClique();
+        pulsar(direito?.inputSource ?? esquerdo?.inputSource, 0.4, 35);
         onClick();
       }}
       onPointerOver={(event) => {
         stop(event);
+        // Só na ENTRADA do hover: o R3F dispara onPointerOver a cada quadro em
+        // que o laser se move sobre o alvo, e vibrar 90 vezes por segundo
+        // esquenta o motor e vira ruído branco na mão.
+        if (desabilitado || hovered.current) return;
         hovered.current = true;
+        playHover();
+        pulsar(direito?.inputSource ?? esquerdo?.inputSource, 0.15, 15);
       }}
       onPointerOut={() => {
         hovered.current = false;
@@ -245,27 +352,230 @@ export function Button3D({
       <mesh renderOrder={998}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial
-          map={panelTexture(width / height, color, "rgba(255,255,255,0.55)", "#2d5a80")}
+          map={panelTexture(
+            width / height,
+            corFundo,
+            // Borda quase branca no destaque: a 3 m, o verde do fundo sozinho
+            // se confunde com as placas vizinhas — a moldura é o que separa.
+            destaque
+              ? "rgba(255,255,255,0.95)"
+              : desabilitado
+                ? "rgba(255,255,255,0.18)"
+                : "rgba(255,255,255,0.55)",
+            sombra(corFundo, destaque ? 0.78 : undefined),
+          )}
           transparent
           toneMapped={false}
           depthTest={false}
           side={THREE.DoubleSide}
         />
       </mesh>
+
       {/* Triângulo "play" em geometria pura: o botão continua reconhecível
           como clicável mesmo se a fonte falhar em carregar (rede ruim). */}
-      <mesh
-        position={[-width / 2 + height * 0.42, 0, 0.004]}
-        rotation={[0, 0, -Math.PI / 2]}
-        renderOrder={999}
-        raycast={() => null}
+      {icone && (
+        <mesh
+          position={[-width / 2 + height * 0.42, 0, 0.004]}
+          rotation={[0, 0, -Math.PI / 2]}
+          renderOrder={999}
+          raycast={() => null}
+        >
+          <circleGeometry args={[height * 0.22, 3]} />
+          <meshBasicMaterial
+            color={corTexto}
+            toneMapped={false}
+            depthTest={false}
+          />
+        </mesh>
+      )}
+
+      {/* Selo da alternativa: keycap claro com a letra na cor do botão. A 2 m
+          a letra é o que a pessoa lê primeiro para decidir onde mirar. */}
+      {selo && (
+        <group position={[-width / 2 + height * 0.45, 0, 0.004]}>
+          <mesh renderOrder={999} raycast={() => null}>
+            <planeGeometry args={[seloLado, seloLado]} />
+            <meshBasicMaterial
+              color={corTexto}
+              transparent
+              opacity={desabilitado ? 0.45 : 0.92}
+              toneMapped={false}
+              depthTest={false}
+            />
+          </mesh>
+          <Text3D position={[0, 0, 0.002]} size={seloLado * 0.62} color={corFundo}>
+            {selo}
+          </Text3D>
+        </group>
+      )}
+
+      {/* maxWidth: sem ele "Aguardando o adversário…" transbordava a placa e
+          escorria para fora do botão. */}
+      <Text3D
+        position={[rotuloX, 0, 0.005]}
+        // Duas linhas medem ~1,02 × a altura da placa: qualquer rótulo que
+        // quebre transborda. Quem tem rótulo longo passa uma largura maior.
+        size={height * 0.42}
+        color={corTexto}
+        maxWidth={width * 0.86}
       >
-        <circleGeometry args={[height * 0.22, 3]} />
-        <meshBasicMaterial color="#ffffff" toneMapped={false} depthTest={false} />
-      </mesh>
-      <Text3D position={[height * 0.14, 0, 0.005]} size={height * 0.42}>
         {label}
       </Text3D>
+    </group>
+  );
+}
+
+/** "+100" que sobe e some no ponto do acerto — resposta imediata e local. */
+export function Floater({
+  value,
+  position,
+}: {
+  value: number;
+  position: [number, number, number];
+}) {
+  const group = useRef<THREE.Group>(null);
+  const life = useRef(0);
+
+  useFrame((_, delta) => {
+    if (!group.current) return;
+    life.current += Math.min(delta, 1 / 30);
+    const t = life.current;
+    group.current.position.y = position[1] + t * 0.35;
+    // Cresce rápido no início, encolhe até sumir no fim.
+    const scale = t < 0.12 ? t / 0.12 : Math.max(0, 1 - (t - 0.45) / 0.35);
+    group.current.scale.setScalar(Math.max(0.001, scale));
+  });
+
+  return (
+    <group ref={group} position={position}>
+      <Text3D size={0.11} color={ARENA_COLORS.success}>
+        {`+${value}`}
+      </Text3D>
+    </group>
+  );
+}
+
+/**
+ * Chegada de uma tela: a placa vem de um pouco atrás e de um pouco menor até
+ * assentar. Troca instantânea de painel dentro do headset parece BUG — o olho
+ * não vê uma transição, vê um corte —, e 0,18 s bastam para o cérebro
+ * entender que a informação é nova.
+ *
+ * Anima escala e profundidade, nunca opacidade: com `outlineWidth` o troika
+ * expõe `material` como array e `material-opacity` cairia no array sem nunca
+ * chegar ao shader (ver o comentário de TEXT_MATERIAL).
+ *
+ * Use com `key={fase}` para a animação recomeçar a cada tela.
+ */
+export function Entrada({
+  children,
+  dur = 0.18,
+  atraso = 0,
+}: {
+  children: ReactNode;
+  dur?: number;
+  atraso?: number;
+}) {
+  const group = useRef<THREE.Group>(null);
+  const tempo = useRef(0);
+
+  useFrame((_, delta) => {
+    const g = group.current;
+    // Para de escrever assim que assenta: é uma animação de 0,18 s, não vale
+    // um write por quadro pelo resto da partida.
+    if (!g || tempo.current > atraso + dur) return;
+    tempo.current += Math.min(delta, 1 / 30);
+    const p = Math.min(1, Math.max(0, (tempo.current - atraso) / dur));
+    const e = 1 - (1 - p) ** 3; // ease-out cúbico: rápido no início, freia no fim
+    g.scale.setScalar(0.92 + 0.08 * e);
+    g.position.z = -0.04 + 0.04 * e;
+  });
+
+  return (
+    <group ref={group} scale={0.92} position={[0, 0, -0.04]}>
+      {children}
+    </group>
+  );
+}
+
+/**
+ * Cores da barra de tempo. Instâncias de módulo porque o `useFrame` copia
+ * delas a cada quadro — criar `THREE.Color` a 90 Hz é lixo para o coletor.
+ */
+const BARRA_OK = new THREE.Color("#7dd3fc");
+const BARRA_ALERTA = new THREE.Color("#ffb020");
+const BARRA_CRITICO = new THREE.Color("#ff6b57");
+
+/**
+ * Barra que drena com o tempo da rodada.
+ *
+ * O número em segundos exige LER; a barra é periférica — a pessoa sabe que o
+ * tempo está acabando sem tirar os olhos do órgão. A fração vem por ref e é
+ * lida DENTRO do useFrame: a 90 Hz, um `setState` por quadro derruba o Quest
+ * sozinho, então escala e cor vão direto no objeto three.
+ *
+ * A mudança de cor é gradual (sem piscar): azul até 50%, âmbar em 33%, coral
+ * em 15%, interpolando entre as faixas.
+ */
+export function BarraTempo({
+  width,
+  height = 0.024,
+  position,
+  fracaoRef,
+}: {
+  width: number;
+  height?: number;
+  position?: [number, number, number];
+  /** Fração restante, de 1 a 0. Lida por quadro, nunca durante o render. */
+  fracaoRef: RefObject<number>;
+}) {
+  const preenchimento = useRef<THREE.Group>(null);
+  const barra = useRef<THREE.Mesh>(null);
+
+  useFrame(() => {
+    const g = preenchimento.current;
+    const m = barra.current;
+    if (!g || !m) return;
+    const f = Math.min(1, Math.max(0, fracaoRef.current));
+    // Nunca zero: escala 0 em three deixa a matriz sem inversa e polui o
+    // console com avisos de matriz degenerada.
+    g.scale.x = Math.max(0.0001, f);
+
+    const cor = (m.material as THREE.MeshBasicMaterial).color;
+    if (f >= 0.5) cor.copy(BARRA_OK);
+    else if (f >= 0.33) cor.copy(BARRA_ALERTA).lerp(BARRA_OK, (f - 0.33) / 0.17);
+    else if (f >= 0.15)
+      cor.copy(BARRA_CRITICO).lerp(BARRA_ALERTA, (f - 0.15) / 0.18);
+    else cor.copy(BARRA_CRITICO);
+  });
+
+  return (
+    <group position={position}>
+      {/* Trilho: sem ele a barra encurtando não tem contra quê ser medida. */}
+      <mesh renderOrder={998} raycast={() => null}>
+        <planeGeometry args={[width, height]} />
+        <meshBasicMaterial
+          color="#0a1119"
+          transparent
+          opacity={0.85}
+          toneMapped={false}
+          depthTest={false}
+        />
+      </mesh>
+      {/*
+        Ancorada à ESQUERDA: o grupo externo leva a origem para a ponta
+        esquerda e normaliza a largura, então o plano unitário em x=0.5 ocupa
+        [0, 1] e escalar em x drena a barra da direita para a esquerda —
+        escalar o mesh direto encolheria pelos dois lados, para o centro.
+      */}
+      <group position={[-width / 2, 0, 0.001]} scale={[width, 1, 1]}>
+        <group ref={preenchimento}>
+          <mesh ref={barra} position={[0.5, 0, 0]} renderOrder={999} raycast={() => null}>
+            <planeGeometry args={[1, height]} />
+            <meshBasicMaterial toneMapped={false} depthTest={false} />
+          </mesh>
+        </group>
+      </group>
     </group>
   );
 }
