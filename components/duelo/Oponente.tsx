@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Billboard } from "@react-three/drei";
 import * as THREE from "three";
-import { Text3D, ARENA_COLORS } from "@/components/arena/ui3d";
+import { Text3D } from "@/components/arena/ui3d";
 
 export type HumorOponente = "idle" | "comemora" | "erra";
 
@@ -19,7 +19,6 @@ export type HumorOponente = "idle" | "comemora" | "erra";
 export function Oponente({
   humor,
   nome,
-  pontos,
   position,
   rotationY = Math.PI,
   sentado = false,
@@ -27,7 +26,6 @@ export function Oponente({
 }: {
   humor: HumorOponente;
   nome: string;
-  pontos: number;
   position: [number, number, number];
   /** Rotação do corpo (padrão: de frente para o jogador). */
   rotationY?: number;
@@ -123,14 +121,15 @@ export function Oponente({
         </mesh>
       </group>
 
-      {/* Placa: nome + pontos. Billboard: sempre de frente para a câmera (no
-          hospital a rotação fixa deixava a placa de costas — nome espelhado). */}
+      {/* Placa com o nome. Billboard: sempre de frente para a câmera (no
+          hospital a rotação fixa deixava a placa de costas — nome espelhado).
+          Os pontos saíram daqui: agora ficam no placar do duelo, junto dos
+          meus, em vez de flutuarem atrás da minha cabeça na sala de aula. O
+          coral é a cor dele no placar — antes era o vermelho de erro, ou
+          seja, o jogo dizia em cor que o adversário é um defeito. */}
       <Billboard position={[0, sentado ? 1.85 : 2.05, 0]} lockX lockZ>
-        <Text3D size={0.09} color={ARENA_COLORS.danger}>
+        <Text3D size={0.09} color="#ff6b57">
           {nome}
-        </Text3D>
-        <Text3D position={[0, -0.14, 0]} size={0.11}>
-          {String(pontos)}
         </Text3D>
       </Billboard>
     </group>

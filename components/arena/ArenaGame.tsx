@@ -4,7 +4,6 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useXR, useXRStore } from "@react-three/xr";
 import type * as THREE from "three";
-import type { Group } from "three";
 import {
   playEnd,
   playHit,
@@ -14,7 +13,7 @@ import {
 } from "@/lib/arena-audio";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ArenaModel } from "./ArenaModel";
-import { ARENA_COLORS, Button3D, Panel, Text3D } from "./ui3d";
+import { ARENA_COLORS, Button3D, Floater, Panel, Text3D } from "./ui3d";
 import type { ArenaAttempt, ArenaPhase, ArenaStructure } from "./types";
 
 /** Duração da partida, em segundos. Curta o bastante para a fila andar. */
@@ -68,36 +67,6 @@ function VigiaDeControles() {
     >
       Controles não detectados — segure os controles e aperte qualquer botão
     </Text3D>
-  );
-}
-
-/** "+100" que sobe e some no ponto do acerto — resposta imediata e local. */
-function Floater({
-  value,
-  position,
-}: {
-  value: number;
-  position: [number, number, number];
-}) {
-  const group = useRef<Group>(null);
-  const life = useRef(0);
-
-  useFrame((_, delta) => {
-    if (!group.current) return;
-    life.current += Math.min(delta, 1 / 30);
-    const t = life.current;
-    group.current.position.y = position[1] + t * 0.35;
-    // Cresce rápido no início, encolhe até sumir no fim.
-    const scale = t < 0.12 ? t / 0.12 : Math.max(0, 1 - (t - 0.45) / 0.35);
-    group.current.scale.setScalar(Math.max(0.001, scale));
-  });
-
-  return (
-    <group ref={group} position={position}>
-      <Text3D size={0.11} color={ARENA_COLORS.success}>
-        {`+${value}`}
-      </Text3D>
-    </group>
   );
 }
 
@@ -428,6 +397,10 @@ export function ArenaGame() {
             position={[0, -0.45, 0.02]}
             width={1.4}
             height={0.36}
+            // Enquanto o modelo não rende estruturas o clique não faz nada:
+            // marcar como desabilitado evita a pessoa insistir num botão morto.
+            desabilitado={structures.length === 0}
+            icone
             onClick={startRound}
           />
         </group>
@@ -560,6 +533,7 @@ export function ArenaGame() {
           <Button3D
             label="Jogar de novo"
             position={[0, -0.95, 0.02]}
+            icone
             onClick={startRound}
           />
         </group>
