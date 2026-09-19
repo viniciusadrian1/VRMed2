@@ -25,6 +25,7 @@ import {
 } from "@/components/arena/ui3d";
 import {
   detectStructures,
+  disposeMaterials,
   normalizeContent,
   prepareModel,
 } from "@/lib/model-utils";
@@ -149,6 +150,8 @@ type Fase =
   | "sala"
   | "codigo"
   | "encerrada";
+
+type ResultadoRodada = "voce" | "adversario" | "tempo" | null;
 
 /**
  * Mesma forma nos dois modos: online, quem cria a sala sorteia as rodadas e o
@@ -357,7 +360,7 @@ function Placar({
       {/* Fita das rodadas: o andamento da partida lido de relance, sem texto. */}
       {Array.from({ length: TOTAL_RODADAS }, (_, i) => (
         <mesh
-          key={i}
+          key={`marca-${i}`}
           position={[(i - (TOTAL_RODADAS - 1) / 2) * 0.05 * s, -0.062 * s, 0.002]}
           // O Panel desenha em 998 com depthTest desligado: sem ordem própria,
           // a fita ficava pintada POR BAIXO do painel do hospital.
@@ -439,7 +442,7 @@ function TelaOnline({
       <Panel width={1.7} height={1.4} />
       {linhas.map((l, i) => (
         <Text3D
-          key={i}
+          key={`linha-hospital-${i}`}
           position={[0, 0.5 - i * 0.2, 0.01]}
           size={(l.tamanho ?? 1) * 0.07}
           color={l.cor}
@@ -450,7 +453,7 @@ function TelaOnline({
       ))}
       {botoes.map((b, i) => (
         <Button3D
-          key={b.texto}
+          key={`botao-hospital-${i}-${b.texto}`}
           label={b.texto}
           width={1.2}
           height={0.2}
@@ -463,7 +466,7 @@ function TelaOnline({
     <group>
       {linhas.map((l, i) => (
         <Text3D
-          key={i}
+          key={`linha-escola-${i}`}
           position={[LOUSA_X, 0.17 - i * 0.1, LOUSA_Z]}
           size={(l.tamanho ?? 1) * 0.042}
           color={l.cor ?? "#f2f5ec"}
@@ -474,7 +477,7 @@ function TelaOnline({
       ))}
       {botoes.map((b, i) => (
         <BotaoLousa
-          key={b.texto}
+          key={`botao-escola-${i}-${b.texto}`}
           texto={b.texto}
           position={[LOUSA_X, -0.3 - i * 0.1, LOUSA_Z]}
           size={0.05}
@@ -515,6 +518,7 @@ function ModeloRodada({
   rodada,
   prontoRef,
   revelado = false,
+  resultado = null,
 }: {
   rodada: Rodada;
   /** Vira true quando o modelo desta rodada aparece (o relógio do bot espera). */
@@ -523,8 +527,10 @@ function ModeloRodada({
    * Rodada resolvida: o giro para por um instante e o marcador cresce — o
    * "hit stop" dos jogos de ação, que dá peso ao acerto. Congela o MODELO,
    * nunca a câmera: parar o mundo em VR embrulha o estômago.
-   */
+  */
   revelado?: boolean;
+  /** Reação visual curta da rodada resolvida. */
+  resultado?: ResultadoRodada;
 }) {
   const caminho = rodada.tipo === "orgao" ? rodada.modelo! : LARINGE;
   const gltf = useGLTF(caminho, "/draco/");
@@ -543,6 +549,7 @@ function ModeloRodada({
    * inverteria.
    */
   const tombo = useRef<THREE.Group>(null);
+  const entrada = useRef<THREE.Group>(null);
   const content = useRef<THREE.Group>(null);
   const marcador = useRef<THREE.Mesh>(null);
   const esquerdo = useXRInputSourceState("controller", "left");
@@ -578,6 +585,10 @@ function ModeloRodada({
     if (!g) return;
     if (spinner.current) spinner.current.rotation.y = 0;
     if (tombo.current) tombo.current.rotation.x = 0;
+    if (entrada.current) {
+      entrada.current.scale.setScalar(0.85 * 0.92);
+      entrada.current.position.z = 0.045;
+    }
     g.updateWorldMatrix(true, true);
     prepareModel(g, "mesh");
     // O modelo do Duelo não é clicável (diferente da Arena) — sem isto, as
@@ -593,13 +604,67 @@ function ModeloRodada({
     // 3% dela — na sala, o marcador caía sobre a cartilagem vizinha.
     // Só roda depois que o GLB chegou (se ainda baixa, o Suspense segura).
     prontoRef.current = true;
+    return () => {
+      // O clone do GLB é um Object3D de verdade: se o React-Three-Fiber
+      // commitar o próximo órgão antes de desmontar este (Suspense), o
+      // anterior fica órfão na cena e os dois se empilham. Tira o clone do
+      // grafo e libera só os materiais clonados — a geometria é compartilhada
+      // com o cache do useGLTF.
+      scene.removeFromParent();
+      disposeMaterials(scene);
+      prontoRef.current = false;
+    };
   }, [scene, rodada, prontoRef]);
+
+  useEffect(() => {
+    if (!revelado || !resultado) return;
+
+    const cor =
+      resultado === "voce"
+        ? new THREE.Color("#4fd1a5")
+        : resultado === "adversario"
+          ? new THREE.Color("#ff6b57")
+          : new THREE.Color("#ffd166");
+    const materiais: THREE.MeshStandardMaterial[] = [];
+
+    content.current?.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const lista = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const material of lista) {
+        const standard = material as THREE.MeshStandardMaterial;
+        if (!standard.emissive) continue;
+        standard.userData.dueloEmissive = standard.emissive.clone();
+        standard.userData.dueloEmissiveIntensity = standard.emissiveIntensity;
+        standard.emissive.copy(cor);
+        standard.emissiveIntensity = 0.65;
+        materiais.push(standard);
+      }
+    });
+
+    return () => {
+      for (const material of materiais) {
+        const original = material.userData.dueloEmissive as THREE.Color | undefined;
+        material.emissive.copy(original ?? new THREE.Color("#000000"));
+        material.emissiveIntensity =
+          (material.userData.dueloEmissiveIntensity as number | undefined) ?? 1;
+        delete material.userData.dueloEmissive;
+        delete material.userData.dueloEmissiveIntensity;
+      }
+    };
+  }, [revelado, resultado]);
 
   useFrame((state, delta) => {
     // Mesmo teto de passo do visualizador: ao recolocar o headset, o primeiro
     // delta vem com segundos acumulados e o órgão daria voltas sozinho.
     const dt = Math.min(delta, 1 / 30);
     const agora = state.clock.elapsedTime;
+
+    if (entrada.current) {
+      const escala = entrada.current.scale.x;
+      entrada.current.scale.setScalar(escala + (0.85 - escala) * Math.min(1, dt * 11));
+      entrada.current.position.z += (0 - entrada.current.position.z) * Math.min(1, dt * 11);
+    }
 
     // Por analógico vale só o eixo DOMINANTE, como no visualizador: ninguém
     // empurra perfeitamente para o lado, e o resto de "frente" tombaria o
@@ -656,11 +721,11 @@ function ModeloRodada({
   });
 
   return (
-    <group scale={0.85}>
+    <group ref={entrada} scale={0.85}>
       <group ref={tombo}>
         <group ref={spinner}>
           <group ref={content} position={ajuste.pos} scale={ajuste.escala}>
-            <primitive object={scene} />
+            <primitive object={scene} dispose={null} />
           </group>
           {rodada.marcador && (
             <mesh ref={marcador} position={rodada.marcador} raycast={() => null}>
@@ -727,6 +792,7 @@ export function DueloGame({
   const [pontosBot, setPontosBot] = useState(0);
   const [humorBot, setHumorBot] = useState<HumorOponente>("idle");
   const [feedback, setFeedback] = useState("");
+  const [resultado, setResultado] = useState<ResultadoRodada>(null);
   const [erroJogador, setErroJogador] = useState(false);
   // Alternativas já erradas nesta rodada: ficam cinzas e param de aceitar clique.
   const [errados, setErrados] = useState<string[]>([]);
@@ -835,6 +901,7 @@ export function DueloGame({
     fracaoTempoRef.current = 1;
     inicioLocal.current = performance.now();
     setGanho(null);
+    setResultado(null);
     setTempoRestante(TEMPO_RODADA);
     tempoRestanteRef.current = TEMPO_RODADA;
     setErroJogador(false);
@@ -969,6 +1036,7 @@ export function DueloGame({
         inicioLocal.current = recebidoEm;
         fracaoTempoRef.current = 1;
         setGanho(null);
+        setResultado(null);
         setTempoRestante(Math.ceil(v.restanteMs / 1000));
         tempoRestanteRef.current = Math.ceil(v.restanteMs / 1000);
         setErroJogador(false);
@@ -985,13 +1053,19 @@ export function DueloGame({
           playTempoEsgotado();
           anotar(null, ultimo.alvo, v.indice);
           setFeedback(`Tempo esgotado — era: ${ultimo.alvo}`);
+          setResultado("tempo");
           setHumorBot("idle");
         } else if (ultimo.quem === "eu") {
           playHit(sequencia.current + 1);
           vibrar(0.7, 80);
           anotar("eu", ultimo.alvo, v.indice);
           setGanho({ pontos: ultimo.pontos, chave: v.indice });
-          setFeedback(`Você pontuou! +${ultimo.pontos}`);
+          setFeedback(
+            `Você pontuou! +${ultimo.pontos}${
+              sequencia.current > 1 ? ` · combo x${sequencia.current}` : ""
+            }`,
+          );
+          setResultado("voce");
           setHumorBot("erra");
         } else {
           // Som PRÓPRIO: antes o ponto do adversário tocava o mesmo som do
@@ -1000,6 +1074,7 @@ export function DueloGame({
           vibrar(0.2, 40);
           anotar("outro", ultimo.alvo, v.indice);
           setFeedback(`Adversário pontuou: ${ultimo.alvo}`);
+          setResultado("adversario");
           setHumorBot("comemora");
         }
       }
@@ -1024,7 +1099,12 @@ export function DueloGame({
   ) => {
     rodadaEncerrada.current = true;
     anotar(quem, rodada.alvo, indice);
-    setFeedback(texto);
+    setFeedback(
+      quem === "eu" && sequencia.current > 1
+        ? `${texto} · combo x${sequencia.current}`
+        : texto,
+    );
+    setResultado(quem === "eu" ? "voce" : quem === "outro" ? "adversario" : "tempo");
     setHumorBot(humor);
     relogio.current = 0;
     setFase("feedback");
@@ -1294,7 +1374,7 @@ export function DueloGame({
     .join(" · ");
 
   /** O analógico gira o órgão — ninguém descobre isso sozinho no headset. */
-  const DICA = "Gatilho responde · Analógico gira o órgão";
+  const DICA = "Mire · gatilho responde · analógico gira";
 
   /** Na revelação as alternativas ficam na tela: a certa acende onde estava. */
   const revelar = fase === "feedback";
@@ -1426,7 +1506,7 @@ export function DueloGame({
             </Text3D>
             {TECLAS.map((t, i) => (
               <Button3D
-                key={t}
+                key={`tecla-hospital-${t}`}
                 label={t}
                 width={t.length > 1 ? 0.46 : 0.4}
                 height={0.2}
@@ -1458,7 +1538,7 @@ export function DueloGame({
               laser registrava a tecla de baixo. */}
           {TECLAS.map((t, i) => (
             <BotaoLousa
-              key={t}
+              key={`tecla-escola-${t}`}
               texto={t}
               position={[
                 LOUSA_X + ((i % 3) - 1) * 0.24,
@@ -1603,7 +1683,7 @@ export function DueloGame({
             >
               {`${TOTAL_RODADAS} rodadas · órgãos 100 pts · estruturas 200 pts`}
             </Text3D>
-            <Text3D position={[0, -0.38, 0.01]} size={0.042} color={CORES.tempo} maxWidth={1.5}>
+            <Text3D position={[0, -0.38, 0.01]} size={0.05} color={CORES.tempo} maxWidth={1.5}>
               {DICA}
             </Text3D>
           </group>
@@ -1628,7 +1708,7 @@ export function DueloGame({
           >
             {`${TOTAL_RODADAS} rodadas · órgãos 100 pts · estruturas 200 pts`}
           </Text3D>
-          <Text3D position={[LOUSA_X, -0.38, LOUSA_Z]} size={0.028} color={CORES.tempo} maxWidth={1.05}>
+           <Text3D position={[LOUSA_X, -0.38, LOUSA_Z]} size={0.035} color={CORES.tempo} maxWidth={1.05}>
             {DICA}
           </Text3D>
         </group>
@@ -1657,7 +1737,9 @@ export function DueloGame({
       const deNovo = emSala ? pedirRevanche : () => comecar(dificuldade);
       const rotuloSegundo = emSala ? "Sair do duelo" : "Trocar dificuldade";
       const segundo = emSala ? voltarAoMenu : () => setFase("menu");
-      const revisar = perdidas.length ? `Revisar: ${perdidas.slice(0, 2).join(", ")}` : null;
+      const revisar = perdidas.length
+        ? `Para revisar: ${perdidas.slice(0, 2).join(", ")}`
+        : "Nenhuma estrutura para revisar";
       if (hosp) {
         return (
           <group position={HOSP_UI} rotation={HOSP_ROT}>
@@ -1690,16 +1772,14 @@ export function DueloGame({
               >
                 {retrospecto}
               </Text3D>
-              {revisar && (
-                <Text3D
-                  position={[0, -0.1, 0.01]}
-                  size={0.045}
-                  color={CORES.ouro}
-                  maxWidth={1.55}
-                >
-                  {revisar}
-                </Text3D>
-              )}
+              <Text3D
+                position={[0, -0.1, 0.01]}
+                size={0.045}
+                color={perdidas.length ? CORES.ouro : CORES.meu}
+                maxWidth={1.55}
+              >
+                {revisar}
+              </Text3D>
               <Button3D
                 label={rotuloDeNovo}
                 width={1.45}
@@ -1750,16 +1830,14 @@ export function DueloGame({
           >
             {retrospecto}
           </Text3D>
-          {revisar && (
-            <Text3D
-              position={[LOUSA_X, -0.135, LOUSA_Z]}
-              size={0.026}
-              color={CORES.ouro}
-              maxWidth={1.05}
-            >
-              {revisar}
-            </Text3D>
-          )}
+          <Text3D
+            position={[LOUSA_X, -0.135, LOUSA_Z]}
+            size={0.026}
+            color={perdidas.length ? CORES.ouro : CORES.meu}
+            maxWidth={1.05}
+          >
+            {revisar}
+          </Text3D>
           <BotaoLousa
             texto={rotuloDeNovo}
             position={[LOUSA_X, -0.255, LOUSA_Z]}
@@ -1791,6 +1869,7 @@ export function DueloGame({
             acima da lousa/do painel (a câmera da escola sobe e a do hospital
             recua, ver DueloApp). */}
         <group
+          key={`slot-modelo-${indice}`}
           position={
             hosp
               ? empilhar
@@ -1808,7 +1887,7 @@ export function DueloGame({
               modelo — pergunta, alternativas e placar seguem, e a partida não
               acaba. Libera o relógio do bot, que esperava o modelo. */}
           <ErrorBoundary
-            key={indice}
+            key={`erro-modelo-${indice}`}
             onError={() => {
               modeloPronto.current = true;
             }}
@@ -1818,14 +1897,27 @@ export function DueloGame({
               </Text3D>
             }
           >
+            {/*
+              A tela de feedback mantém a mesma árvore da rodada (mesmo
+              `indice`) para o modelo congelar e revelar a resposta. Na
+              pergunta seguinte o `key` do Suspense descarta o limite antigo:
+              sem isso o React deixa o GLB anterior visível enquanto o próximo
+              suspende, e os clones ficam um em cima do outro.
+            */}
             <Suspense
+              key={`${indice}:${rodada.tipo}:${rodada.modelo ?? LARINGE}`}
               fallback={
                 <Text3D position={[0, 0, 0]} size={0.11} color={ARENA_COLORS.muted}>
                   Carregando…
                 </Text3D>
               }
             >
-              <ModeloRodada rodada={rodada} prontoRef={modeloPronto} revelado={revelar} />
+              <ModeloRodada
+                rodada={rodada}
+                prontoRef={modeloPronto}
+                revelado={revelar}
+                resultado={resultado}
+              />
             </Suspense>
           </ErrorBoundary>
           {/* "+200" subindo do próprio órgão, no instante do acerto. */}
@@ -1867,7 +1959,7 @@ export function DueloGame({
                   </Text3D>
                 </>
               )}
-              <Text3D position={[0.12, 0.31, 0.01]} size={0.042} color={ARENA_COLORS.muted}>
+              <Text3D position={[0.12, 0.31, 0.01]} size={0.055} color={ARENA_COLORS.muted}>
                 {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
               </Text3D>
               <Text3D position={[0, 0.17, 0.01]} size={0.075} maxWidth={1.5}>
@@ -1882,7 +1974,7 @@ export function DueloGame({
                   era. Antes elas viravam uma frase. */}
               {rodada.opcoes.map((opcao, i) => (
                 <Button3D
-                  key={opcao}
+                  key={`opcao-hospital-${i}-${opcao}`}
                   label={opcao}
                   selo={["A", "B", "C", "D"][i]}
                   width={1.55}
@@ -1962,7 +2054,7 @@ export function DueloGame({
             </Text3D>
             <Text3D
               position={[LOUSA_X + 0.33, 0.082, LOUSA_Z]}
-              size={0.025}
+               size={0.036}
               color={CORES.gizFraco}
             >
               {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
@@ -1971,7 +2063,7 @@ export function DueloGame({
                 alternativa e a seguinte. */}
             {rodada.opcoes.map((opcao, i) => (
               <BotaoLousa
-                key={opcao}
+                key={`opcao-escola-${i}-${opcao}`}
                 texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
                 position={[LOUSA_X, -0.055 - i * 0.115, LOUSA_Z]}
                 cor={
@@ -1992,7 +2084,7 @@ export function DueloGame({
               />
             ))}
             {erroJogador && !revelar && (
-              <Text3D position={[LOUSA_X - 0.53, 0.022, LOUSA_Z]} size={0.03} color="#ffb0a0">
+               <Text3D position={[LOUSA_X - 0.53, 0.022, LOUSA_Z]} size={0.036} color="#ffb0a0">
                 Errado!
               </Text3D>
             )}
