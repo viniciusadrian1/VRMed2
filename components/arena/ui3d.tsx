@@ -65,6 +65,17 @@ export const ARENA_COLORS = {
   danger: "#e06a5c",
 } as const;
 
+/** Iluminação de estudo compartilhada pela Arena e pelo Duelo. */
+export function LuzEstudio() {
+  return (
+    <>
+      <directionalLight position={[4, 6, 4]} intensity={2.05} color="#ffeedd" />
+      <directionalLight position={[-5, 3, -4]} intensity={0.65} color="#9fc3dd" />
+      <hemisphereLight args={["#dfe9f2", "#141a22", 0.42]} />
+    </>
+  );
+}
+
 /** Botão sem resposta: cinza-azulado dessaturado, longe do azul de ação. */
 const COLOR_DESABILITADO = "#39454f";
 /** Rótulo do botão desabilitado — legível, mas claramente apagado. */
@@ -282,6 +293,7 @@ export function Button3D({
 }) {
   const group = useRef<THREE.Group>(null);
   const hovered = useRef(false);
+  const pressionado = useRef(false);
   const scale = useRef(1);
   const esquerdo = useXRInputSourceState("controller", "left");
   const direito = useXRInputSourceState("controller", "right");
@@ -294,7 +306,13 @@ export function Button3D({
     // dentro do headset é desconfortável e ainda esconde o texto em metade dos
     // quadros. O hover continua mandando mais que o destaque enquanto o
     // ponteiro está em cima.
-    const target = ativo ? 1.08 : destaque === "certo" ? 1.04 : 1;
+    const target = pressionado.current
+      ? 0.96
+      : ativo
+        ? 1.08
+        : destaque === "certo"
+          ? 1.04
+          : 1;
     // Suaviza a resposta para não "pular" com o tremor da mão.
     scale.current += (target - scale.current) * Math.min(1, delta * 12);
     group.current.scale.setScalar(scale.current);
@@ -347,6 +365,18 @@ export function Button3D({
       }}
       onPointerOut={() => {
         hovered.current = false;
+        pressionado.current = false;
+      }}
+      onPointerDown={(event) => {
+        stop(event);
+        if (!desabilitado) pressionado.current = true;
+      }}
+      onPointerUp={(event) => {
+        stop(event);
+        pressionado.current = false;
+      }}
+      onPointerCancel={() => {
+        pressionado.current = false;
       }}
     >
       <mesh renderOrder={998}>

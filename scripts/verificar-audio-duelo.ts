@@ -12,7 +12,7 @@
  * Um AudioContext falso registra tudo o que foi agendado; a assinatura de cada
  * evento é essa lista, menos o que é aleatório de propósito.
  *
- * Rodar: npx -y tsx scripts/verificar-audio-duelo.ts
+ * Rodar: npm run verify:audio (Node 22+)
  */
 
 const falhas: string[] = [];
@@ -120,7 +120,7 @@ const escopo = globalThis as Escopo;
 async function principal() {
   // ------------------------------------------- 5. sem AudioContext (antes de tudo)
   delete escopo.AudioContext;
-  const a = await import("../lib/arena-audio");
+  const a = await import("../lib/arena-audio.ts");
   try {
     a.playHit(3);
     a.playMiss();

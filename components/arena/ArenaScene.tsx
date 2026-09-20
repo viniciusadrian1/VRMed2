@@ -10,7 +10,7 @@ import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ArenaGame } from "./ArenaGame";
-import { ARENA_COLORS } from "./ui3d";
+import { ARENA_COLORS, LuzEstudio } from "./ui3d";
 
 /** Altura do chão — o modelo é normalizado em ~2 unidades centradas na origem. */
 const FLOOR_Y = -1.3;
@@ -287,12 +287,7 @@ export function ArenaScene() {
         <SairDoVR position={[-0.45, 1.25, -0.5]} />
       </XROrigin>
 
-          <ambientLight intensity={0.85} />
-          {/* Luz principal levemente quente + contraluz fria: dá volume ao
-              órgão em vez do achatado de luz branca uniforme. */}
-          <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />
-          <directionalLight position={[-5, 3, -4]} intensity={0.7} color="#9fc3dd" />
-          <hemisphereLight args={["#dfe9f2", "#141a22", 1]} />
+          <LuzEstudio />
 
           <ArenaStage />
 

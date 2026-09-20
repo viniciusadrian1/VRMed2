@@ -41,6 +41,7 @@ export function XRButton({ modo = "vr" }: { modo?: keyof typeof MODOS }) {
 
   useEffect(() => {
     if (!navigator.xr) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- resultado síncrono da capability API
       setSupported(false);
       return;
     }

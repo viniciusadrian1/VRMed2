@@ -32,6 +32,7 @@ export function QuizMode() {
   const hasHydrated = useVRMedStore((s) => s.hasHydrated);
   const annotationsByOrgan = useVRMedStore((s) => s.annotationsByOrgan);
   const addQuizResult = useVRMedStore((s) => s.addQuizResult);
+  const setCurrentOrgan = useVRMedStore((s) => s.setCurrentOrgan);
   const saveSession = useVRMedStore((s) => s.saveSession);
 
   const [phase, setPhase] = useState<Phase>("setup");
@@ -63,27 +64,21 @@ export function QuizMode() {
     ) {
       return;
     }
-    const timer = window.setTimeout(() => setTimeLeft((v) => v - 1), 1000);
-    return () => window.clearTimeout(timer);
-  }, [phase, timingMode, selected, timeLeft]);
-
-  // Esgotado o tempo, a questão é registrada como erro.
-  useEffect(() => {
-    if (
-      phase === "playing" &&
-      timingMode === "timed" &&
-      selected === null &&
-      timeLeft === 0
-    ) {
+    const timer = window.setTimeout(() => {
       const question = questions[currentIndex];
       if (!question) return;
-      setSelected("");
-      setAnswers((prev) => [
-        ...prev,
-        { questionId: question.id, selected: "", correct: false },
-      ]);
-    }
-  }, [timeLeft, phase, timingMode, selected, questions, currentIndex]);
+      if (timeLeft === 1) {
+        setSelected("");
+        setAnswers((prev) => [
+          ...prev,
+          { questionId: question.id, selected: "", correct: false },
+        ]);
+        return;
+      }
+      setTimeLeft((v) => v - 1);
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [phase, timingMode, selected, timeLeft, questions, currentIndex]);
 
   const beginQuiz = (targetOrganId: string) => {
     const organ = getOrganById(targetOrganId);
@@ -95,6 +90,10 @@ export function QuizMode() {
     if (built.length === 0) return;
 
     setOrganId(targetOrganId);
+    // O debrief pode levar diretamente de volta ao mesmo órgão no visualizador.
+    // A store só guarda o identificador; o modelo continua sendo carregado pelo
+    // fluxo normal do Viewer, com as mesmas proteções de GLB/Draco.
+    setCurrentOrgan(targetOrganId);
     setQuestions(built);
     setCurrentIndex(0);
     setAnswers([]);

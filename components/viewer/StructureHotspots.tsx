@@ -21,6 +21,7 @@ export function StructureHotspots() {
   const annotationMode = useVRMedStore((s) => s.annotationMode);
   const inspectedLabel = useVRMedStore((s) => s.inspectedLabel);
   const setInspectedLabel = useVRMedStore((s) => s.setInspectedLabel);
+  const setInspectedPoint = useVRMedStore((s) => s.setInspectedPoint);
   // Os pontos são medidos no modelo fechado: com as partes separadas eles
   // ficariam no ar, longe do osso que marcam.
   const aberto = useVRMedStore((s) => s.explosao > 0.001);
@@ -45,6 +46,7 @@ export function StructureHotspots() {
               type="button"
               onClick={() => {
                 setInspectedLabel(structure.label);
+                setInspectedPoint(structure.position);
                 viewerBridge.frameTo(structure.position);
                 track("structure_inspected", {
                   organ: organId,

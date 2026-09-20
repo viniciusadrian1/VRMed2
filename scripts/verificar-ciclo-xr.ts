@@ -10,12 +10,12 @@
  *  5. Registro de diagnóstico: distingue end pedido pela página do fim vindo
  *     do sistema.
  *
- * Rodar: npx -y tsx scripts/verificar-ciclo-xr.ts
+ * Rodar: npm run verify:xr (Node 22+)
  */
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { entrarNoXR, sairENavegar } from "../lib/xr-sessao";
+import { entrarNoXR, sairENavegar } from "../lib/xr-sessao.ts";
 
 const falhas: string[] = [];
 const conferir = (ok: boolean, msg: string) => {
@@ -192,7 +192,7 @@ async function principal() {
       location: { search: "?debug=xrlog", pathname: "/viewer" },
     });
     console.info = () => {}; // o registro também escreve no console
-    const registro = await import("../lib/xr-log");
+    const registro = await import("../lib/xr-log.ts");
     conferir(registro.XR_LOG_LIGADO, "?debug=xrlog liga o registro");
 
     class SessaoFalsa extends EventTarget {

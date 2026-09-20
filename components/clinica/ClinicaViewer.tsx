@@ -193,6 +193,7 @@ function CenaClinica({
 
   return (
     <>
+      <color attach="background" args={["#101820"]} />
       <XROrigin position={[0, FLOOR_Y, 2.4]}>
         <SairDoVR position={[-0.45, 1.25, -0.5]} />
       </XROrigin>
@@ -486,11 +487,17 @@ export function ClinicaViewer({ caso }: { caso: CasoClinico }) {
         gl={{
           antialias: true,
           alpha: false,
-          toneMapping: THREE.NeutralToneMapping,
-          localClippingEnabled: true,
         }}
-        scene={{ environmentIntensity: 0.7 }}
-        onCreated={({ gl }) => gl.setClearColor("#101820")}
+        onCreated={({ gl, scene }) => {
+          // O renderer pode herdar o clear do canvas anterior ao trocar da
+          // lista para um caso. Fixar também o background da cena evita um
+          // canvas branco no primeiro frame enquanto o GLB é preparado.
+          gl.setClearColor("#101820", 1);
+          gl.toneMapping = THREE.NeutralToneMapping;
+          gl.localClippingEnabled = true;
+          scene.environmentIntensity = 0.7;
+          scene.background = new THREE.Color("#101820");
+        }}
       >
         <XR store={store}>
           <CenaClinica

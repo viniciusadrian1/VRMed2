@@ -81,10 +81,13 @@ function CameraRig() {
     };
   }, [camera, controls, invalidate, scene]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!goal.current || !controls) return;
-    camera.position.lerp(goal.current.pos, 0.14);
-    controls.target.lerp(goal.current.look, 0.14);
+    // Mantém a mesma sensação em desktop, Quest 72 Hz e Quest 90 Hz. O
+    // limite evita um salto grande se o navegador retomar após uma pausa.
+    const suavidade = 1 - Math.pow(1 - 0.14, Math.min(delta, 0.1) * 60);
+    camera.position.lerp(goal.current.pos, suavidade);
+    controls.target.lerp(goal.current.look, suavidade);
     controls.update();
     invalidate();
     if (camera.position.distanceTo(goal.current.pos) < 0.012) {
@@ -104,6 +107,8 @@ function SceneInvalidator() {
   const wireframe = useVRMedStore((s) => s.wireframe);
   const transformMode = useVRMedStore((s) => s.transformMode);
   const annotations = useVRMedStore((s) => s.annotationsByOrgan);
+  const inspectedLabel = useVRMedStore((s) => s.inspectedLabel);
+  const inspectedPoint = useVRMedStore((s) => s.inspectedPoint);
 
   useEffect(() => {
     invalidate();
@@ -115,6 +120,8 @@ function SceneInvalidator() {
     wireframe,
     transformMode,
     annotations,
+    inspectedLabel,
+    inspectedPoint,
   ]);
 
   return null;

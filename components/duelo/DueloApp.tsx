@@ -12,7 +12,7 @@ import { entrarNoXR } from "@/lib/xr-sessao";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Text3D } from "@/components/arena/ui3d";
+import { LuzEstudio, Text3D } from "@/components/arena/ui3d";
 import { DueloGame, type Ambiente } from "./DueloGame";
 import { AmbienteHospital } from "./AmbienteHospital";
 import { useDueloOnline, type DueloOnline } from "./useDueloOnline";
@@ -33,7 +33,20 @@ export const ESCOLA_OFF_Y = FLOOR_Y - 0.3 * ESCOLA_S;
 
 function CenarioDuelo() {
   const gltf = useGLTF(CENARIO_GLB, "/draco/");
-  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  const scene = useMemo(() => {
+    const clone = gltf.scene.clone(true);
+    // Remove / oculta as cadeiras do cenário para dar espaço livre aos competidores
+    clone.traverse((child) => {
+      if (
+        child.name.toLowerCase().includes("chair") ||
+        child.name.toLowerCase().includes("cadeira")
+      ) {
+        child.visible = false;
+      }
+    });
+    return clone;
+  }, [gltf.scene]);
+
   return (
     <group position={[0, ESCOLA_OFF_Y, 0]} scale={ESCOLA_S}>
       <primitive object={scene} />
@@ -81,18 +94,16 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
 
   return (
     <>
-      {/* Escola: origem no piso, exatamente sob o assento da cadeira da
-          direita — quem senta de verdade fica com os olhos ~1,2m acima, na
-          altura da lousa; quem fica de pé vê por cima da mesa. Hospital: de
-          pé atrás da sua mesa de instrumentos. */}
+      {/* Escola: origem no piso, exatamente sob o assento da direita — quem fica de pé
+          vê por cima da mesa. Hospital: de pé atrás da sua mesa de instrumentos. */}
       <XROrigin position={escola ? [0.28, FLOOR_Y, 0.99] : [0, FLOOR_Y, 2.55]}>
         <SairDoVR position={[-0.45, escola ? 0.95 : 1.25, -0.5]} />
       </XROrigin>
 
-      <ambientLight intensity={0.85} />
-      <directionalLight position={[4, 6, 4]} intensity={1.9} color="#ffeedd" />
-      <directionalLight position={[-5, 3, -4]} intensity={0.7} color="#9fc3dd" />
-      <hemisphereLight args={["#dfe9f2", "#141a22", 1]} />
+      <LuzEstudio />
+      {/* Luz ambiente equilibrada para clarear a sala e eliminar sombras duras/escuras */}
+      <ambientLight intensity={1.1} color="#f8fafc" />
+      <directionalLight position={[0, 4, 3]} intensity={0.9} color="#fffaf0" />
 
       <PalcoDuelo />
       {/* Cenário é enfeite: se um GLB dele falhar, o jogo segue sem a sala em
@@ -186,11 +197,7 @@ export function DueloApp() {
             <ArrowLeft className="size-4" />
             VRmed
           </Link>
-          {/* Controles no canto de cima: embaixo, no meio, eles cobriam as
-              alternativas e os botões 3D (celular deitado, navegador do Quest)
-              e o toque trocava o ambiente ou entrava no VR. A coluna deixa o
-              toque passar: quando o erro quebra linha ela fica com 320px e,
-              no celular, cobria o link VRmed e o arraste da órbita. */}
+          {/* Controles no canto de cima */}
           <div className="pointer-events-none absolute right-4 top-4 z-20 flex flex-col items-end gap-2">
             {/* Seletor de ambiente do duelo */}
             <div className="pointer-events-auto flex overflow-hidden rounded-full border border-white/15 bg-black/50 text-sm font-medium backdrop-blur">
@@ -227,8 +234,7 @@ export function DueloApp() {
               </p>
             )}
           </div>
-          {/* Só a dica fica embaixo, e ela deixa o clique passar para o canvas. */}
-          <p className="pointer-events-none absolute inset-x-0 bottom-6 z-10 mx-auto max-w-lg px-4 text-center text-[11px] text-white/50">
+          <p className="sr-only">
             Duelo de conhecimento médico — contra um bot ou contra um amigo,
             cada um no seu óculos. No desktop: 1–3 escolhe o bot, 4 cria uma
             sala, 5 entra numa sala, 1–4/A–D responde, Enter repete, Esc volta
@@ -244,8 +250,6 @@ export function DueloApp() {
         dpr={1}
         frameloop="always"
         camera={{
-          // Ambas no ponto de vista do VR (sentado na escola, de pé no
-          // hospital): o desktop não pode esconder o que o headset vê.
           position: ambiente === "escola" ? [0.28, -0.05, 1.0] : [0, 0.3, 2.55],
           fov: 50,
         }}

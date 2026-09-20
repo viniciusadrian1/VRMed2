@@ -785,7 +785,7 @@ export function DueloGame({
     faseRef.current = nova;
     setFaseState(nova);
   };
-  const [dificuldade, setDificuldade] = useState<Dificuldade>("residente");
+  const [dificuldade, setDificuldade] = useState<Dificuldade>("iniciante");
   const [rodadas, setRodadas] = useState<Rodada[]>([]);
   const [indice, setIndice] = useState(0);
   const [pontosJogador, setPontosJogador] = useState(0);
@@ -1415,23 +1415,26 @@ export function DueloGame({
    * o momento em que se quer ver a cara dele — ele evaporava. Manter montado
    * é de graça; remontar é que custa.
    */
-  const oponente = hosp ? (
-    <Oponente
-      humor={humorBot}
-      nome={nomeOponente}
-      position={[-0.45, -1.3, -1.9]}
-      // O corpo é modelado de frente para +z; o jogador está em +z.
-      rotationY={0}
-    />
-  ) : (
-    <Oponente
-      humor={humorBot}
-      nome={nomeOponente}
-      position={[-0.81, -1.54, 1.07]}
-      rotationY={Math.PI}
-      sentado
-    />
-  );
+  const mostrarOponente = fase !== "menu" && fase !== "codigo" && fase !== "sala";
+  const oponente = mostrarOponente ? (
+    hosp ? (
+      <Oponente
+        humor={humorBot}
+        nome={nomeOponente}
+        tipo={dificuldade}
+        position={[-0.45, -1.3, -1.9]}
+        rotationY={0}
+      />
+    ) : (
+      <Oponente
+        humor={humorBot}
+        nome={nomeOponente}
+        tipo={dificuldade}
+        position={[-0.81, -1.3, 1.07]}
+        rotationY={Math.PI * 0.75}
+      />
+    )
+  ) : null;
 
   const tela = () => {
     if (emSala && (online.conexao === "perdida" || fase === "encerrada")) {

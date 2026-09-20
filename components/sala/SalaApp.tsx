@@ -188,7 +188,7 @@ export function SalaApp() {
                 </p>
               </div>
             )}
-            <p className="max-w-lg px-4 text-center text-[11px] text-white/45">
+            <p className="sr-only">
               Sala de estudos — clique no rádio, no computador, nos flashcards
               ou no livro. Conteúdo educacional; o tutor de IA responde com base
               nos tratados de anatomia da graduação.

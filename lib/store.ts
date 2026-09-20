@@ -93,6 +93,9 @@ interface VRMedState {
   /** Estrutura identificada pelo último clique ("clique para identificar"). */
   inspectedLabel: string | null;
   setInspectedLabel: (label: string | null) => void;
+  /** Ponto da última identificação, no espaço local do root do modelo. */
+  inspectedPoint: [number, number, number] | null;
+  setInspectedPoint: (point: [number, number, number] | null) => void;
 
   /* --- camadas anatômicas (transiente, populado ao carregar o modelo) --- */
   layers: LayerState[];
@@ -203,6 +206,7 @@ export const useVRMedStore = create<VRMedState>()(
           transformMode: "none",
           annotationMode: false,
           inspectedLabel: null,
+          inspectedPoint: null,
           explosao: 0,
         }),
       modelKind: null,
@@ -210,7 +214,10 @@ export const useVRMedStore = create<VRMedState>()(
       modelBounds: null,
       setModelBounds: (bounds) => set({ modelBounds: bounds }),
       inspectedLabel: null,
-      setInspectedLabel: (label) => set({ inspectedLabel: label }),
+      setInspectedLabel: (label) =>
+        set({ inspectedLabel: label, ...(label === null ? { inspectedPoint: null } : {}) }),
+      inspectedPoint: null,
+      setInspectedPoint: (point) => set({ inspectedPoint: point }),
 
       layers: [],
       preXrayLayers: null,
@@ -407,6 +414,7 @@ export const useVRMedStore = create<VRMedState>()(
           annotationMode: false,
           // Como em setCurrentOrgan: o rótulo era de uma malha do modelo anterior.
           inspectedLabel: null,
+          inspectedPoint: null,
           explosao: 0,
           chat: session.chat.map((m) => ({ ...m })),
           annotationsByOrgan: {

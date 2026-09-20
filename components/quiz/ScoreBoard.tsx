@@ -1,6 +1,7 @@
 "use client";
 
-import { RotateCcw, Trophy } from "lucide-react";
+import Link from "next/link";
+import { Eye, RotateCcw, Trophy } from "lucide-react";
 import { formatDuration } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -95,6 +96,12 @@ export function ScoreBoard({
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Button variant="outline" onClick={onNewQuiz}>
             Novo quiz
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/viewer">
+              <Eye />
+              Revisar no modelo 3D
+            </Link>
           </Button>
           <Button onClick={onRestart}>
             <RotateCcw />

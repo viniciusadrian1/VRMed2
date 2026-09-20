@@ -2,7 +2,7 @@
  * Joga partidas inteiras do duelo online com relógio falso, sem rede.
  * Reprova se alguma regra de `lib/duelo-salas.ts` quebrar.
  *
- * Rodar: npx -y tsx scripts/verificar-duelo-salas.ts
+ * Rodar: npm run verify:duelo (Node 22+)
  */
 import assert from "node:assert/strict";
 import {
@@ -25,7 +25,7 @@ import {
   sair,
   visao,
   type RodadaOnline,
-} from "../lib/duelo-salas";
+} from "../lib/duelo-salas.ts";
 
 const rodadas: RodadaOnline[] = Array.from({ length: 8 }, (_, i) => ({
   tipo: i % 2 ? "estrutura" : "orgao",

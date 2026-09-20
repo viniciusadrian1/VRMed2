@@ -34,6 +34,9 @@ function QuizModel({ path }: { path: string }) {
   );
   useEffect(() => {
     let cancelled = false;
+    // O modelo pode mudar entre perguntas; não exibir o resultado anterior
+    // enquanto o HEAD assíncrono verifica o novo arquivo.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset de recurso assíncrono
     setState("checking");
     fetch(path, { method: "HEAD" })
       .then((res) => !cancelled && setState(res.ok ? "real" : "missing"))

@@ -75,6 +75,7 @@ export function AudioNarration() {
   // Busca a descrição do órgão atual.
   useEffect(() => {
     if (!organId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- limpa a UI ao perder o órgão
       setDescription(null);
       return;
     }
@@ -113,8 +114,9 @@ export function AudioNarration() {
   // modelo) cortava a narração. Quem a cancela ao trocar de órgão ou sair é
   // a página do viewer (app/viewer/page.tsx).
   useEffect(() => {
+    const audio = audioRef.current;
     return () => {
-      audioRef.current?.pause();
+      audio?.pause();
       setStatus("idle");
     };
   }, [organId]);

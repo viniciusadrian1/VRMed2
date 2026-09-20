@@ -9,7 +9,7 @@ import {
   type RefObject,
 } from "react";
 import { Canvas } from "@react-three/fiber";
-import { ContactShadows, useGLTF } from "@react-three/drei";
+import { ContactShadows, Text, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { normalizeContent } from "@/lib/model-utils";
 import { useMounted } from "@/hooks/use-mounted";
@@ -18,6 +18,37 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SafeEnvironment } from "@/components/viewer/SafeEnvironment";
 import { ComparePlaceholder } from "./ComparePlaceholder";
 import { SyncedCameras, type CameraSyncState } from "./SyncedCameras";
+
+function CompareLoading({ variant }: { variant: "healthy" | "pathological" }) {
+  return (
+    <group position={[0, 0, 0.1]}>
+      <mesh rotation={[0, 0, Math.PI / 4]}>
+        <torusGeometry args={[0.12, 0.025, 8, 24]} />
+        <meshBasicMaterial color="#c8935a" />
+      </mesh>
+      <Text
+        position={[0, -0.24, 0]}
+        font="/fonts/inter-600.woff"
+        fontSize={0.085}
+        color="#f3eee6"
+        anchorX="center"
+        anchorY="middle"
+      >
+        Preparando modelo
+      </Text>
+      <Text
+        position={[0, -0.36, 0]}
+        font="/fonts/inter-600.woff"
+        fontSize={0.055}
+        color="#9aa6b2"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {variant === "healthy" ? "Anatomia saudável" : "Anatomia patológica"}
+      </Text>
+    </group>
+  );
+}
 
 /** Carrega um modelo .glb e o normaliza para caber na cena. */
 function CompareGLB({ path }: { path: string }) {
@@ -52,6 +83,9 @@ function CompareModel({
 
   useEffect(() => {
     let cancelled = false;
+    // O estado precisa voltar a "checking" quando o path muda, antes do HEAD
+    // assíncrono decidir se o GLB real está disponível.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset de recurso assíncrono
     setState("checking");
     fetch(path, { method: "HEAD" })
       .then((res) => {
@@ -82,7 +116,7 @@ function CompareModel({
           onResolved?.("placeholder");
         }}
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={<CompareLoading variant={variant} />}>
           <CompareGLB path={path} />
         </Suspense>
       </ErrorBoundary>

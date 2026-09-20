@@ -66,6 +66,8 @@ function ChatPanelContent() {
       id: genId(),
       role: "user",
       content: trimmed,
+      // Este timestamp nasce no gesto do usuário, não durante o render.
+      // eslint-disable-next-line react-hooks/purity -- handler de envio
       createdAt: Date.now(),
       organContext: organ?.name,
     };
@@ -85,6 +87,7 @@ function ChatPanelContent() {
       id: assistantId,
       role: "assistant",
       content: "",
+      // eslint-disable-next-line react-hooks/purity -- handler de envio
       createdAt: Date.now(),
       feedback: null,
     });

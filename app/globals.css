@@ -1,6 +1,20 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/*
+  A interface não pode depender de uma chamada ao Google Fonts no build: o
+  evento precisa continuar reproduzível mesmo sem rede. A fonte 600 é a mesma
+  usada pela UI 3D; pesos ausentes caem para o sistema e não bloqueiam a
+  construção da aplicação.
+*/
+@font-face {
+  font-family: "VRmed Inter";
+  src: url("/fonts/inter-600.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Variante de tema escuro acionada pela classe .dark (gerenciada por next-themes) */
 @custom-variant dark (&:is(.dark *));
 
@@ -11,6 +25,8 @@
 */
 :root {
   --radius: 0.75rem;
+  --font-inter: "VRmed Inter";
+  --font-fraunces: Georgia;
 
   --background: #f8f7f4;
   --foreground: #1a1a1a;

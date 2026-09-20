@@ -9,7 +9,7 @@ import {
   type RefObject,
 } from "react";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { TransformControls } from "@react-three/drei";
+import { Billboard, TransformControls } from "@react-three/drei";
 import { useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { track } from "@/lib/analytics";
@@ -28,6 +28,7 @@ import {
 } from "@/lib/model-utils";
 import { TEXTO_PADRAO_ANOTACAO } from "@/lib/quiz";
 import { useVRMedStore } from "@/lib/store";
+import { Text3D } from "@/components/arena/ui3d";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AnnotationHotspots } from "./AnnotationSystem";
 import { ClipPlaneHelpers } from "./ClipPlaneHelpers";
@@ -37,6 +38,44 @@ import { StructureHotspots } from "./StructureHotspots";
 import { EntradaXR } from "./XRManipulation";
 
 type Availability = "checking" | "real" | "placeholder";
+
+/** Rótulo legível no headset, com uma entrada curta e um ponto de ancoragem. */
+function RotuloEstruturaVR({
+  label,
+  point,
+}: {
+  label: string;
+  point: [number, number, number];
+}) {
+  const grupo = useRef<THREE.Group>(null);
+  const progresso = useRef(0);
+
+  useFrame((_, delta) => {
+    progresso.current = Math.min(1, progresso.current + Math.min(delta, 1 / 30) * 8);
+    const t = 1 - Math.pow(1 - progresso.current, 3);
+    grupo.current?.scale.setScalar(0.82 + t * 0.18);
+  });
+
+  return (
+    <group ref={grupo}>
+      <mesh position={point} raycast={() => null}>
+        <sphereGeometry args={[0.018, 10, 8]} />
+        <meshBasicMaterial color="#ffd166" toneMapped={false} />
+      </mesh>
+      <Billboard
+        position={[point[0] + 0.12, point[1] + 0.12, point[2]]}
+        follow
+        lockX={false}
+        lockY={false}
+        lockZ={false}
+      >
+        <Text3D size={0.075} color="#f3f6f8" maxWidth={0.9}>
+          {label}
+        </Text3D>
+      </Billboard>
+    </group>
+  );
+}
 
 /** Aplica camadas, cortes e wireframe ao modelo sempre que o estado muda. */
 /**
@@ -149,7 +188,9 @@ export function OrganModel() {
   const annotationMode = useVRMedStore((s) => s.annotationMode);
   const addAnnotation = useVRMedStore((s) => s.addAnnotation);
   const setInspectedLabel = useVRMedStore((s) => s.setInspectedLabel);
+  const setInspectedPoint = useVRMedStore((s) => s.setInspectedPoint);
   const inspectedLabel = useVRMedStore((s) => s.inspectedLabel);
+  const inspectedPoint = useVRMedStore((s) => s.inspectedPoint);
   const invalidate = useThree((s) => s.invalidate);
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
@@ -159,6 +200,7 @@ export function OrganModel() {
   const escala = inSession ? escalaReal(organ?.tamanhoRealCm) : null;
 
   const rootRef = useRef<THREE.Group>(null);
+  const [rootObject, setRootObject] = useState<THREE.Group | null>(null);
   const contentRef = useRef<THREE.Group>(null);
   // Destaque (emissive) da estrutura atualmente identificada.
   const highlightRef = useRef<{
@@ -168,11 +210,18 @@ export function OrganModel() {
 
   const [availability, setAvailability] = useState<Availability>("checking");
   const [modelReady, setModelReady] = useState(false);
+  const setRoot = useCallback((node: THREE.Group | null) => {
+    rootRef.current = node;
+    setRootObject(node);
+  }, []);
 
   useEffect(() => {
     if (!organId) return;
     const def = getOrganById(organId);
     if (!def) return;
+    // O modelo anterior precisa desaparecer imediatamente enquanto o HEAD
+    // assíncrono decide entre GLB real e placeholder.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset visual necessário na troca de órgão
     setAvailability("checking");
     setModelReady(false);
     highlightRef.current = null;
@@ -313,7 +362,12 @@ export function OrganModel() {
     // Identifica a estrutura nomeada; sem nome (órgão de malha única),
     // identifyStructure recai no nome do órgão. O destaque é aplicado pelo
     // useEffect que observa `inspectedLabel`.
-    setInspectedLabel(identifyStructure(event.object, organ?.name));
+    const label = identifyStructure(event.object, organ?.name);
+    const local = rootRef.current
+      ? rootRef.current.worldToLocal(event.point.clone())
+      : event.point;
+    setInspectedLabel(label);
+    setInspectedPoint([local.x, local.y, local.z]);
   };
 
   if (!organ || !organId) return null;
@@ -321,7 +375,7 @@ export function OrganModel() {
   return (
     <>
       <group
-        ref={rootRef}
+        ref={setRoot}
         name={NOME_DO_ROOT}
         position={inSession ? POSE_PROVISORIA : [0, 0, 0]}
         scale={escala ?? 1}
@@ -374,6 +428,13 @@ export function OrganModel() {
             <AnnotationHotspots />
           </>
         )}
+        {inSession && inspectedLabel && inspectedPoint && (
+          <RotuloEstruturaVR
+            key={inspectedLabel}
+            label={inspectedLabel}
+            point={inspectedPoint}
+          />
+        )}
       </group>
 
       {/*
@@ -392,8 +453,8 @@ export function OrganModel() {
         />
       )}
 
-      {!inSession && transformMode !== "none" && modelReady && rootRef.current && (
-        <TransformControls object={rootRef.current} mode={transformMode} />
+      {!inSession && transformMode !== "none" && modelReady && rootObject && (
+        <TransformControls object={rootObject} mode={transformMode} />
       )}
     </>
   );

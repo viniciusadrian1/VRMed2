@@ -13,7 +13,14 @@ import {
 } from "@/lib/arena-audio";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ArenaModel } from "./ArenaModel";
-import { ARENA_COLORS, Button3D, Floater, Panel, Text3D } from "./ui3d";
+import {
+  ARENA_COLORS,
+  BarraTempo,
+  Button3D,
+  Floater,
+  Panel,
+  Text3D,
+} from "./ui3d";
 import type { ArenaAttempt, ArenaPhase, ArenaStructure } from "./types";
 
 /** Duração da partida, em segundos. Curta o bastante para a fila andar. */
@@ -22,6 +29,8 @@ const ROUND_SECONDS = 60;
 const HINT_AFTER = 6;
 /** Penalidade por erro, em segundos. */
 const MISS_PENALTY = 2;
+/** Teto do multiplicador: a Arena recompensa sequência, sem virar corrida. */
+const MAX_COMBO = 3;
 /** Volta sozinho ao modo ocioso depois deste tempo na tela de resultado. */
 const RESULT_TIMEOUT = 20;
 
@@ -127,6 +136,7 @@ export function ArenaGame() {
   // Tempo em ponto flutuante; o estado guarda só o segundo exibido.
   const remaining = useRef(ROUND_SECONDS);
   const sinceTarget = useRef(0);
+  const fracaoTempo = useRef(1);
   const sinceResult = useRef(0);
   const countdownTimer = useRef(0);
   const feedbackTimer = useRef(0);
@@ -156,6 +166,7 @@ export function ArenaGame() {
   const beginStage = useCallback(
     (index: number) => {
       remaining.current = ROUND_SECONDS;
+      fracaoTempo.current = 1;
       countdownTimer.current = 0;
       setSeconds(ROUND_SECONDS);
       setCountdown(3);
@@ -216,7 +227,7 @@ export function ArenaGame() {
       setFeedback(acertou ? "acerto" : "erro");
 
       if (acertou) {
-        const nextCombo = combo + 1;
+        const nextCombo = Math.min(combo + 1, MAX_COMBO);
         setCombo(nextCombo);
         setScore((value) => value + 100 * nextCombo);
         setHits((value) => value + 1);
@@ -286,6 +297,7 @@ export function ArenaGame() {
 
     if (phase === "jogando") {
       remaining.current -= delta;
+      fracaoTempo.current = Math.max(0, remaining.current / ROUND_SECONDS);
       const shown = Math.max(0, Math.ceil(remaining.current));
       if (shown !== seconds) setSeconds(shown);
 
@@ -308,6 +320,7 @@ export function ArenaGame() {
 
   const erros = attempts.filter((a) => !a.acertou).map((a) => a.label);
   const errosUnicos = [...new Set(erros)].slice(0, 3);
+  const precisao = attempts.length === 0 ? 0 : Math.round((hits / attempts.length) * 100);
 
   return (
     <>
@@ -361,7 +374,7 @@ export function ArenaGame() {
               color={ARENA_COLORS.muted}
               maxWidth={1.9}
             >
-              2 fases · Laringe e Fígado · 60 segundos cada
+              2 fases · Laringe e Fígado · 60 segundos cada · combo até x3
             </Text3D>
             {/* Instrução explícita: quem nunca usou VR não sabe que o gatilho
                 fica embaixo do dedo indicador, e tenta apertar o grip. */}
@@ -459,6 +472,21 @@ export function ArenaGame() {
             >
               {target?.label ?? "..."}
             </Text3D>
+            {feedback && (
+              <Text3D
+                position={[0, -0.27, 0.01]}
+                size={0.06}
+                color={feedback === "acerto" ? ARENA_COLORS.success : ARENA_COLORS.danger}
+              >
+                {feedback === "acerto" ? "Acerto" : "Erro · −2 s"}
+              </Text3D>
+            )}
+            <BarraTempo
+              width={1.8}
+              height={0.018}
+              position={[0, -0.21, 0.01]}
+              fracaoRef={fracaoTempo}
+            />
           </Panel>
 
           {/* Tempo à esquerda, pontos à direita — leitura periférica. */}
@@ -495,7 +523,7 @@ export function ArenaGame() {
                 size={0.06}
                 color={ARENA_COLORS.success}
               >
-                {`combo x${combo}`}
+                {`combo x${combo}${combo === MAX_COMBO ? " · máximo" : ""}`}
               </Text3D>
             )}
           </Panel>
@@ -517,7 +545,14 @@ export function ArenaGame() {
               size={0.08}
               color={ARENA_COLORS.muted}
             >
-              {`${hits} estruturas · recorde ${Math.max(best, score)}`}
+              {`${hits} acertos · ${attempts.length} tentativas · ${precisao}% precisão`}
+            </Text3D>
+            <Text3D
+              position={[0, -0.16, 0.01]}
+              size={0.065}
+              color={ARENA_COLORS.muted}
+            >
+              {`Recorde ${Math.max(best, score)}`}
             </Text3D>
             {errosUnicos.length > 0 && (
               <Text3D

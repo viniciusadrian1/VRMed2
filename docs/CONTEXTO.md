@@ -1,5 +1,92 @@
 # VRmed — contexto do projeto
 
+## Polimento contínuo do Duelo (2026-09-18)
+
+O passe de acabamento do `/duelo` começou pela sensação de jogo sem alterar as
+regras das salas online: o modelo da rodada agora é remontado por identidade
+própria (evita órgãos antigos empilhados), entra com uma microanimação de escala
+e profundidade, e reage ao resultado com brilho temporário verde, coral ou âmbar.
+O briefing usa a instrução curta "Mire · gatilho responde · analógico gira", o
+feedback mostra combo quando há sequência de acertos e a tela final informa o
+que revisar. Os materiais do GLB são restaurados após o feedback.
+
+O build deixou de depender de rede para baixar Inter/Fraunces durante o
+`next build`: a interface usa a fonte local disponível e fallbacks do sistema.
+`npm run typecheck` e `npm run build` passam. Teste em Quest ainda é obrigatório
+para confirmar legibilidade, brilho e conforto.
+
+O visualizador principal também passou a mostrar a estrutura identificada como
+texto 3D dentro do VR/AR, ancorado no ponto clicado e acompanhado pelo root do
+modelo; no desktop, a barra DOM continua sendo usada.
+
+`Button3D`, usado por Arena, Duelo e Sala, agora também tem estado visual de
+pressionamento (compressão curta ao apertar), além do hover, som e háptica já
+existentes. Isso dá confirmação imediata entre o gatilho e a troca de tela sem
+adicionar custo de pós-processamento.
+
+O resultado do Quiz agora também oferece "Revisar no modelo 3D": o órgão da
+tentativa é colocado na store antes da partida e o debrief leva de volta ao
+visualizador sem rota ou fluxo paralelo.
+
+O rótulo 3D de estrutura no Viewer/VR agora entra com escala curta, ponto
+âmbar de ancoragem e pequeno deslocamento da superfície. A posição continua no
+espaço local do root, então acompanha manipulação e abertura do modelo.
+
+Arena e Duelo passaram a usar `LuzEstudio`, com luz-chave quente, contraluz fria
+e preenchimento hemisférico reduzido. O objetivo é recuperar volume nos órgãos
+sem HDR remoto, pós-processamento ou sombra dinâmica; validar o resultado final
+no Quest antes de ajustar intensidades novamente.
+
+A Arena passou a exibir também uma barra de tempo drenando no painel da partida.
+Ela lê uma ref no `useFrame`, sem atualização React por quadro, e reaproveita o
+mesmo componente de barra do Duelo.
+
+O debrief da Arena agora mostra acertos, tentativas, precisão percentual derivada
+da partida e recorde separado; os alvos errados continuam listados para revisão.
+
+Durante a partida, a Arena também explicita o resultado imediato: `Acerto` ou
+`Erro · −2 s`, além do flash, som e flutuante de pontos já existentes.
+
+O combo da Arena agora tem teto explícito em `x3`: mantém a progressão sonora e
+visual, mas impede que a pontuação cresça indefinidamente e incentive apenas
+velocidade em vez de identificação cuidadosa.
+
+Na Clínica, o canvas agora fixa explicitamente o fundo da cena além do clear do
+renderer, evitando que a abertura de um caso herde um frame branco durante a
+preparação do GLB.
+
+Na inspeção em navegador local, os casos clínicos responderam `200` e o GLB foi
+carregado, mas o backend de teste registrou `THREE.WebGLRenderer: Context Lost`
+depois de abrir várias cenas 3D na mesma sessão. Duelo, Sala e Viewer renderizam
+normalmente; a Clínica ainda precisa de confirmação em uma sessão limpa/Quest
+antes de qualquer ajuste adicional de shader ou asset.
+
+As verificações de ciclo XR, salas do Duelo e vocabulário de áudio agora rodam
+offline com Node 22+, sem baixar `tsx`: `npm run verify:xr`,
+`npm run verify:duelo` e `npm run verify:audio`.
+
+O lint oficial foi delimitado ao código executável do produto (`app`,
+`components`, `lib`, `scripts` e `eslint.config.mjs`), deixando datasets e
+documentos de pesquisa fora da varredura: `npm run lint` passa sem warnings.
+
+O enquadramento/reset da câmera do Viewer também passou a usar suavização baseada
+em `delta`, mantendo a duração percebida estável entre monitores e taxas de
+atualização diferentes do Quest.
+
+No modo Comparar, o carregamento assíncrono dos GLBs agora exibe um estado
+explícito por lado (saudável ou patológico), evitando um canvas aparentemente
+vazio durante a preparação do modelo.
+
+Na inspeção visual do Duelo em navegador, as listas de marcas, teclas, alternativas
+e telas online receberam chaves com prefixo e índice para evitar colisões quando
+uma alternativa se repete entre rodadas. O texto duplicado de atalhos que ficava
+fantasma no rodapé do canvas foi mantido somente para leitores de tela (`sr-only`),
+pois o briefing 3D já apresenta as instruções ao jogador.
+
+Na Sala de estudos, a descrição duplicada de interação também ficou somente em
+`sr-only`; o cenário permanece livre para os objetos interativos e os botões
+visíveis continuam sendo o ponto de entrada para VR e para o Tutor.
+
 > Documento de continuidade. Se você (ou uma IA assistente) está abrindo este projeto numa
 > máquina nova, leia isto primeiro. Última atualização: 2026-08-29.
 
@@ -19,7 +106,7 @@ num teclado 3D. O site no Render é o árbitro: `app/api/duelo/route.ts`
 acerto com menor tempo de reação medido no óculos (janela de 600 ms), não quem
 tem a internet mais rápida. **Salas vivem na memória do processo:** exige UMA
 instância no Render e um deploy derruba as partidas abertas — não publicar
-durante o evento. Checagens: `npx -y tsx scripts/verificar-duelo-salas.ts`.
+durante o evento. Checagem: `npm run verify:duelo`.
 
 **Apresentação do duelo (2026-09-17) — "parecer um jogo, não um protótipo":** as REGRAS já
 eram boas; o que denunciava protótipo era a encenação (tudo acontecia trocando string em
@@ -31,7 +118,7 @@ não foram tocados:
   eram idênticos. Agora há síntese em camadas (transiente de ruído + corpo + variação de ±25
   cents), tique da contagem em tríade, tensão nos últimos 5 s, som de clique/hover na UI e
   `desbloquearAudio()` num gesto real — sem ele o duelo online corria mudo, porque o primeiro som
-  vinha do servidor. Checagem: `npx -y tsx scripts/verificar-audio-duelo.ts`.
+  vinha do servidor. Checagem: `npm run verify:audio`.
 - **Háptica** (`lib/xr-haptica.ts`, novo): `pulsar()` no hover, clique, acerto, erro e ponto do
   adversário. API de gamepad, não de sessão — não encosta no ciclo WebXR.
 - **Placar de duelo único** `VOCÊ 300 × 200 NOME` com fita de uma marca por rodada, no topo do
@@ -275,7 +362,7 @@ diagnóstico veio do código e dessas fontes.
 | Hub da Sala navegando com a sessão viva (`window.location.href`) | `sairENavegar`: `end()` primeiro e navegação só depois |
 | "Sair do VR" com clique duplo; "Entrar em VR" com clique duplo ou por cima de uma sessão pausada pelo botão Meta | `sairENavegar` (uma vez só) e `entrarNoXR` (sem pedidos sobrepostos, encerra a viva antes) em `lib/xr-sessao.ts` |
 
-**Checagem sem headset:** `npx -y tsx scripts/verificar-ciclo-xr.ts`, que também falha se uma cena
+**Checagem sem headset:** `npm run verify:xr`, que também falha se uma cena
 nova criar store sem as opções, navegar direto ou chamar `store.enterVR()` sem `entrarNoXR`.
 
 **Registro de diagnóstico no aparelho (`lib/xr-log.ts`):** vem desligado. Para ligar, abrir

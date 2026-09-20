@@ -1,22 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConsentBanner } from "@/components/analytics/ConsentBanner";
 import { AnalyticsScript } from "@/components/analytics/AnalyticsScript";
 import { SITE_URL } from "@/lib/site-url";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
 
 const SITE_DESCRIPTION =
   "Plataforma de estudo de anatomia com visualização 3D interativa, cortes anatômicos, comparação saudável × patológico, realidade virtual e um tutor de IA fundamentado em fontes médicas confiáveis.";
@@ -71,7 +58,7 @@ export default function RootLayout({
       lang="pt-BR"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${inter.variable} ${fraunces.variable} scroll-smooth`}
+      className="scroll-smooth"
     >
       <body className="min-h-dvh">
         <ThemeProvider
