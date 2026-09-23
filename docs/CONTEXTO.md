@@ -545,3 +545,20 @@ bloqueada pela falha de ACL: **acabamento visual, conforto e desempenho no Quest
 ainda precisam de homologação física**. Commit local desta revisão autorizado pelo
 usuário; publicação não solicitada. A autorização anterior de envio se referia à
 implementação inicial.
+
+### Correção — painéis originais do site no XR (23/09/2026)
+
+A revisão anterior foi posteriormente autorizada e publicada como `2f6b228`.
+No Quest, o usuário relatou aparência ainda diferente do site e mira falhando no
+tutor. A nova implementação elimina a composição 3D duplicada: `PainelSiteXR`
+reutiliza `ToolsPanelContent`/`ChatPanelContent`, captura seu HTML/CSS como textura
+local e calcula cliques pelos pixels da mesma imagem. Rolagem substitui paginação;
+manipulação, minimizar/reabrir e câmera livre permanecem. Sem nova dependência/API.
+
+Teste de HTML compartilhado, recortes/modais e 324 cliques transformados integra
+`verify:paineis-xr`. Detalhes em `docs/PAINEIS-ESTUDO-XR.md`, última seção.
+**Captura visual, suporte/latência do navegador Quest e mira física continuam sem
+homologação**, pois a automação Computer Use falhou na inicialização do sandbox.
+Não confundir igualdade estrutural de HTML com aprovação visual no headset.
+O usuário autorizou o commit e envio desta correção à `master` de
+`viniciusadrian1/VRMed2`, para teste físico no Quest.

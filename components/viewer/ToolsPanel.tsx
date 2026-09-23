@@ -9,6 +9,8 @@ import { AnnotationPanel } from "./AnnotationSystem";
 import { AudioNarration } from "./AudioNarration";
 import { ClippingPlaneControls } from "./ClippingPlaneControls";
 import { LayersPanel } from "./LayersPanel";
+import { useDOMImersivo } from "./ContextoDOMXR";
+import { useVRMedStore } from "@/lib/store";
 
 interface ToolsPanelProps {
   open: boolean;
@@ -16,7 +18,8 @@ interface ToolsPanelProps {
 }
 
 /** Conteúdo do painel — compartilhado entre o desktop e o drawer mobile. */
-function ToolsPanelContent({ onClose }: { onClose: () => void }) {
+export function ToolsPanelContent({ onClose }: { onClose: () => void }) {
+  const imersivo = useDOMImersivo();
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-border px-3">
@@ -30,14 +33,15 @@ function ToolsPanelContent({ onClose }: { onClose: () => void }) {
           <PanelRightClose />
         </Button>
       </div>
-      <Tabs defaultValue="camadas" className="flex min-h-0 flex-1 flex-col">
+      <Tabs defaultValue="camadas" className="flex min-h-0 flex-1 flex-col"
+        onValueChange={() => { if (imersivo) useVRMedStore.getState().setAnnotationMode(false); }}>
         <TabsList className="m-2 mb-0 w-auto">
           <TabsTrigger value="camadas">Camadas</TabsTrigger>
           <TabsTrigger value="cortes">Cortes</TabsTrigger>
           <TabsTrigger value="anotacoes">Notas</TabsTrigger>
           <TabsTrigger value="audio">Áudio</TabsTrigger>
         </TabsList>
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div data-xr-scroll className="min-h-0 flex-1 overflow-y-auto">
           <TabsContent value="camadas" className="mt-0">
             <LayersPanel />
           </TabsContent>

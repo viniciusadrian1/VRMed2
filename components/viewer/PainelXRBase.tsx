@@ -12,10 +12,12 @@ import { BotaoEstudoXR, TextoPainelXR as Text3D, SuperficieXR, useTemaPainelXR }
 
 export const BotaoXR = BotaoEstudoXR;
 
-export function PainelXRBase({ titulo, aberto, aoAlternar, children }: {
+export function PainelXRBase({ titulo, aberto, aoAlternar, children, conteudoSite = false, largura = PAINEIS_XR.largura, altura = PAINEIS_XR.altura }: {
   titulo: string; aberto: boolean; aoAlternar: () => void; children: ReactNode;
+  conteudoSite?: boolean; largura?: number; altura?: number;
 }) {
   const escudo = useRef({}), janela = useJanelaXR(), tema = useTemaPainelXR();
+  const topo = altura / 2 + 0.062, rodape = -altura / 2 - 0.061;
   useEffect(() => {
     const dono = escudo.current;
     return () => liberarPonteiroUI(dono);
@@ -24,11 +26,11 @@ export function PainelXRBase({ titulo, aberto, aoAlternar, children }: {
   const focar = (e: ThreeEvent<PointerEvent>) => { bloquear(e); if (janela.id) useJanelasEstudoXR.getState().focar(janela.id); };
   return <group>
     {/* Barra exclusiva de manipulação: não disputa gestos com as ferramentas. */}
-    <SuperficieXR largura={1.04} altura={0.085} y={0.622} cor={janela.arrastando ? tema.accent : tema.muted} borda />
-    <Text3D position={[0, 0.622, 0.025]} size={0.024} color="primary">
+    <SuperficieXR largura={1.04} altura={0.085} y={topo} cor={janela.arrastando ? tema.accent : tema.muted} borda />
+    <Text3D position={[0, topo, 0.025]} size={0.024} color="primary">
       {janela.arrastando ? "Solte o gatilho para posicionar" : "Mover janela · segure o gatilho e arraste"}
     </Text3D>
-    <mesh name="Mover janela" position={[0, 0.622, 0.035]} pointerEventsOrder={janela.ordem + 2}
+    <mesh name="Mover janela" position={[0, topo, 0.035]} pointerEventsOrder={janela.ordem + 2}
       userData={{ ordemJanelaXR: janela.ordem + 2 }}
       onPointerDown={janela.aoApertar} onPointerMove={janela.aoMover} onPointerUp={janela.aoSoltar} onPointerCancel={janela.aoSoltar}
       onClick={bloquear} onPointerOver={(e) => { bloquear(e); ocuparPonteiroUI(escudo.current, e); }}
@@ -37,26 +39,28 @@ export function PainelXRBase({ titulo, aberto, aoAlternar, children }: {
     </mesh>
     {/* Ocultar sem desmontar preserva aba, rascunho, teclado e resposta em curso. */}
     <group visible={aberto} pointerEvents={aberto ? "auto" : "none"}>
-      <SuperficieXR largura={PAINEIS_XR.largura} altura={PAINEIS_XR.altura} borda nivel={0} />
+      <SuperficieXR largura={largura} altura={altura} borda nivel={0} />
       <mesh name="escudo-painel-xr" position={[0, 0, 0.005]} pointerEventsOrder={janela.ordem}
         onClick={bloquear} onPointerDown={focar} onPointerUp={bloquear}
         onPointerOver={(e) => { bloquear(e); ocuparPonteiroUI(escudo.current, e); }}
         onPointerOut={(e) => liberarPonteiroUI(escudo.current, e.pointerId)}
         onPointerCancel={(e) => liberarPonteiroUI(escudo.current, e.pointerId)}>
-        <planeGeometry args={[PAINEIS_XR.largura, PAINEIS_XR.altura]} />
+        <planeGeometry args={[largura, altura]} />
         <meshBasicMaterial colorWrite={false} depthWrite={false} side={DoubleSide} />
       </mesh>
+      {!conteudoSite && <>
       <Text3D position={[-0.475, 0.482, 0.02]} anchorX="left" size={0.032} maxWidth={0.75}>{titulo}</Text3D>
       <BotaoXR label="−" x={0.44} y={0.482} largura={0.09} onClick={aoAlternar} variante="ghost" />
       <SuperficieXR largura={1.036} altura={0.002} y={0.422} cor={tema.border} />
+      </>}
       {children}
-      <SuperficieXR largura={1.04} altura={0.083} y={-0.621} cor={tema.muted} borda />
-      <BotaoXR label="−" x={-0.463} y={-0.621} largura={0.08} onClick={janela.diminuir} desabilitado={janela.escala <= LIMITES_JANELA_XR.escalaMin} />
-      <Text3D position={[-0.352, -0.621, 0.03]} size={0.023}>{Math.round(janela.escala * 100) + "%"}</Text3D>
-      <BotaoXR label="+" x={-0.242} y={-0.621} largura={0.08} onClick={janela.aumentar} desabilitado={janela.escala >= LIMITES_JANELA_XR.escalaMax} />
-      <BotaoXR label="Mais perto" x={-0.075} y={-0.621} largura={0.225} tamanho={0.022} onClick={janela.aproximar} />
-      <BotaoXR label="Mais longe" x={0.164} y={-0.621} largura={0.225} tamanho={0.022} onClick={janela.afastar} />
-      <BotaoXR label="Restaurar" x={0.397} y={-0.621} largura={0.22} tamanho={0.022} onClick={janela.restaurar} />
+      <SuperficieXR largura={1.04} altura={0.083} y={rodape} cor={tema.muted} borda />
+      <BotaoXR label="−" x={-0.463} y={rodape} largura={0.08} onClick={janela.diminuir} desabilitado={janela.escala <= LIMITES_JANELA_XR.escalaMin} />
+      <Text3D position={[-0.352, rodape, 0.03]} size={0.023}>{Math.round(janela.escala * 100) + "%"}</Text3D>
+      <BotaoXR label="+" x={-0.242} y={rodape} largura={0.08} onClick={janela.aumentar} desabilitado={janela.escala >= LIMITES_JANELA_XR.escalaMax} />
+      <BotaoXR label="Mais perto" x={-0.075} y={rodape} largura={0.225} tamanho={0.022} onClick={janela.aproximar} />
+      <BotaoXR label="Mais longe" x={0.164} y={rodape} largura={0.225} tamanho={0.022} onClick={janela.afastar} />
+      <BotaoXR label="Restaurar" x={0.397} y={rodape} largura={0.22} tamanho={0.022} onClick={janela.restaurar} />
     </group>
     {!aberto && <BotaoXR label={titulo + " · Abrir"} largura={1.04} altura={0.095} y={0.482} onClick={aoAlternar} />}
   </group>;
@@ -73,9 +77,9 @@ export function PaginacaoXR({ pagina, total, aoMudar, y = -0.46 }: {
 }
 
 /** Teclado renderizado na própria placa, sem DOM, teclado do sistema ou microfone. */
-export function TecladoXR({ texto, aoMudar, aoConfirmar, aoCancelar, limite = 500, confirmar = "Enviar" }: {
+export function TecladoXR({ texto, aoMudar, aoConfirmar, aoCancelar, limite = 500, confirmar = "Enviar", permitirVazio = false }: {
   texto: string; aoMudar: (texto: string) => void; aoConfirmar: () => void; aoCancelar: () => void;
-  limite?: number; confirmar?: string;
+  limite?: number; confirmar?: string; permitirVazio?: boolean;
 }) {
   const [maiusculas, setMaiusculas] = useState(false);
   const digitar = (tecla: string) => aoMudar(editarTextoXR(texto, tecla, limite));
@@ -91,6 +95,6 @@ export function TecladoXR({ texto, aoMudar, aoConfirmar, aoCancelar, limite = 50
     <BotaoXR label="Apagar" x={0.35} largura={0.24} y={-0.24} onClick={() => digitar("Apagar")} />
     <BotaoXR label="Cancelar" x={-0.31} largura={0.28} y={-0.43} onClick={aoCancelar} />
     <BotaoXR label="Limpar" largura={0.24} y={-0.43} onClick={() => digitar("Limpar")} />
-    <BotaoXR label={confirmar} x={0.31} largura={0.28} y={-0.43} ativo desabilitado={!texto.trim()} onClick={aoConfirmar} />
+    <BotaoXR label={confirmar} x={0.31} largura={0.28} y={-0.43} ativo desabilitado={!permitirVazio && !texto.trim()} onClick={aoConfirmar} />
   </group>;
 }

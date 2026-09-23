@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye, Focus, Palette, X } from "lucide-react";
+import { useId } from "react";
 import { track } from "@/lib/analytics";
 import { useVRMedStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,7 @@ function ColorControl({
 
 /** Painel de camadas anatômicas: visibilidade, opacidade, cor e raio-X. */
 export function LayersPanel() {
+  const prefixo = useId();
   const layers = useVRMedStore((s) => s.layers);
   const organId = useVRMedStore((s) => s.currentOrganId);
   const xray = useVRMedStore((s) => s.xray);
@@ -116,7 +118,7 @@ export function LayersPanel() {
           >
             <div className="flex items-center gap-2">
               <Checkbox
-                id={`layer-${layer.name}`}
+                id={`${prefixo}-layer-${layer.name}`}
                 checked={layer.visible}
                 onCheckedChange={(checked) => {
                   const visible = checked === true;
@@ -129,7 +131,7 @@ export function LayersPanel() {
                 }}
               />
               <label
-                htmlFor={`layer-${layer.name}`}
+                htmlFor={`${prefixo}-layer-${layer.name}`}
                 className="min-w-0 flex-1 cursor-pointer truncate text-sm font-medium"
               >
                 {layer.label}

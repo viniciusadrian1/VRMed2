@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { ContextoPortalDOMXR, useDOMImersivo } from "@/components/viewer/ContextoDOMXR";
 import { MessageSquarePlus, ThumbsDown, ThumbsUp } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { useVRMedStore } from "@/lib/store";
@@ -20,6 +22,17 @@ const TAG_OPTIONS: { id: FeedbackTag; label: string }[] = [
   { id: "incompleta", label: "Resposta incompleta" },
   { id: "fora_escopo", label: "Fora do escopo" },
 ];
+
+function ConteudoAvaliacao({ aberto, children }: { aberto: boolean; children: ReactNode }) {
+  const imersivo = useDOMImersivo();
+  const portal = useContext(ContextoPortalDOMXR);
+  if (!imersivo) return <PopoverContent align="start" className="w-80">{children}</PopoverContent>;
+  // Portais fora do painel não entram na textura. Mantém o mesmo formulário dentro da janela.
+  const formulario = aberto ? <div data-xr-modal role="dialog" aria-label="Avaliar esta resposta"
+    className="absolute inset-x-3 bottom-3 z-50 max-h-[90%] overflow-y-auto rounded-lg border bg-popover p-4 text-popover-foreground shadow-lg" data-xr-scroll>{children}</div> : null;
+  // Irmão da conversa: não é recortado ou deslocado pela rolagem das mensagens.
+  return portal ? createPortal(formulario, portal) : formulario;
+}
 
 /** Botões de avaliação (👍/👎) e formulário de feedback de uma resposta. */
 export function FeedbackButtons({ message }: { message: ChatMessage }) {
@@ -149,7 +162,7 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
           )}
         </div>
       </PopoverAnchor>
-      <PopoverContent align="start" className="w-80">
+      <ConteudoAvaliacao aberto={open}>
         <p className="text-sm font-medium">Avaliar esta resposta</p>
         <p className="mt-0.5 text-xs text-muted-foreground">
           Sua avaliação apoia a validação do tutor por especialistas.
@@ -184,7 +197,7 @@ export function FeedbackButtons({ message }: { message: ChatMessage }) {
             Enviar avaliação
           </Button>
         </div>
-      </PopoverContent>
+      </ConteudoAvaliacao>
     </Popover>
   );
 }

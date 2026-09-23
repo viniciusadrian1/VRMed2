@@ -2,6 +2,7 @@
 
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "@/lib/utils";
+import { faixasDOMXR } from "@/lib/painel-dom-xr";
 
 function Slider({
   className,
@@ -15,6 +16,12 @@ function Slider({
 
   return (
     <SliderPrimitive.Root
+      ref={(elemento) => {
+        if (elemento) faixasDOMXR.set(elemento, {
+          min: props.min ?? 0, max: props.max ?? 100, step: props.step ?? 1, disabled: props.disabled,
+          mudar: (valor) => props.onValueChange?.([valor]),
+        });
+      }}
       data-slot="slider"
       className={cn(
         "relative flex w-full touch-none select-none items-center data-[disabled]:opacity-50",

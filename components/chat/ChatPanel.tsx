@@ -18,7 +18,7 @@ const EXAMPLE_QUESTIONS = [
 ];
 
 /** O DOM e os painéis XR usam a mesma conversa e o mesmo pedido em andamento. */
-function ChatPanelContent() {
+export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
   const chat = useVRMedStore((s) => s.chat);
   const setChatOpen = useVRMedStore((s) => s.setChatOpen);
   const guia = useTutor3D((s) => s.ativo);
@@ -70,7 +70,7 @@ function ChatPanelContent() {
         <Button
           variant="ghost"
           size="icon-sm"
-          onClick={() => setChatOpen(false)}
+          onClick={() => onClose ? onClose() : setChatOpen(false)}
           aria-label="Fechar chat"
         >
           <X />
@@ -88,7 +88,7 @@ function ChatPanelContent() {
           {foco && <button type="button" className="underline" onClick={() => useTutor3D.getState().limparFoco()}>Limpar foco</button>}
         </div>
       </div>
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto p-3">
+      <div ref={scrollRef} data-xr-scroll className="min-h-0 flex-1 overflow-y-auto p-3">
         {chat.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 px-2 text-center">
             <span className="grid size-12 place-items-center rounded-xl bg-accent text-accent-foreground">

@@ -1,8 +1,8 @@
 # Ferramentas e tutor dentro de AR/VR
 
 Implementação inicial: 23/09/2026, publicada em `ddc9dd2` após autorização.
-Revisão de identidade e manipulação: 23/09/2026. Commit local autorizado pelo usuário;
-publicação não solicitada nesta revisão.
+Revisão de identidade e manipulação: 23/09/2026, publicada em `2f6b228` após
+autorização posterior. Nova correção de HTML/mira documentada ao final.
 
 ## O que mudou
 
@@ -206,3 +206,120 @@ cada janela para ambos os lados, testar escala mínima/máxima, sobrepor e alter
 minimizar durante edição/resposta, reabrir pelo dock e recuperar com B/Y após caminhar.
 Testar desconexão/pausa no meio do gesto e verificar que soltar não aciona outro botão.
 Comparar tema claro/escuro com o site e medir fluidez com o teclado aberto.
+
+## Correção — HTML do site e mira por pixel (23/09/2026)
+
+Esta seção substitui a descrição visual das revisões anteriores. A revisão
+`2f6b228` foi publicada após a autorização posterior do usuário. No teste físico,
+ele relatou que o visual ainda era diferente do site e a mira falhava no tutor.
+A correção abaixo foi autorizada pelo usuário para commit e envio à `master`
+de `viniciusadrian1/VRMed2`, para homologação física no Quest.
+
+### Diagnóstico e mudança de abordagem
+
+A versão anterior compartilhava tokens e estado, mas desenhava uma segunda
+interface com textos/cartões 3D. Isso não atendia ao pedido de usar a interface
+do site. A falha física de apontamento não foi reproduzida nesta máquina;
+não atribuir uma causa única ao relato com base apenas em testes sintéticos.
+
+Agora `PainelSiteXR` monta os próprios `ToolsPanelContent` e `ChatPanelContent`
+numa raiz DOM auxiliar. O navegador fornece o CSS computado; um SVG local com
+`foreignObject` o transforma em canvas/textura no plano 3D. A fonte Inter local
+é embutida na imagem. Ícones SVG, balões, Markdown, citações, campos, botões e
+cartões são os componentes originais, não uma segunda composição aproximada.
+Não é DOM overlay e não exige que o Quest desenhe HTML diretamente na sessão.
+
+- Larguras originais: ferramentas 340 px; tutor 400 px; altura de janela 740 px.
+  Texturas em 2×: 680×1480 e 800×1480, sem mudar DPR 1 do renderizador XR.
+  O corpo 3D tem 1,4 m de altura e largura proporcional à página.
+- Camadas e conversa passam a ter **rolagem**, não paginação/reformatação.
+  Arrastar uma região de leitura ou usar Subir/Descer; no desktop há roda do mouse.
+- Controles externos de mover/tamanho/distância/restaurar continuam separados
+  do conteúdo do site. O fechar original minimiza a janela; a faixa/dock reabre.
+- O teclado 3D edita o campo original. Aplicar não envia a pergunta: Enviar,
+  no painel original, continua explícito. É possível aplicar um campo vazio.
+  Teclado e seletor de cor são adaptações de entrada, não diálogos nativos do Quest.
+- O formulário de avaliação mantém seus campos, mas abre dentro da superfície
+  capturada, acima da conversa. Seu portal não é recortado pela rolagem.
+- Malha, abrir/fechar ossos e parar resposta continuam em uma faixa externa.
+  Anotações não movem a câmera XR; marcação exige o crânio fechado.
+- Não houve alteração em modelo/credenciais da IA, API, assets anatômicos,
+  regras do Duelo, runtime Unity ou dependências.
+
+### Mira e resposta dos controles
+
+A mesma malha que exibe a textura recebe o raio. Sua matriz real (incluindo pai,
+rotação, translação e escala) converte o impacto em pixels CSS. Cada quadro leva
+o mapa dos controles DOM colhido junto da imagem. Não há coordenadas de botões
+mantidas manualmente em paralelo ao desenho.
+
+O mapa recorta alvos por viewport/ancestrais roláveis, inclui o polegar visível
+do slider, ignora controles ocultos/desabilitados e restringe ações ao formulário
+quando aberto. Antes de disparar, verifica se o controle continua presente e na
+região exibida; conteúdo alterado solicita uma nova captura. Texto em streaming
+não impede iniciar a rolagem. IDs exclusivos evitam labels acionando a raiz DOM
+errada. O alvo recebe realce e rótulo externos, além de som/háptica ao confirmar.
+
+O raio confirma no aperto do gatilho, sem exigir soltura rápida. Sliders/rolagem
+capturam o ponteiro; pausa, desconexão, minimização, reset ou erro de captura
+liberam o gesto. Se a renderização falhar, remove-se o mapa antigo e aparece
+Tentar novamente, em vez de continuar clicando numa imagem desatualizada.
+
+Capturas são sob demanda, serializadas entre painéis, com intervalo mínimo de
+250 ms para mudanças passivas e 80 ms para ações. Janelas minimizadas não geram
+novas capturas. Esses são limites do agendamento, **não FPS/latência medidos**.
+O DOM auxiliar fica fora da navegação Tab/leitura acessível duplicada. Transições
+CSS auxiliares são desativadas para não congelar cores no meio da animação.
+
+### Arquivos e testes
+
+- `components/viewer/PainelSiteXR.tsx`, `ContextoDOMXR.tsx`:
+  montagem dos componentes originais, superfície e adaptações de entrada.
+- `lib/renderizar-painel-dom.ts`, `lib/painel-dom-xr.ts`:
+  captura local, geometria de pixels, mapa e despacho para os controles.
+- `ToolsPanel.tsx`, `LayersPanel.tsx`, `AnnotationSystem.tsx`,
+  `components/chat/ChatPanel.tsx`, `FeedbackButtons.tsx`,
+  `components/ui/slider.tsx`: pontos mínimos de reutilização.
+- `FerramentasPainelXR.tsx` e `TutorPainelVR.tsx` delegam para a superfície;
+  `PainelXRBase.tsx` acomoda as dimensões originais e preserva a manipulação.
+- `scripts/verificar-paineis-site-xr.ts`, `registrar-componentes-teste.mjs`:
+  comparação SSR do HTML original/XR (com IDs normalizados), fixtures de recorte,
+  modal, controles ocultos, estado obsoleto e **324 cliques** com a biblioteca real
+  de raios em escalas, rotações e origens de ambas as mãos. Integra `verify:paineis-xr`.
+  A fixture DOM fornece retângulos/estilos controlados: não é teste de navegador.
+
+### Validação visual obrigatória antes de homologar
+
+Validação final local desta correção: `npm run typecheck`, `npm run lint`,
+`npm run build`, `npm run verify:core` (incluindo os três scripts de painéis)
+e `git diff --check` passaram. Sem chamadas novas à OpenAI. O usuário autorizou
+posteriormente o commit e envio ao GitHub para teste; a validação física segue pendente.
+Os avisos do Node sobre `MODULE_TYPELESS_PACKAGE_JSON` não impediram os testes;
+o formato de módulos do projeto não foi alterado para ocultá-los.
+
+A skill Computer Use voltou a falhar antes de abrir o navegador
+(`windows sandbox failed: helper_unknown_error: apply deny-read ACLs`),
+inclusive após reset. **Nenhuma captura visual foi produzida nesta correção.**
+Igualdade de HTML não prova rasterização pixel a pixel, suporte a SVG/foreignObject
+no navegador do headset, funcionamento dos eventos React, conforto ou desempenho.
+Não afirmar que a mira física já foi corrigida definitivamente.
+
+Em desenvolvimento, comparar lado a lado a superfície e o HTML original usando
+`/viewer?inspecao=tutor&compararPainel=tutor` e a variante `ferramentas`.
+O parâmetro de comparação é exclusivo de desenvolvimento/desktop.
+
+Antes de publicar para uso geral, verificar no navegador e no Quest:
+
+1. Texto, fonte, ícones, cores claro/escuro e posição dos controles, com conversa
+   vazia, resposta longa, rolagem e todas as abas. Conferir também barras de rolagem.
+2. Mirar centro/bordas dos botões do tutor com os dois controles, manter o gatilho
+   pressionado e soltá-lo sobre outro controle: uma única ação no alvo original.
+3. Repetir após mover, ampliar, reduzir, aproximar, sobrepor, minimizar e reabrir.
+4. Teclado → Aplicar → Enviar; voltar e limpar o campo. Avaliar/comentar somente
+   quando a avaliação for intencional, pois são os endpoints reais do site.
+5. Sliders, checkbox/rótulos, cor, cortes, notas e narração sincronizados com a tela.
+   Formulário aberto não deixa clicar/rolar a conversa atrás.
+6. Desconectar/pausar durante arraste; simular falha da fonte/captura e repetir.
+   Não deve restar alvo invisível, gesto preso ou painel antigo clicável.
+7. Medir fluidez/custo de captura durante streaming, rolagem e teclado, em AR e VR.
+   Não há nova medição de FPS/draw calls. O crânio mantém seu risco de geometria alta.

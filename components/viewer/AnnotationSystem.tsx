@@ -8,6 +8,7 @@ import { viewerBridge } from "@/lib/viewer-bridge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { useDOMImersivo } from "./ContextoDOMXR";
 
 /* -------------------------------------------------------------------------- */
 /* Hotspots renderizados dentro do Canvas                                      */
@@ -66,6 +67,8 @@ export function AnnotationHotspots() {
 
 /** Painel lateral para criar, editar e remover anotações. */
 export function AnnotationPanel() {
+  const imersivo = useDOMImersivo();
+  const aberto = useVRMedStore((s) => s.explosao > 0.001);
   const organId = useVRMedStore((s) => s.currentOrganId);
   const byOrgan = useVRMedStore((s) => s.annotationsByOrgan);
   const annotationMode = useVRMedStore((s) => s.annotationMode);
@@ -88,6 +91,8 @@ export function AnnotationPanel() {
     <div className="flex flex-col gap-3 p-3">
       <Button
         variant={annotationMode ? "default" : "outline"}
+        disabled={imersivo && aberto}
+        title={imersivo && aberto ? "Feche os ossos para marcar uma anotação." : undefined}
         onClick={() => setAnnotationMode(!annotationMode)}
       >
         <Plus />
@@ -156,7 +161,13 @@ export function AnnotationPanel() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => viewerBridge.frameTo(annotation.position)}
+                  disabled={imersivo && aberto}
+                  onClick={() => {
+                    if (imersivo) {
+                      useVRMedStore.getState().setInspectedLabel(`Nota ${index + 1}`);
+                      useVRMedStore.getState().setInspectedPoint(annotation.position);
+                    } else viewerBridge.frameTo(annotation.position);
+                  }}
                   aria-label="Voar até a anotação"
                   title="Voar até"
                 >
