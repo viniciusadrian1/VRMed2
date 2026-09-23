@@ -423,3 +423,16 @@ public/draco/   decodificador local
 ```
 
 **Próximo passo planejado:** ver `docs/PLANO-FIAP-NEXT.md`.
+
+### Atualização — arena médica (22/09/2026)
+
+O Hospital do Duelo agora se apresenta como **Arena médica** e é o ambiente inicial;
+a Escola permanece disponível. Bancada autoral, console físico, iluminação e LEDs
+reagem a uma cópia do estado da partida, sem alterar regras online. Personagens de
+cenário usam variantes locais leves; órgãos não foram simplificados. O crânio ganhou
+acabamento de osso e iluminação específica, mantendo GLB e abertura originais.
+
+Baseline, arquivos, evidências Blender/Unity, testes e limites estão em
+`docs/ARENA-MEDICA-2026-09-22.md`. Desktop e testes automatizados verificados;
+**homologação física no Quest ainda pendente**. Não confundir a bancada de escala
+Unity nem o teste `verify:xr` com validação de conforto/performance em headset.

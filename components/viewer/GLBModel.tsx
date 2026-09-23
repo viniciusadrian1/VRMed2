@@ -5,6 +5,7 @@ import { useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { disposeMaterials } from "@/lib/model-utils";
+import { aplicarMaterialOsso } from "@/lib/material-osso";
 import { useVRMedStore } from "@/lib/store";
 import type { OrganDefinition } from "@/types";
 
@@ -37,8 +38,11 @@ export function GLBModel({
 
   useEffect(() => {
     onReady();
+    // onReady clona os materiais: o ajuste nunca contamina o GLB em cache.
+    if (path === "/models/organs/cranio.glb") aplicarMaterialOsso(scene);
+    invalidate();
     return () => disposeMaterials(scene);
-  }, [scene, onReady]);
+  }, [scene, onReady, path, invalidate]);
 
   // Abertura: a animação do arquivo nunca toca sozinha. O instante dela segue
   // `explosao` do store — o controle deslizante na tela e o analógico

@@ -16,6 +16,9 @@ import { LuzEstudio, Text3D } from "@/components/arena/ui3d";
 import { DueloGame, type Ambiente } from "./DueloGame";
 import { AmbienteHospital } from "./AmbienteHospital";
 import { useDueloOnline, type DueloOnline } from "./useDueloOnline";
+import { ProvedorArena } from "./EstadoArena";
+import { IluminacaoArena, SinalEscola } from "./ArenaMedica";
+import { MedidorDuelo } from "./MedidorDuelo";
 
 const FLOOR_Y = -1.3;
 
@@ -87,8 +90,8 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
         ? [0.28, 0.15, 1.0]
         : [0.28, -0.05, 1.0]
       : retrato
-        ? [0.72, 0.35, 3.6]
-        : [0, 0.3, 2.55];
+        ? [0.85, 0.48, 4.45]
+        : [0, 0.45, 3.8];
     get().camera.position.set(x, y, z);
   }, [escola, retrato, inSession, get]);
 
@@ -100,10 +103,8 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
         <SairDoVR position={[-0.45, escola ? 0.95 : 1.25, -0.5]} />
       </XROrigin>
 
-      <LuzEstudio />
-      {/* Luz ambiente equilibrada para clarear a sala e eliminar sombras duras/escuras */}
-      <ambientLight intensity={1.1} color="#f8fafc" />
-      <directionalLight position={[0, 4, 3]} intensity={0.9} color="#fffaf0" />
+      {escola ? <><LuzEstudio /><ambientLight intensity={0.25} color="#d3e6eb" /></> : <IluminacaoArena />}
+      {escola && <SinalEscola />}
 
       <PalcoDuelo />
       {/* Cenário é enfeite: se um GLB dele falhar, o jogo segue sem a sala em
@@ -148,8 +149,8 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
                 ? [0.36, 0, -1.06]
                 : [0.36, -0.2, -1.06]
               : retrato
-                ? [0.72, 0.35, -0.5]
-                : [0.35, 0.1, -0.5]
+                ? [0.85, 0.35, -0.65]
+                : [0, 0.15, -0.6]
           }
           minDistance={escola ? 0.8 : 1.5}
           maxDistance={9}
@@ -165,7 +166,10 @@ export function DueloApp() {
   const mounted = useMounted();
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
-  const [ambiente, setAmbiente] = useState<Ambiente>("escola");
+  const [altaQualidade, setAltaQualidade] = useState(false);
+  const [medir, setMedir] = useState(false);
+  const [medicao, setMedicao] = useState("Aguardando 5 s de amostra…");
+  const [ambiente, setAmbiente] = useState<Ambiente>("hospital");
   // Fora do <Canvas>: a conexão da partida online não pode depender da árvore
   // 3D (erro de modelo, remontagem do canvas).
   const online = useDueloOnline();
@@ -204,12 +208,13 @@ export function DueloApp() {
               {(
                 [
                   ["escola", "🏫 Escola"],
-                  ["hospital", "🏥 Hospital"],
+                  ["hospital", "Arena médica"],
                 ] as const
               ).map(([valor, rotulo]) => (
                 <button
                   key={valor}
                   type="button"
+                  aria-pressed={ambiente === valor}
                   onClick={() => setAmbiente(valor)}
                   className={
                     ambiente === valor
@@ -240,6 +245,13 @@ export function DueloApp() {
             sala, 5 entra numa sala, 1–4/A–D responde, Enter repete, Esc volta
             ao menu.
           </p>
+          <div className="absolute bottom-4 left-4 z-20 flex max-w-[70%] flex-wrap items-center gap-2 text-xs text-slate-100">
+            <button type="button" aria-pressed={altaQualidade} onClick={() => setAltaQualidade((v) => !v)} className="rounded-full border border-white/20 bg-slate-950/85 px-3 py-2" title="A nitidez alta usa mais GPU. Em VR o DPR permanece 1.">
+              Nitidez: {altaQualidade ? "alta" : "padrão"}
+            </button>
+            <button type="button" aria-pressed={medir} onClick={() => { setMedir((v) => !v); setMedicao("Aguardando 5 s de amostra…"); }} className="rounded-full border border-white/20 bg-slate-950/85 px-3 py-2">Desempenho</button>
+            {medir && <output className="rounded-lg bg-slate-950/90 px-3 py-2" aria-label="Medição local de desempenho">{medicao}</output>}
+          </div>
         </>
       )}
 
@@ -247,17 +259,18 @@ export function DueloApp() {
         role="application"
         aria-label="Duelo 1×1 em 3D. Menu: teclas 1 a 3 escolhem a dificuldade, 4 cria uma sala online e 5 entra numa sala pelo código; na rodada, 1 a 4 ou A a D respondem; ao final, Enter joga de novo; Esc volta ao menu."
         shadows={false}
-        dpr={1}
+        dpr={inSession ? 1 : altaQualidade ? 2 : 1}
         frameloop="always"
         camera={{
-          position: ambiente === "escola" ? [0.28, -0.05, 1.0] : [0, 0.3, 2.55],
+          position: ambiente === "escola" ? [0.28, -0.05, 1.0] : [0, 0.45, 3.8],
           fov: 50,
         }}
         gl={{ antialias: true, alpha: false }}
         onCreated={({ gl }) => gl.setClearColor("#101820")}
       >
         <XR store={store}>
-          <CenaDuelo ambiente={ambiente} online={online} />
+          {medir && <MedidorDuelo publicar={setMedicao} />}
+          <ProvedorArena><CenaDuelo ambiente={ambiente} online={online} /></ProvedorArena>
         </XR>
       </Canvas>
     </main>

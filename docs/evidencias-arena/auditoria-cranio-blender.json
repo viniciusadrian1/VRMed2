@@ -1,0 +1,19 @@
+{
+  "malhas": 25,
+  "uv_malhas": 0,
+  "normais_nulas_ou_nao_finitas": 0,
+  "transformacoes_negativas": 0,
+  "nos_movidos_na_abertura": 46,
+  "frames_comparados": [
+    0,
+    96
+  ],
+  "dimensoes_fechado_originais": [
+    14.878717422485352,
+    23.000904083251953,
+    25.105512619018555
+  ],
+  "geometria_modificada": false,
+  "arquivo_original_modificado": false,
+  "limite": "Normais invertidas localmente e fidelidade anatômica exigem revisão especializada; verificação numérica não certifica anatomia."
+}

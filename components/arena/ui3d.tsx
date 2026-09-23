@@ -602,7 +602,9 @@ export function BarraTempo({
         <group ref={preenchimento}>
           <mesh ref={barra} position={[0.5, 0, 0]} renderOrder={999} raycast={() => null}>
             <planeGeometry args={[1, height]} />
-            <meshBasicMaterial toneMapped={false} depthTest={false} />
+            {/* Mesma fila transparente do painel: renderOrder sozinho não
+                coloca uma malha opaca depois de uma placa transparente. */}
+            <meshBasicMaterial transparent depthWrite={false} toneMapped={false} depthTest={false} />
           </mesh>
         </group>
       </group>

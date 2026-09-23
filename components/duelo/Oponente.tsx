@@ -1,36 +1,38 @@
 "use client";
 
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Billboard, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { Text3D } from "@/components/arena/ui3d";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { disposeMaterials } from "@/lib/model-utils";
 
 export type HumorOponente = "idle" | "comemora" | "erra";
 export type TipoOponente = "iniciante" | "residente" | "especialista";
 
 const MODELOS_BOTS: Record<TipoOponente, string> = {
-  iniciante: "/models/props/dr-caloni.glb",
-  residente: "/models/props/dra-reis.glb",
-  especialista: "/models/props/dr-chefe.glb",
+  iniciante: "/models/props/dr-caloni-arena.glb",
+  residente: "/models/props/dra-reis-arena.glb",
+  especialista: "/models/props/dr-chefe-arena.glb",
 };
 
 // Pré-carrega o modelo já existente
-useGLTF.preload(MODELOS_BOTS.iniciante);
+useGLTF.preload(MODELOS_BOTS.iniciante, "/draco/");
 
 /**
  * Carrega o modelo 3D GLB correspondente ao médico selecionado.
  */
 function ModeloGLB({ url }: { url: string }) {
-  const gltf = useGLTF(url);
-  const scene = useMemo(() => {
-    const clone = gltf.scene.clone(true);
-    clone.traverse((child) => {
+  const gltf = useGLTF(url, "/draco/");
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  useLayoutEffect(() => {
+    scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.raycast = () => null;
         const mats = Array.isArray(child.material) ? child.material : [child.material];
-        for (const mat of mats) {
+        const copias = mats.map((original) => {
+          const mat = original.clone();
           if (mat instanceof THREE.MeshStandardMaterial) {
             if (mat.normalMap) {
               mat.normalScale.set(0.12, 0.12);
@@ -39,18 +41,18 @@ function ModeloGLB({ url }: { url: string }) {
             mat.metalness = 0.0;
             mat.needsUpdate = true;
           }
-        }
+          return mat;
+        });
+        child.material = Array.isArray(child.material) ? copias : copias[0];
       }
     });
-    return clone;
-  }, [gltf.scene]);
+    return () => disposeMaterials(scene);
+  }, [scene]);
 
   return (
     <group position={[0, 0, 0]} scale={1.78}>
-      <primitive object={scene} />
-      {/* Luz de retrato facial suave */}
-      <pointLight position={[0, 0.92, 0.85]} intensity={3.2} distance={4.5} color="#fff6eb" decay={2} />
-      <pointLight position={[-0.4, 0.85, 0.6]} intensity={1.8} distance={4} color="#f0f7ff" decay={2} />
+      <primitive object={scene} dispose={null} />
+      {/* Usa a iluminação da arena, sem duas luzes extras sobre cada material. */}
     </group>
   );
 }

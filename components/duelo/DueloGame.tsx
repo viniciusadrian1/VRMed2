@@ -31,6 +31,8 @@ import {
 } from "@/lib/model-utils";
 import type { StructurePoint } from "@/types";
 import { ORGANS } from "@/lib/organs";
+import { PublicarEstadoArena } from "./EstadoArena";
+import { CONSOLE_POS, CONSOLE_ROT, LETREIRO_POS } from "./ArenaMedica";
 import {
   desbloquearAudio,
   playClique,
@@ -96,9 +98,9 @@ export type Ambiente = "escola" | "hospital";
 // entre os dois, ao lado da mesa dele (não pode ficar atrás do painel). O layout antigo foi desenhado para a câmera
 // de desktop vista de cima: a pergunta ficava a 3m do chão e 44° à esquerda —
 // no Quest ela "não aparecia".
-const HOSP_UI: [number, number, number] = [0.75, 0.15, -0.55];
-const HOSP_ROT: [number, number, number] = [0, -0.25, 0];
-const HOSP_LED: [number, number, number] = [0, 1.27, -3.13];
+const HOSP_UI = CONSOLE_POS;
+const HOSP_ROT = CONSOLE_ROT;
+const HOSP_LED = LETREIRO_POS;
 
 /**
  * Papéis de cor do duelo — os mesmos nos dois ambientes.
@@ -583,6 +585,10 @@ function ModeloRodada({
   useLayoutEffect(() => {
     const g = content.current;
     if (!g) return;
+    // O Strict Mode repete setup → cleanup → setup sem remontar o primitive.
+    // Como a limpeza remove o clone para impedir sobreposição entre rodadas,
+    // o segundo setup precisa recolocá-lo no contêiner antes de prepará-lo.
+    if (scene.parent !== g) g.add(scene);
     if (spinner.current) spinner.current.rotation.y = 0;
     if (tombo.current) tombo.current.rotation.x = 0;
     if (entrada.current) {
@@ -637,7 +643,8 @@ function ModeloRodada({
         standard.userData.dueloEmissive = standard.emissive.clone();
         standard.userData.dueloEmissiveIntensity = standard.emissiveIntensity;
         standard.emissive.copy(cor);
-        standard.emissiveIntensity = 0.65;
+        // A arena comunica o resultado sem apagar a cor e o relevo anatômicos.
+        standard.emissiveIntensity = 0.12;
         materiais.push(standard);
       }
     });
@@ -1422,7 +1429,7 @@ export function DueloGame({
         humor={humorBot}
         nome={nomeOponente}
         tipo={dificuldade}
-        position={[-0.45, -1.3, -1.9]}
+        position={[-2.15, -1.3, -2.6]}
         rotationY={0}
       />
     ) : (
@@ -1876,7 +1883,7 @@ export function DueloGame({
           position={
             hosp
               ? empilhar
-                ? [0.72, 1.2, -0.5]
+                ? [0.85, 1.45, -0.5]
                 : [-1.05, 0.2, -0.5]
               : empilhar
                 ? // 0.42 punha a base do órgão em cima do placar (a laringe é
@@ -1884,7 +1891,7 @@ export function DueloGame({
                   [LOUSA_X, 0.56, -0.95]
                 : [-0.78, -0.15, -0.95]
           }
-          scale={hosp ? (empilhar ? 0.4 : 0.6) : empilhar ? 0.26 : 0.36}
+          scale={hosp ? (empilhar ? 0.35 : 0.6) : empilhar ? 0.26 : 0.36}
         >
           {/* Boundary LOCAL, novo a cada rodada: um GLB que falha tira só o
               modelo — pergunta, alternativas e placar seguem, e a partida não
@@ -2106,6 +2113,12 @@ export function DueloGame({
         modelo 3D no meio da revelação.
       */}
       <Entrada key={fase === "feedback" ? "rodada" : fase}>{tela()}</Entrada>
+      <PublicarEstadoArena
+        fase={fase} resultado={resultado} erro={erroJogador}
+        tempo={tempoRestante} rodada={indice + 1}
+        combo={historico.reduce((n, h) => h === "eu" ? n + 1 : 0, 0)}
+        meus={pontosJogador} outros={pontosBot}
+      />
       {oponente}
       {hosp && (
         <Text3D position={HOSP_LED} size={ledSize} color={led.cor}>

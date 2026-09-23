@@ -38,3 +38,17 @@ Todos do Sketchfab, licença CC-BY-4.0, com dieta simplify/resize/webp/draco:
 
 Fora do projeto por decisão: "Surgical/Instrument table collection" (CC-BY-NC,
 não-comercial) e "Hospital Stuff" (1,67M triângulos — inviável em VR).
+
+## Arena médica — incremento de setembro de 2026
+
+- `bancada-arena.glb`: bancada e luminária autorais do projeto, geradas
+  proceduralmente por `scripts/criar-bancada-arena.py`. Sem assets externos.
+  1.728 triângulos, 5 materiais, unidades em metros, 125.028 bytes.
+- `dr-caloni-arena.glb`, `dra-reis-arena.glb`, `dr-chefe-arena.glb`:
+  variantes de apresentação dos personagens já fornecidos pelo projeto.
+  Derivadas dos arquivos homônimos sem `-arena`, que permanecem intactos.
+  Redução de geometria apenas nesses personagens decorativos, texturas de até
+  1.024 pixels e compressão Draco. Nenhum órgão foi simplificado.
+  A variante não altera nem concede novos direitos sobre o personagem original.
+- A referência a Surgeon Simulator é de composição e apresentação, sem uso de
+  seus modelos, texturas, personagens, marcas ou arquivos.

@@ -165,6 +165,7 @@ function SceneContents() {
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
   const emAR = modo === "immersive-ar";
+  const cranio = useVRMedStore((s) => s.currentOrganId === "cranio");
   const explodivel = useVRMedStore((s) =>
     Boolean(getOrganById(s.currentOrganId)?.explosao),
   );
@@ -197,10 +198,10 @@ function SceneContents() {
        * chave forte do modo 2D deixa o órgão "estourado" e chapado contra o
        * passthrough. Menos intensidade e mais preenchimento.
        */}
-      <ambientLight intensity={emAR ? 1.15 : inSession ? 0.85 : 0.5} />
+      <ambientLight intensity={cranio ? (inSession ? 0.35 : 0.3) : emAR ? 1.15 : inSession ? 0.85 : 0.5} />
       <directionalLight
         position={[5, 7, 5]}
-        intensity={emAR ? 1.1 : 2.1}
+        intensity={cranio ? 1.8 : emAR ? 1.1 : 2.1}
         castShadow={!inSession}
         shadow-mapSize={[2048, 2048]}
         shadow-bias={-0.0002}
@@ -212,11 +213,13 @@ function SceneContents() {
       </directionalLight>
       <directionalLight
         position={[-6, 3, -5]}
-        intensity={emAR ? 0.8 : 0.55}
+        intensity={cranio ? 0.5 : emAR ? 0.8 : 0.55}
         color="#9fc3dd"
       />
 
       <OrganModel />
+      {/* Fundo de estudo aumenta o contraste do osso, sem cobrir o passthrough. */}
+      {cranio && !emAR && <color attach="background" args={["#30434d"]} />}
 
       {/*
        * O cenário do VR (grade + anel) existe para a pessoa não ficar num vazio
@@ -227,7 +230,9 @@ function SceneContents() {
         emAR ? null : <XRStage />
       ) : (
         <>
-          <SafeEnvironment />
+          {/* No osso sem texturas, o estúdio branco preenchia até as cavidades.
+              A chave e o recorte preservam o relevo sem esse preenchimento. */}
+          {!cranio && <SafeEnvironment />}
           <ContactShadows
             // Aberto a 100%, o crânio desce até y -1,98 (a normalização mede
             // fechado): o chão da sombra vai para baixo dele.
@@ -272,6 +277,7 @@ export function Scene() {
   // "demand" (usado no 2D para economizar GPU) não é suportado pelo WebXR
   // e deixaria o headset com a tela preta.
   const [inXR, setInXR] = useState(false);
+  const [altaQualidade, setAltaQualidade] = useState(false);
 
   // Registra a entrada em VR/AR na ponte e mede a duração das sessões.
   useEffect(() => {
@@ -315,10 +321,11 @@ export function Scene() {
   }
 
   return (
+    <>
     <Canvas
       // Sombras (PCSS + mapa 2048²) são caras demais para o Quest.
       shadows={inXR ? false : "percentage"}
-      dpr={inXR ? 1 : [1, 2]}
+      dpr={inXR ? 1 : altaQualidade ? 2 : [1, 2]}
       frameloop={inXR ? "always" : "demand"}
       camera={{ position: DEFAULT_CAMERA, fov: 45 }}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
@@ -336,5 +343,12 @@ export function Scene() {
         <SceneContents />
       </XR>
     </Canvas>
+    {!inXR && <button
+      type="button" aria-pressed={altaQualidade}
+      onClick={() => setAltaQualidade((valor) => !valor)}
+      title="Alta usa DPR 2, mesmo em monitor comum. Custa mais GPU; em XR o DPR fica em 1."
+      className="absolute bottom-5 left-4 rounded-full border border-border bg-card/90 px-3 py-2 text-xs shadow-sm"
+    >Nitidez: {altaQualidade ? "alta (2×)" : "automática"}</button>}
+    </>
   );
 }
