@@ -1,5 +1,23 @@
 # VRmed — contexto do projeto
 
+## Arena médica — ambientação em 360 graus (2026-09-23)
+
+A frente aprovada permanece intacta. As laterais e o fundo receberam apoio
+hospitalar autoral: leito vazio com grades/rodízios, cortina recolhida, cabeceira
+técnica, higienização, armazenamento, posto de apoio e acabamento da entrada.
+Novo `retaguarda-arena.glb`: 18.423 triângulos, oito malhas, 1.321.600 bytes.
+A cortina anterior saiu da cena, mas o arquivo foi preservado. A cadeira fica
+estacionada na lateral. Sem órgãos modificados, novas dependências ou luzes caras.
+
+`RetaguardaHospital.tsx` é decorativo, com ponteiros desligados. O novo
+`verify:retaguarda` testa orçamento, normais, corredor livre e dois raios no GLB
+real, integrado ao `verify:core`. Vistas `?inspecao=esquerda|direita|fundo` são
+apenas para desenvolvimento desktop; produção/XR ignoram-nas. Origem do headset,
+controles e regras online não mudaram. Relatório e reteste físico pendente em
+`docs/ARENA-360-2026-09-23.md`.
+Na tela vertical desktop, câmera em z=3,80/FOV 54° evita entrar na porta de
+apoio (antes z=4,45); o enquadramento horizontal e a câmera XR não mudaram.
+
 ## Escola de medicina do Duelo (2026-09-23)
 
 A Escola ganhou uma sala autoral de anatomia: bancada do órgão, lousa integrada,

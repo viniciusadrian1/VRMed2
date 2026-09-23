@@ -7,13 +7,14 @@ import { Text3D } from "@/components/arena/ui3d";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Bloco, ConsoleArena, FaixaReativa, MonitorArena, PalcoAnatomico } from "./ArenaMedica";
 import { EntornoHospital } from "./EntornoHospital";
+import { RetaguardaHospital } from "./RetaguardaHospital";
 
 /**
  * Arena médica do Duelo: bancada anatômica, console de competição e pórtico
  * reativo. A arquitetura organiza o foco; os equipamentos dão escala à sala.
  *
- * Híbrido: sala procedural + entorno autoral agrupado por material. Cadeira
- * e cortina do acervo seguem no fundo (créditos dos originais no CREDITS.md).
+ * Híbrido: sala procedural + entorno autoral agrupado por material. Apoio
+ * hospitalar ocupa as laterais e o fundo; cadeira do acervo na área de apoio.
  * Cada prop se auto-normaliza: mede o próprio arquivo solto da cena, escala
  * para a altura-alvo e assenta a base no y=0 do grupo.
  */
@@ -185,6 +186,9 @@ export function AmbienteHospital() {
       <ErrorBoundary fallback={null}><Suspense fallback={null}>
         <EntornoHospital />
       </Suspense></ErrorBoundary>
+      <ErrorBoundary fallback={null}><Suspense fallback={null}>
+        <RetaguardaHospital />
+      </Suspense></ErrorBoundary>
 
       {/* Telão LED do cronômetro no alto, entre os dois lados */}
       <TelaoLed position={[0, 2.81, -3.22]} />
@@ -193,16 +197,13 @@ export function AmbienteHospital() {
       {/* Props GLB do grupo (dieta aplicada) */}
       <ErrorBoundary fallback={null}><Suspense fallback={null}>
         {/* Acervo preservado em zonas de apoio, sem atravessar a bancada. */}
-        <Prop url={`${HOSPITAL_DIR}/cortina-monitor.glb`} alturaAlvo={2.1} position={[-4.0, 0, 2.3]} rotationY={Math.PI / 2} />
-        {/* Cadeira de rodas encostada */}
-        <Prop url={`${HOSPITAL_DIR}/cadeira-rodas.glb`} alturaAlvo={1.0} position={[3.6, 0, 2.8]} rotationY={-Math.PI / 2.5} />
+        {/* Cadeira estacionada entre os setores, fora do corredor do jogador. */}
+        <Prop url={`${HOSPITAL_DIR}/cadeira-rodas.glb`} alturaAlvo={1.0} position={[3.78, 0, 1.12]} rotationY={-Math.PI / 2} />
       </Suspense></ErrorBoundary>
     </group>
     </group>
   );
 }
 
-// Só os dois props mantidos no cenário; o entorno tem seu próprio Suspense.
-for (const nome of ["cortina-monitor", "cadeira-rodas"]) {
-  useGLTF.preload(`${HOSPITAL_DIR}/${nome}.glb`, "/draco/");
-}
+// A cortina antiga fica no acervo; a nova integra o leito no GLB agrupado.
+useGLTF.preload(`${HOSPITAL_DIR}/cadeira-rodas.glb`, "/draco/");

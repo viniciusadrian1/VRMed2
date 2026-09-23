@@ -24,6 +24,12 @@ import { posicaoCompetidorEscola } from "@/lib/escola-apresentacao";
 
 const FLOOR_Y = -1.3;
 
+// Inspeção só no desenvolvimento: produção e câmera XR ignoram estas vistas.
+const VISTAS_ARENA: Record<string, [number, number, number]> = {
+  fundo: [0, .3, 4.5], esquerda: [-4.5, .3, 2.1], direita: [4.5, .3, 2.1],
+  "fundo-esquerda": [-3.4, .3, 4.3], "fundo-direita": [3.4, .3, 4.3],
+};
+
 /** Chão escuro por baixo/fora da sala (a sala de aula ambienta o resto). */
 function PalcoDuelo() {
   return (
@@ -41,6 +47,9 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
 }) {
   const inSession = useXR((state) => Boolean(state.session));
   const escola = ambiente === "escola";
+  const nomeVista = process.env.NODE_ENV === "development" && !escola && typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("inspecao") ?? "" : "";
+  const vistaLocal = Object.hasOwn(VISTAS_ARENA, nomeVista) ? VISTAS_ARENA[nomeVista] : undefined;
   // Tela em pé, o órgão vai para cima da lousa/do painel (ver DueloGame).
   // Escola: paisagem usa olhos a 1,60m do piso; retrato preserva o espaço
   // acima da lousa para o órgão, longe do seletor e do botão de VR do canto.
@@ -53,20 +62,21 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
   // o celular: a câmera é reposicionada aqui. Na sessão XR quem manda é o óculos.
   useEffect(() => {
     if (inSession) return;
-    const [x, y, z] = escola
+    const [x, y, z] = vistaLocal ? [0, .3, 2.55] : escola
       ? retrato
         ? [0.28, 0.15, 1.6]
         : [0.28, 0.3, 1.65]
       : retrato
-        ? [0.85, 0.48, 4.45]
+        ? [0.85, 0.48, 3.8]
         : [0, 0.45, 3.8];
     get().camera.position.set(x, y, z);
     const camera = get().camera;
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.fov = escola ? 55 : 50;
+      // No retrato, ampliar o campo em vez de recuar para dentro da porta.
+      camera.fov = vistaLocal ? 75 : escola ? 55 : retrato ? 54 : 50;
       camera.updateProjectionMatrix();
     }
-  }, [escola, retrato, inSession, get]);
+  }, [escola, retrato, inSession, get, vistaLocal]);
 
   return (
     <>
@@ -115,11 +125,11 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
           enableDamping
           dampingFactor={0.08}
           target={
-            escola
+            vistaLocal ?? (escola
               ? [0.36, 0, -1.06]
               : retrato
                 ? [0.85, 0.35, -0.65]
-                : [0, 0.15, -0.6]
+                : [0, 0.15, -0.6])
           }
           minDistance={escola ? 0.8 : 1.5}
           maxDistance={9}

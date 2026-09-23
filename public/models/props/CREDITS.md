@@ -57,6 +57,13 @@ não-comercial) e "Hospital Stuff" (1,67M triângulos — inviável em VR).
   carrinho de instrumentos, equipamento de treinamento, janela técnica,
   porta e ventilação. Oito materiais, sem texturas externas. O visor é uma
   representação abstrata de simulação, não um exame ou sinal clínico.
+- `retaguarda-arena.glb`: apoio hospitalar autoral produzido no Blender por
+  `scripts/criar-retaguarda-arena.py`: leito vazio de treinamento, cortina,
+  cabeceira técnica, armário de materiais, higienização, posto de apoio e
+  acabamento da entrada. 18.423 triângulos, oito malhas/materiais, sem texturas
+  ou animações, 1.321.600 bytes, unidades em metros. Sem assets externos ou
+  anatomia gerada. Substitui a instância antiga de cortina/monitor; seu arquivo
+  de origem permanece no acervo. Telas e equipamentos são cenográficos.
 
 ## Escola de medicina — 2026-09-23
 
