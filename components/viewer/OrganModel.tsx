@@ -1,4 +1,5 @@
 "use client";
+import { deveAcionarBotao3D } from "@/lib/botao3d-interacao";
 
 import {
   Suspense,
@@ -140,9 +141,6 @@ function ModelStateApplier({
   const bounds = useVRMedStore((s) => s.modelBounds);
   const foco = useTutor3D((s) => s.foco);
   const invalidate = useThree((s) => s.invalidate);
-  const inSession = useXR(
-    (state) => state.mode === "immersive-vr" || state.mode === "immersive-ar",
-  );
 
   // Planos no espaço do root (o dos bounds) e as cópias em MUNDO que os
   // materiais recebem. O three só aceita corte em mundo; medidos no root, os
@@ -153,14 +151,13 @@ function ModelStateApplier({
   useEffect(() => {
     const root = rootRef.current;
     if (!root || !bounds || layers.length === 0) return;
-    // Não há controle de corte dentro da sessão de AR/VR, então ele fica
-    // desligado nela e volta ao sair.
-    planosNoRoot.current = inSession ? [] : computeClippingPlanes(clipping, bounds);
+    // Os mesmos cortes ficam disponíveis nos painéis DOM e imersivos.
+    planosNoRoot.current = computeClippingPlanes(clipping, bounds);
     planosNoMundo.current = planosNoRoot.current.map((plano) => plano.clone());
     const apresentacao = camadasComFoco(layers, foco);
     applyModelState(root, apresentacao, planosNoMundo.current, wireframe);
     invalidate();
-  }, [layers, clipping, wireframe, bounds, invalidate, rootRef, inSession, foco]);
+  }, [layers, clipping, wireframe, bounds, invalidate, rootRef, foco]);
 
   // Leva os planos para o mundo a cada quadro, antes de desenhar. Os materiais
   // guardam estas mesmas instâncias de Plane, então mudar o valor não
@@ -347,7 +344,7 @@ export function OrganModel() {
   }), []);
 
   // Clique no modelo: cria anotação (modo marcação) ou identifica a estrutura.
-  const handleModelClick = (event: ThreeEvent<MouseEvent>) => {
+  const handleModelClick = (event: ThreeEvent<MouseEvent | PointerEvent>) => {
     if (!organId) return;
     event.stopPropagation();
 
@@ -376,6 +373,11 @@ export function OrganModel() {
         hideLabel: false,
       });
       track("annotation_created", { organ: organId });
+      if (inSession) {
+        loja.setAnnotationMode(false);
+        loja.setInspectedLabel("Nova nota");
+        loja.setInspectedPoint([ponto.x, ponto.y, ponto.z]);
+      }
       return;
     }
 
@@ -399,7 +401,8 @@ export function OrganModel() {
         name={NOME_DO_ROOT}
         position={inSession ? POSE_PROVISORIA : [0, 0, 0]}
         scale={escala ?? 1}
-        onClick={handleModelClick}
+        onClick={(event) => { if (deveAcionarBotao3D("clicar", event)) handleModelClick(event); }}
+        onPointerDown={(event) => { if (deveAcionarBotao3D("pressionar", event)) handleModelClick(event); }}
         onPointerOver={(event) => {
           event.stopPropagation();
           document.body.style.cursor = annotationMode

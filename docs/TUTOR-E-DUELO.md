@@ -55,14 +55,13 @@ para esse limite da hierarquia.
 
 ### Uso no headset
 
-O botão “Tutor 3D”, no visualizador imersivo, abre um painel com “Explicar” e
-“Qual a função?”. O alvo é a estrutura selecionada pelo gatilho ou o modelo
-inteiro. Há paginação do texto, limpeza do foco e fechamento com cancelamento
-da requisição. Trocar o modelo descarta a resposta anterior.
+O incremento seguinte substitui o painel de perguntas rápidas por dois painéis
+laterais: Ferramentas do modelo e Tutor de IA. Há teclado 3D, histórico
+compartilhado com o DOM, perguntas rápidas, paginação e cancelamento.
+Trocar de órgão cancela o pedido sem apagar o histórico. A câmera continua livre.
 
-É uma primeira interação por perguntas rápidas, não reconhecimento de voz nem
-um chat livre com teclado dentro do VR. Ainda requer teste físico de posição,
-legibilidade, seleção e conforto no Quest.
+Detalhes e roteiro em `PAINEIS-ESTUDO-XR.md`. Não há reconhecimento de voz.
+Ainda requer teste físico de posição, legibilidade, seleção e conforto no Quest.
 
 ## Duelo: variedade sem mudar a competição
 

@@ -4,6 +4,7 @@ import { useRef, useState, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useXRInputSourceState } from "@react-three/xr";
 import * as THREE from "three";
+import { bloquearPincaUI, maoNaInterface } from "@/lib/xr-foco-interface";
 
 /** Limites de escala, relativos ao tamanho original do modelo. */
 const MIN_SCALE = 0.2;
@@ -153,6 +154,7 @@ export function XRManipulation({
   const pinch = useRef<{ distance: number; middle: THREE.Vector3 } | null>(null);
   /** Pinça ativa em cada mão, para aplicar a histerese. */
   const pinching = useRef({ left: false, right: false });
+  const pincaNaUI = useRef({ left: false, right: false });
 
   useFrame((state, rawDelta, frame) => {
     const model = target.current;
@@ -194,6 +196,7 @@ export function XRManipulation({
     // rastreada (pinça). O resto da lógica não precisa saber a diferença.
     const referenceSpace = state.gl.xr.getReferenceSpace();
 
+    const esquerdaAntes = pinching.current.left, direitaAntes = pinching.current.right;
     pinching.current.left = isPinching(
       leftHandInput,
       frame,
@@ -207,11 +210,13 @@ export function XRManipulation({
       pinching.current.right,
     );
 
+    pincaNaUI.current.left = bloquearPincaUI(pinching.current.left, esquerdaAntes, pincaNaUI.current.left, maoNaInterface("left"));
+    pincaNaUI.current.right = bloquearPincaUI(pinching.current.right, direitaAntes, pincaNaUI.current.right, maoNaInterface("right"));
     const leftHeld =
-      isPressed(leftController, "xr-standard-squeeze") || pinching.current.left;
+      isPressed(leftController, "xr-standard-squeeze") || (pinching.current.left && !pincaNaUI.current.left);
     const rightHeld =
       isPressed(rightController, "xr-standard-squeeze") ||
-      pinching.current.right;
+      (pinching.current.right && !pincaNaUI.current.right);
     const leftHand = leftController?.object ?? leftHandInput?.object;
     const rightHand = rightController?.object ?? rightHandInput?.object;
 
@@ -478,7 +483,7 @@ interface PoseDaCabeca {
  * `getViewerPose` continua, mas só como sinal de que o rastreio está valendo
  * neste quadro; sem ele a câmera poderia guardar uma pose velha ou nula.
  */
-function poseDaCabeca(
+export function poseDaCabeca(
   gl: THREE.WebGLRenderer,
   frame: XRFrame | undefined,
   aceitarEstimada = false,

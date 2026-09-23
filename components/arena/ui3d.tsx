@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { Text } from "@react-three/drei";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { useXRInputSourceState } from "@react-three/xr";
@@ -9,6 +9,7 @@ import * as THREE from "three";
 import { playClique, playHover } from "@/lib/arena-audio";
 import { pulsar } from "@/lib/xr-haptica";
 import { CAMADAS_UI3D, deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "@/lib/botao3d-interacao";
+import { ocuparPonteiroUI, liberarPonteiroUI } from "@/lib/xr-foco-interface";
 
 /**
  * Primitivas de interface em espaço 3D para a Arena.
@@ -42,7 +43,7 @@ if (typeof window !== "undefined") {
     {
       font: ARENA_FONT,
       characters:
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ·×ÁÂÃÀÇÉÊÍÓÔÕÚáâãàçéêíóôõú.,:!?()-<>↓…—+/_",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ·×ÁÂÃÀÇÉÊÍÓÔÕÚáâãàçéêíóôõú.,:!?()-<>↓…—+/_%−;",
     },
     () => {},
   );
@@ -306,6 +307,11 @@ export function Button3D({
   const scale = useRef(1);
   const esquerdo = useXRInputSourceState("controller", "left");
   const direito = useXRInputSourceState("controller", "right");
+  const donoUI = useRef({});
+  useEffect(() => {
+    const dono = donoUI.current;
+    return () => liberarPonteiroUI(dono);
+  }, []);
 
   useFrame((_, delta) => {
     if (!group.current) return;
@@ -356,6 +362,7 @@ export function Button3D({
       }}
       onPointerOver={(event) => {
         stop(event);
+        ocuparPonteiroUI(donoUI.current, event);
         // Só na ENTRADA do hover: o R3F dispara onPointerOver a cada quadro em
         // que o laser se move sobre o alvo, e vibrar 90 vezes por segundo
         // esquenta o motor e vira ruído branco na mão.
@@ -366,6 +373,7 @@ export function Button3D({
         pulsar(fonteDoPonteiro(event) ?? direito?.inputSource ?? esquerdo?.inputSource, 0.15, 15);
       }}
       onPointerOut={(event) => {
+        liberarPonteiroUI(donoUI.current, event.pointerId);
         hovered.current.delete(event.pointerId);
         pressionado.current.delete(event.pointerId);
       }}
@@ -380,6 +388,7 @@ export function Button3D({
         pressionado.current.delete(event.pointerId);
       }}
       onPointerCancel={(event) => {
+        liberarPonteiroUI(donoUI.current, event.pointerId);
         hovered.current.delete(event.pointerId);
         pressionado.current.delete(event.pointerId);
       }}

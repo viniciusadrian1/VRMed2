@@ -2,16 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Eraser, Send, Sparkles, X } from "lucide-react";
-import { track } from "@/lib/analytics";
-import { detectQuestionCategory, streamChatResponse } from "@/lib/chat-client";
-import { genId, stableHash } from "@/lib/format";
-import { getOrganById } from "@/lib/organs";
+import { enviarPerguntaTutor, limparConversaTutor, repetirPerguntaTutor, useConversaTutor } from "@/lib/tutor-conversa";
 import { useVRMedStore } from "@/lib/store";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import type { ChatMessage } from "@/types";
 import { Message } from "./Message";
 import { useTutor3D } from "@/lib/tutor-3d-store";
 
@@ -21,148 +17,32 @@ const EXAMPLE_QUESTIONS = [
   "Quais são as camadas da parede do estômago?",
 ];
 
-/** Conteúdo do chat — cabeçalho, histórico e campo de entrada. */
+/** O DOM e os painéis XR usam a mesma conversa e o mesmo pedido em andamento. */
 function ChatPanelContent() {
   const chat = useVRMedStore((s) => s.chat);
-  const addChatMessage = useVRMedStore((s) => s.addChatMessage);
-  const appendToChatMessage = useVRMedStore((s) => s.appendToChatMessage);
-  const clearChat = useVRMedStore((s) => s.clearChat);
-  const setChat = useVRMedStore((s) => s.setChat);
   const setChatOpen = useVRMedStore((s) => s.setChatOpen);
-  const organId = useVRMedStore((s) => s.currentOrganId);
-  const organ = getOrganById(organId);
   const guia = useTutor3D((s) => s.ativo);
   const contexto = useTutor3D((s) => s.contexto);
   const foco = useTutor3D((s) => s.foco);
-
   const [input, setInput] = useState("");
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
+  const isStreaming = useConversaTutor((s) => s.ocupado);
+  const erro = useConversaTutor((s) => s.erro);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  // Controla o streaming em andamento para poder abortá-lo.
-  const abortRef = useRef<AbortController | null>(null);
 
-  // Mantém a conversa rolada para a mensagem mais recente.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [chat]);
 
-  // Aborta qualquer streaming pendente ao desmontar (fechar o painel / sair).
-  useEffect(() => {
-    return () => abortRef.current?.abort();
-  }, []);
-
-  useEffect(() => useVRMedStore.subscribe((s, anterior) => {
-    if (s.currentOrganId !== anterior.currentOrganId) {
-      abortRef.current?.abort();
-      useTutor3D.getState().limparFoco();
-    }
-  }), []);
-
-  // Limpa a conversa, interrompendo antes um streaming em curso.
-  const handleClearChat = () => {
-    abortRef.current?.abort();
-    setIsStreaming(false);
-    setErro(null);
-    clearChat();
-    useTutor3D.getState().limparFoco();
-  };
-
+  // Fechar apenas o DOM não cancela o pedido que está sendo lido no XR.
+  // A saída do visualizador encerra a conversa através de Scene.
+  const handleClearChat = limparConversaTutor;
+  const retry = repetirPerguntaTutor;
   const sendMessage = async (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || isStreaming) return;
-    setErro(null);
-    useTutor3D.getState().limparFoco();
-
-    const userMessage: ChatMessage = {
-      id: genId(),
-      role: "user",
-      content: trimmed,
-      // Este timestamp nasce no gesto do usuário, não durante o render.
-      // eslint-disable-next-line react-hooks/purity -- handler de envio
-      createdAt: Date.now(),
-      organContext: organ?.name,
-    };
-    addChatMessage(userMessage);
+    if (!text.trim() || isStreaming) return;
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
-
-    // Lê o estado mais recente da store (evita um `chat` desatualizado em
-    // envios rápidos e sucessivos). O set do zustand é síncrono, então a
-    // pergunta já está aí — reanexá-la mandaria o turno "user" em dobro.
-    const history = useVRMedStore
-      .getState()
-      .chat.map((message) => ({ role: message.role, content: message.content }));
-
-    const assistantId = genId();
-    addChatMessage({
-      id: assistantId,
-      role: "assistant",
-      content: "",
-      // eslint-disable-next-line react-hooks/purity -- handler de envio
-      createdAt: Date.now(),
-      feedback: null,
-    });
-    setIsStreaming(true);
-
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    // Telemetria anônima: hash + categoria da pergunta, nunca o texto.
-    track("chat_message_sent", {
-      organ: organId,
-      questionHash: stableHash(trimmed),
-      category: detectQuestionCategory(trimmed),
-    });
-
-    try {
-      const contextoDoPedido = guia && contexto?.organId === organId ? contexto : undefined;
-      await streamChatResponse(
-        { messages: history, currentOrgan: organ?.name, contexto3d: contextoDoPedido },
-        (chunk) => appendToChatMessage(assistantId, chunk),
-        controller.signal,
-        (comando) => {
-          if (!controller.signal.aborted && contextoDoPedido) useTutor3D.getState().aplicar(comando, contextoDoPedido);
-        },
-      );
-    } catch (error) {
-      useTutor3D.getState().limparFoco();
-      // Abortos (troca de órgão, fechar painel, limpar) não são erros. Mas o
-      // placeholder ainda vazio não pode ficar: seria persistido como um turno
-      // do tutor sem texto (e iria para as sessões e o PDF). A leitura via
-      // getState() vale mesmo com o painel já desmontado; resposta parcial
-      // fica, porque é conteúdo real.
-      if (controller.signal.aborted) {
-        const atual = useVRMedStore.getState().chat;
-        if (atual.some((m) => m.id === assistantId && !m.content.trim())) {
-          setChat(atual.filter((m) => m.id !== assistantId));
-        }
-        return;
-      }
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Não foi possível contatar o tutor de IA.";
-      // O erro não pode virar um turno "assistant": seria persistido, reenviado
-      // ao modelo e ganharia botões de feedback. Remove o placeholder (lendo o
-      // estado mais recente da store, não o `chat` do closure) e mostra o aviso
-      // à parte, com opção de tentar de novo.
-      setChat(useVRMedStore.getState().chat.filter((m) => m.id !== assistantId));
-      setErro(message);
-    } finally {
-      if (abortRef.current === controller) abortRef.current = null;
-      setIsStreaming(false);
-    }
-  };
-
-  // Reenvia a última pergunta após uma falha (sendMessage re-adiciona a
-  // pergunta e o placeholder do assistente).
-  const retry = () => {
-    const last = useVRMedStore.getState().chat.at(-1);
-    if (!last || last.role !== "user") return;
-    setChat(useVRMedStore.getState().chat.slice(0, -1));
-    void sendMessage(last.content);
+    await enviarPerguntaTutor(text);
   };
 
   return (

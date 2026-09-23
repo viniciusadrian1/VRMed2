@@ -512,3 +512,17 @@ Detalhes, fontes, arquivos, testes e limitações em `docs/TUTOR-E-DUELO.md`.
 `verify:tutor` e `verify:perguntas` integram `verify:core`; `verify:duelo-http`
 é opt-in e requer servidor local. Build/testes e integração HTTP/SSE passaram;
 **painel do tutor, conforto e desempenho ainda precisam de teste físico no Quest**.
+
+### Atualização — painéis de estudo em AR/VR (23/09/2026)
+
+Dois painéis 3D laterais substituem as ferramentas DOM e o tutor restrito a perguntas
+rápidas durante a imersão. Camadas, cortes, notas, áudio e conversa usam estado
+compartilhado com a tela. Há teclado 3D, leitura paginada, recolher/reabrir e B/Y
+para reposicionar a interface sem mexer na câmera. Cortes não são mais desativados
+no XR; o raycast ignora superfícies ocultas/recortadas. Pinça na UI não inicia arraste.
+
+`verify:paineis-xr` passa a integrar `verify:core`. Implementação, arquivos,
+limites e roteiro em `docs/PAINEIS-ESTUDO-XR.md`. A automação do navegador ficou
+indisponível por falha de ACL do sandbox; **não houve captura visual neste incremento**.
+Homologação física do Quest, legibilidade, hand tracking e desempenho pendentes.
+Commit e envio à `master` autorizados pelo usuário para teste físico no Quest.

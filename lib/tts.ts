@@ -86,6 +86,7 @@ export function createUtterance(
 
 /** Intervalo do keep-alive da fala atual (ver `speak`). */
 let keepAlive = 0;
+let inicioPendente = 0;
 
 /**
  * Inicia a narração de um texto. Cancela qualquer fala anterior e adia o
@@ -94,8 +95,9 @@ let keepAlive = 0;
  */
 export function speak(text: string, options: SpeakOptions = {}): void {
   if (!isSpeechSupported()) return;
-  window.speechSynthesis.cancel();
-  window.setTimeout(() => {
+  cancelSpeech();
+  inicioPendente = window.setTimeout(() => {
+    inicioPendente = 0;
     const synth = window.speechSynthesis;
     synth.speak(createUtterance(text, options));
     // Contorna a limitação do Chrome que interrompe a síntese após ~15 s. Fica
@@ -114,6 +116,8 @@ export function speak(text: string, options: SpeakOptions = {}): void {
 /** Interrompe imediatamente qualquer narração em andamento. */
 export function cancelSpeech(): void {
   if (isSpeechSupported()) {
+    window.clearTimeout(inicioPendente);
+    inicioPendente = 0;
     window.clearInterval(keepAlive);
     window.speechSynthesis.cancel();
   }

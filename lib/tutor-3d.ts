@@ -46,6 +46,9 @@ export async function lerEventosTutor(
   signal?: AbortSignal,
 ) {
   const leitor = corpo.getReader();
+  // Encerra também uma leitura pendente, sem esperar o próximo fragmento.
+  const cancelar = () => { void leitor.cancel().catch(() => {}); };
+  signal?.addEventListener("abort", cancelar, { once: true });
   const decoder = new TextDecoder();
   let buffer = "";
   let terminou = false;
@@ -61,8 +64,10 @@ export async function lerEventosTutor(
     else throw new Error("Resposta do tutor inválida.");
   };
   try {
+    if (signal?.aborted) throw new DOMException("Cancelado", "AbortError");
     while (true) {
       const { value, done } = await leitor.read();
+      if (signal?.aborted) throw new DOMException("Cancelado", "AbortError");
       buffer += decoder.decode(value, { stream: !done });
       if (buffer.length > 64_000) throw new Error("Resposta do tutor excedeu o limite.");
       let quebra: number;
@@ -75,6 +80,7 @@ export async function lerEventosTutor(
     linha(buffer);
     if (!terminou) throw new Error("A resposta foi interrompida. Tente novamente.");
   } finally {
+    signal?.removeEventListener("abort", cancelar);
     await leitor.cancel().catch(() => {});
     leitor.releaseLock();
   }

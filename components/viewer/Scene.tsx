@@ -19,7 +19,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrganModel } from "./OrganModel";
 import { SafeEnvironment } from "./SafeEnvironment";
-import { TutorPainelVR } from "./TutorPainelVR";
+import { PaineisEstudoXR, type InspecaoPaineis } from "./PaineisEstudoXR";
 
 const DEFAULT_CAMERA: [number, number, number] = [3.2, 2.3, 4.6];
 const MIN_DISTANCE = 1.7;
@@ -176,8 +176,8 @@ function XRStage() {
 }
 
 /**
- * Conteúdo da cena. Em VR, remove tudo que é DOM, custoso ou que disputa a
- * câmera do headset:
+ * Conteúdo da cena. Em VR, substitui os painéis DOM por geometria e remove
+ * efeitos custosos ou controles que disputam a câmera do headset:
  *  - OrbitControls e CameraRig escrevem em `camera.position` a cada quadro
  *    (o OrbitControls do drei não tem consciência de XR) e, numa sessão, essa
  *    câmera é a do headset — brigando com o rastreamento da cabeça.
@@ -185,10 +185,25 @@ function XRStage() {
  *    fora da sessão VR pelo custo de PMREM no Quest.
  *  - Html (hotspots) é DOM: invisível em VR e ainda faz raycast por quadro.
  */
+function CameraInspecao({ dupla }: { dupla: boolean }) {
+  const { camera, invalidate } = useThree();
+  useEffect(() => {
+    camera.position.set(0, 0, dupla ? 1.5 : 1.65);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+    invalidate();
+  }, [camera, invalidate, dupla]);
+  return null;
+}
+
 function SceneContents() {
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
   const emAR = modo === "immersive-ar";
+  const saidaRef = useRef<THREE.Group>(null);
+  const parametro = new URLSearchParams(window.location.search).get("inspecao");
+  const inspecao: InspecaoPaineis | undefined = process.env.NODE_ENV === "development" && !inSession &&
+    (parametro === "paineis" || parametro === "ferramentas" || parametro === "tutor") ? parametro : undefined;
   const cranio = useVRMedStore((s) => s.currentOrganId === "cranio");
   const explodivel = useVRMedStore((s) =>
     Boolean(getOrganById(s.currentOrganId)?.explosao),
@@ -207,16 +222,21 @@ function SceneContents() {
        * centro da cena.
        */}
       <XROrigin position={emAR ? [0, 0, 0] : [0, FLOOR_Y, 0]}>
-        <SairDoVR position={[-0.45, 1.25, -0.5]} />
-        {inSession && <TutorPainelVR />}
+        {debugXR && inSession && <DiagnosticoXR />}
+      </XROrigin>
+      {/* Sempre montado: o cleanup de SairDoVR encerra uma sessão viva.
+          A ancoragem acompanha os painéis, inclusive para quem está sentado. */}
+      <group ref={saidaRef} position={[0, (emAR ? 0 : FLOOR_Y) + 1.48, 0]}>
+        <SairDoVR position={[0.31, -0.66, -1.12]} rotationY={0} />
         {/* Sem esta dica ninguém descobre o gesto: não há botão na cena. */}
         {inSession && explodivel && (
-          <Text3D position={[-0.45, 1.14, -0.5]} size={0.02} maxWidth={0.34}>
+          <Text3D position={[0, -0.82, -1.12]} size={0.02} maxWidth={0.9}>
             Analógico esquerdo: puxe para abrir, empurre para fechar
           </Text3D>
         )}
-        {debugXR && inSession && <DiagnosticoXR />}
-      </XROrigin>
+      </group>
+      {(inSession || inspecao) && <PaineisEstudoXR key={modo ?? inspecao} inspecao={inspecao} saidaRef={saidaRef} />}
+      {inspecao && <CameraInspecao dupla={inspecao === "paineis"} />}
 
       {/*
        * Em AR a luz da sala real já ilumina o campo de visão; repetir aqui a
@@ -267,14 +287,14 @@ function SceneContents() {
             blur={2.8}
             far={4}
           />
-          <OrbitControls
+          {!inspecao && <OrbitControls
             makeDefault
             enableDamping
             dampingFactor={0.08}
             minDistance={MIN_DISTANCE}
             maxDistance={MAX_DISTANCE}
-          />
-          <CameraRig />
+          />}
+          {!inspecao && <CameraRig />}
         </>
       )}
 

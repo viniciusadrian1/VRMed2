@@ -1,188 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import { Pause, Play, Square, Volume2 } from "lucide-react";
-import { track } from "@/lib/analytics";
-import {
-  getAudioFallbackPath,
-  getDescriptionPath,
-} from "@/lib/organs";
 import { useVRMedStore } from "@/lib/store";
-import {
-  cancelSpeech,
-  isSpeechSupported,
-  loadVoices,
-  pickPortugueseVoice,
-  speak,
-} from "@/lib/tts";
-import { useMounted } from "@/hooks/use-mounted";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { isSpeechSupported } from "@/lib/tts";
+import { ouvirNarracao, pausarNarracao, pararNarracao, useNarracaoEstudo, velocidadeNarracao } from "@/lib/narracao-estudo";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import type { OrganDescription } from "@/types";
 
-type PlayStatus = "idle" | "playing" | "paused";
-
-/** Painel de narração em áudio e descrição textual do órgão. */
+/** O reprodutor é compartilhado com a aba Áudio em AR/VR. */
 export function AudioNarration() {
   const organId = useVRMedStore((s) => s.currentOrganId);
-  const mounted = useMounted();
-
-  const [description, setDescription] = useState<OrganDescription | null>(null);
-  const [loading, setLoading] = useState(false);
-  // A fala sobrevive ao painel fechado: ao reabrir, parte do estado real do
-  // sintetizador. Sem risco de hidratação — o painel nunca renderiza no SSR.
-  const [status, setStatus] = useState<PlayStatus>(() =>
-    isSpeechSupported() && window.speechSynthesis.speaking
-      ? window.speechSynthesis.paused
-        ? "paused"
-        : "playing"
-      : "idle",
-  );
-  const [rate, setRate] = useState(1);
-
-  const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
-  const [voiceResolved, setVoiceResolved] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioError, setAudioError] = useState(false);
-  const startedAtRef = useRef(0);
-
-  // Usa a síntese de voz sempre que o navegador a suporta. A voz pt-BR é
-  // apenas uma preferência (voiceRef); sem ela, o navegador narra com a voz
-  // padrão a partir do `lang`. O áudio pré-gravado é só o último recurso.
-  const useSpeech = mounted && isSpeechSupported();
-
-  // Carrega as vozes do navegador uma única vez.
-  useEffect(() => {
-    let cancelled = false;
-    loadVoices().then((voices) => {
-      if (cancelled) return;
-      voiceRef.current = pickPortugueseVoice(voices);
-      setVoiceResolved(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Busca a descrição do órgão atual.
-  useEffect(() => {
-    if (!organId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- limpa a UI ao perder o órgão
-      setDescription(null);
-      return;
-    }
-    setLoading(true);
-    setDescription(null);
-    setAudioError(false);
-    let cancelled = false;
-    fetch(getDescriptionPath(organId))
-      .then((res) => (res.ok ? (res.json() as Promise<OrganDescription>) : null))
-      .then((data) => {
-        if (!cancelled) setDescription(data);
-      })
-      .catch(() => {
-        if (!cancelled) setDescription(null);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [organId]);
-
-  const finishTracking = useCallback(() => {
-    if (startedAtRef.current > 0) {
-      track("audio_narration_played", {
-        organ: organId,
-        listenedMs: Date.now() - startedAtRef.current,
-      });
-      startedAtRef.current = 0;
-    }
-  }, [organId]);
-
-  // Ao trocar de órgão ou desmontar, para só o áudio de fallback. A voz do
-  // navegador NÃO é cancelada aqui: fechar o painel (no celular, para ver o
-  // modelo) cortava a narração. Quem a cancela ao trocar de órgão ou sair é
-  // a página do viewer (app/viewer/page.tsx).
-  useEffect(() => {
-    const audio = audioRef.current;
-    return () => {
-      audio?.pause();
-      setStatus("idle");
-    };
-  }, [organId]);
-
-  // O keep-alive do Chrome vive em lib/tts. Aqui só devolve a UI ao estado
-  // ocioso quando a fala termina com o painel fechado (o onEnd era da
-  // instância desmontada).
-  useEffect(() => {
-    if (status !== "playing" || !useSpeech) return;
-    const id = window.setInterval(() => {
-      const synth = window.speechSynthesis;
-      if (!synth.speaking && !synth.pending) setStatus("idle");
-    }, 500);
-    return () => window.clearInterval(id);
-  }, [status, useSpeech]);
-
-  // Mantém a velocidade do áudio de fallback sincronizada.
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.playbackRate = rate;
-  }, [rate]);
-
-  const handlePlay = () => {
-    if (!description) return;
-
-    if (status === "paused") {
-      if (useSpeech) window.speechSynthesis.resume();
-      else void audioRef.current?.play();
-      setStatus("playing");
-      return;
-    }
-
-    startedAtRef.current = Date.now();
-
-    if (useSpeech) {
-      speak(description.fullDescription, {
-        voice: voiceRef.current,
-        rate,
-        onEnd: () => {
-          setStatus("idle");
-          finishTracking();
-        },
-        onError: () => setStatus("idle"),
-      });
-    } else if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.playbackRate = rate;
-      void audioRef.current.play().catch(() => setAudioError(true));
-    }
-    setStatus("playing");
-  };
-
-  const handlePause = () => {
-    if (useSpeech) window.speechSynthesis.pause();
-    else audioRef.current?.pause();
-    setStatus("paused");
-  };
-
-  const handleStop = () => {
-    cancelSpeech();
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    finishTracking();
-    setStatus("idle");
-  };
+  const { description, loading, status, rate, erro: audioError } = useNarracaoEstudo();
+  const useSpeech = isSpeechSupported();
+  const handlePlay = ouvirNarracao;
+  const handlePause = pausarNarracao;
+  const handleStop = pararNarracao;
+  const setRate = velocidadeNarracao;
 
   if (!organId) {
     return (
@@ -211,7 +47,7 @@ export function AudioNarration() {
   }
 
   const narrationDisabled =
-    (!useSpeech && audioError) || (!useSpeech && !voiceResolved);
+    loading || !description;
 
   return (
     <div className="flex flex-col gap-3 p-3">
@@ -275,28 +111,13 @@ export function AudioNarration() {
           </span>
         </div>
 
-        {narrationDisabled && (
+        {audioError && (
           <p className="mt-2 text-xs text-muted-foreground">
             Narração em áudio indisponível neste navegador. O texto abaixo segue
             disponível para leitura.
           </p>
         )}
       </div>
-
-      {/* Áudio de fallback usado quando não há voz pt-BR disponível. */}
-      {!useSpeech && voiceResolved && organId && (
-        <audio
-          ref={audioRef}
-          src={getAudioFallbackPath(organId)}
-          preload="none"
-          onEnded={() => {
-            finishTracking();
-            setStatus("idle");
-          }}
-          onError={() => setAudioError(true)}
-          className="hidden"
-        />
-      )}
 
       <Accordion type="single" collapsible defaultValue="texto">
         <AccordionItem value="texto">

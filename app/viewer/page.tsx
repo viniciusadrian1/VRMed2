@@ -20,7 +20,8 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { track } from "@/lib/analytics";
 import { getOrganById } from "@/lib/organs";
 import { useVRMedStore } from "@/lib/store";
-import { cancelSpeech } from "@/lib/tts";
+import { encerrarNarracao, prepararNarracao } from "@/lib/narracao-estudo";
+import { cancelarConversaTutor } from "@/lib/tutor-conversa";
 
 /** Estado inicial exibido quando nenhum órgão foi selecionado. */
 function EmptyViewerState() {
@@ -75,7 +76,8 @@ export default function ViewerPage() {
 
   // Para a narração ao trocar de órgão ou sair do viewer. Fica na página, e
   // não no painel de Ferramentas, para a voz seguir com o painel fechado.
-  useEffect(() => () => cancelSpeech(), [organId]);
+  useEffect(() => { void prepararNarracao(organId); }, [organId]);
+  useEffect(() => () => { encerrarNarracao(); cancelarConversaTutor(); }, []);
 
   // Telemetria: tempo de permanência registrado ao sair de cada órgão.
   useEffect(() => {

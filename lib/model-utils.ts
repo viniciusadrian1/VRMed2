@@ -422,6 +422,29 @@ export function computeClippingPlanes(
   return planes;
 }
 
+const raycastsPreparados = new WeakSet<THREE.Mesh>();
+
+/** O laser deve selecionar a superfície visível, não uma camada cortada/oculta. */
+function prepararRaycastVisivel(mesh: THREE.Mesh) {
+  if (raycastsPreparados.has(mesh)) return;
+  raycastsPreparados.add(mesh);
+  const original = mesh.raycast;
+  mesh.raycast = function (raycaster, intersecoes) {
+    if (!mesh.visible) return;
+    const inicio = intersecoes.length;
+    original.call(mesh, raycaster, intersecoes);
+    for (let i = intersecoes.length - 1; i >= inicio; i--) {
+      const hit = intersecoes[i];
+      const material = Array.isArray(mesh.material) ? mesh.material[hit.face?.materialIndex ?? 0] : mesh.material;
+      const cortes = material?.clippingPlanes ?? [];
+      const recortado = cortes.length > 0 && (material.clipIntersection
+        ? cortes.every((p) => p.distanceToPoint(hit.point) < 0)
+        : cortes.some((p) => p.distanceToPoint(hit.point) < 0));
+      if (!material?.visible || material.opacity <= 0 || recortado) intersecoes.splice(i, 1);
+    }
+  };
+}
+
 /** Aplica visibilidade, opacidade, cor, wireframe e cortes ao modelo. */
 export function applyModelState(
   root: THREE.Object3D,
@@ -436,6 +459,7 @@ export function applyModelState(
     if (!mesh.isMesh) return;
     const layer = byName.get(mesh.userData.layerKey as string);
     if (!layer) return;
+    prepararRaycastVisivel(mesh);
 
     mesh.visible = layer.visible;
     const materials = Array.isArray(mesh.material)

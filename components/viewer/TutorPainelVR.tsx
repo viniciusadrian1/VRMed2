@@ -1,69 +1,71 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Panel, Button3D, Text3D } from "@/components/arena/ui3d";
-import { streamChatResponse } from "@/lib/chat-client";
+import { useState } from "react";
+import { Text3D } from "@/components/arena/ui3d";
 import { useTutor3D } from "@/lib/tutor-3d-store";
 import { useVRMedStore } from "@/lib/store";
-import type { ContextoTutor } from "@/lib/tutor-3d";
+import { paginasXR } from "@/lib/painel-estudo-xr";
+import { cancelarConversaTutor, enviarPerguntaTutor, limparConversaTutor, repetirPerguntaTutor, useConversaTutor } from "@/lib/tutor-conversa";
+import { BotaoXR, PainelXRBase, PaginacaoXR, TecladoXR } from "./PainelXRBase";
 
-/** Perguntas rápidas sem teclado/microfone. Montado só na sessão imersiva. */
+/** Conversa completa no mundo 3D, compartilhada com o painel da tela. */
 export function TutorPainelVR() {
-  const contexto = useTutor3D((s) => s.contexto);
-  // Trocar o modelo descarta texto e requisição anteriores, não só o destaque.
-  return <ConteudoTutorVR key={contexto?.revisao ?? "carregando"} contexto={contexto} />;
-}
-
-function ConteudoTutorVR({ contexto }: { contexto: ContextoTutor | null }) {
-  const [aberto, setAberto] = useState(false);
-  const [texto, setTexto] = useState("");
-  const [erro, setErro] = useState("");
-  const [ocupado, setOcupado] = useState(false);
+  const [aberto, setAberto] = useState(true);
+  const [escrevendo, setEscrevendo] = useState(false);
+  const [rascunho, setRascunho] = useState("");
+  const [mensagemId, setMensagemId] = useState<string | null>(null);
   const [pagina, setPagina] = useState(0);
-  const pedido = useRef<AbortController | null>(null);
+  const [confirmarLimpeza, setConfirmarLimpeza] = useState(false);
+  const chat = useVRMedStore((s) => s.chat);
+  const contexto = useTutor3D((s) => s.contexto);
+  const guia = useTutor3D((s) => s.ativo);
   const foco = useTutor3D((s) => s.foco);
+  const ocupado = useConversaTutor((s) => s.ocupado);
+  const erro = useConversaTutor((s) => s.erro);
   const inspecionado = useVRMedStore((s) => s.inspectedLabel);
-  const alvo = inspecionado ?? contexto?.alvos[0].label ?? "modelo";
-  const paginas = texto.match(/[\s\S]{1,230}(?:\s|$)|[\s\S]{1,230}/g) ?? [""];
-
-  useEffect(() => {
-    return () => { pedido.current?.abort(); useTutor3D.getState().limparFoco(); };
-  }, [contexto]);
-
-  const perguntar = async (funcao: boolean) => {
-    if (!contexto || pedido.current) return;
-    const controller = new AbortController();
-    useTutor3D.getState().limparFoco();
-    pedido.current = controller;
-    setTexto(""); setErro(""); setPagina(0); setOcupado(true);
-    const pergunta = funcao ? `Qual a função de ${alvo}? Explique de forma simples.` : `Explique ${alvo} e destaque no modelo se estiver disponível.`;
-    try {
-      await streamChatResponse({
-        messages: [{ role: "user", content: pergunta }], currentOrgan: contexto.alvos[0].label,
-        contexto3d: useTutor3D.getState().ativo ? contexto : undefined,
-      }, (parte) => setTexto((s) => s + parte), controller.signal,
-      (comando) => { if (!controller.signal.aborted) useTutor3D.getState().aplicar(comando, contexto); });
-    } catch (falha) {
-      useTutor3D.getState().limparFoco();
-      if (!controller.signal.aborted) { setTexto(""); setErro(falha instanceof Error ? falha.message : "Tutor indisponível."); }
-    } finally {
-      if (pedido.current === controller) { pedido.current = null; setOcupado(false); }
-    }
+  const alvo = contexto?.alvos.find((a) => a.label === inspecionado)?.label ?? contexto?.alvos[0]?.label ?? "modelo";
+  const indice = mensagemId ? chat.findIndex((m) => m.id === mensagemId) : chat.length - 1;
+  const atual = Math.max(0, indice < 0 ? chat.length - 1 : indice);
+  const mensagem = chat[atual];
+  const paginas = paginasXR(erro || mensagem?.content || (ocupado
+    ? "Preparando explicação..."
+    : "Aponte para uma estrutura com o laser. Escolha uma pergunta rápida ou escreva sua dúvida no teclado 3D."));
+  const paginaAtual = Math.min(pagina, paginas.length - 1);
+  const enviar = (pergunta: string) => {
+    setConfirmarLimpeza(false);
+    setEscrevendo(false); setRascunho(""); setMensagemId(null); setPagina(0);
+    void enviarPerguntaTutor(pergunta);
   };
-
-  return <group position={[0.55, 1.45, -0.95]}>
-    {!aberto ? <Button3D label="Tutor 3D" width={0.3} height={0.075} onClick={() => setAberto(true)} /> :
-      <Panel width={0.73} height={0.83}>
-        <Text3D position={[0, 0.35, 0.01]} size={0.034}>Tutor 3D</Text3D>
-        <Text3D position={[0, 0.275, 0.01]} size={0.024} maxWidth={0.65}>{`Selecionado: ${alvo}`}</Text3D>
-        <Text3D position={[0, 0.06, 0.01]} size={0.025} maxWidth={0.64}>
-          {erro || paginas[pagina] || (ocupado ? "Preparando explicação..." : "Aponte para uma estrutura e puxe o gatilho. Depois escolha uma pergunta abaixo. Sua cabeça continua livre.")}
-        </Text3D>
-        <Button3D label="Explicar" position={[-0.17, -0.17, 0.01]} width={0.3} height={0.065} desabilitado={ocupado || !contexto} onClick={() => void perguntar(false)} />
-        <Button3D label="Qual a função?" position={[0.17, -0.17, 0.01]} width={0.3} height={0.065} desabilitado={ocupado || !contexto} onClick={() => void perguntar(true)} />
-        <Button3D label={paginas.length > 1 ? `Texto ${pagina + 1}/${paginas.length}` : "Texto completo"} position={[-0.17, -0.255, 0.01]} width={0.3} height={0.065} desabilitado={paginas.length < 2} onClick={() => setPagina((p) => (p + 1) % paginas.length)} />
-        <Button3D label="Limpar foco" position={[0.17, -0.255, 0.01]} width={0.3} height={0.065} desabilitado={!foco} onClick={() => useTutor3D.getState().limparFoco()} />
-        <Button3D label="Fechar tutor" position={[0, -0.345, 0.01]} width={0.4} height={0.065} onClick={() => { pedido.current?.abort(); setAberto(false); useTutor3D.getState().limparFoco(); }} />
-      </Panel>}
-  </group>;
+  const escolherMensagem = (i: number) => { setMensagemId(chat[i]?.id ?? null); setPagina(0); };
+  return <PainelXRBase titulo="Tutor de IA" aberto={aberto} aoAlternar={() => {
+    if (aberto && ocupado) cancelarConversaTutor();
+    setAberto(!aberto); setEscrevendo(false); setConfirmarLimpeza(false);
+  }}>
+    {escrevendo ? <TecladoXR texto={rascunho} aoMudar={setRascunho} aoCancelar={() => setEscrevendo(false)} aoConfirmar={() => enviar(rascunho)} /> : <>
+      <BotaoXR label={guia ? "Guia 3D: ligado" : "Guia 3D: desligado"} x={-0.245} y={0.375} largura={0.45} ativo={guia} onClick={() => useTutor3D.getState().habilitar(!guia)} />
+      <BotaoXR label="Limpar foco" x={0.245} y={0.375} largura={0.45} desabilitado={!foco} onClick={() => useTutor3D.getState().limparFoco()} />
+      <Text3D position={[0, 0.293, 0.025]} size={0.023} maxWidth={0.91} color="#a7d4df">
+        {foco ? `Foco: ${foco.label}` : "A câmera continua livre em AR e VR"}
+      </Text3D>
+      <BotaoXR label="Mensagem anterior" x={-0.265} y={0.215} largura={0.4} desabilitado={atual === 0 || !chat.length} onClick={() => escolherMensagem(atual - 1)} />
+      <BotaoXR label="Mais recente" x={0.265} y={0.215} largura={0.4} desabilitado={!chat.length || atual === chat.length - 1} onClick={() => { setMensagemId(null); setPagina(0); }} />
+      <Text3D position={[0, 0.145, 0.025]} size={0.022} color={erro ? "#ffb4a4" : "#a7d4df"}>
+        {erro ? "Não foi possível responder" : mensagem ? `${mensagem.role === "user" ? "Você" : "Tutor"} · ${atual + 1}/${chat.length}` : "Sua conversa de estudo"}
+      </Text3D>
+      <Text3D position={[0, 0.11, 0.025]} anchorY="top" size={0.028} maxWidth={0.92}>{paginas[paginaAtual]}</Text3D>
+      <PaginacaoXR pagina={paginaAtual} total={paginas.length} aoMudar={setPagina} y={-0.18} />
+      <BotaoXR label="Explicar" x={-0.32} y={-0.275} largura={0.29} desabilitado={ocupado || !contexto} onClick={() => enviar(`Explique ${alvo} e destaque no modelo se estiver disponível.`)} />
+      <BotaoXR label="Qual a função?" y={-0.275} largura={0.31} desabilitado={ocupado || !contexto} onClick={() => enviar(`Qual a função de ${alvo}? Explique de forma simples.`)} />
+      <BotaoXR label="Escrever" x={0.32} y={-0.275} largura={0.29} desabilitado={ocupado} onClick={() => setEscrevendo(true)} />
+      {ocupado ? <BotaoXR label="Parar resposta" y={-0.37} largura={0.6} onClick={cancelarConversaTutor} /> :
+        erro ? <BotaoXR label="Tentar novamente" y={-0.37} largura={0.6} onClick={repetirPerguntaTutor} /> :
+        <BotaoXR label={confirmarLimpeza ? "Confirmar: apagar conversa" : "Limpar conversa"} y={-0.37} largura={0.65} desabilitado={!chat.length} onClick={() => {
+          if (confirmarLimpeza) { limparConversaTutor(); setMensagemId(null); setPagina(0); }
+          setConfirmarLimpeza(!confirmarLimpeza);
+        }} />}
+      <Text3D position={[0, -0.478, 0.025]} size={0.021} maxWidth={0.92} color="#aebecd">
+        Ferramenta de estudo. Não substitui avaliação clínica.
+      </Text3D>
+    </>}
+  </PainelXRBase>;
 }
