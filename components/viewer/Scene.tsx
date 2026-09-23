@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, events, useFrame, useThree } from "@react-three/fiber";
+import { ordenarAlvosPaineis } from "@/lib/janelas-estudo-xr";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { XR, XROrigin, createXRStore, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
@@ -368,6 +369,7 @@ export function Scene() {
   return (
     <>
     <Canvas
+      events={(state) => ({ ...events(state), filter: (itens) => ordenarAlvosPaineis(itens) })}
       // Sombras (PCSS + mapa 2048²) são caras demais para o Quest.
       shadows={inXR ? false : "percentage"}
       dpr={inXR ? 1 : altaQualidade ? 2 : [1, 2]}

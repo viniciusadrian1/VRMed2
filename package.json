@@ -18,7 +18,7 @@
     "verify:retaguarda": "node --experimental-strip-types scripts/verificar-retaguarda.ts",
     "verify:tutor": "node --experimental-strip-types scripts/verificar-tutor-3d.ts",
     "verify:perguntas": "node --experimental-strip-types scripts/verificar-perguntas-duelo.ts",
-    "verify:paineis-xr": "node --experimental-strip-types scripts/verificar-paineis-estudo-xr.ts",
+    "verify:paineis-xr": "node --experimental-strip-types scripts/verificar-paineis-estudo-xr.ts && node --experimental-strip-types scripts/verificar-janelas-estudo-xr.ts",
     "verify:duelo-http": "node --experimental-strip-types scripts/verificar-duelo-http.ts",
     "verify:core": "npm run verify:xr && npm run verify:duelo && npm run verify:audio && npm run verify:apresentacao && npm run verify:botoes-xr && npm run verify:escola && npm run verify:retaguarda && npm run verify:tutor && npm run verify:perguntas && npm run verify:paineis-xr"
   },

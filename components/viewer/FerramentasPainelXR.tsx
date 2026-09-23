@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Text3D } from "@/components/arena/ui3d";
+import { TextoPainelXR as Text3D, SuperficieXR, OpacidadeXR, CaixaSelecaoXR, useTemaPainelXR } from "./EstiloPainelXR";
+import { useJanelasEstudoXR } from "@/lib/janelas-estudo-xr";
 import { useVRMedStore } from "@/lib/store";
 import { getOrganById } from "@/lib/organs";
 import { CORES_XR, limitar, paginasXR, PAINEIS_XR } from "@/lib/painel-estudo-xr";
@@ -13,32 +14,35 @@ const ABAS = ["Camadas", "Cortes", "Notas", "Áudio"] as const;
 const SEM_NOTAS: Annotation[] = [];
 
 function CamadasXR() {
-  const layers = useVRMedStore((s) => s.layers);
-  const xray = useVRMedStore((s) => s.xray);
-  const [pagina, setPagina] = useState(0);
-  const [selecionada, setSelecionada] = useState<string | null>(null);
-  const total = Math.max(1, Math.ceil(layers.length / PAINEIS_XR.camadasPorPagina));
-  const atual = Math.min(pagina, total - 1);
+  const layers = useVRMedStore((s) => s.layers), xray = useVRMedStore((s) => s.xray), tema = useTemaPainelXR();
+  const [pagina, setPagina] = useState(0), [colorindo, setColorindo] = useState<string | null>(null);
+  const total = Math.max(1, Math.ceil(layers.length / PAINEIS_XR.camadasPorPagina)), atual = Math.min(pagina, total - 1);
   const fatia = layers.slice(atual * PAINEIS_XR.camadasPorPagina, (atual + 1) * PAINEIS_XR.camadasPorPagina);
-  const camada = fatia.find((l) => l.name === selecionada) ?? fatia[0];
-  const loja = useVRMedStore.getState;
+  const camada = layers.find((l) => l.name === colorindo), loja = useVRMedStore.getState;
+  const profundidades = { external: "EXTERNA", intermediate: "INTERMEDIÁRIA", internal: "INTERNA" };
   return <group>
-    <BotaoXR label={xray ? "Raio-X: ligado" : "Raio-X"} x={-0.32} y={0.27} largura={0.29} ativo={xray} onClick={() => loja().applyXray(!xray)} />
-    <BotaoXR label="Mostrar tudo" y={0.27} largura={0.30} onClick={() => loja().showAllLayers()} />
-    <BotaoXR label="Isolar seleção" x={0.32} y={0.27} largura={0.29} desabilitado={!camada} onClick={() => camada && loja().isolateLayer(camada.name)} />
-    {fatia.map((layer, i) => <group key={layer.name}>
-      <BotaoXR label={layer.label} x={-0.105} y={0.17 - i * 0.095} largura={0.72} ativo={camada?.name === layer.name} onClick={() => setSelecionada(layer.name)} />
-      <BotaoXR label={layer.visible ? "Visível" : "Oculta"} x={0.38} y={0.17 - i * 0.095} largura={0.2} ativo={layer.visible} onClick={() => loja().setLayerVisibility(layer.name, !layer.visible)} />
-    </group>)}
+    <SuperficieXR largura={0.97} altura={0.085} y={0.267} cor={tema.muted} />
+    <CaixaSelecaoXR x={-0.425} y={0.267} ativo={xray} onClick={() => loja().applyXray(!xray)} />
+    <Text3D position={[-0.369, 0.267, 0.025]} anchorX="left" size={0.025}>Modo raio-X</Text3D>
+    <BotaoXR label="Mostrar tudo" x={0.29} y={0.267} largura={0.33} variante="ghost" onClick={() => loja().showAllLayers()} />
+    {fatia.map((layer, i) => {
+      const y = 0.11 - i * 0.195;
+      return <group key={layer.name}>
+        <SuperficieXR largura={0.97} altura={0.177} y={y} borda />
+        <CaixaSelecaoXR x={-0.425} y={y + 0.034} ativo={layer.visible} onClick={() => loja().setLayerVisibility(layer.name, !layer.visible)} />
+        <Text3D position={[-0.365, y + 0.043, 0.025]} size={0.025} maxWidth={0.62} anchorX="left">{layer.label.length > 38 ? layer.label.slice(0, 35) + "..." : layer.label}</Text3D>
+        <Text3D position={[-0.365, y + 0.008, 0.025]} size={0.017} color="muted" anchorX="left">{profundidades[layer.depth]}</Text3D>
+        <BotaoXR label="Isolar" x={0.395} y={y + 0.035} largura={0.142} tamanho={0.022} variante="ghost" onClick={() => loja().isolateLayer(layer.name)} />
+        <OpacidadeXR x={-0.13} y={y - 0.049} largura={0.60} valor={layer.opacity} aoMudar={(v) => loja().setLayerOpacity(layer.name, v)} />
+        <Text3D position={[0.241, y - 0.049, 0.03]} size={0.022} color="muted">{Math.round(layer.opacity * 100) + "%"}</Text3D>
+        <BotaoXR label="Cor" x={0.395} y={y - 0.049} largura={0.142} tamanho={0.022} ativo={colorindo === layer.name} onClick={() => setColorindo(colorindo === layer.name ? null : layer.name)} />
+      </group>;
+    })}
     {!layers.length && <Text3D position={[0, 0.08, 0.025]} size={0.027} maxWidth={0.9}>Aguardando as camadas do modelo.</Text3D>}
-    <PaginacaoXR pagina={atual} total={total} aoMudar={setPagina} y={-0.13} />
-    {camada && <>
-      <Text3D position={[0, -0.22, 0.025]} size={0.024} maxWidth={0.92}>{camada.label}</Text3D>
-      <BotaoXR label="Menos opaca" x={-0.31} y={-0.31} largura={0.29} desabilitado={camada.opacity === 0} onClick={() => loja().setLayerOpacity(camada.name, limitar(camada.opacity - 0.1, 0, 1))} />
-      <Text3D position={[0, -0.31, 0.025]} size={0.027}>{`${Math.round(camada.opacity * 100)}%`}</Text3D>
-      <BotaoXR label="Mais opaca" x={0.31} y={-0.31} largura={0.29} desabilitado={camada.opacity === 1} onClick={() => loja().setLayerOpacity(camada.name, limitar(camada.opacity + 0.1, 0, 1))} />
+    {camada && <group>
       {CORES_XR.map((c, i) => <BotaoXR key={c.nome} label={c.nome} x={(i - 2) * 0.19} y={-0.42} largura={0.174} ativo={camada.color === c.cor} onClick={() => loja().setLayerColor(camada.name, c.cor)} />)}
-    </>}
+    </group>}
+    <PaginacaoXR pagina={atual} total={total} aoMudar={(p) => { setPagina(p); setColorindo(null); }} y={-0.507} />
   </group>;
 }
 
@@ -95,7 +99,7 @@ function NotasXR({ organId, aoEditar }: { organId: string | null; aoEditar: (ati
   }} />;
   return <group>
     <BotaoXR label={criando ? "Cancelar marcação" : "Nova nota no órgão"} y={0.265} largura={0.8} ativo={criando} desabilitado={!organId || abertura > 0.001} onClick={() => { loja().setAnnotationMode(!criando); setId(null); setPagina(0); setExcluir(false); }} />
-    <Text3D position={[0, 0.18, 0.025]} size={0.023} maxWidth={0.92} color="#a7d4df">
+    <Text3D position={[0, 0.18, 0.025]} size={0.023} maxWidth={0.92} color="muted">
       {abertura > 0.001 ? "Feche os ossos para marcar ou localizar notas." : criando ? "Aponte para o órgão e pressione o gatilho." : nota ? `Nota ${indice + 1} de ${notas.length} · salva neste modelo` : "Suas notas também aparecem na tela"}
     </Text3D>
     <Text3D position={[0, 0.115, 0.025]} anchorY="top" size={0.027} maxWidth={0.92}>{texto[Math.min(pagina, texto.length - 1)]}</Text3D>
@@ -130,7 +134,7 @@ function AudioXR() {
     <BotaoXR label="Mais lenta" x={-0.31} y={-0.12} largura={0.29} desabilitado={rate === 0.5} onClick={() => velocidadeNarracao(rate - 0.25)} />
     <Text3D position={[0, -0.12, 0.025]} size={0.025}>{`${rate.toFixed(2)}×`}</Text3D>
     <BotaoXR label="Mais rápida" x={0.31} y={-0.12} largura={0.29} desabilitado={rate === 2} onClick={() => velocidadeNarracao(rate + 0.25)} />
-    <Text3D position={[0, -0.245, 0.025]} size={0.024} maxWidth={0.92} color={erro ? "#ffb4a4" : "#a7d4df"}>
+    <Text3D position={[0, -0.245, 0.025]} size={0.024} maxWidth={0.92} color={erro ? "danger" : "muted"}>
       {erro ? "Áudio indisponível neste navegador. A descrição continua disponível para leitura." : "A velocidade da voz vale na próxima reprodução. Use Parar e Ouvir para reiniciar."}
     </Text3D>
     <PaginacaoXR pagina={Math.min(pagina, paginas.length - 1)} total={paginas.length} aoMudar={setPagina} y={-0.42} />
@@ -143,14 +147,16 @@ export function FerramentasPainelXR() {
 }
 
 function ConteudoFerramentasXR({ organId }: { organId: string | null }) {
-  const [aberto, setAberto] = useState(true);
+  const aberto = useJanelasEstudoXR((s) => s.abertas.ferramentas);
+  const tema = useTemaPainelXR();
   const [aba, setAba] = useState<typeof ABAS[number]>("Camadas");
   const [editando, setEditando] = useState(false);
   return <PainelXRBase titulo="Ferramentas do modelo" aberto={aberto} aoAlternar={() => {
-    setAberto(!aberto); setEditando(false); useVRMedStore.getState().setAnnotationMode(false);
+    useJanelasEstudoXR.getState().abrir("ferramentas", !aberto); useVRMedStore.getState().setAnnotationMode(false);
   }}>
     <group key={organId ?? "sem-modelo"}>
-      {!editando && ABAS.map((nome, i) => <BotaoXR key={nome} label={nome} x={(i - 1.5) * 0.245} y={0.375} largura={0.225} ativo={aba === nome} onClick={() => { setAba(nome); useVRMedStore.getState().setAnnotationMode(false); }} />)}
+      {!editando && <SuperficieXR largura={0.985} altura={0.085} y={0.365} cor={tema.muted} />}
+      {!editando && ABAS.map((nome, i) => <BotaoXR key={nome} label={nome} x={(i - 1.5) * 0.245} y={0.365} largura={0.235} variante="tab" ativo={aba === nome} onClick={() => { setAba(nome); useVRMedStore.getState().setAnnotationMode(false); }} />)}
       {aba === "Camadas" && <CamadasXR />}
       {aba === "Cortes" && <CortesXR />}
       {aba === "Notas" && <NotasXR organId={organId} aoEditar={setEditando} />}

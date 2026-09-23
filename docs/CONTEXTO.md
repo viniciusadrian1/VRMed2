@@ -526,3 +526,22 @@ limites e roteiro em `docs/PAINEIS-ESTUDO-XR.md`. A automação do navegador fic
 indisponível por falha de ACL do sandbox; **não houve captura visual neste incremento**.
 Homologação física do Quest, legibilidade, hand tracking e desempenho pendentes.
 Commit e envio à `master` autorizados pelo usuário para teste físico no Quest.
+
+### Atualização — identidade e manipulação dos painéis XR (23/09/2026)
+
+Revisão local sobre `ddc9dd2`, após o usuário testar a primeira versão no Quest.
+Ferramentas e tutor agora reutilizam a paleta claro/escuro e a fonte do site, com
+abas, cartões, sliders de opacidade e balões de conversa. Cada janela pode ser
+arrastada pela barra superior, escalada (65–155%), aproximada/afastada, minimizada
+e reaberta. Minimizar preserva rascunhos/abas e não cancela a resposta da IA.
+
+Dock fixo reabre as telas; B/Y recupera posição e tamanho sem mover câmera/órgão.
+Prioridade visual acompanha a prioridade dos raios, inclusive em sobreposição.
+Novos testes de matemática, captura e tema em `scripts/verificar-janelas-estudo-xr.ts`
+integram `verify:paineis-xr`. Detalhes e roteiro em `docs/PAINEIS-ESTUDO-XR.md`.
+
+Sem novas dependências ou mudanças de API/modelo. A automação visual continuou
+bloqueada pela falha de ACL: **acabamento visual, conforto e desempenho no Quest
+ainda precisam de homologação física**. Commit local desta revisão autorizado pelo
+usuário; publicação não solicitada. A autorização anterior de envio se referia à
+implementação inicial.

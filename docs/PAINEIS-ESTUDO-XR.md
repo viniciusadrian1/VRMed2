@@ -1,7 +1,8 @@
 # Ferramentas e tutor dentro de AR/VR
 
-Implementação: 23/09/2026. Base: `37a1002`.
-Commit e envio à `master` autorizados pelo usuário para teste físico no Quest.
+Implementação inicial: 23/09/2026, publicada em `ddc9dd2` após autorização.
+Revisão de identidade e manipulação: 23/09/2026. Commit local autorizado pelo usuário;
+publicação não solicitada nesta revisão.
 
 ## O que mudou
 
@@ -10,7 +11,7 @@ O visualizador monta dois painéis de geometria 3D nas sessões `immersive-ar` e
 O órgão permanece no centro; ferramentas à esquerda e tutor à direita.
 
 - **Camadas:** três itens por página, seleção, visibilidade, isolamento, raio-X,
-  mostrar todas, opacidade em passos de 10% e cinco opções de cor (incluindo original).
+  mostrar todas, barra de opacidade de 0–100% e cinco opções de cor (incluindo original).
 - **Cortes:** planos axial, sagital e coronal, posição em passos de 0,1, inversão,
   remoção de cortes e wireframe. Modelos com abertura também oferecem abrir/fechar.
 - **Notas:** marcar um ponto com o gatilho, editar texto pelo teclado, percorrer
@@ -33,7 +34,8 @@ Painéis de 1,04 × 1,12 m; centros a ±0,95 m lateralmente e 1,12 m à frente,
 inclinados em 0,55 rad. A altura acompanha a pose real dos olhos na entrada,
 0,12 m abaixo deles, tanto sentado quanto em pé. Depois ficam **fixos no mundo**.
 
-**B/Y** ou **Reposicionar painéis** trazem a interface à frente do olhar atual.
+**B/Y** ou **Reposicionar painéis** restauram tamanho/posição e trazem a interface
+à frente do olhar atual. Mantêm a escolha de quais janelas estão minimizadas.
 Nenhuma dessas ações move a câmera ou o órgão. A/X continuam reposicionando o órgão.
 O botão de sair permanece montado durante toda a vida da cena e é ancorado abaixo
 dos painéis, junto ao reposicionamento; não disputa as abas quando o aluno se senta.
@@ -52,7 +54,7 @@ São recortes de superfície, **não** uma reconstrução de tecido interno ou u
 `tutor-conversa.ts` é o serviço compartilhado entre chat DOM e XR: um pedido por vez.
 Cancelar/trocar de órgão remove placeholder vazio, preserva texto parcial e impede
 respostas/comandos atrasados. Fechar só o chat DOM não interrompe o texto lido no XR;
-recolher o tutor 3D enquanto ele responde cancela o pedido. Sair da página encerra-o.
+minimizar o tutor 3D preserva a resposta em andamento. Parar resposta ou sair da página encerra-a.
 Entrar/sair da sessão sem sair da página mantém histórico e reprodutor.
 
 `narracao-estudo.ts` mantém um único áudio. Fechar/trocar a aba não o interrompe;
@@ -130,3 +132,77 @@ ao entrar em AR/VR, sem parâmetro.
    Não deve restar pedido preso, voz atrasada ou foco no órgão anterior.
 10. Testar hand tracking: pinça nos botões não arrasta o modelo; soltar e pinçar
     fora da UI permite manipular novamente. Medir fluidez com teclado aberto.
+
+## Revisão — identidade do site e janelas manipuláveis
+
+Atende ao retorno do usuário após o primeiro teste no Quest. Não altera o Duelo,
+modelos anatômicos, credenciais, chamadas da IA ou regras de sessão.
+
+### Visual
+
+- Mesmos tokens claro/escuro de `app/globals.css`, acompanhando o tema do site.
+  Teste automático impede divergência dessas cores. Fonte Inter local, sem contorno.
+- Ferramentas: cabeçalho, trilho de abas, cartões com borda, seleção, profundidade,
+  isolamento e slider de opacidade por camada. Cores continuam em cinco opções.
+- Tutor: cabeçalho, guia 3D, pergunta em balão azul à direita, resposta à esquerda,
+  histórico, campo de pergunta e teclado. A pergunta longa acima da resposta é um
+  resumo; o texto completo permanece acessível pelo histórico paginado.
+- O layout é adaptado ao laser: três camadas por página, alvos maiores e leitura
+  paginada. Não é um DOM capturado nem uma promessa de igualdade pixel a pixel.
+  Cortes, notas, áudio e todas as ações anteriores continuam disponíveis.
+
+### Controles
+
+1. **Mover:** apontar para a barra superior, segurar o gatilho, deslocar o controle
+   e soltar. A captura mantém o arraste mesmo saindo da barra; só o ponteiro que
+   começou o gesto pode movê-la. Ao soltar, a janela se orienta para o usuário.
+2. **Tamanho:** −/+ na barra inferior; escala limitada a 65–155%.
+3. **Distância:** Mais perto / Mais longe, em passos de 15 cm.
+4. **Minimizar:** − no cabeçalho. A janela vira uma faixa reabrível, preservando
+   aba, rascunho, edição e resposta. Não desmonta o conteúdo.
+5. **Reabrir:** faixa da janela ou botões fixos Ferramentas / Tutor de IA.
+6. **Recuperar:** Restaurar na janela retorna só ela ao padrão; B/Y ou Reposicionar
+   recuperam ambas à frente do olhar. Câmera e órgão nunca são movidos.
+
+O centro da janela fica entre ±2,2 m na horizontal, −0,65/+0,75 m na vertical e
+0,55–2,4 m à frente da âncora de entrada/recentragem. Pose e escala são independentes
+por janela e reiniciam numa nova sessão, sem gravar coordenadas físicas em localStorage.
+O dock de recuperação tem prioridade sobre as janelas mesmo quando sobreposto.
+
+Ordem visual e de interação acompanham a janela ativa. Painéis minimizados não
+interceptam raios nem mouse invisivelmente; vãos dos painéis abertos continuam
+bloqueando o órgão atrás. Pausa/desconexão, perda de captura e reset liberam gestos.
+Som e háptica de confirmação preservados. DPR 1 em XR e ausência de novas luzes,
+sombras ou pós-processamento preservados.
+
+### Arquivos desta revisão
+
+- `EstiloPainelXR.tsx`, `ContextoJanelaXR.tsx`, `JanelaMovelXR.tsx`: primitivas
+  de estudo, contexto por janela e manipulação; todos em `components/viewer/`.
+- `PainelXRBase.tsx`, `PaineisEstudoXR.tsx`, `FerramentasPainelXR.tsx`,
+  `TutorPainelVR.tsx`, `Scene.tsx`: integração sem alterar os componentes DOM.
+- `lib/tema-paineis-xr.ts`, `lib/janelas-estudo-xr.ts`: tokens, estado e matemática.
+- `scripts/verificar-janelas-estudo-xr.ts` e `package.json`: novos testes dentro
+  de `verify:paineis-xr`, que já integra `verify:core`.
+
+### Evidências e limites desta revisão
+
+Validação final local: `npm run typecheck`, `npm run lint`, `npm run build`,
+`npm run verify:core` (incluindo os dois scripts de painéis) e `git diff --check`
+passaram. Nenhuma publicação foi executada nesta revisão.
+
+Testes determinísticos usam o raio real da biblioteca instalada: pegada sem salto,
+arraste capturado com origens esquerda/direita, pai rotacionado/deslocado/escalado,
+soltura, opacidade, limites, sobreposição, ocultação, reabertura e tokens dos dois temas.
+Testes dos serviços continuam com HTTP/voz simulados, sem chamadas OpenAI.
+
+A skill Computer Use foi usada para tentar inspecionar o site, mas o navegador
+falhou na inicialização (ACL do sandbox), inclusive após reset. Referências visuais:
+print fornecido pelo usuário e componentes/tokens reais do site. **Sem nova captura
+visual, medição de FPS/draw calls ou homologação física.** Isso não bloqueou a edição.
+
+Antes de aprovar para evento: repetir o roteiro acima em VR e AR no Quest; arrastar
+cada janela para ambos os lados, testar escala mínima/máxima, sobrepor e alternar foco,
+minimizar durante edição/resposta, reabrir pelo dock e recuperar com B/Y após caminhar.
+Testar desconexão/pausa no meio do gesto e verificar que soltar não aciona outro botão.
+Comparar tema claro/escuro com o site e medir fluidez com o teclado aberto.
