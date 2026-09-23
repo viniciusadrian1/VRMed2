@@ -7,6 +7,7 @@ from mathutils import Vector
 
 RAIZ = Path(__file__).resolve().parents[1]
 DESTINO = RAIZ / 'public/models/props/escola-medicina.glb'
+LAYOUT = json.loads((RAIZ / 'lib/escola-layout.json').read_text(encoding='utf-8'))
 anterior = bpy.context.window.scene
 cena = bpy.data.scenes.new('VRmed_Escola_Medicina')
 
@@ -72,15 +73,19 @@ def livro(x,y,z,w=.12,cor=ambar):
     caixa('Lombada do atlas', (x,y,z+.103),(w*.75,.016,.012),marfim,.002)
 
 def mesa(x,z):
-    caixa('Tampo de estudo',(x,.76,z),(1.4,.07,.64),madeira,.025)
+    caixa('Tampo de estudo',(x,.76,z),(LAYOUT['mesaLargura'],.07,LAYOUT['mesaProfundidade']),madeira,.025)
     for dx in (-.59,.59):
         for dz in (-.23,.23): tubo('Pé tubular',(x+dx,.04,z+dz),(x+dx,.73,z+dz),.022,metal)
     caixa('Caderno',(x-.25,.806,z),(.27,.023,.22),marfim,.005)
-    caixa('Assento',(x,.43,z+.62),(.42,.07,.41),tecido,.045)
-    caixa('Encosto',(x,.74,z+.79),(.43,.47,.065),tecido,.04)
-    for dx in (-.16,.16):
-        tubo('Estrutura da cadeira',(x+dx,.04,z+.48),(x+dx,.93,z+.80),.017,metal)
-        tubo('Pé da cadeira',(x+dx,.04,z+.83),(x+dx,.43,z+.64),.017,metal)
+
+def posto(x, cor):
+    # Demarcação rente ao piso, não um degrau; centro livre para ficar em pé.
+    z = LAYOUT['postoZ']
+    for dx in (-.38,.38):
+        for dz in (-.38,.38):
+            caixa('Demarcação do posto',(x+dx,.007,z+dz),(.18,.003,.018),cor,0)
+            caixa('Demarcação do posto',(x+dx,.007,z+dz),(.018,.003,.18),cor,0)
+    mesa(x,z-LAYOUT['mesaRecuo'])
 
 try:
     bpy.context.window.scene=cena
@@ -160,8 +165,9 @@ try:
             caixa('Prateleira',(x,y,-3.32),(.37,.025,.36),marfim)
             for i in range(3): livro(x-.12+i*.12,y+.145,-3.29,.075,ambar if i%2 else tecido)
     texto('ATLAS / ESTUDO',(-2.4,2.20,-3.26),.075)
-    # Mesas de alunos no fundo e porta: contexto de aula, não um segundo hospital.
-    mesa(-1.65,2.35); mesa(1.15,2.35)
+    # Dois competidores lado a lado; carteiras à frente, sem cadeiras nos corpos.
+    posto(LAYOUT['adversarioX'], ambar)
+    posto(LAYOUT['jogadorX'], luz)
     caixa('Marco porta',(0,1.10,3.79),(1.25,2.2,.10),madeira)
     caixa('Porta',(0,1.08,3.71),(1.10,2.09,.065),tecido)
     caixa('Visor porta',(0,1.65,3.665),(.38,.50,.02),luz)

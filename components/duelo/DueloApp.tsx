@@ -20,6 +20,7 @@ import { ProvedorArena } from "./EstadoArena";
 import { IluminacaoArena } from "./ArenaMedica";
 import { AmbienteEscola, IluminacaoEscola } from "./AmbienteEscola";
 import { MedidorDuelo } from "./MedidorDuelo";
+import { posicaoCompetidorEscola } from "@/lib/escola-apresentacao";
 
 const FLOOR_Y = -1.3;
 
@@ -69,10 +70,9 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
 
   return (
     <>
-      {/* Escola: origem no piso, exatamente sob o assento da direita — quem fica de pé
-          vê por cima da mesa. Hospital: de pé atrás da sua mesa de instrumentos. */}
-      <XROrigin position={escola ? [0.28, FLOOR_Y, 0.99] : [0, FLOOR_Y, 2.55]}>
-        <SairDoVR position={[-0.45, escola ? 0.95 : 1.25, -0.5]} />
+      {/* Dois postos em pé, sem assentos. A altura dos olhos vem do headset. */}
+      <XROrigin position={escola ? posicaoCompetidorEscola("jogador") : [0, FLOOR_Y, 2.55]}>
+        <SairDoVR position={[-0.45, 1.25, -0.5]} />
       </XROrigin>
 
       {escola ? <IluminacaoEscola /> : <IluminacaoArena />}

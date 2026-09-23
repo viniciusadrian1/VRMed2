@@ -1,0 +1,9 @@
+{
+  "piso": -1.3,
+  "jogadorX": 0.28,
+  "adversarioX": -1.42,
+  "postoZ": 0.99,
+  "mesaRecuo": 0.85,
+  "mesaLargura": 1.4,
+  "mesaProfundidade": 0.64
+}

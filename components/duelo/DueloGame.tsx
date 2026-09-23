@@ -34,7 +34,7 @@ import { ORGANS } from "@/lib/organs";
 import { PublicarEstadoArena } from "./EstadoArena";
 import { CONSOLE_POS, CONSOLE_ROT, LETREIRO_POS } from "./ArenaMedica";
 import { BotaoLousa } from "./BotaoLousa";
-import { ESCOLA } from "@/lib/escola-apresentacao";
+import { ESCOLA, posicaoCompetidorEscola, ROTACAO_ADVERSARIO_ESCOLA } from "@/lib/escola-apresentacao";
 import {
   desbloquearAudio,
   playEnd,
@@ -1342,8 +1342,8 @@ export function DueloGame({
         humor={humorBot}
         nome={nomeOponente}
         tipo={dificuldade}
-        position={[-1.95, -1.3, -2.6]}
-        rotationY={0.22}
+        position={posicaoCompetidorEscola("adversario")}
+        rotationY={ROTACAO_ADVERSARIO_ESCOLA}
       />
     )
   ) : null;

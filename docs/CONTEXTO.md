@@ -14,6 +14,13 @@ e aparece no menu/fim, nunca concorrendo com o órgão da rodada. O XR mantém D
 Relatório, orçamento, testes e limitações em
 `docs/ESCOLA-MEDICINA-2026-09-23.md`. Teste físico no Quest continua pendente.
 
+Após o teste do usuário no Quest, as duas cadeiras foram removidas do GLB e as
+carteiras aproximadas da lousa. Há dois postos em pé, jogador à direita e médico/
+adversário à esquerda. `lib/escola-layout.json` compartilha as medidas entre o
+Blender, a origem XR e o avatar. A origem do jogador e a distância da lousa não
+mudaram. `verify:escola` verifica os triângulos exportados para garantir volume
+livre em cada posto; este novo posicionamento ainda precisa do reteste no Quest.
+
 ## Polimento contínuo do Duelo (2026-09-18)
 
 O passe de acabamento do `/duelo` começou pela sensação de jogo sem alterar as

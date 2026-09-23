@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createRayPointer } from "@pmndrs/pointer-events";
-import { ESCOLA, mostrarEsqueleto3D } from "../lib/escola-apresentacao.ts";
+import { ESCOLA, mostrarEsqueleto3D, posicaoCompetidorEscola, ROTACAO_ADVERSARIO_ESCOLA } from "../lib/escola-apresentacao.ts";
 import { deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "../lib/botao3d-interacao.ts";
 
 const jogo = readFileSync("components/duelo/DueloGame.tsx", "utf8");
@@ -35,7 +36,8 @@ const alvos = Array.from({ length: 4 }, (_, i) => {
   quadro.add(alvo); return alvo;
 });
 const controles = [-.2, .2].map((x) => {
-  const espaco = new THREE.Object3D(); espaco.position.set(x, .05, 2.5); cena.add(espaco);
+  const espaco = new THREE.Object3D();
+  espaco.position.set(ESCOLA.jogadorX + x, ESCOLA.piso + 1.25, ESCOLA.postoZ - .1); cena.add(espaco);
   return { espaco, ponteiro: createRayPointer(() => camera, { current: espaco }, {}) };
 });
 let tempo = 1000;
@@ -90,10 +92,42 @@ const escola = glb("escola-medicina");
 assert.equal(escola.json.meshes.length, 10);
 assert.ok(escola.triangulos < 25000 && escola.dados.length < 2_000_000);
 assert.equal(escola.json.images?.length ?? 0, 0);
+
+// O gerador e o runtime compartilham os postos, sem mudar a distância da lousa.
+const app = readFileSync("components/duelo/DueloApp.tsx", "utf8");
+const gerador = readFileSync("scripts/criar-escola-medicina.py", "utf8");
+assert.ok(app.includes('posicaoCompetidorEscola("jogador")'));
+assert.ok(jogo.includes('position={posicaoCompetidorEscola("adversario")}'));
+assert.ok(gerador.includes("lib/escola-layout.json"));
+assert.ok(!/caixa\('(Assento|Encosto)'|tubo\('(Estrutura|Pé) da cadeira'/.test(gerador));
+assert.deepEqual(posicaoCompetidorEscola("jogador"), [.28, -1.3, .99]);
+assert.ok(ESCOLA.jogadorX - ESCOLA.adversarioX >= 1.5, "postos separados lateralmente");
+assert.ok(ESCOLA.mesaRecuo - ESCOLA.mesaProfundidade / 2 > .45, "mesa não atravessa o corpo");
+const direcao = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), ROTACAO_ADVERSARIO_ESCOLA);
+assert.ok(direcao.dot(new THREE.Vector3(ESCOLA.lousaX - ESCOLA.adversarioX, 0, ESCOLA.lousaZ - ESCOLA.postoZ).normalize()) > .999);
+
+// Verifica triângulos do GLB exportado, não só nomes (as malhas são agrupadas).
+const sala = await new GLTFLoader().parseAsync(Uint8Array.from(escola.dados).buffer, "");
+sala.scene.position.y = ESCOLA.piso;
+sala.scene.updateMatrixWorld(true);
+for (const lado of ["jogador", "adversario"] as const) {
+  const [x, y, z] = posicaoCompetidorEscola(lado);
+  const livre = new THREE.Box3(new THREE.Vector3(x - .3, y + .05, z - .3), new THREE.Vector3(x + .3, y + 2.05, z + .3));
+  const tri = new THREE.Triangle();
+  sala.scene.traverse((obj) => {
+    if (!(obj instanceof THREE.Mesh)) return;
+    const vertices = obj.geometry.getAttribute("position");
+    const indices = obj.geometry.getIndex();
+    for (let i = 0; i < (indices?.count ?? vertices.count); i += 3) {
+      [tri.a, tri.b, tri.c].forEach((p, j) => p.fromBufferAttribute(vertices, indices?.getX(i + j) ?? i + j).applyMatrix4(obj.matrixWorld));
+      assert.ok(!livre.intersectsTriangle(tri), `${lado}: cenário invade o volume livre do corpo (${obj.name})`);
+    }
+  });
+}
 const osso = glb("esqueleto-estudo");
 assert.equal(osso.triangulos, 158090, "ossos/dentes preservados, sem simplificação");
 assert.equal(osso.json.meshes.length, 3);
 assert.ok(osso.json.extensionsUsed.includes("KHR_draco_mesh_compression"));
 const png = readFileSync("public/models/props/esqueleto-prancha.png");
 assert.equal(png.readUInt32BE(16), 512); assert.equal(png.readUInt32BE(20), 1024);
-console.log("ok: Escola — botões compartilhados, dois raios, bordas/intervalos, gatilho longo, fonte háptica, vitrine e orçamento");
+console.log("ok: Escola — dois postos livres, GLB sem invasão dos corpos, botões, dois raios, bordas/intervalos, gatilho longo, vitrine e orçamento");
