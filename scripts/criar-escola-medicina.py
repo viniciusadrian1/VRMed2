@@ -33,7 +33,8 @@ latao = material('Latao', (.38,.26,.10), .4, .55)
 luz = material('Luz', (.7,.82,.79), .8, 0, .35)
 tecido = material('Tecido', (.074,.13,.11), .98)
 ambar = material('Identidade', (.66,.39,.14), .62)
-materiais = [parede, marfim, madeira, escuro, verde, metal, latao, luz, tecido, ambar]
+azul = material('Orientacao', (.08,.38,.47), .62)
+materiais = [parede, marfim, madeira, escuro, verde, metal, latao, luz, tecido, ambar, azul]
 
 def p(v): return Vector((v[0], -v[2], v[1]))
 
@@ -76,7 +77,14 @@ def mesa(x,z):
     caixa('Tampo de estudo',(x,.76,z),(LAYOUT['mesaLargura'],.07,LAYOUT['mesaProfundidade']),madeira,.025)
     for dx in (-.59,.59):
         for dz in (-.23,.23): tubo('Pé tubular',(x+dx,.04,z+dz),(x+dx,.73,z+dz),.022,metal)
-    caixa('Caderno',(x-.25,.806,z),(.27,.023,.22),marfim,.005)
+    caixa('Área de trabalho',(x,.798,z),(1.25,.008,.48),tecido,.012)
+    caixa('Prancheta',(x-.43,.811,z-.10),(.28,.018,.24),madeira,.007)
+    caixa('Ficha de estudo',(x-.43,.822,z-.10),(.24,.003,.20),marfim,.001)
+    caixa('Clipe da ficha',(x-.43,.827,z-.19),(.08,.012,.025),metal,.003)
+    for dz in (-.14,-.09,-.04):
+        caixa('Linha da ficha',(x-.43,.825,z+dz),(.16,.002,.004),parede,0)
+    tubo('Lápis de estudo',(x-.23,.822,z-.18),(x-.23,.822,z+.01),.007,ambar,8)
+    caixa('Faixa da estação',(x,.715,z+.327),(1.18,.034,.012),azul if x==LAYOUT['jogadorX'] else ambar,.003)
 
 def posto(x, cor):
     # Demarcação rente ao piso, não um degrau; centro livre para ficar em pé.
@@ -93,6 +101,9 @@ try:
     caixa('Piso', (0,-.045,0), (7.2,.09,8), marfim)
     for x in range(-3,4): caixa('Junta piso',(x,.002,0),(.008,.004,8),parede,0)
     for z in range(-3,4): caixa('Junta piso',(0,.002,z),(7.2,.004,.008),parede,0)
+    # Zona de competição rente ao piso: referência espacial, nunca um degrau.
+    meio=(LAYOUT['jogadorX']+LAYOUT['adversarioX'])/2
+    caixa('Zona dos postos',(meio,.004,.63),(3.45,.003,1.65),tecido,0)
     for z in (-3.92,3.92):
         caixa('Parede transversal',(0,1.6,z),(7.2,3.2,.12),parede)
         caixa('Rodapé',(0,.10,z+(.075 if z<0 else -.075)),(7.2,.20,.045),escuro)
@@ -125,7 +136,7 @@ try:
     caixa('Apagador',(.85,.69,-1.00),(.17,.035,.055),tecido)
     for x in (-.10,-.03,.04): tubo('Giz',(x,.68,-1.04),(x+.045,.68,-1.04),.008,marfim,8)
     caixa('Cabeçalho do desafio',(.36,1.80,-1.30),(1.5,.19,.08),verde)
-    texto('DESAFIO DE ANATOMIA',(.36,1.81,-1.252),.058)
+    texto('RESPONDA NA LOUSA',(.36,1.81,-1.252),.070)
     # Bancada anatômica independente, ao lado da lousa.
     caixa('Rodapé bancada',(-.78,.08,-.95),(.82,.16,.63),escuro,.035)
     caixa('Bancada de demonstração',(-.78,.43,-.95),(.90,.70,.65),madeira,.04)
@@ -158,7 +169,22 @@ try:
         tubo('Cabeça microscópio',(2.68,1.38,z-.16),(2.53,1.48,z+.015),.045,escuro)
         tubo('Ocular',(2.53,1.48,z+.015),(2.49,1.53,z+.065),.028,metal)
         caixa('Platina microscópio',(2.56,1.15,z),(.22,.022,.18),metal,.004)
-        tubo('Objetiva',(2.57,1.34,z),(2.57,1.23,z),.022,metal)
+        tubo('Revólver das objetivas',(2.57,1.34,z),(2.57,1.29,z),.072,escuro)
+        for dx,dz in ((-.043,0),(.022,-.037),(.022,.037)):
+            tubo('Objetiva',(2.57+dx,1.29,z+dz),(2.57+dx,1.22,z+dz),.016,metal)
+            tubo('Anel da objetiva',(2.57+dx,1.24,z+dz),(2.57+dx,1.225,z+dz),.018,latao)
+        tubo('Ajuste de foco',(2.67,1.19,z-.13),(2.79,1.19,z-.13),.051,escuro)
+        tubo('Botão de foco',(2.79,1.19,z-.13),(2.82,1.19,z-.13),.025,metal)
+        caixa('Lâmina de estudo',(2.56,1.165,z),(.14,.005,.07),azul,.002)
+        caixa('Iluminador',(2.56,1.05,z),(.10,.018,.10),marfim,.008)
+    # Placa apoiada na bancada, para o setor ser reconhecível à distância.
+    for x in (2.27,3.14): tubo('Suporte setor',(x,.99,-.68),(x,1.98,-.68),.012,metal)
+    caixa('Placa microscopia',(2.705,1.89,-.68),(1.0,.24,.045),verde)
+    texto('MICROSCOPIA',(2.705,1.93,-.65),.070)
+    texto('PREPARO / LÂMINAS',(2.705,1.84,-.65),.044,marfim)
+    caixa('Bandeja de lâminas',(3.02,1.005,.84),(.29,.032,.22),metal,.012)
+    for i in range(4):
+        caixa('Lâmina na bandeja',(2.93+i*.06,1.03,.84),(.045,.007,.15),azul,.002)
     for x in (-2.62,-2.18):
         caixa('Biblioteca de atlas',(x,1.1,-3.48),(.40,1.95,.34),madeira)
         for y in (.31,.83,1.35,1.87):
@@ -167,7 +193,7 @@ try:
     texto('ATLAS / ESTUDO',(-2.4,2.20,-3.26),.075)
     # Dois competidores lado a lado; carteiras à frente, sem cadeiras nos corpos.
     posto(LAYOUT['adversarioX'], ambar)
-    posto(LAYOUT['jogadorX'], luz)
+    posto(LAYOUT['jogadorX'], azul)
     caixa('Marco porta',(0,1.10,3.79),(1.25,2.2,.10),madeira)
     caixa('Porta',(0,1.08,3.71),(1.10,2.09,.065),tecido)
     caixa('Visor porta',(0,1.65,3.665),(.38,.50,.02),luz)

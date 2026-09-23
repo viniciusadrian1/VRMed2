@@ -51,7 +51,7 @@ Props e malhas decorativas não recebem raycast. Mouse e atalhos foram mantidos.
 
 | Asset | Malhas | Triângulos | Bytes |
 | --- | ---: | ---: | ---: |
-| escola-medicina.glb | 10 | 18.451 | 1.329.700 |
+| escola-medicina.glb | 11 | 21.694 | 1.530.688 |
 | esqueleto-estudo.glb, opcional | 3 | 158.090 | 447.592 |
 | esqueleto-prancha.png, 512 × 1.024 | plano em runtime | 2 | 652.819 |
 
@@ -145,3 +145,66 @@ gerou o acerto esperado. A imagem `evidencias-escola/postos-em-pe-blender.png`
 registra a bancada de composição no Blender com o mesmo cenário e personagem:
 é uma verificação de escala/folga, não uma captura do jogo nem prova de FPS XR.
 O reteste no Quest desta revisão continua necessário.
+
+## Revisão de acabamento e orientação — após `904e0e7`
+
+Referência consultada: apresentação oficial de
+[Surgeon Simulator 2](https://store.steampowered.com/app/774791/Surgeon_Simulator_2/),
+que descreve o próprio estabelecimento médico como parte da personalidade do
+jogo. A aplicação ao VRmed é uma decisão de direção visual: setores reconhecíveis,
+postos identificados e instruções integradas ao mobiliário. Nenhum asset, marca,
+personagem ou identidade visual da referência foi copiado; a simulação caótica
+não foi incorporada às regras educacionais.
+
+### Mudanças
+
+- Plaquetas físicas nas mesas: posto local azul, adversário âmbar. A instrução
+  local acompanha menu, código, espera, contagem, rodada, bloqueio por erro,
+  últimos segundos, revelação e resultado. Não são botões adicionais.
+- Bancada identifica onde observar o órgão; cabeçalho da lousa identifica onde
+  responder. Os alvos, distâncias XR e acionamento dos controles não mudaram.
+- Pranchetas, fichas, lápis e áreas de trabalho nas mesas; faixas de cor
+  correspondentes aos postos e demarcação plana da zona de competição.
+- Microscópios com revólver, três objetivas, ajuste de foco, lâmina e iluminador;
+  bandeja de lâminas e identificação física do setor de microscopia.
+- Contato visual de mesas, bancada, vitrine e personagem com o piso por planos
+  transparentes de máscara radial de 32 × 32. São quatro planos no menu e cinco
+  com o adversário, sem shadow maps, bloom ou novas luzes. Há custo adicional de
+  transparência, textos e chamadas; não é um efeito gratuito.
+- Câmera desktop horizontal elevada para olhos a 1,60 m do piso e alinhada ao
+  posto local. Visão vertical, origem XR e câmera controlada pelo headset
+  preservadas. Nenhuma anatomia foi modificada.
+
+O GLB anterior tinha 18.451 triângulos, 10 malhas/materiais e 1.329.700 bytes;
+o atual está na tabela de orçamento acima, ainda abaixo do limite de teste de
+25 mil triângulos/2 MB para este cenário. Isso não substitui uma medição no Quest.
+
+### Verificação deste incremento
+
+Typecheck, lint, os seis verificadores de `verify:core` e build passaram.
+`verify:escola` agora cobre mensagens de cada fase e repete os raios de seleção
+com o GLB real carregado. A checagem de volume livre dos dois corpos continua
+passando. Regras, endpoints, controles e geometria dos órgãos não foram alterados.
+
+Amostra pontual no medidor do build local, menu com prancha, viewport 1.280 × 720
+e DPR 1: 144 FPS, p95 7,1 ms, 97 chamadas e 35.508 triângulos renderizados. É uma
+janela de cinco segundos neste computador/navegador, não benchmark comparativo,
+medida da rodada com todos os órgãos nem previsão de desempenho do Quest.
+
+No navegador de desenvolvimento: menu, contagem, rodada, clique por mouse,
+erro/bloqueio, revelação e troca de coração, laringe e sistema digestório, sem
+modelo anterior remanescente observado. As plaquetas ficaram abaixo da área de
+respostas. No build: Escola/Hospital e entrada por teclado na tela de código,
+sem criar sala pública; menu e rodada em 390 × 844, com resposta por teclado e
+feedback de erro confirmados. Console do build sem erros na sessão inspecionada.
+Evidências desta revisão usam o prefixo `orientacao-`
+em `docs/evidencias-escola/`; as capturas anteriores documentam revisões anteriores.
+
+Limitações: sem headset físico, sem partida entre dois headsets e sem medição
+comparativa de FPS em Quest. Testar de pé nos dois controles, alcance/legibilidade
+das plaquetas, conforto ao alternar órgão/lousa e estabilidade durante oito
+rodadas. Não apresentar esta inspeção desktop como validação de conforto XR.
+
+Arquivos desta revisão: `OrientacaoEscola.tsx`, `AmbienteEscola.tsx`,
+`DueloApp.tsx`, `lib/escola-apresentacao.ts`, `scripts/criar-escola-medicina.py`,
+`scripts/verificar-escola.ts` e o GLB da sala, além de documentação/evidências.

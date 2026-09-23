@@ -42,8 +42,8 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
   const inSession = useXR((state) => Boolean(state.session));
   const escola = ambiente === "escola";
   // Tela em pé, o órgão vai para cima da lousa/do painel (ver DueloGame).
-  // Escola: câmera e alvo sobem 0,2m juntos — a cena desce inteira, sem mudar a
-  // composição, e o órgão sai de baixo do seletor e do botão de VR do canto.
+  // Escola: paisagem usa olhos a 1,60m do piso; retrato preserva o espaço
+  // acima da lousa para o órgão, longe do seletor e do botão de VR do canto.
   // Hospital: o painel de 1,7m não cabe na largura com a câmera do VR, então
   // ela recua e centraliza no painel.
   const retrato = useThree((s) => s.size.width < s.size.height);
@@ -56,7 +56,7 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
     const [x, y, z] = escola
       ? retrato
         ? [0.28, 0.15, 1.6]
-        : [0.05, -0.05, 1.65]
+        : [0.28, 0.3, 1.65]
       : retrato
         ? [0.85, 0.48, 4.45]
         : [0, 0.45, 3.8];
@@ -116,9 +116,7 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
           dampingFactor={0.08}
           target={
             escola
-              ? retrato
-                ? [0.36, 0, -1.06]
-                : [0.36, -0.2, -1.06]
+              ? [0.36, 0, -1.06]
               : retrato
                 ? [0.85, 0.35, -0.65]
                 : [0, 0.15, -0.6]

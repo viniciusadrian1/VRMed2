@@ -3,7 +3,8 @@ import { readFileSync } from "node:fs";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createRayPointer } from "@pmndrs/pointer-events";
-import { ESCOLA, mostrarEsqueleto3D, posicaoCompetidorEscola, ROTACAO_ADVERSARIO_ESCOLA } from "../lib/escola-apresentacao.ts";
+import { ESCOLA, mostrarEsqueleto3D, orientacaoDaEscola, posicaoCompetidorEscola, ROTACAO_ADVERSARIO_ESCOLA } from "../lib/escola-apresentacao.ts";
+import { ARENA_INICIAL } from "../lib/duelo-apresentacao.ts";
 import { deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "../lib/botao3d-interacao.ts";
 
 const jogo = readFileSync("components/duelo/DueloGame.tsx", "utf8");
@@ -81,6 +82,24 @@ for (const fase of ["contagem", "rodada", "feedback", "codigo", "sala"]) assert.
 assert.equal(mostrarEsqueleto3D("menu", true), true);
 assert.equal(mostrarEsqueleto3D("fim", true), true);
 assert.equal(mostrarEsqueleto3D("menu", false), false);
+// As instruções acompanham a fase sem alterar o estado da partida.
+for (const [fase, mensagem] of [
+  ["menu", "Escolha seu desafio na lousa"],
+  ["codigo", "Digite o código na lousa"],
+  ["sala", "Aguarde o adversário"],
+  ["contagem", "Prepare-se · acompanhe a contagem"],
+  ["rodada", "Observe o órgão · responda na lousa"],
+  ["feedback", "Confira a resposta destacada"],
+  ["fim", "Seu resultado está na lousa"],
+  ["encerrada", "Partida encerrada · veja a lousa"],
+]) {
+  const estado = Object.freeze({ ...ARENA_INICIAL, fase });
+  assert.equal(orientacaoDaEscola(estado), mensagem);
+}
+assert.equal(orientacaoDaEscola({ ...ARENA_INICIAL, fase: "rodada", tempo: 5 }), "Últimos segundos · escolha na lousa");
+assert.equal(orientacaoDaEscola({ ...ARENA_INICIAL, fase: "rodada", tempo: 5, erro: true }), "Aguarde para tentar novamente");
+const orientacao = readFileSync("components/duelo/OrientacaoEscola.tsx", "utf8");
+assert.equal((orientacao.match(/return <group pointerEvents="none">/g) ?? []).length, 2, "plaquetas e contatos não capturam o ponteiro");
 function glb(nome: string) {
   const dados = readFileSync(`public/models/props/${nome}.glb`);
   const json = JSON.parse(dados.toString("utf8", 20, 20 + dados.readUInt32LE(12)));
@@ -89,7 +108,7 @@ function glb(nome: string) {
   return { dados, json, triangulos };
 }
 const escola = glb("escola-medicina");
-assert.equal(escola.json.meshes.length, 10);
+assert.equal(escola.json.meshes.length, 11);
 assert.ok(escola.triangulos < 25000 && escola.dados.length < 2_000_000);
 assert.equal(escola.json.images?.length ?? 0, 0);
 
@@ -110,6 +129,13 @@ assert.ok(direcao.dot(new THREE.Vector3(ESCOLA.lousaX - ESCOLA.adversarioX, 0, E
 const sala = await new GLTFLoader().parseAsync(Uint8Array.from(escola.dados).buffer, "");
 sala.scene.position.y = ESCOLA.piso;
 sala.scene.updateMatrixWorld(true);
+// O cenário real, incluindo as mesas, não rouba os alvos da interface.
+sala.scene.pointerEvents = "none";
+cena.add(sala.scene);
+for (const controle of controles) for (let i = 0; i < 4; i++) {
+  mirar(controle, i);
+  assert.equal(controle.ponteiro.getIntersection()?.object, alvos[i]);
+}
 for (const lado of ["jogador", "adversario"] as const) {
   const [x, y, z] = posicaoCompetidorEscola(lado);
   const livre = new THREE.Box3(new THREE.Vector3(x - .3, y + .05, z - .3), new THREE.Vector3(x + .3, y + 2.05, z + .3));
@@ -130,4 +156,4 @@ assert.equal(osso.json.meshes.length, 3);
 assert.ok(osso.json.extensionsUsed.includes("KHR_draco_mesh_compression"));
 const png = readFileSync("public/models/props/esqueleto-prancha.png");
 assert.equal(png.readUInt32BE(16), 512); assert.equal(png.readUInt32BE(20), 1024);
-console.log("ok: Escola — dois postos livres, GLB sem invasão dos corpos, botões, dois raios, bordas/intervalos, gatilho longo, vitrine e orçamento");
+console.log("ok: Escola — orientação por fase, dois postos livres, GLB sem invasão dos corpos, botões, dois raios com cenário, bordas/intervalos, gatilho longo, vitrine e orçamento");

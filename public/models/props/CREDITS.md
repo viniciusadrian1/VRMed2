@@ -63,9 +63,10 @@ não-comercial) e "Hospital Stuff" (1,67M triângulos — inviável em VR).
 - `escola-medicina.glb`: sala autoral gerada no Blender por
   `scripts/criar-escola-medicina.py`. Arquitetura, bancada, lousa, vitrine,
   microscópios estilizados, atlas, carteiras e luminárias sem assets externos.
-  Revisão dos postos em pé: 18.451 triângulos, 10 malhas/materiais,
-  sem texturas, 1.329.700 bytes. Cadeiras removidas; carteiras alinhadas aos
-  competidores e demarcações de piso sem plataforma elevada.
+  Revisão de acabamento/orientação: 21.694 triângulos, 11 malhas/materiais,
+  sem texturas, 1.530.688 bytes. Cadeiras removidas; carteiras alinhadas aos
+  competidores, pranchetas, lâminas e microscópios mais detalhados. Demarcações
+  e zona dos postos rente ao piso, sem plataforma elevada.
 - `esqueleto-estudo.glb`: exposição de ossos e dentes extraída do arquivo
   `public/models/systems/arthrology.glb` já presente no acervo. Três malhas,
   158.090 triângulos preservados, materiais de apresentação e compressão Draco;

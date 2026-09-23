@@ -21,6 +21,14 @@ Blender, a origem XR e o avatar. A origem do jogador e a distância da lousa nã
 mudaram. `verify:escola` verifica os triângulos exportados para garantir volume
 livre em cada posto; este novo posicionamento ainda precisa do reteste no Quest.
 
+A revisão seguinte melhora acabamento e orientação: plaquetas físicas dos dois
+postos, instrução contextual por fase, setor de microscopia identificado,
+pranchetas/lâminas e microscópios mais detalhados. Contatos suaves no piso usam
+planos com máscara procedural pequena, não sombras dinâmicas. O enquadramento
+desktop horizontal usa olhos a 1,60 m do piso; a origem/câmera XR não mudou.
+O cenário tem 21.694 triângulos, 11 malhas/materiais e 1.530.688 bytes. Os novos
+elementos decorativos não recebem ponteiros. Hospital e regras online preservados.
+
 ## Polimento contínuo do Duelo (2026-09-18)
 
 O passe de acabamento do `/duelo` começou pela sensação de jogo sem alterar as

@@ -10,6 +10,7 @@ import { sinalDaArena } from "@/lib/duelo-apresentacao";
 import { ESCOLA, mostrarEsqueleto3D } from "@/lib/escola-apresentacao";
 import { useEstadoArena } from "./EstadoArena";
 import { Bloco, FaixaReativa, SinalEscola } from "./ArenaMedica";
+import { ContatoEscola, OrientacaoEscola } from "./OrientacaoEscola";
 
 const CENARIO = "/models/props/escola-medicina.glb";
 const ESQUELETO = "/models/props/esqueleto-estudo.glb";
@@ -104,6 +105,8 @@ export function AmbienteEscola({ detalhado, alternar }: { detalhado: boolean; al
         </ErrorBoundary>
       </group>
       <SinalEscola />
+      <ContatoEscola />
+      <OrientacaoEscola />
       <FaixaReativa pos={[-.78, -.51, -.554]} tam={[.85, .012, .015]} />
       <mesh position={[-.78, -.454, -.95]} rotation={[-Math.PI / 2, 0, 0]} raycast={SEM_RAYCAST}>
         <ringGeometry args={[.27, .283, 48]} /><meshBasicMaterial color={sinal.cor} toneMapped={false} />
@@ -113,7 +116,7 @@ export function AmbienteEscola({ detalhado, alternar }: { detalhado: boolean; al
           <ModeloExposto url="/models/healthy/coracao.glb" altura={.63} />
         </Suspense></ErrorBoundary>
       </group>}
-      <Text3D position={[-.78, -.69, -.59]} size={.036} color="#ede5cf">BANCADA ANATÔMICA</Text3D>
+      <Text3D position={[-.78, -.66, -.59]} size={.048} color="#ede5cf">OBSERVE O ÓRGÃO</Text3D>
       <Text3D position={[.36, -.72, -1.04]} size={.034} color={sinal.cor}>
         {estado.combo > 1 ? `SEQUÊNCIA ×${estado.combo} · CONTINUE ASSIM` : "OBSERVE · IDENTIFIQUE · APRENDA"}
       </Text3D>
