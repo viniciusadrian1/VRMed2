@@ -8,6 +8,7 @@ import { preloadFont } from "troika-three-text";
 import * as THREE from "three";
 import { playClique, playHover } from "@/lib/arena-audio";
 import { pulsar } from "@/lib/xr-haptica";
+import { CAMADAS_UI3D, deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "@/lib/botao3d-interacao";
 
 /**
  * Primitivas de interface em espaço 3D para a Arena.
@@ -99,6 +100,7 @@ const TEXT_MATERIAL = new THREE.MeshBasicMaterial({
   // A interface nunca pode ser engolida pelo modelo — o jogador pode
   // escalá-lo até 6× e cobrir o painel que ele precisa clicar.
   depthTest: false,
+  depthWrite: false,
   // Sem tonemapping o texto mantém o contraste dentro do headset.
   toneMapped: false,
 });
@@ -136,7 +138,7 @@ export function Text3D({
       outlineWidth={size * 0.05}
       outlineColor="#04070c"
       material={TEXT_MATERIAL}
-      renderOrder={999}
+      renderOrder={CAMADAS_UI3D.texto}
       // Texto não intercepta o laser: o clique atravessa até o modelo.
       raycast={() => null}
     >
@@ -157,8 +159,9 @@ function panelTexture(
   fill: string,
   stroke: string,
   fillBottom = "#0d151d",
+  espessura = 3,
 ): THREE.CanvasTexture {
-  const key = `${aspect.toFixed(1)}|${fill}|${stroke}|${fillBottom}`;
+  const key = `${aspect.toFixed(1)}|${fill}|${stroke}|${fillBottom}|${espessura}`;
   const cached = panelTextureCache.get(key);
   if (cached) return cached;
 
@@ -177,7 +180,7 @@ function panelTexture(
   gradient.addColorStop(1, fillBottom);
   ctx.fillStyle = gradient;
   ctx.fill();
-  ctx.lineWidth = 3;
+  ctx.lineWidth = espessura;
   ctx.strokeStyle = stroke;
   ctx.stroke();
 
@@ -238,12 +241,13 @@ export function Panel({
     <group position={position}>
       {/* raycast nulo: o painel é pano de fundo, não alvo do laser — sem
           isso ele bloquearia os cliques no modelo atrás dele. */}
-      <mesh renderOrder={998} raycast={() => null}>
+      <mesh renderOrder={CAMADAS_UI3D.painel} raycast={() => null}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial
           map={panelTexture(width / height, color, "rgba(88,150,200,0.45)")}
           transparent
           opacity={opacity}
+          depthWrite={false}
           side={THREE.DoubleSide}
           toneMapped={false}
           depthTest={false}
@@ -256,9 +260,8 @@ export function Panel({
 
 /**
  * Botão 3D: reage ao laser do controle (ou da mão) e ao gatilho.
- * Cresce um pouco sob o ponteiro — o único aviso visual de que é clicável
- * para quem nunca usou um headset — e responde com som e vibração, que em VR
- * confirmam o toque melhor que qualquer animação.
+ * Alvo estável, independente da animação visual. No XR confirma ao apertar
+ * o gatilho; mouse/toque continuam usando o clique convencional.
  */
 export function Button3D({
   label,
@@ -292,33 +295,31 @@ export function Button3D({
   desabilitado?: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
-  const hovered = useRef(false);
-  const pressionado = useRef(false);
+  const hovered = useRef(new Set<number>());
+  const pressionado = useRef(new Set<number>());
+  const contorno = useRef<THREE.Mesh>(null);
   const scale = useRef(1);
   const esquerdo = useXRInputSourceState("controller", "left");
   const direito = useXRInputSourceState("controller", "right");
 
   useFrame((_, delta) => {
     if (!group.current) return;
-    const ativo = hovered.current && !desabilitado;
-    // `destaque` continua valendo com o botão desabilitado: é a revelação.
-    // A resposta certa cresce um pouco (1.04) e FICA — sem piscar, que a 72 Hz
-    // dentro do headset é desconfortável e ainda esconde o texto em metade dos
-    // quadros. O hover continua mandando mais que o destaque enquanto o
-    // ponteiro está em cima.
-    const target = pressionado.current
-      ? 0.96
-      : ativo
-        ? 1.08
-        : destaque === "certo"
-          ? 1.04
-          : 1;
-    // Suaviza a resposta para não "pular" com o tremor da mão.
+    const ativo = hovered.current.size > 0 && !desabilitado;
+    if (contorno.current) contorno.current.visible = ativo;
+    // Só o desenho comprime; a malha clicável permanece nas dimensões reais.
+    // Sem crescer para dentro da alternativa vizinha, mesmo com dois lasers.
+    const target = pressionado.current.size > 0 && !desabilitado ? 0.985 : 1;
     scale.current += (target - scale.current) * Math.min(1, delta * 12);
     group.current.scale.setScalar(scale.current);
   });
 
   const stop = (event: ThreeEvent<PointerEvent>) => event.stopPropagation();
+  const acionar = (event: object) => {
+    if (desabilitado) return;
+    playClique();
+    pulsar(fonteDoPonteiro(event) ?? direito?.inputSource ?? esquerdo?.inputSource, 0.4, 35);
+    onClick();
+  };
 
   // Verde e coral mais claros que os da paleta: na revelação a placa certa
   // precisa saltar de relance a 3 m, e o `success` normal fica escuro demais
@@ -342,44 +343,50 @@ export function Button3D({
 
   return (
     <group
-      ref={group}
       position={position}
+      pointerEventsOrder={ORDEM_PONTEIRO_UI}
       onClick={(event) => {
         event.stopPropagation();
-        if (desabilitado) return;
-        // Som e vibração ANTES do callback: quem chama pode trocar de tela no
-        // mesmo quadro, e o retorno do toque tem que sair de qualquer jeito.
-        playClique();
-        pulsar(direito?.inputSource ?? esquerdo?.inputSource, 0.4, 35);
-        onClick();
+        if (deveAcionarBotao3D("clicar", event)) acionar(event);
       }}
       onPointerOver={(event) => {
         stop(event);
         // Só na ENTRADA do hover: o R3F dispara onPointerOver a cada quadro em
         // que o laser se move sobre o alvo, e vibrar 90 vezes por segundo
         // esquenta o motor e vira ruído branco na mão.
-        if (desabilitado || hovered.current) return;
-        hovered.current = true;
+        if (hovered.current.has(event.pointerId)) return;
+        hovered.current.add(event.pointerId);
+        if (desabilitado) return;
         playHover();
-        pulsar(direito?.inputSource ?? esquerdo?.inputSource, 0.15, 15);
+        pulsar(fonteDoPonteiro(event) ?? direito?.inputSource ?? esquerdo?.inputSource, 0.15, 15);
       }}
-      onPointerOut={() => {
-        hovered.current = false;
-        pressionado.current = false;
+      onPointerOut={(event) => {
+        hovered.current.delete(event.pointerId);
+        pressionado.current.delete(event.pointerId);
       }}
       onPointerDown={(event) => {
         stop(event);
-        if (!desabilitado) pressionado.current = true;
+        if (desabilitado || event.button !== 0) return;
+        pressionado.current.add(event.pointerId);
+        if (deveAcionarBotao3D("pressionar", event)) acionar(event);
       }}
       onPointerUp={(event) => {
         stop(event);
-        pressionado.current = false;
+        pressionado.current.delete(event.pointerId);
       }}
-      onPointerCancel={() => {
-        pressionado.current = false;
+      onPointerCancel={(event) => {
+        hovered.current.delete(event.pointerId);
+        pressionado.current.delete(event.pointerId);
       }}
     >
-      <mesh renderOrder={998}>
+      {/* Este é o único alvo: nunca encolhe, cresce ou muda de profundidade. */}
+      <mesh name={`alvo-botao-${selo ?? label}`}>
+        <planeGeometry args={[width, height]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
+      </mesh>
+      <group ref={group} pointerEvents="none">
+      {/* Camadas explícitas: o fundo não pode cobrir botões pela distância. */}
+      <mesh renderOrder={CAMADAS_UI3D.botao} raycast={() => null}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial
           map={panelTexture(
@@ -395,9 +402,17 @@ export function Button3D({
             sombra(corFundo, destaque ? 0.78 : undefined),
           )}
           transparent
+          depthWrite={false}
           toneMapped={false}
           depthTest={false}
           side={THREE.DoubleSide}
+        />
+      </mesh>
+      <mesh ref={contorno} visible={false} position={[0, 0, 0.003]} renderOrder={CAMADAS_UI3D.contorno} raycast={() => null}>
+        <planeGeometry args={[width, height]} />
+        <meshBasicMaterial
+          map={panelTexture(width / height, "rgba(0,0,0,0)", "#b6f4ff", "rgba(0,0,0,0)", 6)}
+          transparent depthWrite={false} depthTest={false} toneMapped={false}
         />
       </mesh>
 
@@ -407,12 +422,14 @@ export function Button3D({
         <mesh
           position={[-width / 2 + height * 0.42, 0, 0.004]}
           rotation={[0, 0, -Math.PI / 2]}
-          renderOrder={999}
+          renderOrder={CAMADAS_UI3D.contorno}
           raycast={() => null}
         >
           <circleGeometry args={[height * 0.22, 3]} />
           <meshBasicMaterial
             color={corTexto}
+            transparent
+            depthWrite={false}
             toneMapped={false}
             depthTest={false}
           />
@@ -423,12 +440,13 @@ export function Button3D({
           a letra é o que a pessoa lê primeiro para decidir onde mirar. */}
       {selo && (
         <group position={[-width / 2 + height * 0.45, 0, 0.004]}>
-          <mesh renderOrder={999} raycast={() => null}>
+          <mesh renderOrder={CAMADAS_UI3D.contorno} raycast={() => null}>
             <planeGeometry args={[seloLado, seloLado]} />
             <meshBasicMaterial
               color={corTexto}
               transparent
               opacity={desabilitado ? 0.45 : 0.92}
+              depthWrite={false}
               toneMapped={false}
               depthTest={false}
             />
@@ -451,6 +469,7 @@ export function Button3D({
       >
         {label}
       </Text3D>
+      </group>
     </group>
   );
 }

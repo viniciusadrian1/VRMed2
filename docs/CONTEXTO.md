@@ -436,3 +436,15 @@ Baseline, arquivos, evidências Blender/Unity, testes e limites estão em
 `docs/ARENA-MEDICA-2026-09-22.md`. Desktop e testes automatizados verificados;
 **homologação física no Quest ainda pendente**. Não confundir a bancada de escala
 Unity nem o teste `verify:xr` com validação de conforto/performance em headset.
+
+### Atualização — entorno e controles (23/09/2026)
+
+O centro aprovado da Arena médica permanece intacto. O entorno agora usa um GLB
+autoral de oito malhas: armários, preparo, carrinho, estação de simulação e
+arquitetura técnica. O botão 3D confirma raios XR no aperto, com alvo estável,
+contorno por ponteiro e camadas visuais ordenadas. Isso corrige a perda de
+`click` após 300 ms da biblioteca instalada e o fundo cobrindo alternativas.
+
+Diagnóstico, orçamento do GLB, testes e roteiro de homologação física em
+`docs/ARENA-ENTORNO-E-CONTROLES.md`. Novo comando: `npm run verify:botoes-xr`
+(também em `verify:core`). **O Quest com controles ainda precisa do reteste físico.**

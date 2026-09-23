@@ -41,6 +41,14 @@ const cranio = lerGlb("public/models/organs/cranio.glb");
 assert.equal(createHash("sha256").update(cranio.dados).digest("hex"), "849278d46cc5756074e237e725341a9cf30778fee913c70b5bd00803ed44d2e5", "crânio original preservado byte a byte");
 assert.equal(cranio.json.meshes.length, 25);
 assert.equal(cranio.json.animations[0].channels.length, 22);
+const entorno = lerGlb("public/models/props/entorno-arena.glb");
+assert.equal(entorno.json.meshes.length, 8, "decoração agrupada em oito malhas");
+assert.ok(entorno.dados.length < 2_000_000, "orçamento do entorno sem texturas externas");
+const triangulosEntorno = entorno.json.meshes.reduce((soma: number, malha: { primitives: { indices: number }[] }) =>
+  soma + malha.primitives.reduce((n, p) => n + entorno.json.accessors[p.indices].count / 3, 0), 0);
+assert.ok(triangulosEntorno < 25_000);
+assert.equal(entorno.json.images?.length ?? 0, 0);
+assert.equal(entorno.json.animations?.length ?? 0, 0);
 for (const nome of ["dr-caloni", "dra-reis", "dr-chefe"]) {
   const { json, dados } = lerGlb(`public/models/props/${nome}-arena.glb`);
   assert.ok(json.extensionsUsed.includes("KHR_draco_mesh_compression"));
@@ -53,4 +61,4 @@ assert.ok(jogo.includes("if (scene.parent !== g) g.add(scene)"), "remonte de efe
 assert.ok(jogo.includes('key={`slot-modelo-${indice}`}'), "cada rodada tem contêiner próprio");
 assert.ok(jogo.includes("scene.removeFromParent()"), "o órgão antigo é removido");
 assert.ok(jogo.includes("dispose={null}"), "a geometria compartilhada não é descartada");
-console.log("ok: sinais da arena, acabamento de osso, integridade do crânio, variantes leves e guardas de ciclo do modelo");
+console.log("ok: sinais da arena, acabamento de osso, integridade do crânio, entorno, variantes leves e guardas de ciclo do modelo");

@@ -6,13 +6,14 @@ import * as THREE from "three";
 import { Text3D } from "@/components/arena/ui3d";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Bloco, ConsoleArena, FaixaReativa, MonitorArena, PalcoAnatomico } from "./ArenaMedica";
+import { EntornoHospital } from "./EntornoHospital";
 
 /**
  * Arena médica do Duelo: bancada anatômica, console de competição e pórtico
  * reativo. A arquitetura organiza o foco; os equipamentos dão escala à sala.
  *
- * Híbrido: sala procedural (zero download) + props GLB curados pelo grupo
- * (Sketchfab CC-BY, dieta simplify/webp/draco — créditos no CREDITS.md).
+ * Híbrido: sala procedural + entorno autoral agrupado por material. Cadeira
+ * e cortina do acervo seguem no fundo (créditos dos originais no CREDITS.md).
  * Cada prop se auto-normaliza: mede o próprio arquivo solto da cena, escala
  * para a altura-alvo e assenta a base no y=0 do grupo.
  */
@@ -61,7 +62,7 @@ function Prop({
   return (
     <group ref={grupo} position={position} rotation={[0, rotationY, 0]}>
       <group position={ajuste.pos} scale={ajuste.escala}>
-        <primitive object={scene} />
+        <primitive object={scene} dispose={null} />
       </group>
     </group>
   );
@@ -95,66 +96,6 @@ function usePisoTexture(): THREE.CanvasTexture {
   }, []);
 }
 
-/** Prateleira procedural com potes coloridos (como na foto de referência). */
-function Prateleira({ position, largura = 2 }: { position: [number, number, number]; largura?: number }) {
-  const cores = ["#7b9da7", "#bfb798", "#65978e", "#a7736c"];
-  const potes = Math.floor(largura / 0.28);
-  return (
-    <group position={position}>
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[largura, 0.05, 0.35]} />
-        <meshStandardMaterial color="#344a54" roughness={0.7} />
-      </mesh>
-      {Array.from({ length: potes }, (_, i) => {
-        const cor = cores[i % cores.length];
-        const x = -largura / 2 + 0.2 + i * 0.28;
-        return (
-          <group key={i} position={[x, 0.025, 0]}>
-            <mesh position={[0, 0.11, 0]}>
-              <cylinderGeometry args={[0.08, 0.08, 0.22, 12]} />
-              <meshStandardMaterial color={cor} roughness={0.35} />
-            </mesh>
-            <mesh position={[0, 0.245, 0]}>
-              <cylinderGeometry args={[0.085, 0.085, 0.05, 12]} />
-              <meshStandardMaterial color="#e8e2d4" roughness={0.6} />
-            </mesh>
-          </group>
-        );
-      })}
-    </group>
-  );
-}
-
-/** Pôster de anatomia procedural (moldura + corpo esquemático). */
-function Poster({ position, rotationY = 0 }: { position: [number, number, number]; rotationY?: number }) {
-  return (
-    <group position={position} rotation={[0, rotationY, 0]}>
-      <mesh>
-        <planeGeometry args={[0.72, 0.98]} />
-        <meshStandardMaterial color="#f4efe2" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0.28, 0.005]}>
-        <circleGeometry args={[0.09, 16]} />
-        <meshStandardMaterial color="#d3a284" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, -0.05, 0.005]}>
-        <capsuleGeometry args={[0.13, 0.3, 4, 10]} />
-        <meshStandardMaterial color="#e0b5a0" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, -0.02, 0.012]}>
-        <capsuleGeometry args={[0.05, 0.1, 4, 8]} />
-        <meshStandardMaterial color="#c96a5a" roughness={0.8} />
-      </mesh>
-      {[0.38, -0.42].map((y) => (
-        <mesh key={y} position={[0, y, 0.006]}>
-          <planeGeometry args={[0.5, 0.045]} />
-          <meshStandardMaterial color="#9db8c9" roughness={0.9} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
 /** Telão do cronômetro estilo LED (a moldura; o número vem do DueloGame). */
 function TelaoLed({ position }: { position: [number, number, number] }) {
   return (
@@ -185,7 +126,7 @@ export function AmbienteHospital() {
   const MEIA = 4.6; // meia-largura da sala
 
   return (
-    <group>
+    <group pointerEvents="none">
       <PalcoAnatomico />
       <ConsoleArena />
     <group ref={sala} position={[0, FLOOR_Y, 0]}>
@@ -236,35 +177,23 @@ export function AmbienteHospital() {
       <Text3D position={[0, 3.12, -3.1]} size={0.095} color="#c6dfe2">VRmed / ARENA MÉDICA</Text3D>
       <Bloco pos={[0, 0.015, -0.6]} tam={[3.7, 0.025, 2.35]} cor="#253f48" />
       {[-1, 1].map((lado) => <group key={lado}>
-        <Bloco pos={[lado * 3.25, 0.5, -4.0]} tam={[1.8, 1.0, 0.85]} cor="#526e73" />
-        <Bloco pos={[lado * 3.25, 1.03, -4.0]} tam={[1.9, 0.08, 0.94]} cor="#c3c9b9" />
-        {[-0.42, 0.42].map((x) => <Bloco key={x} pos={[lado * 3.25 + x, 0.51, -3.56]} tam={[0.75, 0.81, 0.04]} cor="#76928e" />)}
         <FaixaReativa pos={[lado * 1.65, 0.036, 0.05]} tam={[0.03, 0.012, 1.5]} />
+        <FaixaReativa pos={[lado * 3.32, 3.0, -4.23]} tam={[1.78, 0.016, 0.018]} />
       </group>)}
 
-      {/* Prateleiras de potes + pôsteres nas paredes */}
-      <Prateleira position={[-3.3, 2.35, -MEIA + 0.2]} largura={1.8} />
-      <Prateleira position={[-3.3, 1.8, -MEIA + 0.2]} largura={1.8} />
-      <Prateleira position={[-MEIA + 0.2, 1.9, 1.6]} largura={2.2} />
-      <Poster position={[3.4, 2.35, -MEIA + 0.02]} />
-      <Poster position={[-MEIA + 0.02, 1.8, -1.2]} rotationY={Math.PI / 2} />
+      {/* Equipamentos e arquitetura lateral autorais; o centro fica intacto. */}
+      <ErrorBoundary fallback={null}><Suspense fallback={null}>
+        <EntornoHospital />
+      </Suspense></ErrorBoundary>
 
       {/* Telão LED do cronômetro no alto, entre os dois lados */}
       <TelaoLed position={[0, 2.81, -3.22]} />
-      <MonitorArena pos={[-3.1, 1.8, -2.55]} titulo="ESTAÇÃO DO ADVERSÁRIO" />
+      <MonitorArena pos={[-3.12, 1.57, -3.36]} titulo="ESTAÇÃO DO ADVERSÁRIO" />
 
       {/* Props GLB do grupo (dieta aplicada) */}
       <ErrorBoundary fallback={null}><Suspense fallback={null}>
-        {/* Mesa de instrumentos do jogador e do bot */}
-        <Prop url={`${HOSPITAL_DIR}/trolley.glb`} alturaAlvo={0.9} position={[2.8, 0, -1.3]} rotationY={-0.35} />
-        <Prop url={`${HOSPITAL_DIR}/trolley.glb`} alturaAlvo={0.9} position={[-2.6, 0, -3.25]} rotationY={Math.PI} />
-        {/* Monitores de sinais vitais nas paredes laterais */}
-        <Prop url={`${HOSPITAL_DIR}/monitor-hr.glb`} alturaAlvo={0.55} position={[-MEIA + 0.25, 1.85, 3.0]} rotationY={Math.PI / 2} />
-        <Prop url={`${HOSPITAL_DIR}/monitor-hr.glb`} alturaAlvo={0.55} position={[-MEIA + 0.25, 1.85, -3.0]} rotationY={Math.PI / 2} />
-        {/* Ultrassom no canto de trás */}
-        <Prop url={`${HOSPITAL_DIR}/ultrassom.glb`} alturaAlvo={1.45} position={[3.5, 0, -2.4]} rotationY={-Math.PI / 4} />
-        {/* Cortina hospitalar no canto oposto */}
-        <Prop url={`${HOSPITAL_DIR}/cortina-monitor.glb`} alturaAlvo={2.1} position={[-4.0, 0, 0.2]} rotationY={Math.PI / 2} />
+        {/* Acervo preservado em zonas de apoio, sem atravessar a bancada. */}
+        <Prop url={`${HOSPITAL_DIR}/cortina-monitor.glb`} alturaAlvo={2.1} position={[-4.0, 0, 2.3]} rotationY={Math.PI / 2} />
         {/* Cadeira de rodas encostada */}
         <Prop url={`${HOSPITAL_DIR}/cadeira-rodas.glb`} alturaAlvo={1.0} position={[3.6, 0, 2.8]} rotationY={-Math.PI / 2.5} />
       </Suspense></ErrorBoundary>
@@ -273,8 +202,7 @@ export function AmbienteHospital() {
   );
 }
 
-// Todos: o Suspense é um só, então as mesas (à frente do jogador) só
-// aparecem quando o último prop chega.
-for (const nome of ["trolley", "monitor-hr", "ultrassom", "cortina-monitor", "cadeira-rodas"]) {
+// Só os dois props mantidos no cenário; o entorno tem seu próprio Suspense.
+for (const nome of ["cortina-monitor", "cadeira-rodas"]) {
   useGLTF.preload(`${HOSPITAL_DIR}/${nome}.glb`, "/draco/");
 }

@@ -52,3 +52,8 @@ não-comercial) e "Hospital Stuff" (1,67M triângulos — inviável em VR).
   A variante não altera nem concede novos direitos sobre o personagem original.
 - A referência a Surgeon Simulator é de composição e apresentação, sem uso de
   seus modelos, texturas, personagens, marcas ou arquivos.
+- `entorno-arena.glb`: arquitetura e equipamentos de apoio autorais, gerados
+  no Blender por `scripts/criar-entorno-arena.py`: armários, cuba/torneira,
+  carrinho de instrumentos, equipamento de treinamento, janela técnica,
+  porta e ventilação. Oito materiais, sem texturas externas. O visor é uma
+  representação abstrata de simulação, não um exame ou sinal clínico.
