@@ -4,18 +4,23 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { useThree } from "@react-three/fiber";
 import { useXR } from "@react-three/xr";
 import { Group, Vector3 } from "three";
-import { escalaPainelXR, iniciarArrastePainel, limitarPosicaoPainel, posicaoArrastadaPainel, useJanelasEstudoXR, type JanelaXR } from "@/lib/janelas-estudo-xr";
+import { iniciarArrastePainel, posicaoArrastadaPainel, useJanelasEstudoXR, type JanelaXR } from "@/lib/janelas-estudo-xr";
+import { iniciarTamanhoPainel, tamanhoPeloRaio, type BordaPainelXR } from "@/lib/gestos-janelas-xr";
 import { liberarPonteiroUI, ocuparPonteiroUI } from "@/lib/xr-foco-interface";
 import { ContextoJanelaXR, type EventoJanelaXR } from "./ContextoJanelaXR";
 
 type Captura = { setPointerCapture: (id: number) => void; releasePointerCapture: (id: number) => void };
+type GestoJanela = { ponteiro: number; captura: Captura } & (
+  { tipo: "mover"; dados: ReturnType<typeof iniciarArrastePainel> } |
+  { tipo: "tamanho"; dados: ReturnType<typeof iniciarTamanhoPainel> }
+);
 /** Só transforma a janela. Câmera e órgão nunca participam do arraste. */
 export function JanelaMovelXR({ id, posicao, rotacao, children }: {
   id: JanelaXR; posicao: [number, number, number]; rotacao: number; children: ReactNode;
 }) {
   const grupo = useRef<Group>(null);
   const dono = useRef({});
-  const inicio = useRef<{ ponteiro: number; captura: Captura; dados: ReturnType<typeof iniciarArrastePainel> } | null>(null);
+  const inicio = useRef<GestoJanela | null>(null);
   const [escala, setEscala] = useState(1), [arrastando, setArrastando] = useState(false);
   const frente = useJanelasEstudoXR((s) => s.frente);
   const { camera, invalidate, gl } = useThree();
@@ -57,17 +62,19 @@ export function JanelaMovelXR({ id, posicao, rotacao, children }: {
     const cabeca = (gl.xr.isPresenting ? gl.xr.getCamera() : camera).getWorldPosition(new Vector3()), centro = g.getWorldPosition(new Vector3());
     g.lookAt(cabeca.x, centro.y, cabeca.z);
   };
-  const moverProfundidade = (delta: number) => {
-    if (!grupo.current) return;
-    soltar(); grupo.current.position.z += delta; limitarPosicaoPainel(grupo.current.position);
-    orientar(); invalidate();
-  };
   const aoApertar = (e: EventoJanelaXR) => {
     e.stopPropagation(); if (e.button !== 0 || inicio.current || !grupo.current) return;
     useJanelasEstudoXR.getState().focar(id);
     grupo.current.updateWorldMatrix(true, false);
     const captura = e.target as unknown as Captura;
-    inicio.current = { ponteiro: e.pointerId, captura, dados: iniciarArrastePainel(grupo.current, e.point, e.ray) };
+    inicio.current = { tipo: "mover", ponteiro: e.pointerId, captura, dados: iniciarArrastePainel(grupo.current, e.point, e.ray) };
+    captura.setPointerCapture(e.pointerId); ocuparPonteiroUI(dono.current, e); setArrastando(true);
+  };
+  const aoRedimensionar = (e: EventoJanelaXR, borda: BordaPainelXR, largura: number, altura: number) => {
+    e.stopPropagation(); if (e.button !== 0 || inicio.current || !grupo.current) return;
+    useJanelasEstudoXR.getState().focar(id);
+    const captura = e.target as unknown as Captura;
+    inicio.current = { tipo: "tamanho", ponteiro: e.pointerId, captura, dados: iniciarTamanhoPainel(grupo.current, e.point, borda, largura, altura) };
     captura.setPointerCapture(e.pointerId); ocuparPonteiroUI(dono.current, e); setArrastando(true);
   };
   const aoMover = (e: EventoJanelaXR) => {
@@ -75,18 +82,22 @@ export function JanelaMovelXR({ id, posicao, rotacao, children }: {
     const atual = inicio.current, g = grupo.current;
     if (!atual || atual.ponteiro !== e.pointerId || !g?.parent) return;
     g.parent.updateWorldMatrix(true, false);
-    g.position.copy(posicaoArrastadaPainel(e.ray, atual.dados, g.parent.matrixWorld)); invalidate();
+    if (atual.tipo === "mover") g.position.copy(posicaoArrastadaPainel(e.ray, atual.dados, g.parent.matrixWorld));
+    else {
+      const novo = tamanhoPeloRaio(e.ray, atual.dados, g.parent.matrixWorld);
+      if (novo) { g.position.copy(novo.posicao); g.scale.setScalar(novo.escala); setEscala(novo.escala); }
+    }
+    invalidate();
   };
   const aoSoltar = (e: EventoJanelaXR) => {
     e.stopPropagation();
     if (inicio.current?.ponteiro !== e.pointerId) return;
-    orientar(); soltar();
+    if (inicio.current.tipo === "mover") orientar();
+    soltar();
   };
   return <ContextoJanelaXR.Provider value={{
     id, ordem, escala, arrastando,
-    aumentar: () => { soltar(); setEscala((s) => escalaPainelXR(s + 0.1)); },
-    diminuir: () => { soltar(); setEscala((s) => escalaPainelXR(s - 0.1)); },
-    aproximar: () => moverProfundidade(0.15), afastar: () => moverProfundidade(-0.15), restaurar, aoApertar, aoMover, aoSoltar,
+    restaurar, aoApertar, aoMover, aoSoltar, aoRedimensionar,
   }}>
     <group ref={grupo} position={[px, py, pz]} rotation={[0, rotacao, 0]} scale={escala} name={`janela-xr-${id}`} userData={{ ordemJanelaXR: ordem }} pointerEventsOrder={ordem}>
       {children}

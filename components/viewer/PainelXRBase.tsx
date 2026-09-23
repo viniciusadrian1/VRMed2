@@ -6,41 +6,52 @@ import { useEffect, useRef, useState } from "react";
 import { DoubleSide } from "three";
 import { ocuparPonteiroUI, liberarPonteiroUI } from "@/lib/xr-foco-interface";
 import { editarTextoXR, paginasXR, PAINEIS_XR, TECLAS_XR } from "@/lib/painel-estudo-xr";
-import { useJanelasEstudoXR, LIMITES_JANELA_XR } from "@/lib/janelas-estudo-xr";
+import { useJanelasEstudoXR } from "@/lib/janelas-estudo-xr";
 import { useJanelaXR } from "./ContextoJanelaXR";
+import { raioPlacaXR } from "@/lib/raio-placa-xr";
+import { alcaJanelaXR, zonasBordaXR } from "@/lib/gestos-janelas-xr";
 import { BotaoEstudoXR, TextoPainelXR as Text3D, SuperficieXR, useTemaPainelXR } from "./EstiloPainelXR";
 
 export const BotaoXR = BotaoEstudoXR;
 
-export function PainelXRBase({ titulo, aberto, aoAlternar, children, conteudoSite = false, largura = PAINEIS_XR.largura, altura = PAINEIS_XR.altura }: {
+function BordaJanela({ zona, largura, altura }: { zona: ReturnType<typeof zonasBordaXR>[number]; largura: number; altura: number }) {
+  const janela = useJanelaXR(), tema = useTemaPainelXR(), dono = useRef({});
+  const [sobre, setSobre] = useState(false);
+  useEffect(() => { const d = dono.current; return () => liberarPonteiroUI(d); }, []);
+  return <group position={[zona.x, zona.y, 0.025]}>
+    {/* Alvo na margem extrema: não invade o X ou os botões do site. */}
+    <mesh raycast={raioPlacaXR} name="Redimensionar pela borda" pointerEventsOrder={janela.ordem + 2} userData={{ ordemJanelaXR: janela.ordem + 2 }}
+      onPointerDown={(e) => janela.aoRedimensionar(e, zona.borda, largura, altura)}
+      onPointerMove={janela.aoMover} onPointerUp={janela.aoSoltar} onPointerCancel={janela.aoSoltar}
+      onClick={(e) => e.stopPropagation()}
+      onPointerOver={(e) => { e.stopPropagation(); ocuparPonteiroUI(dono.current, e); setSobre(true); }}
+      onPointerOut={(e) => { liberarPonteiroUI(dono.current, e.pointerId); setSobre(false); }}>
+      <planeGeometry args={[zona.largura, zona.altura]} /><meshBasicMaterial colorWrite={false} depthWrite={false} side={DoubleSide} />
+    </mesh>
+    {sobre && <SuperficieXR largura={zona.borda.x ? 0.004 : 0.12} altura={zona.borda.y ? 0.004 : 0.12} cor={tema.primary} nivel={5} />}
+    {sobre && zona.borda.x !== 0 && zona.borda.y !== 0 && <>
+      <SuperficieXR largura={0.045} altura={0.004} cor={tema.primary} nivel={5} />
+      <SuperficieXR largura={0.004} altura={0.045} cor={tema.primary} nivel={5} />
+    </>}
+  </group>;
+}
+
+/** Conteúdo original, uma alça inferior e bordas de tamanho. Sem barras de comandos extras. */
+export function PainelXRBase({ titulo, aberto, aoAlternar, children, largura = PAINEIS_XR.largura, altura = PAINEIS_XR.altura }: {
   titulo: string; aberto: boolean; aoAlternar: () => void; children: ReactNode;
-  conteudoSite?: boolean; largura?: number; altura?: number;
+  largura?: number; altura?: number;
 }) {
   const escudo = useRef({}), janela = useJanelaXR(), tema = useTemaPainelXR();
-  const topo = altura / 2 + 0.062, rodape = -altura / 2 - 0.061;
-  useEffect(() => {
-    const dono = escudo.current;
-    return () => liberarPonteiroUI(dono);
-  }, [aberto]);
+  const [sobreAlca, setSobreAlca] = useState(false);
+  const alca = alcaJanelaXR(altura, aberto);
+  useEffect(() => { const dono = escudo.current; return () => liberarPonteiroUI(dono); }, [aberto]);
   const bloquear = (e: ThreeEvent<PointerEvent | MouseEvent>) => e.stopPropagation();
   const focar = (e: ThreeEvent<PointerEvent>) => { bloquear(e); if (janela.id) useJanelasEstudoXR.getState().focar(janela.id); };
   return <group>
-    {/* Barra exclusiva de manipulação: não disputa gestos com as ferramentas. */}
-    <SuperficieXR largura={1.04} altura={0.085} y={topo} cor={janela.arrastando ? tema.accent : tema.muted} borda />
-    <Text3D position={[0, topo, 0.025]} size={0.024} color="primary">
-      {janela.arrastando ? "Solte o gatilho para posicionar" : "Mover janela · segure o gatilho e arraste"}
-    </Text3D>
-    <mesh name="Mover janela" position={[0, topo, 0.035]} pointerEventsOrder={janela.ordem + 2}
-      userData={{ ordemJanelaXR: janela.ordem + 2 }}
-      onPointerDown={janela.aoApertar} onPointerMove={janela.aoMover} onPointerUp={janela.aoSoltar} onPointerCancel={janela.aoSoltar}
-      onClick={bloquear} onPointerOver={(e) => { bloquear(e); ocuparPonteiroUI(escudo.current, e); }}
-      onPointerOut={(e) => liberarPonteiroUI(escudo.current, e.pointerId)}>
-      <planeGeometry args={[1.04, 0.085]} /><meshBasicMaterial colorWrite={false} depthWrite={false} side={DoubleSide} />
-    </mesh>
     {/* Ocultar sem desmontar preserva aba, rascunho, teclado e resposta em curso. */}
     <group visible={aberto} pointerEvents={aberto ? "auto" : "none"}>
       <SuperficieXR largura={largura} altura={altura} borda nivel={0} />
-      <mesh name="escudo-painel-xr" position={[0, 0, 0.005]} pointerEventsOrder={janela.ordem}
+      <mesh raycast={raioPlacaXR} name="escudo-painel-xr" position={[0, 0, 0.005]} pointerEventsOrder={janela.ordem}
         onClick={bloquear} onPointerDown={focar} onPointerUp={bloquear}
         onPointerOver={(e) => { bloquear(e); ocuparPonteiroUI(escudo.current, e); }}
         onPointerOut={(e) => liberarPonteiroUI(escudo.current, e.pointerId)}
@@ -48,21 +59,20 @@ export function PainelXRBase({ titulo, aberto, aoAlternar, children, conteudoSit
         <planeGeometry args={[largura, altura]} />
         <meshBasicMaterial colorWrite={false} depthWrite={false} side={DoubleSide} />
       </mesh>
-      {!conteudoSite && <>
-      <Text3D position={[-0.475, 0.482, 0.02]} anchorX="left" size={0.032} maxWidth={0.75}>{titulo}</Text3D>
-      <BotaoXR label="−" x={0.44} y={0.482} largura={0.09} onClick={aoAlternar} variante="ghost" />
-      <SuperficieXR largura={1.036} altura={0.002} y={0.422} cor={tema.border} />
-      </>}
       {children}
-      <SuperficieXR largura={1.04} altura={0.083} y={rodape} cor={tema.muted} borda />
-      <BotaoXR label="−" x={-0.463} y={rodape} largura={0.08} onClick={janela.diminuir} desabilitado={janela.escala <= LIMITES_JANELA_XR.escalaMin} />
-      <Text3D position={[-0.352, rodape, 0.03]} size={0.023}>{Math.round(janela.escala * 100) + "%"}</Text3D>
-      <BotaoXR label="+" x={-0.242} y={rodape} largura={0.08} onClick={janela.aumentar} desabilitado={janela.escala >= LIMITES_JANELA_XR.escalaMax} />
-      <BotaoXR label="Mais perto" x={-0.075} y={rodape} largura={0.225} tamanho={0.022} onClick={janela.aproximar} />
-      <BotaoXR label="Mais longe" x={0.164} y={rodape} largura={0.225} tamanho={0.022} onClick={janela.afastar} />
-      <BotaoXR label="Restaurar" x={0.397} y={rodape} largura={0.22} tamanho={0.022} onClick={janela.restaurar} />
+      {aberto && zonasBordaXR(largura, altura).map((zona) => <BordaJanela key={zona.borda.x + ":" + zona.borda.y} zona={zona} largura={largura} altura={altura} />)}
     </group>
-    {!aberto && <BotaoXR label={titulo + " · Abrir"} largura={1.04} altura={0.095} y={0.482} onClick={aoAlternar} />}
+    <group position={[alca.x, alca.y, 0.03]}>
+      <SuperficieXR largura={sobreAlca || janela.arrastando ? 0.24 : 0.20} altura={0.008} cor={sobreAlca || janela.arrastando ? tema.primary : tema.mutedForeground} nivel={5} />
+      <mesh raycast={raioPlacaXR} name="Mover janela pela alça inferior" pointerEventsOrder={janela.ordem + 2} userData={{ ordemJanelaXR: janela.ordem + 2 }}
+        onPointerDown={janela.aoApertar} onPointerMove={janela.aoMover} onPointerUp={janela.aoSoltar} onPointerCancel={janela.aoSoltar}
+        onClick={bloquear}
+        onPointerOver={(e) => { bloquear(e); ocuparPonteiroUI(escudo.current, e); setSobreAlca(true); }}
+        onPointerOut={(e) => { liberarPonteiroUI(escudo.current, e.pointerId); setSobreAlca(false); }}>
+        <planeGeometry args={[alca.largura, alca.altura]} /><meshBasicMaterial colorWrite={false} depthWrite={false} side={DoubleSide} />
+      </mesh>
+    </group>
+    {!aberto && <BotaoXR label={titulo} largura={Math.max(largura, 0.5)} altura={0.085} y={0} onClick={aoAlternar} />}
   </group>;
 }
 

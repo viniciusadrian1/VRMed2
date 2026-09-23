@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as THREE from "three";
+import { raioPlacaXR } from "../lib/raio-placa-xr.ts";
 import { createRayPointer } from "@pmndrs/pointer-events";
 import { alvoAindaValido, alvoNoPixel, colherAlvosDOM, contemPonto, intersecaoRetangulos, PAINEL_SITE_XR, pixelNoPainel, valorFaixaXR, type AlvoDOMXR } from "../lib/painel-dom-xr.ts";
 import { deveAcionarBotao3D } from "../lib/botao3d-interacao.ts";
@@ -131,7 +132,7 @@ for (const id of ["ferramentas", "tutor"] as const) {
     pai.position.set(1.2, 0.8, -0.4); pai.rotation.y = 0.3; cena.add(pai);
     janela.position.set(0.5, 0.2, -1.4); janela.rotation.y = giro; janela.scale.setScalar(escala); pai.add(janela);
     const plano = new THREE.Mesh(new THREE.PlaneGeometry(largura, altura), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })); janela.add(plano);
-    plano.pointerEventsOrder = 1201; controle.position.set(mao, 1, 0.5); cena.add(controle);
+    plano.raycast = raioPlacaXR; plano.pointerEventsOrder = 1201; controle.position.set(mao, 1, 0.5); cena.add(controle);
     let selecionado: AlvoDOMXR | null = null, cliques = 0;
     plano.addEventListener("pointerdown", (e) => {
       if (!deveAcionarBotao3D("pressionar", e)) return;

@@ -562,3 +562,31 @@ homologação**, pois a automação Computer Use falhou na inicialização do sa
 Não confundir igualdade estrutural de HTML com aprovação visual no headset.
 O usuário autorizou o commit e envio desta correção à `master` de
 `viniciusadrian1/VRMed2`, para teste físico no Quest.
+
+### Revisão — Quest com painéis vazios e controles de janela (23/09/2026)
+
+A correção anterior foi publicada em `af04e58`. O usuário testou no Quest e
+enviou captura com duas superfícies escuras, sem conteúdo. A nova revisão local
+remove os offsets/aliases do host oculto da raiz capturada e rejeita imagem
+transparente/uniforme. O conteúdo segue usando os componentes reais do site.
+A hipótese dos offsets é compatível com o código, mas não foi reproduzida no
+navegador do headset; não afirmar resolução definitiva sem reteste.
+
+As fileiras de botões e barra superior foram substituídas por alça inferior e
+redimensionamento nas bordas/cantos (65–155%). Fechar/recolher do próprio cabeçalho
+minimiza; o título reabre. B/Y recupera e abre ambas as janelas. Conteúdo e alças
+usam raycast retangular contínuo após um caso de falha numérica de triângulos
+reproduzido nos testes.
+
+No visualizador AR/VR, esquerdo gira e abre/fecha o crânio (tomba outros modelos);
+direito desloca lateralmente e afasta/aproxima no plano do olhar, sem mover câmera.
+Sobre uma área rolável da UI, direito rola, sem mover o órgão. A/X permanece.
+O tutor compartilha o botão enviar/parar com o site, sem botão externo duplicado.
+
+`typecheck`, `lint`, `verify:core`, `verify:paineis-xr` e `build` passaram.
+Incluídos 96 casos de borda, foco/analógicos e captura vazia sintética; mantidos
+324 cliques por pixel. **Não houve inspeção visual automatizada** (Computer Use
+bloqueado pelo sandbox), nem medição/homologação no Quest. Diagnóstico, arquivos e
+roteiro atualizado na última seção de `docs/PAINEIS-ESTUDO-XR.md`.
+O usuário autorizou o commit e envio desta revisão à `master` de
+`viniciusadrian1/VRMed2` para reteste físico no Quest; homologação visual pendente.

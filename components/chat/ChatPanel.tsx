@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Eraser, Send, Sparkles, X } from "lucide-react";
-import { enviarPerguntaTutor, limparConversaTutor, repetirPerguntaTutor, useConversaTutor } from "@/lib/tutor-conversa";
+import { Eraser, Send, Sparkles, Square, X } from "lucide-react";
+import { cancelarConversaTutor, enviarPerguntaTutor, limparConversaTutor, repetirPerguntaTutor, useConversaTutor } from "@/lib/tutor-conversa";
 import { useVRMedStore } from "@/lib/store";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
@@ -169,11 +169,11 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
           />
           <Button
             size="icon"
-            onClick={() => void sendMessage(input)}
-            disabled={isStreaming || input.trim().length === 0}
-            aria-label="Enviar mensagem"
+            onClick={() => isStreaming ? cancelarConversaTutor() : void sendMessage(input)}
+            disabled={!isStreaming && input.trim().length === 0}
+            aria-label={isStreaming ? "Parar resposta" : "Enviar mensagem"}
           >
-            <Send />
+            {isStreaming ? <Square /> : <Send />}
           </Button>
         </div>
         <p className="mt-1.5 text-[11px] text-muted-foreground">

@@ -5,7 +5,7 @@ const alvos = new Map<object, Map<number, XRHandedness>>();
 
 export function ocuparPonteiroUI(dono: object, evento: { pointerId: number }) {
   const fonte = fonteDoPonteiro(evento);
-  if (!fonte?.hand || fonte.handedness === "none") return;
+  if (!fonte || fonte.handedness === "none") return;
   let ponteiros = alvos.get(dono);
   if (!ponteiros) alvos.set(dono, ponteiros = new Map());
   ponteiros.set(evento.pointerId, fonte.handedness);

@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { useXRInputSourceState } from "@react-three/xr";
 import * as THREE from "three";
 import { bloquearPincaUI, maoNaInterface } from "@/lib/xr-foco-interface";
+import { analogicosEstudoXR, transladarModeloXR } from "@/lib/controles-modelo-xr";
 
 /** Limites de escala, relativos ao tamanho original do modelo. */
 const MIN_SCALE = 0.2;
@@ -106,8 +107,9 @@ interface Snapshot {
  *    mantendo a posição relativa de onde foi agarrado.
  *  - **Pegar com as duas** — afastar/aproximar aumenta e diminui;
  *    mover as duas juntas arrasta o modelo.
- *  - **Analógico ⇄ (qualquer um)** — gira o órgão como um torno (yaw).
- *  - **Analógico direito ↕** — traz para perto do rosto / afasta.
+ *  - **Esquerdo ⇄** — gira o órgão como um torno (yaw).
+ *  - **Direito ⇄ / ↕ no visualizador** — desloca lateralmente / afasta-aproxima.
+ *    Outros modos preservam o contrato anterior de giro e aproximação.
  *  - **Analógico esquerdo ↕** — tomba o órgão (pitch), para alcançar
  *    estruturas no topo ou embaixo. Num modelo que se separa em partes (o
  *    crânio), abre e fecha em vez de tombar (`aoExplodir`).
@@ -121,8 +123,11 @@ export function XRManipulation({
   target,
   aoResetar,
   aoExplodir,
+  controlesSeparados = false,
 }: {
   target: RefObject<THREE.Group | null>;
+  /** Visualizador: esquerdo gira/abre, direito desloca. Outros modos mantêm seu contrato. */
+  controlesSeparados?: boolean;
   /**
    * O que A/X faz com a POSIÇÃO. Sem isto, volta ao instantâneo inicial — o
    * certo nas cenas com lugar fixo (clínica, arena, mapa de achados). O
@@ -155,6 +160,7 @@ export function XRManipulation({
   /** Pinça ativa em cada mão, para aplicar a histerese. */
   const pinching = useRef({ left: false, right: false });
   const pincaNaUI = useRef({ left: false, right: false });
+  const pegadaUI = useRef({ esquerdaAntes: false, direitaAntes: false, esquerda: false, direita: false });
 
   useFrame((state, rawDelta, frame) => {
     const model = target.current;
@@ -212,10 +218,14 @@ export function XRManipulation({
 
     pincaNaUI.current.left = bloquearPincaUI(pinching.current.left, esquerdaAntes, pincaNaUI.current.left, maoNaInterface("left"));
     pincaNaUI.current.right = bloquearPincaUI(pinching.current.right, direitaAntes, pincaNaUI.current.right, maoNaInterface("right"));
+    const apertoEsquerdo = isPressed(leftController, "xr-standard-squeeze"), apertoDireito = isPressed(rightController, "xr-standard-squeeze");
+    pegadaUI.current.esquerda = bloquearPincaUI(apertoEsquerdo, pegadaUI.current.esquerdaAntes, pegadaUI.current.esquerda, controlesSeparados && maoNaInterface("left"));
+    pegadaUI.current.direita = bloquearPincaUI(apertoDireito, pegadaUI.current.direitaAntes, pegadaUI.current.direita, controlesSeparados && maoNaInterface("right"));
+    pegadaUI.current.esquerdaAntes = apertoEsquerdo; pegadaUI.current.direitaAntes = apertoDireito;
     const leftHeld =
-      isPressed(leftController, "xr-standard-squeeze") || (pinching.current.left && !pincaNaUI.current.left);
+      (apertoEsquerdo && !pegadaUI.current.esquerda) || (pinching.current.left && !pincaNaUI.current.left);
     const rightHeld =
-      isPressed(rightController, "xr-standard-squeeze") ||
+      (apertoDireito && !pegadaUI.current.direita) ||
       (pinching.current.right && !pincaNaUI.current.right);
     const leftHand = leftController?.object ?? leftHandInput?.object;
     const rightHand = rightController?.object ?? rightHandInput?.object;
@@ -275,7 +285,7 @@ export function XRManipulation({
     /* ------------- Analógicos: girar, tombar e aproximar ------------- */
     // Virar o modelo pela pegada 1:1 exige contorção do punho (180° de giro
     // = 180° de pulso). Os analógicos fazem isso sem esforço:
-    //   direito  X → gira (yaw)      | direito  Y → aproxima/afasta
+    //   direito  X → desloca (estudo) ou gira (outros) | Y → aproxima/afasta
     //   esquerdo X → gira (yaw)      | esquerdo Y → TOMBA (pitch)
     // O tombamento é o que faltava: estrutura no topo ou embaixo do órgão
     // era inalcançável só com o giro horizontal.
@@ -286,15 +296,16 @@ export function XRManipulation({
     const ly = leftPad?.yAxis ?? 0;
     const ry = rightPad?.yAxis ?? 0;
 
-    // Por analógico, age só o eixo DOMINANTE. Ninguém empurra o polegar
+    // No giro, age só o eixo DOMINANTE. Ninguém empurra o polegar
     // perfeitamente para o lado — sempre vai um resto de "frente" junto, e
     // com os eixos independentes tentar girar disparava o aproximar.
+    const separado = analogicosEstudoXR(lx, ly, rx, ry, maoNaInterface("left"), maoNaInterface("right"));
     const rightSpin = Math.abs(rx) >= Math.abs(ry) ? shapedAxis(rx) : 0;
-    const approach = Math.abs(ry) > Math.abs(rx) ? shapedAxis(ry) : 0;
+    const approach = controlesSeparados ? 0 : Math.abs(ry) > Math.abs(rx) ? shapedAxis(ry) : 0;
     const leftSpin = Math.abs(lx) >= Math.abs(ly) ? shapedAxis(lx) : 0;
-    const pitch = Math.abs(ly) > Math.abs(lx) ? shapedAxis(ly) : 0;
-    const spin =
-      Math.abs(rightSpin) >= Math.abs(leftSpin) ? rightSpin : leftSpin;
+    const pitch = controlesSeparados ? separado.aberturaOuTombo : Math.abs(ly) > Math.abs(lx) ? shapedAxis(ly) : 0;
+    const spin = controlesSeparados ? separado.giro : Math.abs(rightSpin) >= Math.abs(leftSpin) ? rightSpin : leftSpin;
+    if (controlesSeparados) transladarModeloXR(model, state.gl.xr.isPresenting ? state.gl.xr.getCamera() : state.camera, separado.lateral, separado.profundidade, delta);
 
     if (spin !== 0) {
       // Analógico para a direita traz para a frente o lado que estava à
@@ -730,6 +741,7 @@ export function EntradaXR({
       {posicionado && (
         <XRManipulation
           target={target}
+          controlesSeparados
           aoExplodir={explosao?.mover}
           aoResetar={(model, gl, frame) => {
             explosao?.fechar();

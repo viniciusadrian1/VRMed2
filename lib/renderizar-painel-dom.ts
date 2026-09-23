@@ -1,4 +1,5 @@
 import { colherAlvosDOM, type AlvoDOMXR } from "./painel-dom-xr";
+import { estiloRaizCapturada, validarPixelsPainel } from "./painel-captura-xr";
 
 export type QuadroPainelDOM = { canvas: HTMLCanvasElement; alvos: AlvoDOMXR[] };
 let fonteLocal: Promise<string> | undefined;
@@ -47,8 +48,12 @@ async function desenharPainel(raiz: HTMLElement, escala: number): Promise<Quadro
   if (!largura || !altura || !raiz.isConnected) throw new Error("Painel não está montado");
   // Geometria de interação e imagem são capturadas no mesmo instante de layout.
   const alvos = colherAlvosDOM(raiz), copia = clonarComEstilos(raiz) as HTMLElement;
-  copia.style.position = "relative"; copia.style.left = "0"; copia.style.top = "0"; copia.style.right = "auto"; copia.style.margin = "0";
-  copia.style.width = largura + "px"; copia.style.height = altura + "px"; copia.removeAttribute("aria-hidden");
+  // Também existem inset-inline-start/inset-block-start no estilo computado.
+  // Trocar só left/top preservava aliases de -10000px: a imagem podia ficar vazia.
+  const estiloOriginal = getComputedStyle(raiz);
+  copia.style.cssText = "";
+  for (const [nome, valor] of Object.entries(estiloRaizCapturada(largura, altura, (nome) => estiloOriginal.getPropertyValue(nome)))) copia.style.setProperty(nome, valor);
+  copia.removeAttribute("aria-hidden");
   const style = document.createElement("style");
   const placeholder = getComputedStyle(raiz.querySelector("textarea,input") ?? raiz, "::placeholder").color;
   style.textContent = `@font-face{font-family:"VRmed Inter";src:url("${fonte}") format("woff");font-weight:600;font-style:normal}textarea::placeholder,input::placeholder{color:${placeholder}}`;
@@ -57,6 +62,7 @@ async function desenharPainel(raiz: HTMLElement, escala: number): Promise<Quadro
   svg.setAttribute("width", String(largura * escala)); svg.setAttribute("height", String(altura * escala));
   svg.setAttribute("viewBox", `0 0 ${largura} ${altura}`);
   const objeto = document.createElementNS(svg.namespaceURI, "foreignObject");
+  objeto.setAttribute("x", "0"); objeto.setAttribute("y", "0");
   objeto.setAttribute("width", String(largura)); objeto.setAttribute("height", String(altura)); objeto.appendChild(copia); svg.appendChild(objeto);
   const endereco = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(svg));
   const imagem = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -70,8 +76,11 @@ async function desenharPainel(raiz: HTMLElement, escala: number): Promise<Quadro
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D indisponível");
   ctx.drawImage(imagem, 0, 0);
-  // Detecta canvas contaminado/recusado antes de enviá-lo ao WebGL.
-  ctx.getImageData(0, 0, 1, 1);
+  // Ambos os painéis sempre têm título/ícones no cabeçalho. Transparência ou
+  // fundo uniforme NÃO é uma captura bem-sucedida, mesmo sem erro do canvas.
+  if (!validarPixelsPainel(ctx.getImageData(0, 0, canvas.width, Math.min(canvas.height, Math.ceil(120 * escala))).data)) {
+    throw new Error("PAINEL_SEM_CONTEUDO: o navegador não desenhou o cabeçalho HTML");
+  }
   return { canvas, alvos };
 }
 export function renderizarPainelDOM(raiz: HTMLElement, escala = 2) {

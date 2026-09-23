@@ -4,14 +4,12 @@ import { useEffect, useRef, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useXRInputSourceState } from "@react-three/xr";
 import { Group } from "three";
-import { TextoPainelXR as Text3D } from "./EstiloPainelXR";
 import { JanelaMovelXR } from "./JanelaMovelXR";
 import { useJanelasEstudoXR } from "@/lib/janelas-estudo-xr";
 import { PAINEIS_XR } from "@/lib/painel-estudo-xr";
 import { useVRMedStore } from "@/lib/store";
 import { FerramentasPainelXR } from "./FerramentasPainelXR";
 import { TutorPainelVR } from "./TutorPainelVR";
-import { BotaoXR } from "./PainelXRBase";
 import { poseDaCabeca } from "./XRManipulation";
 
 /** Inspeção desktop só montada em desenvolvimento; não simula hardware WebXR. */
@@ -32,6 +30,8 @@ export function PaineisEstudoXR({ inspecao, saidaRef }: { inspecao?: InspecaoPai
     if (pressionado && !botaoAnterior.current) {
       reposicionar.current = true;
       useJanelasEstudoXR.getState().restaurarLayout();
+      useJanelasEstudoXR.getState().abrir("ferramentas", true);
+      useJanelasEstudoXR.getState().abrir("tutor", true);
     }
     botaoAnterior.current = pressionado;
     if (!reposicionar.current) return;
@@ -59,11 +59,5 @@ export function PaineisEstudoXR({ inspecao, saidaRef }: { inspecao?: InspecaoPai
     <JanelaMovelXR id="tutor" posicao={[PAINEIS_XR.lateral, 0, -PAINEIS_XR.distancia]} rotacao={-PAINEIS_XR.inclinacao}>
       <TutorPainelVR />
     </JanelaMovelXR>
-    <group position={[-0.27, -0.66, -1.12]}>
-      <BotaoXR label="Reposicionar painéis" largura={0.48} y={0} onClick={() => { reposicionar.current = true; useJanelasEstudoXR.getState().restaurarLayout(); }} />
-      <BotaoXR label="Ferramentas" x={-0.02} y={-0.1} largura={0.48} onClick={() => useJanelasEstudoXR.getState().abrir("ferramentas", true)} />
-      <BotaoXR label="Tutor de IA" x={0.56} y={-0.1} largura={0.48} onClick={() => useJanelasEstudoXR.getState().abrir("tutor", true)} />
-      <Text3D position={[0.27, -0.23, 0]} size={0.022} color="#f8f7f4" maxWidth={0.9}>B/Y: restaurar painéis</Text3D>
-    </group>
   </group>;
 }

@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { useThree, type ThreeEvent } from "@react-three/fiber";
-import { useXR } from "@react-three/xr";
+import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { useXR, useXRInputSourceState } from "@react-three/xr";
 import { CanvasTexture, DoubleSide, LinearFilter, SRGBColorSpace, type Mesh } from "three";
 import { ToolsPanelContent } from "./ToolsPanel";
 import { ChatPanelContent } from "@/components/chat/ChatPanel";
@@ -20,20 +20,8 @@ import { liberarPonteiroUI, ocuparPonteiroUI } from "@/lib/xr-foco-interface";
 import { pulsar } from "@/lib/xr-haptica";
 import { playClique } from "@/lib/arena-audio";
 import { useVRMedStore } from "@/lib/store";
-import { getOrganById } from "@/lib/organs";
-import { cancelarConversaTutor, useConversaTutor } from "@/lib/tutor-conversa";
-
-function AcoesModeloXR() {
-  const malha = useVRMedStore((s) => s.wireframe), abertura = useVRMedStore((s) => s.explosao);
-  const explodivel = useVRMedStore((s) => Boolean(getOrganById(s.currentOrganId)?.explosao));
-  return <>
-    <BotaoXR label={malha ? "Malha: ligada" : "Ver malha"} x={explodivel ? -0.34 : 0} y={0} largura={0.30} ativo={malha} onClick={() => useVRMedStore.getState().toggleWireframe()} />
-    {explodivel && <>
-      <BotaoXR label="Fechar ossos" y={0} largura={0.30} desabilitado={abertura === 0} onClick={() => useVRMedStore.getState().setExplosao(abertura - 0.1)} />
-      <BotaoXR label="Abrir ossos" x={0.34} y={0} largura={0.30} desabilitado={abertura === 1} onClick={() => useVRMedStore.getState().setExplosao(abertura + 0.1)} />
-    </>}
-  </>;
-}
+import { raioPlacaXR } from "@/lib/raio-placa-xr";
+import { eixoSuaveXR } from "@/lib/controles-modelo-xr";
 
 type Evento = ThreeEvent<PointerEvent>;
 type Entrada = { elemento: HTMLInputElement | HTMLTextAreaElement; texto: string; cor: boolean };
@@ -53,10 +41,11 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
   const plano = useRef<Mesh>(null), realce = useRef<Mesh>(null), dono = useRef({}), gesto = useRef<Gesto | null>(null);
   const solicitar = useRef<(urgente?: boolean) => void>(() => {}), sobre = useRef<AlvoDOMXR | null>(null);
   const cancelarInteracao = useRef(() => {});
-  const [textura, setTextura] = useState<CanvasTexture | null>(null), [erro, setErro] = useState(false);
-  const [entrada, setEntrada] = useState<Entrada | null>(null), [rotulo, setRotulo] = useState("");
+  const [textura, setTextura] = useState<CanvasTexture | null>(null), [erro, setErro] = useState<string | null>(null);
+  const [entrada, setEntrada] = useState<Entrada | null>(null);
   const { invalidate, gl } = useThree(), sessao = useXR((s) => s.session);
-  const ocupado = useConversaTutor((s) => s.ocupado);
+  const direito = useXRInputSourceState("controller", "right");
+  const mira = useRef(new Map<number, { lado: XRHandedness; x: number; y: number }>());
   const alternar = () => useJanelasEstudoXR.getState().abrir(id, !aberto);
 
   useEffect(() => {
@@ -80,6 +69,7 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
     dom.render(<ConteudoSiteXR id={id} aoFechar={fecharJanela} portal={host} />);
     let fim = false, ocupado = false, sujo = true, urgente = false, timer = 0, ultimo = 0;
     let mapa: CanvasTexture | null = null;
+    let ultimoErro = "";
     const atualizar = (prioritario = false) => {
       sujo = true; urgente ||= prioritario;
       if (fim || ocupado || !useJanelasEstudoXR.getState().abertas[id]) return;
@@ -99,11 +89,15 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
             mapa.minFilter = LinearFilter; mapa.magFilter = LinearFilter; mapa.generateMipmaps = false;
             setTextura(mapa);
           } else { mapa.image = proximo.canvas; mapa.needsUpdate = true; }
-          quadro.current = proximo; setErro(false); invalidate();
-        } catch {
+          quadro.current = proximo; ultimoErro = ""; setErro(null); invalidate();
+        } catch (falha) {
           if (!fim) {
+            // Código técnico, sem conversa, HTML ou dados pessoais no console.
+            const codigo = falha instanceof Error && falha.message.startsWith("PAINEL_SEM_CONTEUDO") ? "PAINEL_SEM_CONTEUDO" : "FALHA_CAPTURA_HTML";
+            if (codigo !== ultimoErro) console.warn("[VRmed/XR]", id, codigo);
+            ultimoErro = codigo;
             quadro.current = null; cancelarInteracao.current();
-            setErro(true); invalidate();
+            setErro(codigo); invalidate();
           }
         } finally { ocupado = false; if (sujo && !fim) atualizar(); }
       }, Math.max(0, (urgente ? 80 : 250) - (performance.now() - ultimo)));
@@ -129,7 +123,7 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
   useEffect(() => {
     const d = dono.current;
     const cancelar = () => {
-      const atual = gesto.current; gesto.current = null; sobre.current = null;
+      const atual = gesto.current; gesto.current = null; sobre.current = null; mira.current.clear();
       if (atual) { try { atual.captura.releasePointerCapture(atual.id); } catch { /* Controle removido. */ } }
       liberarPonteiroUI(d);
       if (realce.current) realce.current.visible = false;
@@ -169,6 +163,7 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
     e.stopPropagation(); ocuparPonteiroUI(dono.current, e);
     const p = pixel(e), host = raiz.current, atual = gesto.current;
     if (!p || !host || !quadro.current) return;
+    const fonte = fonteDoPonteiro(e); if (fonte) mira.current.set(e.pointerId, { lado: fonte.handedness, ...p });
     if (atual?.id === e.pointerId) {
       if (atual.alvo.tipo === "slider") slider(atual.alvo, p.x);
       else { atual.alvo.elemento.scrollTop -= p.y - atual.ultimoY; atual.ultimoY = p.y; solicitar.current(true); }
@@ -185,8 +180,6 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
         realce.current.scale.set(r.largura / dimensao.largura * largura, r.altura / dimensao.altura * altura, 1);
       }
     }
-    const nome = valido ? alvo.elemento.getAttribute("aria-label") || alvo.elemento.getAttribute("title") || alvo.elemento.textContent?.trim().slice(0, 60) || "Editar" : "";
-    setRotulo(nome);
   };
   const pressionar = (e: Evento) => {
     e.stopPropagation(); if (e.button !== 0 || gesto.current) return;
@@ -221,12 +214,28 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
     setEntrada(null); solicitar.current(true);
   };
 
+  useFrame((_, delta) => {
+    if (!aberto || entrada || janela.arrastando || gesto.current || !quadro.current) return;
+    const eixo = eixoSuaveXR(direito?.gamepad?.["xr-standard-thumbstick"]?.yAxis ?? 0);
+    if (!eixo) return;
+    for (const alvo of mira.current.values()) {
+      if (alvo.lado !== "right") continue;
+      const regiao = alvoNoPixel(quadro.current.alvos, alvo.x, alvo.y, true);
+      if (regiao) {
+        const antes = regiao.elemento.scrollTop;
+        regiao.elemento.scrollTop += eixo * Math.min(delta, 1 / 30) * 600;
+        if (antes !== regiao.elemento.scrollTop) solicitar.current(true);
+      }
+      break;
+    }
+  });
+
   return <PainelXRBase titulo={id === "tutor" ? "Tutor de IA" : "Ferramentas do modelo"} aberto={aberto} aoAlternar={alternar}
-    conteudoSite largura={largura} altura={altura}>
-    {textura && !erro ? <mesh ref={plano} name={"Site: " + id} position={[0, 0, 0.01]}
+    largura={largura} altura={altura}>
+    {textura && !erro ? <mesh ref={plano} raycast={raioPlacaXR} name={"Site: " + id} position={[0, 0, 0.01]}
       renderOrder={janela.ordem + 3} pointerEventsOrder={janela.ordem + 1} userData={{ ordemJanelaXR: janela.ordem + 1 }}
       onPointerMove={apontar} onPointerOver={apontar} onPointerDown={pressionar} onPointerUp={soltar} onPointerCancel={soltar}
-      onPointerOut={(e) => { if (gesto.current?.id !== e.pointerId) { liberarPonteiroUI(dono.current, e.pointerId); sobre.current = null; setRotulo(""); if (realce.current) realce.current.visible = false; } }}
+      onPointerOut={(e) => { mira.current.delete(e.pointerId); if (gesto.current?.id !== e.pointerId) { liberarPonteiroUI(dono.current, e.pointerId); sobre.current = null; if (realce.current) realce.current.visible = false; } }}
       onClick={(e) => {
         e.stopPropagation(); if (!deveAcionarBotao3D("clicar", e)) return;
         const p = pixel(e), host = raiz.current; if (!p || !host || !quadro.current) return;
@@ -236,23 +245,17 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
       onWheel={(e) => { e.stopPropagation(); rolar(e.deltaY); }}>
       <planeGeometry args={[largura, altura]} />
       <meshBasicMaterial map={textura} transparent depthTest={false} depthWrite={false} toneMapped={false} side={DoubleSide} />
-    </mesh> : <TextoPainelXR size={0.03} maxWidth={largura - 0.05}>{erro ? "Não foi possível mostrar o painel do site." : "Carregando o painel do site..."}</TextoPainelXR>}
+    </mesh> : <TextoPainelXR size={0.03} maxWidth={largura - 0.05}>{erro === "PAINEL_SEM_CONTEUDO" ? "O navegador gerou um painel vazio. Tente carregar novamente." : erro ? "Não foi possível mostrar o painel do site." : "Carregando o painel do site..."}</TextoPainelXR>}
     {erro && <BotaoXR label="Tentar novamente" largura={0.45} y={-0.15} onClick={() => solicitar.current(true)} />}
     <mesh ref={realce} visible={false} renderOrder={janela.ordem + 4} raycast={() => null}>
       <planeGeometry args={[1, 1]} /><meshBasicMaterial color="#5896c8" opacity={0.16} transparent depthTest={false} depthWrite={false} toneMapped={false} side={DoubleSide} />
     </mesh>
-    <group position={[0, -altura / 2 - 0.145, 0.03]}>
-      <BotaoXR label="Subir" x={-0.36} y={0} largura={0.24} onClick={() => rolar(-210)} />
-        <TextoPainelXR position={[0, 0, 0.02]} size={0.02} maxWidth={0.42}>{erro ? "Painel indisponível" : rotulo || "Arraste o texto para rolar"}</TextoPainelXR>
-      <BotaoXR label="Descer" x={0.36} y={0} largura={0.24} onClick={() => rolar(210)} />
-    </group>
-    <group position={[0, -altura / 2 - 0.235, 0.03]}>
-      {id === "ferramentas" ? <AcoesModeloXR /> : ocupado && <BotaoXR label="Parar resposta" y={0} largura={0.55} onClick={cancelarConversaTutor} />}
-    </group>
     {entrada && <ContextoJanelaXR.Provider value={{ ...janela, ordem: janela.ordem + 20 }}>
       <group position={[0, 0, 0.08]} userData={{ ordemJanelaXR: janela.ordem + 20 }} pointerEventsOrder={janela.ordem + 20}>
         <SuperficieXR largura={1.04} altura={1.12} borda nivel={0} />
-        <mesh onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+        <mesh raycast={raioPlacaXR} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}
+          onPointerOver={(e) => { e.stopPropagation(); ocuparPonteiroUI(dono.current, e); }}
+          onPointerOut={(e) => liberarPonteiroUI(dono.current, e.pointerId)}>
           <planeGeometry args={[1.04, 1.12]} /><meshBasicMaterial colorWrite={false} depthWrite={false} side={DoubleSide} />
         </mesh>
         <TextoPainelXR position={[0, 0.48, 0.02]} size={0.03}>{entrada.cor ? "Cor de destaque" : "Editar texto"}</TextoPainelXR>

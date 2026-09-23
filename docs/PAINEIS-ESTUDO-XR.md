@@ -2,7 +2,10 @@
 
 Implementação inicial: 23/09/2026, publicada em `ddc9dd2` após autorização.
 Revisão de identidade e manipulação: 23/09/2026, publicada em `2f6b228` após
-autorização posterior. Nova correção de HTML/mira documentada ao final.
+autorização posterior. A captura HTML foi publicada em `af04e58`, mas o teste do
+usuário mostrou painéis vazios. **O estado atual está na última seção:** revisão
+local da captura, alça inferior/bordas e analógicos separados. As seções anteriores
+são histórico, não a descrição da interface atual.
 
 ## O que mudou
 
@@ -323,3 +326,122 @@ Antes de publicar para uso geral, verificar no navegador e no Quest:
    Não deve restar alvo invisível, gesto preso ou painel antigo clicável.
 7. Medir fluidez/custo de captura durante streaming, rolagem e teclado, em AR e VR.
    Não há nova medição de FPS/draw calls. O crânio mantém seu risco de geometria alta.
+
+## Revisão — painel vazio, alça inferior e analógicos separados (23/09/2026)
+
+**Estado atual:** revisão sobre `af04e58`. Esta seção substitui a descrição antiga
+de barra superior, fileiras de comandos e dock. O usuário autorizou o commit e
+envio à `master` de `viniciusadrian1/VRMed2` para reteste físico no Quest.
+
+### Evidência e correção da captura
+
+O usuário forneceu uma captura real do Quest em AR: as duas superfícies estavam
+escuras e sem conteúdo, embora as barras externas aparecessem. Isso reprova a
+validação visual da versão publicada; os testes de HTML/raios não detectavam o erro.
+
+A clonagem copiava todas as propriedades CSS do host situado em `left:-10000px`,
+inclusive aliases lógicos de posicionamento, e depois alterava somente left/top.
+A raiz agora recebe uma lista restrita de propriedades de pintura/tipografia e um
+layout novo, na origem do SVG, sem insets lógicos ou transformações do host oculto.
+Aliases lógicos podem corresponder a coordenadas físicas conforme a escrita
+([MDN — inset-inline-start](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/inset-inline-start)).
+**Essa é uma hipótese compatível encontrada no código, não uma causa reproduzida no
+navegador do Quest.** O estilo computado real e a imagem final ainda precisam de inspeção.
+
+Também foi corrigido um erro verificável de validação: ler um pixel sem exceção
+aceitava uma imagem completamente transparente/uniforme. Agora os primeiros 120 px
+CSS, que sempre incluem título/ícones, precisam ter opacidade e contraste mínimos.
+Se a captura falhar, o mapa de cliques antigo é invalidado, aparece mensagem com
+nova tentativa e registra-se somente um código técnico por falha no console
+(`PAINEL_SEM_CONTEUDO` ou `FALHA_CAPTURA_HTML`), sem HTML/conversa/dados pessoais.
+Essa verificação detecta imagem vazia; não comprova fidelidade completa.
+
+A fonte do conteúdo continua sendo **ToolsPanelContent/ChatPanelContent reais**,
+com seu HTML, CSS, ícones e estado, não uma recriação 3D. Não foi introduzido
+fallback visual aproximado. A biblioteca html2canvas já instalada foi avaliada,
+mas não adicionada a este caminho: o projeto registra incompatibilidades dela com
+cores do Tailwind v4 em `lib/pdf-export.ts`.
+
+### Manipulação atual
+
+- **Mover:** segurar o gatilho sobre a pequena alça inferior e arrastar. O alvo é
+  maior que o traço visível. Soltar orienta a janela horizontalmente para o usuário.
+- **Tamanho:** puxar qualquer uma das oito bordas/cantos. Mantém a proporção do
+  conteúdo e o lado/canto oposto ancorado, entre 65% e 155%, dentro dos limites
+  espaciais existentes. Há realce somente ao apontar.
+- **Minimizar:** usar o fechar/recolher do cabeçalho original. Um pequeno título
+  fica no lugar para reabrir; rascunho, aba e conversa são preservados.
+- **Recuperar as janelas:** B ou Y reabre ambas e restaura o layout à frente do olhar.
+- Removidas barras superiores e fileiras de +/-/perto/longe/restaurar/rolar/comandos
+  do modelo. O botão permanente de sair de XR foi preservado.
+- O botão de enviar do tutor passa a parar a resposta durante streaming, tanto
+  no site quanto no XR, sem um controle externo duplicado.
+- Teclado 3D e seletor de cor continuam sendo adaptações de entrada, não janelas
+  nativas do sistema Quest.
+
+Foi reproduzida, nos testes de raios, uma perda de interseção na emenda dos dois
+triângulos de uma pequena placa transformada. Alça, bordas, escudo e conteúdo usam
+agora um raycast retangular contínuo, sem ampliar as áreas de ação dos botões.
+A conversão raio→pixel continua usando a matriz real do painel e o mapa da captura.
+
+### Controles do modelo no visualizador (AR e VR)
+
+| Controle | Horizontal | Vertical |
+| --- | --- | --- |
+| Esquerdo | Girar o órgão | Puxar abre / empurrar fecha o crânio; tomba modelos sem abertura |
+| Direito | Deslocar esquerda/direita | Empurrar afasta / puxar aproxima |
+
+O deslocamento direito segue o plano horizontal do olhar, sem alterar altura,
+rotação, escala ou câmera. Tem zona morta/curva suave, velocidade diagonal limitada,
+limites de distância e passo de tempo limitado ao retomar a sessão.
+
+Apontar para a interface reserva esse controle para ela: o direito rola a região
+rolável sob o laser, sem levar o órgão junto. A pegada lateral iniciada sobre UI
+fica bloqueada para o órgão até soltar. A/X continua restaurando o modelo.
+A opção `controlesSeparados` é ativada somente por `EntradaXR`; demais consumidores
+de `XRManipulation` e regras do Duelo conservam seu contrato.
+
+### Arquivos desta revisão
+
+- `lib/painel-captura-xr.ts`, `lib/renderizar-painel-dom.ts`: raiz segura e rejeição de imagem vazia.
+- `lib/raio-placa-xr.ts`, `lib/gestos-janelas-xr.ts`: alvos contínuos, alça e redimensionamento.
+- `components/viewer/PainelXRBase.tsx`, `JanelaMovelXR.tsx`, `ContextoJanelaXR.tsx`:
+  manipulação da janela sem fileiras de botões.
+- `components/viewer/PainelSiteXR.tsx`, `PaineisEstudoXR.tsx`:
+  captura, rolagem pelo direito, recuperação e remoção do dock.
+- `lib/controles-modelo-xr.ts`, `lib/xr-foco-interface.ts`,
+  `components/viewer/XRManipulation.tsx`: eixos separados e foco.
+- `components/chat/ChatPanel.tsx`: enviar/parar compartilhado.
+- `scripts/verificar-gestos-estudo-xr.ts`, `scripts/verificar-paineis-site-xr.ts`,
+  `package.json`: regressões e comando integrado.
+- Este relatório e `docs/CONTEXTO.md`: estado/limites da entrega.
+
+### Testes e homologação pendente
+
+Passaram `typecheck`, `lint`, `verify:core` e `build`. Depois da ampliação final
+dos testes, `typecheck`, `lint`, `verify:paineis-xr` e `build` foram repetidos e
+passaram. O novo script inclui estilos/pixels sintéticos, foco dos controles,
+movimento com pais transformados/câmera preservada, **96 pegadas de borda** com
+captura de ponteiro e limites/UV do raycast. Permanecem os **324 cliques por pixel**
+e comparação estrutural do HTML site/XR. Sem chamada nova à OpenAI.
+
+**Não homologado visualmente.** A skill Computer Use falhou na inicialização
+(`trusted Node process exited`; após reset, `apply deny-read ACLs`).
+Não foi produzido antes/depois no navegador nem medição de FPS/latência no Quest.
+As verificações numéricas não validam SVG/foreignObject no navegador do headset.
+DPR XR permanece 1; sem pós-processamento, alteração de GLB ou dependência nova.
+A captura adicional de pixels tem custo ainda não medido no dispositivo.
+
+Reteste obrigatório, em AR **e** VR:
+
+1. Conferir conteúdo real (não apenas fundo) e comparar claro/escuro, fonte, abas,
+   sliders, conversa vazia/longa e formulário com o site.
+2. Mover cada painel pela alça e puxar as oito bordas/cantos. Repetir cliques no
+   tutor depois de ampliar, mover e sobrepor janelas.
+3. Minimizar pelo cabeçalho, reabrir pelo título e recuperar com B/Y.
+4. Mirar a conversa/lista e rolar pelo direito; órgão deve ficar parado.
+5. Fora da UI: esquerdo gira/abre/fecha; direito desloca sem girar, alterar altura
+   ou mover a câmera. Repetir olhando para outros lados, sentado e em pé.
+6. Pausar/desconectar durante gesto; sair/reentrar. Nada fica preso ou invisível
+   capturando cliques. Forçar erro de captura deve mostrar nova tentativa.
+7. Medir fluidez com crânio, streaming, rolagem e teclado antes de liberar para evento.
