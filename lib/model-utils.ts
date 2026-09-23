@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { categorizeMesh, translateMeshName } from "@/lib/anatomy-labels";
+import { categorizeMesh, translateMeshName } from "./anatomy-labels.ts";
 import type {
   ClipAxis,
   ClippingState,
@@ -171,6 +171,9 @@ function structureNameOf(object: THREE.Object3D): string | null {
   let found: THREE.Object3D | null = null;
   let depth = 0;
   while (node && depth < 10) {
+    // O contêiner da aplicação não é anatomia. Órgãos sem nomes internos
+    // chegavam até ele e ganhavam um falso ponto chamado "Vrmed Root".
+    if (node.name === NOME_DO_ROOT) break;
     const name = cleanStructureName(node.name ?? "");
     if (name && !isGenericName(name)) {
       found = node;
@@ -186,6 +189,7 @@ function structureNameOf(object: THREE.Object3D): string | null {
   let best = found;
   let guard = 0;
   while (best.parent && guard < 6) {
+    if (best.parent.name === NOME_DO_ROOT) break;
     const parentName = cleanStructureName(best.parent.name ?? "");
     const bestName = cleanStructureName(best.name ?? "");
     if (

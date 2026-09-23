@@ -1,8 +1,10 @@
 import type { ChatApiMessage } from "@/types";
+import { lerEventosTutor, type ContextoTutor, type ComandoTutor } from "./tutor-3d.ts";
 
 interface ChatRequestPayload {
   messages: ChatApiMessage[];
   currentOrgan?: string;
+  contexto3d?: ContextoTutor;
 }
 
 /**
@@ -13,6 +15,7 @@ export async function streamChatResponse(
   payload: ChatRequestPayload,
   onChunk: (text: string) => void,
   signal?: AbortSignal,
+  onCommand?: (comando: ComandoTutor) => void,
 ): Promise<void> {
   // O servidor aceita no máximo 40 mensagens não vazias (app/api/chat/route.ts).
   // Sem este corte, um chat longo persistido no localStorage deixava o tutor
@@ -43,6 +46,13 @@ export async function streamChatResponse(
       throw new Error(message);
     }
 
+    if (response.headers.get("Content-Type")?.includes("application/x-ndjson")) {
+      await lerEventosTutor(response.body, (evento) => {
+        if (evento.tipo === "texto") onChunk(evento.texto);
+        if (evento.tipo === "comando") onCommand?.(evento.comando);
+      }, signal);
+      return;
+    }
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 

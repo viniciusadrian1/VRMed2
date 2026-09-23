@@ -11,7 +11,9 @@ export interface ViewerBridge {
   /** Reposiciona a câmera na vista padrão. */
   resetCamera: () => void;
   /** Anima a câmera até enquadrar um ponto do modelo. */
-  frameTo: (point: Vec3) => void;
+  frameTo: (point: Vec3, radius?: number) => void;
+  /** Interrompe transição sem mudar a posição escolhida pelo aluno. */
+  cancelCamera: () => void;
   /** Aproxima (fator < 1) ou afasta (fator > 1) a câmera. */
   zoom: (factor: number) => void;
   /** Solicita a entrada em modo VR (WebXR). */
@@ -24,6 +26,7 @@ export const viewerBridge: ViewerBridge = {
   capture: () => null,
   resetCamera: () => {},
   frameTo: () => {},
+  cancelCamera: () => {},
   zoom: () => {},
   enterVR: () => {},
   enterAR: () => {},

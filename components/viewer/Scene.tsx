@@ -19,6 +19,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrganModel } from "./OrganModel";
 import { SafeEnvironment } from "./SafeEnvironment";
+import { TutorPainelVR } from "./TutorPainelVR";
 
 const DEFAULT_CAMERA: [number, number, number] = [3.2, 2.3, 4.6];
 const MIN_DISTANCE = 1.7;
@@ -29,6 +30,8 @@ const FLOOR_Y = -1.3;
 interface OrbitLike {
   target: THREE.Vector3;
   update: () => void;
+  addEventListener: (type: "start", callback: () => void) => void;
+  removeEventListener: (type: "start", callback: () => void) => void;
 }
 
 /** Anima a câmera (reset / enquadramento) e registra as ações na ponte. */
@@ -37,12 +40,17 @@ function CameraRig() {
   const controls = useThree((s) => s.controls) as unknown as OrbitLike | null;
   const invalidate = useThree((s) => s.invalidate);
   const scene = useThree((s) => s.scene);
+  const gl = useThree((s) => s.gl);
   const goal = useRef<{ pos: THREE.Vector3; look: THREE.Vector3 } | null>(null);
 
   useEffect(() => {
     if (!controls) return;
+    const cancelar = () => { goal.current = null; };
+    viewerBridge.cancelCamera = cancelar;
+    controls.addEventListener("start", cancelar);
 
     viewerBridge.resetCamera = () => {
+      if (gl.xr.isPresenting) return;
       // "Resetar vista" também desfaz o gizmo: sem isso nenhum controle
       // devolvia o modelo movido, girado ou escalado à pose original.
       const root = scene.getObjectByName(NOME_DO_ROOT);
@@ -56,7 +64,8 @@ function CameraRig() {
       invalidate();
     };
 
-    viewerBridge.frameTo = (point) => {
+    viewerBridge.frameTo = (point, radius) => {
+      if (gl.xr.isPresenting) return;
       // Pontos e anotações estão no espaço do root; a câmera precisa de mundo.
       // Converter aqui cobre todos os chamadores.
       const look = new THREE.Vector3(...point);
@@ -64,11 +73,18 @@ function CameraRig() {
       const direction = new THREE.Vector3()
         .subVectors(camera.position, controls.target)
         .normalize();
-      goal.current = { pos: look.clone().addScaledVector(direction, 2.6), look };
+      const perspectiva = camera as THREE.PerspectiveCamera;
+      const abertura = THREE.MathUtils.degToRad(perspectiva.fov / 2);
+      const menorAngulo = Math.min(abertura, Math.atan(Math.tan(abertura) * perspectiva.aspect));
+      const escala = scene.getObjectByName(NOME_DO_ROOT)?.getWorldScale(new THREE.Vector3()).length() ?? Math.sqrt(3);
+      const distancia = radius === undefined ? 2.6 : clamp(radius * escala / Math.sqrt(3) / Math.sin(menorAngulo) * 1.2, MIN_DISTANCE, MAX_DISTANCE);
+      goal.current = { pos: look.clone().addScaledVector(direction, distancia), look };
       invalidate();
     };
 
     viewerBridge.zoom = (factor) => {
+      if (gl.xr.isPresenting) return;
+      cancelar();
       const offset = camera.position.clone().sub(controls.target);
       const distance = clamp(
         offset.length() * factor,
@@ -79,10 +95,18 @@ function CameraRig() {
       controls.update();
       invalidate();
     };
-  }, [camera, controls, invalidate, scene]);
+    return () => {
+      cancelar();
+      controls.removeEventListener("start", cancelar);
+      viewerBridge.frameTo = () => {};
+      viewerBridge.zoom = () => {};
+      viewerBridge.resetCamera = () => {};
+      viewerBridge.cancelCamera = () => {};
+    };
+  }, [camera, controls, invalidate, scene, gl]);
 
   useFrame((_, delta) => {
-    if (!goal.current || !controls) return;
+    if (gl.xr.isPresenting || !goal.current || !controls) return;
     // Mantém a mesma sensação em desktop, Quest 72 Hz e Quest 90 Hz. O
     // limite evita um salto grande se o navegador retomar após uma pausa.
     const suavidade = 1 - Math.pow(1 - 0.14, Math.min(delta, 0.1) * 60);
@@ -184,6 +208,7 @@ function SceneContents() {
        */}
       <XROrigin position={emAR ? [0, 0, 0] : [0, FLOOR_Y, 0]}>
         <SairDoVR position={[-0.45, 1.25, -0.5]} />
+        {inSession && <TutorPainelVR />}
         {/* Sem esta dica ninguém descobre o gesto: não há botão na cena. */}
         {inSession && explodivel && (
           <Text3D position={[-0.45, 1.14, -0.5]} size={0.02} maxWidth={0.34}>

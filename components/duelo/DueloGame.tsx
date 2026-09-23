@@ -29,8 +29,8 @@ import {
   normalizeContent,
   prepareModel,
 } from "@/lib/model-utils";
-import type { StructurePoint } from "@/types";
 import { ORGANS } from "@/lib/organs";
+import { montarRodadasDuelo } from "@/lib/duelo-perguntas";
 import { PublicarEstadoArena } from "./EstadoArena";
 import { CONSOLE_POS, CONSOLE_ROT, LETREIRO_POS } from "./ArenaMedica";
 import { BotaoLousa } from "./BotaoLousa";
@@ -63,8 +63,8 @@ import type { DueloOnline } from "./useDueloOnline";
 /**
  * Duelo 1x1 (Modo 2 do plano multi-modo): contra BOT ou contra outra pessoa.
  *
- * 8 rodadas alternando: órgão inteiro (100 pts) e estrutura da laringe
- * marcada (200 pts). Quem responde certo primeiro pontua.
+ * 8 rodadas alternando 100/200 pontos: identificação, função e curiosidades.
+ * Um desafio mantém o marcador de estrutura real. A arbitragem não mudou.
  *
  *  - Contra bot, tudo roda aqui: o bot "responde" após um atraso sorteado.
  *  - Online, cada pessoa no seu óculos: o servidor (`app/api/duelo`) é o
@@ -154,7 +154,7 @@ type ResultadoRodada = "voce" | "adversario" | "tempo" | null;
 /**
  * Mesma forma nos dois modos: online, quem cria a sala sorteia as rodadas e o
  * servidor as repassa ao outro. `alvo` é a resposta correta como aparece nos
- * botões; `modelo` só no tipo "orgao"; `marcador` só no tipo "estrutura", no
+ * botões; `modelo` em órgão/conhecimento; `marcador` só no tipo "estrutura", no
  * espaço local do spinner.
  */
 type Rodada = RodadaOnline;
@@ -169,52 +169,6 @@ function planejarBot(bot: (typeof BOTS)[Dificuldade]) {
     acerta: Math.random() < bot.acerto,
     respondeu: false,
   };
-}
-
-function embaralhar<T>(lista: T[]): T[] {
-  const r = [...lista];
-  for (let i = r.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [r[i], r[j]] = [r[j], r[i]];
-  }
-  return r;
-}
-
-function montarRodadas(estruturas: StructurePoint[]): Rodada[] {
-  const orgaos = embaralhar(ORGAOS_DUELO).slice(0, TOTAL_RODADAS / 2);
-  const nomesOrgaos = ORGANS.map((o) => o.name);
-  // Sem repetidos: a laringe tem malhas diferentes com o mesmo rótulo, e duas
-  // alternativas iguais na mesma pergunta não têm resposta certa.
-  const nomesEstruturas = [...new Set(estruturas.map((p) => p.label))];
-  const alvosEstrutura = embaralhar(estruturas).slice(0, TOTAL_RODADAS / 2);
-
-  const rodadasOrgao: Rodada[] = orgaos.map((organ) => ({
-    tipo: "orgao",
-    pontos: 100,
-    alvo: organ.name,
-    modelo: organ.modelPath,
-    opcoes: embaralhar([
-      organ.name,
-      ...embaralhar(nomesOrgaos.filter((n) => n !== organ.name)).slice(0, 3),
-    ]),
-  }));
-  const rodadasEstrutura: Rodada[] = alvosEstrutura.map((ponto) => ({
-    tipo: "estrutura",
-    pontos: 200,
-    alvo: ponto.label,
-    marcador: ponto.position,
-    opcoes: embaralhar([
-      ponto.label,
-      ...embaralhar(nomesEstruturas.filter((e) => e !== ponto.label)).slice(0, 3),
-    ]),
-  }));
-
-  // Alterna fácil/difícil: 100, 200, 100, 200…
-  const rodadas: Rodada[] = [];
-  for (let i = 0; i < TOTAL_RODADAS / 2; i += 1) {
-    rodadas.push(rodadasOrgao[i], rodadasEstrutura[i]);
-  }
-  return rodadas;
 }
 
 /**
@@ -439,7 +393,7 @@ function ModeloRodada({
   /** Reação visual curta da rodada resolvida. */
   resultado?: ResultadoRodada;
 }) {
-  const caminho = rodada.tipo === "orgao" ? rodada.modelo! : LARINGE;
+  const caminho = rodada.tipo === "estrutura" ? LARINGE : rodada.modelo!;
   const gltf = useGLTF(caminho, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   // Três grupos aninhados (padrão do ArenaModel): o de fora carrega a escala
@@ -677,8 +631,7 @@ export function DueloGame({
   }, [direito, esquerdo]);
   const vibrar = (forca: number, ms: number) => pulsar(fonteRef.current, forca, ms);
   const empilhar = retrato && !naSessao;
-  // A laringe carrega já no menu (Suspense) — as rodadas de 200 pts saem
-  // das estruturas nomeadas reais dela.
+  // A laringe carrega no menu; o desafio marcado usa estruturas reais dela.
   const laringe = useGLTF(LARINGE, "/draco/");
   // Pontos medidos no clone normalizado e solto da cena — mesma normalização
   // do ModeloRodada, então a posição já é a do espaço local do spinner.
@@ -699,6 +652,12 @@ export function DueloGame({
   };
   const [dificuldade, setDificuldade] = useState<Dificuldade>("iniciante");
   const [rodadas, setRodadas] = useState<Rodada[]>([]);
+  const recentes = useRef<string[]>([]);
+  const montarRodadas = () => {
+    const novas = montarRodadasDuelo(estruturas, recentes.current);
+    recentes.current = [...recentes.current, ...novas.flatMap((r) => r.perguntaId ? [r.perguntaId] : [])].slice(-20);
+    return novas;
+  };
   const [indice, setIndice] = useState(0);
   const [pontosJogador, setPontosJogador] = useState(0);
   const [pontosBot, setPontosBot] = useState(0);
@@ -790,7 +749,7 @@ export function DueloGame({
     // sem isto o duelo inteiro corria mudo.
     desbloquearAudio();
     setDificuldade(nivel);
-    setRodadas(montarRodadas(estruturas));
+    setRodadas(montarRodadas());
     setIndice(0);
     setPontosJogador(0);
     setPontosBot(0);
@@ -829,7 +788,7 @@ export function DueloGame({
     zerarPartida();
     setFase("sala");
     playTransicao();
-    online.criar(montarRodadas(estruturas));
+    online.criar(montarRodadas());
   };
 
   const abrirTeclado = () => {
@@ -870,7 +829,7 @@ export function DueloGame({
   const pedirRevanche = () => {
     if (revanche.eu) return;
     setRevanche((r) => ({ ...r, eu: true }));
-    online.revanche(montarRodadas(estruturas));
+    online.revanche(montarRodadas());
   };
 
   /**
@@ -1480,7 +1439,7 @@ export function DueloGame({
               Duelo 1×1
             </Text3D>
             <Text3D position={[0, 0.36, 0.01]} size={0.055} color={ARENA_COLORS.muted} maxWidth={1.5}>
-              Identifique órgãos (100 pts) e estruturas (200 pts) antes do oponente
+              Órgãos, funções e curiosidades: responda antes do oponente
             </Text3D>
             <Text3D position={[0, 0.24, 0.01]} size={0.042} color={CORES.tempo} maxWidth={1.5}>
               {DICA}
@@ -1530,7 +1489,7 @@ export function DueloGame({
             color={CORES.gizFraco}
             maxWidth={1.05}
           >
-            Órgãos valem 100 · estruturas valem 200
+            Conhecimento geral · desafios de 100 e 200 pontos
           </Text3D>
           <Text3D position={[LOUSA_X, 0.06, LOUSA_Z]} size={0.028} color={CORES.tempo} maxWidth={1.05}>
             {DICA}
@@ -1596,7 +1555,7 @@ export function DueloGame({
               color={ARENA_COLORS.muted}
               maxWidth={1.5}
             >
-              {`${TOTAL_RODADAS} rodadas · órgãos 100 pts · estruturas 200 pts`}
+              {`${TOTAL_RODADAS} rodadas · 100/200 pts · observe e responda`}
             </Text3D>
             <Text3D position={[0, -0.38, 0.01]} size={0.05} color={CORES.tempo} maxWidth={1.5}>
               {DICA}
@@ -1621,7 +1580,7 @@ export function DueloGame({
             color={CORES.gizFraco}
             maxWidth={1.05}
           >
-            {`${TOTAL_RODADAS} rodadas · órgãos 100 pts · estruturas 200 pts`}
+            {`${TOTAL_RODADAS} rodadas · 100/200 pts · observe e responda`}
           </Text3D>
            <Text3D position={[LOUSA_X, -0.38, LOUSA_Z]} size={0.035} color={CORES.tempo} maxWidth={1.05}>
             {DICA}
@@ -1654,7 +1613,7 @@ export function DueloGame({
       const segundo = emSala ? voltarAoMenu : () => setFase("menu");
       const revisar = perdidas.length
         ? `Para revisar: ${perdidas.slice(0, 2).join(", ")}`
-        : "Nenhuma estrutura para revisar";
+        : "Nenhum tema para revisar";
       if (hosp) {
         return (
           <group position={HOSP_UI} rotation={HOSP_ROT}>
@@ -1877,12 +1836,12 @@ export function DueloGame({
               <Text3D position={[0.12, 0.31, 0.01]} size={0.055} color={ARENA_COLORS.muted}>
                 {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
               </Text3D>
-              <Text3D position={[0, 0.17, 0.01]} size={0.075} maxWidth={1.5}>
+              <Text3D position={[0, 0.17, 0.01]} size={0.053} maxWidth={1.5}>
                 {revelar
                   ? feedback
-                  : rodada.tipo === "orgao"
+                  : rodada.pergunta ?? (rodada.tipo === "orgao"
                     ? "Qual órgão é este?"
-                    : "Qual estrutura está marcada em amarelo?"}
+                    : "Qual estrutura está marcada em amarelo?")}
               </Text3D>
               {/* As alternativas NÃO saem da tela no feedback: a certa acende
                   verde no lugar onde estava, e quem errou finalmente vê qual
@@ -1894,6 +1853,7 @@ export function DueloGame({
                   selo={["A", "B", "C", "D"][i]}
                   width={1.55}
                   height={0.18}
+                  tamanhoTexto={Math.min(0.069, 1.22 / Math.max(1, opcao.length * 0.55))}
                   position={[0, -0.02 - i * 0.21, 0.01]}
                   color={
                     revelar
@@ -1922,6 +1882,9 @@ export function DueloGame({
                 </Text3D>
               )}
             </Panel>
+            {revelar && rodada.explicacao && <Text3D position={[0, -0.94, 0.02]} size={0.046} maxWidth={1.6} color="#cfe7dd">
+              {rodada.explicacao}
+            </Text3D>}
           </group>
         ) : (
           <>
@@ -1956,16 +1919,16 @@ export function DueloGame({
               </>
             )}
             <Text3D
-              position={[LOUSA_X, 0.022, LOUSA_Z]}
-              size={0.048}
+              position={[LOUSA_X, 0.024, LOUSA_Z]}
+              size={0.033}
               maxWidth={1.08}
               color={CORES.giz}
             >
               {revelar
                 ? feedback
-                : rodada.tipo === "orgao"
+                : rodada.pergunta ?? (rodada.tipo === "orgao"
                   ? "Qual órgão é este?"
-                  : "Qual estrutura está marcada em amarelo?"}
+                  : "Qual estrutura está marcada em amarelo?")}
             </Text3D>
             <Text3D
               position={[LOUSA_X + 0.33, 0.082, LOUSA_Z]}
@@ -2003,6 +1966,9 @@ export function DueloGame({
                 Errado!
               </Text3D>
             )}
+            {revelar && rodada.explicacao && <Text3D position={[LOUSA_X, -0.515, LOUSA_Z]} size={0.029} maxWidth={1.1} color="#d1e7cc">
+              {rodada.explicacao}
+            </Text3D>}
           </>
         )}
       </group>

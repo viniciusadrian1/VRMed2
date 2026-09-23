@@ -5,6 +5,9 @@ import {
   buildOrganContextNote,
 } from "@/lib/medical-system-prompt";
 import { CHAT_MODEL, getOpenAIClient } from "@/lib/openai";
+import { contextoTutorSchema } from "@/lib/tutor-3d";
+import { responderComGuia } from "@/lib/tutor-3d-servidor";
+import { getOrganById } from "@/lib/organs";
 
 /** Validação do payload de chat (Zod). */
 const chatRequestSchema = z.object({
@@ -18,6 +21,7 @@ const chatRequestSchema = z.object({
     .min(1)
     .max(40),
   currentOrgan: z.string().max(80).optional(),
+  contexto3d: contextoTutorSchema.optional(),
 });
 
 export async function POST(request: Request) {
@@ -53,12 +57,23 @@ export async function POST(request: Request) {
     );
   }
 
-  const { messages, currentOrgan } = parsed.data;
+  const { messages, currentOrgan, contexto3d } = parsed.data;
+  if (contexto3d && !getOrganById(contexto3d.organId)) {
+    return Response.json({ error: "Modelo do guia inválido." }, { status: 400 });
+  }
 
   // O system prompt reúne as diretrizes estáveis e o contexto do órgão atual.
   const systemPrompt = `${MEDICAL_SYSTEM_PROMPT}\n\n${buildOrganContextNote(
-    currentOrgan,
+    contexto3d ? getOrganById(contexto3d.organId)?.name : currentOrgan,
   )}`;
+
+  if (contexto3d) {
+    try {
+      return await responderComGuia(client, CHAT_MODEL, systemPrompt, messages, contexto3d, request.signal);
+    } catch {
+      return Response.json({ error: "Não foi possível contatar o tutor de IA. Tente novamente." }, { status: 502 });
+    }
+  }
 
   // 3. Inicia a resposta em streaming (Chat Completions da OpenAI).
   let erro: unknown;

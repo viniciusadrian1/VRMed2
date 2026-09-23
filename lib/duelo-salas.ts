@@ -10,7 +10,7 @@
  * testar a partida inteira sem esperar (`scripts/verificar-duelo-salas.ts`).
  */
 
-export const VERSAO_PROTOCOLO = 1;
+export const VERSAO_PROTOCOLO = 2;
 export const TOTAL_RODADAS = 8;
 export const CONTAGEM_MS = 3000;
 export const RODADA_MS = 18000;
@@ -37,12 +37,15 @@ export const SALA_ORFA_MS = 10 * 60_000;
 export const SALA_ESPERA_ORFA_MS = 2 * 60_000;
 
 export interface RodadaOnline {
-  tipo: "orgao" | "estrutura";
+  tipo: "orgao" | "estrutura" | "conhecimento";
   pontos: 100 | 200;
   alvo: string;
   opcoes: string[];
   modelo?: string;
   marcador?: [number, number, number];
+  perguntaId?: string;
+  pergunta?: string;
+  explicacao?: string;
 }
 
 export type FaseSala =

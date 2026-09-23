@@ -1,5 +1,6 @@
 import { z } from "zod";
 import * as Salas from "@/lib/duelo-salas";
+import { rodadasSchema } from "@/lib/duelo-schema";
 
 /**
  * Duelo 1×1 online: o servidor é o árbitro das salas.
@@ -202,31 +203,6 @@ export async function GET(request: Request) {
 /* ----------------------------------------------------------------- POST */
 
 const texto = z.string().min(1).max(80);
-
-const rodadasSchema = z
-  .array(
-    z.object({
-      tipo: z.enum(["orgao", "estrutura"]),
-      pontos: z.union([z.literal(100), z.literal(200)]),
-      alvo: texto,
-      opcoes: z.array(texto).length(4),
-      modelo: z.string().startsWith("/models/").max(120).optional(),
-      marcador: z.tuple([z.number(), z.number(), z.number()]).optional(),
-    }),
-  )
-  .length(Salas.TOTAL_RODADAS)
-  .refine(
-    (lista) =>
-      lista.every(
-        (r) =>
-          r.pontos === (r.tipo === "orgao" ? 100 : 200) &&
-          (r.tipo !== "orgao" || Boolean(r.modelo)) &&
-          r.opcoes.includes(r.alvo) &&
-          new Set(r.opcoes).size === 4 &&
-          (r.marcador ?? []).every(Number.isFinite),
-      ),
-    "Rodadas inválidas.",
-  );
 
 const base = { v: z.literal(Salas.VERSAO_PROTOCOLO), jogador: idJogador };
 

@@ -29,6 +29,6 @@ export function sinalDaArena(estado: EstadoArena) {
   }
   if (estado.fase === "rodada" && estado.tempo <= 5) return { cor: "#f2be6b", rotulo: "ÚLTIMOS SEGUNDOS", pulso: true };
   if (estado.fase === "contagem") return { cor: "#bce6f2", rotulo: "PREPARE-SE", pulso: false };
-  if (estado.fase === "rodada") return { cor: "#77cfe3", rotulo: `RODADA ${estado.rodada} · IDENTIFIQUE`, pulso: false };
+  if (estado.fase === "rodada") return { cor: "#77cfe3", rotulo: `RODADA ${estado.rodada} · RESPONDA`, pulso: false };
   return { cor: "#77cfe3", rotulo: "ARENA DE TREINAMENTO", pulso: false };
 }

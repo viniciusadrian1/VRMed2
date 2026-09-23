@@ -495,3 +495,20 @@ contorno por ponteiro e camadas visuais ordenadas. Isso corrige a perda de
 Diagnóstico, orçamento do GLB, testes e roteiro de homologação física em
 `docs/ARENA-ENTORNO-E-CONTROLES.md`. Novo comando: `npm run verify:botoes-xr`
 (também em `verify:core`). **O Quest com controles ainda precisa do reteste físico.**
+
+### Atualização — tutor com foco 3D e Duelo acessível (23/09/2026)
+
+O chat do visualizador aceita comandos estruturados de foco sobre o inventário
+real do GLB. Destaque e transparência são transitórios; somente no desktop há
+enquadramento automático. No XR, a câmera nunca é movida pelo tutor e há um
+painel de perguntas rápidas. Órgãos sem segmentação, como o coração atual, só
+oferecem foco no conjunto. A chave OpenAI existente foi reutilizada no servidor.
+
+O Duelo ganhou 30 questões de função/curiosidades para público geral. Mantém
+oito rodadas, 100/200 pontos, 18 segundos e arbitragem de 600 ms. O protocolo
+online agora é **v2**; recarregar ambos os aparelhos depois da atualização.
+
+Detalhes, fontes, arquivos, testes e limitações em `docs/TUTOR-E-DUELO.md`.
+`verify:tutor` e `verify:perguntas` integram `verify:core`; `verify:duelo-http`
+é opt-in e requer servidor local. Build/testes e integração HTTP/SSE passaram;
+**painel do tutor, conforto e desempenho ainda precisam de teste físico no Quest**.

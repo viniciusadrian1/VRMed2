@@ -36,6 +36,9 @@ import { GLBModel } from "./GLBModel";
 import { PlaceholderOrgan } from "./PlaceholderOrgan";
 import { StructureHotspots } from "./StructureHotspots";
 import { EntradaXR } from "./XRManipulation";
+import { FocoTutor3D } from "./FocoTutor3D";
+import { useTutor3D } from "@/lib/tutor-3d-store";
+import { camadasComFoco } from "@/lib/tutor-3d";
 
 type Availability = "checking" | "real" | "placeholder";
 
@@ -135,6 +138,7 @@ function ModelStateApplier({
   const clipping = useVRMedStore((s) => s.clipping);
   const wireframe = useVRMedStore((s) => s.wireframe);
   const bounds = useVRMedStore((s) => s.modelBounds);
+  const foco = useTutor3D((s) => s.foco);
   const invalidate = useThree((s) => s.invalidate);
   const inSession = useXR(
     (state) => state.mode === "immersive-vr" || state.mode === "immersive-ar",
@@ -153,9 +157,10 @@ function ModelStateApplier({
     // desligado nela e volta ao sair.
     planosNoRoot.current = inSession ? [] : computeClippingPlanes(clipping, bounds);
     planosNoMundo.current = planosNoRoot.current.map((plano) => plano.clone());
-    applyModelState(root, layers, planosNoMundo.current, wireframe);
+    const apresentacao = camadasComFoco(layers, foco);
+    applyModelState(root, apresentacao, planosNoMundo.current, wireframe);
     invalidate();
-  }, [layers, clipping, wireframe, bounds, invalidate, rootRef, inSession]);
+  }, [layers, clipping, wireframe, bounds, invalidate, rootRef, inSession, foco]);
 
   // Leva os planos para o mundo a cada quadro, antes de desenhar. Os materiais
   // guardam estas mesmas instâncias de Plane, então mudar o valor não
@@ -191,6 +196,7 @@ export function OrganModel() {
   const setInspectedPoint = useVRMedStore((s) => s.setInspectedPoint);
   const inspectedLabel = useVRMedStore((s) => s.inspectedLabel);
   const inspectedPoint = useVRMedStore((s) => s.inspectedPoint);
+  const focoTutor = useTutor3D((s) => s.foco);
   const invalidate = useThree((s) => s.invalidate);
   const modo = useXR((state) => state.mode);
   const inSession = modo === "immersive-vr" || modo === "immersive-ar";
@@ -224,6 +230,7 @@ export function OrganModel() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reset visual necessário na troca de órgão
     setAvailability("checking");
     setModelReady(false);
+    useTutor3D.getState().limparContexto();
     highlightRef.current = null;
     let cancelled = false;
     fetch(def.modelPath, { method: "HEAD" })
@@ -240,6 +247,7 @@ export function OrganModel() {
       });
     return () => {
       cancelled = true;
+      useTutor3D.getState().limparContexto();
     };
   }, [organId, setModelKind]);
 
@@ -273,7 +281,11 @@ export function OrganModel() {
     setLayers(prepareModel(content, layerBy));
     // Os pontos só aparecem em modelos cujas malhas têm nomes anatômicos
     // reais (a função decide); os demais não recebem marcadores.
-    setStructures(medirNoEspacoDoPai(content, () => detectStructures(content)));
+    const estruturas = medirNoEspacoDoPai(content, () => detectStructures(content));
+    setStructures(estruturas);
+    if (def && useVRMedStore.getState().modelKind === "real") {
+      useTutor3D.getState().registrar(def.id, def.name, def.layerBy === "material" ? [] : estruturas.map((e) => e.label));
+    }
     setModelReady(true);
   }, [organId, setLayers, setStructures, setModelBounds]);
 
@@ -296,7 +308,8 @@ export function OrganModel() {
     }
     highlightRef.current = null;
 
-    if (!inspectedLabel || !modelReady || !contentRef.current) {
+    const rotulo = focoTutor?.label ?? inspectedLabel;
+    if (!rotulo || !modelReady || !contentRef.current) {
       invalidate();
       return;
     }
@@ -308,7 +321,7 @@ export function OrganModel() {
     contentRef.current.traverse((node) => {
       const mesh = node as THREE.Mesh;
       if (!mesh.isMesh) return;
-      if (identifyStructure(mesh, organ?.name) !== inspectedLabel) return;
+      if (focoTutor?.id !== "modelo" && identifyStructure(mesh, organ?.name) !== rotulo) return;
       const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       list.forEach((material) => {
         if (material && "emissive" in material) {
@@ -322,9 +335,16 @@ export function OrganModel() {
       materials: collected,
       originals: collected.map((material) => material.emissive.clone()),
     };
-    collected.forEach((material) => material.emissive.setHex(0x1f5fa8));
+    collected.forEach((material) => material.emissive.setHex(focoTutor ? 0x554015 : 0x1f5fa8));
     invalidate();
-  }, [inspectedLabel, modelReady, organ?.name, invalidate]);
+  }, [inspectedLabel, modelReady, organ?.name, invalidate, focoTutor]);
+
+  useEffect(() => useVRMedStore.subscribe((s, antes) => {
+    if (s.layers !== antes.layers || s.clipping !== antes.clipping || s.explosao !== antes.explosao ||
+        s.inspectedLabel !== antes.inspectedLabel || s.transformMode !== antes.transformMode) {
+      useTutor3D.getState().limparFoco();
+    }
+  }), []);
 
   // Clique no modelo: cria anotação (modo marcação) ou identifica a estrutura.
   const handleModelClick = (event: ThreeEvent<MouseEvent>) => {
@@ -390,6 +410,7 @@ export function OrganModel() {
           document.body.style.cursor = "";
         }}
       >
+        {modelReady && <FocoTutor3D rootRef={rootRef} contentRef={contentRef} />}
         <group key={`${organId}-${availability}`} ref={contentRef}>
           {availability === "real" && (
             // Se o .glb existir mas falhar ao decodificar (arquivo corrompido,
@@ -424,7 +445,7 @@ export function OrganModel() {
         {!inSession && (
           <>
             <ClipPlaneHelpers />
-            <StructureHotspots />
+            {!focoTutor && <StructureHotspots />}
             <AnnotationHotspots />
           </>
         )}

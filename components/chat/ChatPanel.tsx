@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import type { ChatMessage } from "@/types";
 import { Message } from "./Message";
+import { useTutor3D } from "@/lib/tutor-3d-store";
 
 const EXAMPLE_QUESTIONS = [
   "O que é a valva mitral e qual a sua função?",
@@ -30,6 +31,9 @@ function ChatPanelContent() {
   const setChatOpen = useVRMedStore((s) => s.setChatOpen);
   const organId = useVRMedStore((s) => s.currentOrganId);
   const organ = getOrganById(organId);
+  const guia = useTutor3D((s) => s.ativo);
+  const contexto = useTutor3D((s) => s.contexto);
+  const foco = useTutor3D((s) => s.foco);
 
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -49,18 +53,27 @@ function ChatPanelContent() {
     return () => abortRef.current?.abort();
   }, []);
 
+  useEffect(() => useVRMedStore.subscribe((s, anterior) => {
+    if (s.currentOrganId !== anterior.currentOrganId) {
+      abortRef.current?.abort();
+      useTutor3D.getState().limparFoco();
+    }
+  }), []);
+
   // Limpa a conversa, interrompendo antes um streaming em curso.
   const handleClearChat = () => {
     abortRef.current?.abort();
     setIsStreaming(false);
     setErro(null);
     clearChat();
+    useTutor3D.getState().limparFoco();
   };
 
   const sendMessage = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isStreaming) return;
     setErro(null);
+    useTutor3D.getState().limparFoco();
 
     const userMessage: ChatMessage = {
       id: genId(),
@@ -104,12 +117,17 @@ function ChatPanelContent() {
     });
 
     try {
+      const contextoDoPedido = guia && contexto?.organId === organId ? contexto : undefined;
       await streamChatResponse(
-        { messages: history, currentOrgan: organ?.name },
+        { messages: history, currentOrgan: organ?.name, contexto3d: contextoDoPedido },
         (chunk) => appendToChatMessage(assistantId, chunk),
         controller.signal,
+        (comando) => {
+          if (!controller.signal.aborted && contextoDoPedido) useTutor3D.getState().aplicar(comando, contextoDoPedido);
+        },
       );
     } catch (error) {
+      useTutor3D.getState().limparFoco();
       // Abortos (troca de órgão, fechar painel, limpar) não são erros. Mas o
       // placeholder ainda vazio não pode ficar: seria persistido como um turno
       // do tutor sem texto (e iria para as sessões e o PDF). A leitura via
@@ -179,6 +197,17 @@ function ChatPanelContent() {
         </Button>
       </div>
 
+      <div className="border-b border-border px-3 py-2 text-xs">
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={guia} onChange={(e) => useTutor3D.getState().habilitar(e.target.checked)} />
+          Guiar no modelo 3D
+        </label>
+        <p className="mt-1 text-muted-foreground">{contexto?.alvos.length === 1 ? "Este modelo permite foco no conjunto, não em partes isoladas." : "Destaque de estruturas disponíveis; câmera livre no VR."}</p>
+        <div role="status" className="mt-1 flex items-center justify-between gap-2">
+          <span>{foco ? `Foco: ${foco.label}` : !contexto ? "Aguardando modelo 3D." : "Pergunte sobre o modelo para explorar."}</span>
+          {foco && <button type="button" className="underline" onClick={() => useTutor3D.getState().limparFoco()}>Limpar foco</button>}
+        </div>
+      </div>
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto p-3">
         {chat.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 px-2 text-center">

@@ -16,7 +16,10 @@
     "verify:botoes-xr": "node --experimental-strip-types scripts/verificar-botoes-xr.ts",
     "verify:escola": "node --experimental-strip-types scripts/verificar-escola.ts",
     "verify:retaguarda": "node --experimental-strip-types scripts/verificar-retaguarda.ts",
-    "verify:core": "npm run verify:xr && npm run verify:duelo && npm run verify:audio && npm run verify:apresentacao && npm run verify:botoes-xr && npm run verify:escola && npm run verify:retaguarda"
+    "verify:tutor": "node --experimental-strip-types scripts/verificar-tutor-3d.ts",
+    "verify:perguntas": "node --experimental-strip-types scripts/verificar-perguntas-duelo.ts",
+    "verify:duelo-http": "node --experimental-strip-types scripts/verificar-duelo-http.ts",
+    "verify:core": "npm run verify:xr && npm run verify:duelo && npm run verify:audio && npm run verify:apresentacao && npm run verify:botoes-xr && npm run verify:escola && npm run verify:retaguarda && npm run verify:tutor && npm run verify:perguntas"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

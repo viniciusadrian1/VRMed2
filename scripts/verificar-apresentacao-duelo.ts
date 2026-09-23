@@ -8,7 +8,7 @@ import { aplicarMaterialOsso } from "../lib/material-osso.ts";
 const sinal = (dados: Partial<typeof ARENA_INICIAL>) => sinalDaArena({ ...ARENA_INICIAL, ...dados });
 assert.match(sinal({}).rotulo, /TREINAMENTO/);
 assert.match(sinal({ fase: "contagem" }).rotulo, /PREPARE/);
-assert.match(sinal({ fase: "rodada", tempo: 6 }).rotulo, /IDENTIFIQUE/);
+assert.match(sinal({ fase: "rodada", tempo: 6 }).rotulo, /RESPONDA/);
 assert.equal(sinal({ fase: "rodada", tempo: 5 }).cor, "#f2be6b");
 assert.equal(sinal({ fase: "rodada", tempo: 0 }).pulso, true);
 assert.equal(sinal({ fase: "feedback", resultado: "voce", tempo: 0 }).cor, "#71e0b2");
