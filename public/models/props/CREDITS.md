@@ -57,3 +57,22 @@ não-comercial) e "Hospital Stuff" (1,67M triângulos — inviável em VR).
   carrinho de instrumentos, equipamento de treinamento, janela técnica,
   porta e ventilação. Oito materiais, sem texturas externas. O visor é uma
   representação abstrata de simulação, não um exame ou sinal clínico.
+
+## Escola de medicina — 2026-09-23
+
+- `escola-medicina.glb`: sala autoral gerada no Blender por
+  `scripts/criar-escola-medicina.py`. Arquitetura, bancada, lousa, vitrine,
+  microscópios estilizados, atlas, carteiras e luminárias sem assets externos.
+  19.043 triângulos, 10 malhas/materiais, sem texturas, 1.361.416 bytes.
+- `esqueleto-estudo.glb`: exposição de ossos e dentes extraída do arquivo
+  `public/models/systems/arthrology.glb` já presente no acervo. Três malhas,
+  158.090 triângulos preservados, materiais de apresentação e compressão Draco;
+  sem decimação e sem modificar o original. Não representa a camada completa
+  de ligamentos/cartilagens do arquivo de artrologia.
+- `esqueleto-prancha.png`: renderização frontal das mesmas malhas originais,
+  feita no Blender (512 × 1.024). Não é anatomia gerada por IA. Serve como
+  alternativa leve na vitrine durante a partida.
+- As duas apresentações do esqueleto são reproduzidas por
+  `scripts/preparar-esqueleto-escola.py`. A derivação não altera nem concede
+  novos direitos sobre o acervo original; mantém-se a responsabilidade de
+  documentar a licença de origem antes de redistribuí-lo fora do projeto.

@@ -33,13 +33,13 @@ import type { StructurePoint } from "@/types";
 import { ORGANS } from "@/lib/organs";
 import { PublicarEstadoArena } from "./EstadoArena";
 import { CONSOLE_POS, CONSOLE_ROT, LETREIRO_POS } from "./ArenaMedica";
+import { BotaoLousa } from "./BotaoLousa";
+import { ESCOLA } from "@/lib/escola-apresentacao";
 import {
   desbloquearAudio,
-  playClique,
   playEnd,
   playEnviado,
   playHit,
-  playHover,
   playMiss,
   playOponentePontuou,
   playStart,
@@ -78,13 +78,9 @@ const LARINGE = "/models/organs/larynx.glb";
 // wifi de evento; o nome "Pulmão" ainda aparece como alternativa errada.
 const ORGAOS_DUELO = ORGANS.filter((o) => o.id !== "pulmao");
 
-// Layout "sala de aula" em coordenadas de mundo, derivado das medidas do GLB
-// na escala humana (ESCOLA_S=0.72, ver DueloApp): face da lousa em z=-1.06,
-// centro em x=0.36; o quadro verde ocupa y≈-0.50..0.26 e x≈±0.58 do centro
-// (conferido no print da visão sentada — a estimativa anterior cortava 13cm do topo).
-// Cadeiras da frente: x=-0.81 (bot) e x=+0.28 (jogador/XROrigin).
-const LOUSA_X = 0.36;
-const LOUSA_Z = -1.06;
+// A sala autoral preserva a face da lousa e a origem XR já ajustadas no Quest.
+const LOUSA_X = ESCOLA.lousaX;
+const LOUSA_Z = ESCOLA.lousaZ;
 
 // Mesmas regras nos dois modos: vêm das salas online.
 const TEMPO_RODADA = RODADA_MS / 1000;
@@ -219,97 +215,6 @@ function montarRodadas(estruturas: StructurePoint[]): Rodada[] {
     rodadas.push(rodadasOrgao[i], rodadasEstrutura[i]);
   }
   return rodadas;
-}
-
-/**
- * Opção clicável escrita em giz na lousa (sem pop-up): texto + plano
- * invisível para o raycast + crescimento suave no hover.
- *
- * `altura` existe porque o alvo de clique acompanhava o tamanho da fonte
- * (`size * 1.9`) e ignorava o passo entre as linhas: no teclado do código
- * online, dígitos de `size 0.075` viravam alvos de 14 cm com passo de 11 cm —
- * **as teclas se sobrepunham 3 cm**, coplanares. Com o laser tremendo a 2 m,
- * a pessoa clicava na tecla de baixo achando que clicou na de cima, e errar
- * uma alternativa custa 1,6 s de trava. Quem empilha botões passa a altura
- * do passo, e o alvo nunca invade o vizinho.
- */
-function BotaoLousa({
-  texto,
-  position,
-  onClick,
-  cor = CORES.giz,
-  size = 0.14,
-  width = 2.3,
-  altura,
-  destaque = null,
-  desabilitado = false,
-}: {
-  texto: string;
-  position: [number, number, number];
-  onClick: () => void;
-  cor?: string;
-  size?: number;
-  width?: number;
-  /** Altura do alvo de clique (padrão: o tamanho do texto). */
-  altura?: number;
-  /** Revelação da resposta: verde na certa, coral na que a pessoa errou. */
-  destaque?: "certo" | "errado" | null;
-  /** Fora da rodada as alternativas continuam na tela, mas não respondem. */
-  desabilitado?: boolean;
-}) {
-  const grupo = useRef<THREE.Group>(null);
-  const hovered = useRef(false);
-  const escala = useRef(1);
-  const risco = useRef<THREE.Mesh>(null);
-  const esquerdo = useXRInputSourceState("controller", "left");
-  const direito = useXRInputSourceState("controller", "right");
-  useFrame((_, delta) => {
-    if (!grupo.current) return;
-    const ativo = hovered.current && !desabilitado;
-    const alvo = destaque === "certo" ? 1.06 : ativo ? 1.09 : 1;
-    escala.current += (alvo - escala.current) * Math.min(1, delta * 12);
-    grupo.current.scale.setScalar(escala.current);
-    // Sublinhado de giz: a 2 m, crescer 9% quase não se vê.
-    if (risco.current) risco.current.visible = ativo;
-  });
-  const corFinal =
-    destaque === "certo" ? CORES.meu : destaque === "errado" ? CORES.dele : cor;
-  return (
-    <group
-      ref={grupo}
-      position={position}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (desabilitado) return;
-        playClique();
-        pulsar(direito?.inputSource ?? esquerdo?.inputSource, 0.4, 35);
-        onClick();
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        if (desabilitado || hovered.current) return;
-        hovered.current = true;
-        playHover();
-        pulsar(direito?.inputSource ?? esquerdo?.inputSource, 0.15, 15);
-      }}
-      onPointerOut={() => {
-        hovered.current = false;
-      }}
-    >
-      {/* Panel/Text3D têm raycast desligado — o plano invisível recebe o clique */}
-      <mesh>
-        <planeGeometry args={[width, altura ?? size * 1.9]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-      </mesh>
-      <Text3D size={size} color={corFinal} maxWidth={width}>
-        {texto}
-      </Text3D>
-      <mesh ref={risco} position={[0, -size * 0.78, 0]} visible={false} raycast={() => null}>
-        <planeGeometry args={[width * 0.92, 0.004]} />
-        <meshBasicMaterial color={corFinal} toneMapped={false} depthTest={false} transparent opacity={0.8} />
-      </mesh>
-    </group>
-  );
 }
 
 /**
@@ -1437,8 +1342,8 @@ export function DueloGame({
         humor={humorBot}
         nome={nomeOponente}
         tipo={dificuldade}
-        position={[-0.81, -1.3, 1.07]}
-        rotationY={Math.PI * 0.75}
+        position={[-1.95, -1.3, -2.6]}
+        rotationY={0.22}
       />
     )
   ) : null;
@@ -1889,7 +1794,7 @@ export function DueloGame({
                 ? // 0.42 punha a base do órgão em cima do placar (a laringe é
                   // mais alta que larga); 0.56 deixa o placar livre.
                   [LOUSA_X, 0.56, -0.95]
-                : [-0.78, -0.15, -0.95]
+                : [-0.78, -0.08, -0.95]
           }
           scale={hosp ? (empilhar ? 0.35 : 0.6) : empilhar ? 0.26 : 0.36}
         >
@@ -2075,7 +1980,7 @@ export function DueloGame({
               <BotaoLousa
                 key={`opcao-escola-${i}-${opcao}`}
                 texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
-                position={[LOUSA_X, -0.055 - i * 0.115, LOUSA_Z]}
+                position={[LOUSA_X, -0.055 - i * ESCOLA.passoOpcao, LOUSA_Z]}
                 cor={
                   revelar
                     ? "#8fae94"
@@ -2088,8 +1993,8 @@ export function DueloGame({
                 destaque={destaqueDe(opcao)}
                 desabilitado={revelar || erroJogador || errados.includes(opcao)}
                 size={0.05}
-                altura={0.094}
-                width={1.1}
+                altura={ESCOLA.alturaOpcao}
+                width={ESCOLA.larguraOpcao}
                 onClick={() => responder(opcao)}
               />
             ))}

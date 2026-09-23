@@ -274,6 +274,8 @@ export function Button3D({
   selo,
   destaque = null,
   desabilitado = false,
+  tamanhoTexto,
+  corRotulo = ARENA_COLORS.text,
 }: {
   label: string;
   onClick: () => void;
@@ -293,6 +295,9 @@ export function Button3D({
   destaque?: "certo" | "errado" | null;
   /** Fora da rodada o botão continua na tela, mas não responde. */
   desabilitado?: boolean;
+  /** A lousa usa a mesma interação, com tipografia de giz dimensionada à placa. */
+  tamanhoTexto?: number;
+  corRotulo?: string;
 }) {
   const group = useRef<THREE.Group>(null);
   const hovered = useRef(new Set<number>());
@@ -336,7 +341,7 @@ export function Button3D({
         : desabilitado
           ? COLOR_DESABILITADO
           : color;
-  const corTexto = desabilitado && !destaque ? TEXTO_DESABILITADO : ARENA_COLORS.text;
+  const corTexto = desabilitado && !destaque ? TEXTO_DESABILITADO : destaque ? ARENA_COLORS.text : corRotulo;
   // Ícone e selo ocupam a esquerda da placa; sem eles o rótulo volta ao centro.
   const seloLado = height * 0.52;
   const rotuloX = selo ? height * 0.2 : icone ? height * 0.14 : 0;
@@ -463,7 +468,7 @@ export function Button3D({
         position={[rotuloX, 0, 0.005]}
         // Duas linhas medem ~1,02 × a altura da placa: qualquer rótulo que
         // quebre transborda. Quem tem rótulo longo passa uma largura maior.
-        size={height * 0.42}
+        size={tamanhoTexto ?? height * 0.42}
         color={corTexto}
         maxWidth={width * 0.86}
       >

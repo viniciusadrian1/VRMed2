@@ -1,5 +1,19 @@
 # VRmed — contexto do projeto
 
+## Escola de medicina do Duelo (2026-09-23)
+
+A Escola ganhou uma sala autoral de anatomia: bancada do órgão, lousa integrada,
+vitrine osteológica, microscópios, atlas, carteiras e iluminação própria.
+`AmbienteEscola.tsx` substitui a instanciação do cenário antigo, sem apagar o GLB
+anterior. As alternativas passaram a reutilizar `Button3D`, incluindo a correção
+de gatilho e alvos estáveis do Hospital. Pontuação e arbitragem online preservadas.
+
+O esqueleto é derivado dos ossos/dentes do acervo de artrologia, sem simplificação.
+O padrão é a prancha renderizada leve; a versão 3D só carrega por escolha explícita
+e aparece no menu/fim, nunca concorrendo com o órgão da rodada. O XR mantém DPR 1.
+Relatório, orçamento, testes e limitações em
+`docs/ESCOLA-MEDICINA-2026-09-23.md`. Teste físico no Quest continua pendente.
+
 ## Polimento contínuo do Duelo (2026-09-18)
 
 O passe de acabamento do `/duelo` começou pela sensação de jogo sem alterar as

@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { XR, XROrigin, useXR } from "@react-three/xr";
 import { SairDoVR } from "@/components/xr/SairDoVR";
 import { obterXRStore } from "@/lib/xr-store";
@@ -12,51 +12,16 @@ import { entrarNoXR } from "@/lib/xr-sessao";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { LuzEstudio, Text3D } from "@/components/arena/ui3d";
+import { Text3D } from "@/components/arena/ui3d";
 import { DueloGame, type Ambiente } from "./DueloGame";
 import { AmbienteHospital } from "./AmbienteHospital";
 import { useDueloOnline, type DueloOnline } from "./useDueloOnline";
 import { ProvedorArena } from "./EstadoArena";
-import { IluminacaoArena, SinalEscola } from "./ArenaMedica";
+import { IluminacaoArena } from "./ArenaMedica";
+import { AmbienteEscola, IluminacaoEscola } from "./AmbienteEscola";
 import { MedidorDuelo } from "./MedidorDuelo";
 
 const FLOOR_Y = -1.3;
-
-// Cenário "Cute Magic Stylized LowPoly" exportado do Unity pelo grupo
-// (29MB de projeto → 142KB: glTFast + webp + draco).
-//
-// ESCALA HUMANA (teste no Quest): a mobília do pacote é gigante — mesa a
-// 1,04 un. acima do piso, assento a ~0,5 un., e o piso tem 0,30 un. de
-// espessura. Escala 0,72 põe a mesa em 75cm e o assento em ~38cm; o grupo
-// desce 0,30×0,72 para o TOPO do piso cair exatamente em FLOOR_Y (antes o
-// jogador ficava 48cm abaixo do piso e via a lousa por baixo da mesa).
-const CENARIO_GLB = "/models/props/cenario-duelo.glb";
-export const ESCOLA_S = 0.72;
-export const ESCOLA_OFF_Y = FLOOR_Y - 0.3 * ESCOLA_S;
-
-function CenarioDuelo() {
-  const gltf = useGLTF(CENARIO_GLB, "/draco/");
-  const scene = useMemo(() => {
-    const clone = gltf.scene.clone(true);
-    // Remove / oculta as cadeiras do cenário para dar espaço livre aos competidores
-    clone.traverse((child) => {
-      if (
-        child.name.toLowerCase().includes("chair") ||
-        child.name.toLowerCase().includes("cadeira")
-      ) {
-        child.visible = false;
-      }
-    });
-    return clone;
-  }, [gltf.scene]);
-
-  return (
-    <group position={[0, ESCOLA_OFF_Y, 0]} scale={ESCOLA_S}>
-      <primitive object={scene} />
-    </group>
-  );
-}
-useGLTF.preload(CENARIO_GLB, "/draco/");
 
 /** Chão escuro por baixo/fora da sala (a sala de aula ambienta o resto). */
 function PalcoDuelo() {
@@ -70,7 +35,9 @@ function PalcoDuelo() {
   );
 }
 
-function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnline }) {
+function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
+  ambiente: Ambiente; online: DueloOnline; esqueleto3D: boolean; alternarEsqueleto: () => void;
+}) {
   const inSession = useXR((state) => Boolean(state.session));
   const escola = ambiente === "escola";
   // Tela em pé, o órgão vai para cima da lousa/do painel (ver DueloGame).
@@ -87,12 +54,17 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
     if (inSession) return;
     const [x, y, z] = escola
       ? retrato
-        ? [0.28, 0.15, 1.0]
-        : [0.28, -0.05, 1.0]
+        ? [0.28, 0.15, 1.6]
+        : [0.05, -0.05, 1.65]
       : retrato
         ? [0.85, 0.48, 4.45]
         : [0, 0.45, 3.8];
     get().camera.position.set(x, y, z);
+    const camera = get().camera;
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = escola ? 55 : 50;
+      camera.updateProjectionMatrix();
+    }
   }, [escola, retrato, inSession, get]);
 
   return (
@@ -103,8 +75,7 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
         <SairDoVR position={[-0.45, escola ? 0.95 : 1.25, -0.5]} />
       </XROrigin>
 
-      {escola ? <><LuzEstudio /><ambientLight intensity={0.25} color="#d3e6eb" /></> : <IluminacaoArena />}
-      {escola && <SinalEscola />}
+      {escola ? <IluminacaoEscola /> : <IluminacaoArena />}
 
       <PalcoDuelo />
       {/* Cenário é enfeite: se um GLB dele falhar, o jogo segue sem a sala em
@@ -112,7 +83,7 @@ function CenaDuelo({ ambiente, online }: { ambiente: Ambiente; online: DueloOnli
           para a troca de ambiente dar nova chance ao outro cenário. */}
       <ErrorBoundary key={ambiente} fallback={null}>
         <Suspense fallback={null}>
-          {escola ? <CenarioDuelo /> : <AmbienteHospital />}
+          {escola ? <AmbienteEscola detalhado={esqueleto3D} alternar={alternarEsqueleto} /> : <AmbienteHospital />}
         </Suspense>
       </ErrorBoundary>
       <mesh>
@@ -167,6 +138,7 @@ export function DueloApp() {
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
   const [altaQualidade, setAltaQualidade] = useState(false);
+  const [esqueleto3D, setEsqueleto3D] = useState(false);
   const [medir, setMedir] = useState(false);
   const [medicao, setMedicao] = useState("Aguardando 5 s de amostra…");
   const [ambiente, setAmbiente] = useState<Ambiente>("hospital");
@@ -250,6 +222,12 @@ export function DueloApp() {
               Nitidez: {altaQualidade ? "alta" : "padrão"}
             </button>
             <button type="button" aria-pressed={medir} onClick={() => { setMedir((v) => !v); setMedicao("Aguardando 5 s de amostra…"); }} className="rounded-full border border-white/20 bg-slate-950/85 px-3 py-2">Desempenho</button>
+            {ambiente === "escola" && <button type="button" aria-pressed={esqueleto3D}
+              onClick={() => setEsqueleto3D((v) => !v)}
+              title="O esqueleto detalhado usa mais GPU e aparece apenas fora das rodadas."
+              className="rounded-full border border-white/20 bg-slate-950/85 px-3 py-2">
+              Esqueleto: {esqueleto3D ? "3D fora das rodadas" : "prancha leve"}
+            </button>}
             {medir && <output className="rounded-lg bg-slate-950/90 px-3 py-2" aria-label="Medição local de desempenho">{medicao}</output>}
           </div>
         </>
@@ -270,7 +248,8 @@ export function DueloApp() {
       >
         <XR store={store}>
           {medir && <MedidorDuelo publicar={setMedicao} />}
-          <ProvedorArena><CenaDuelo ambiente={ambiente} online={online} /></ProvedorArena>
+          <ProvedorArena><CenaDuelo ambiente={ambiente} online={online} esqueleto3D={esqueleto3D}
+            alternarEsqueleto={() => setEsqueleto3D((v) => !v)} /></ProvedorArena>
         </XR>
       </Canvas>
     </main>
