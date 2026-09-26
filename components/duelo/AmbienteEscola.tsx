@@ -15,6 +15,7 @@ import { ContatoEscola, OrientacaoEscola } from "./OrientacaoEscola";
 import { SinalizacaoCenario } from "./SinalizacaoCenario";
 import { PisoCenario } from "./PisoCenario";
 import { useReflexosCenario } from "./useReflexosCenario";
+import { SalaEscolaRevisao } from "./SalaEscolaRevisao";
 
 const CENARIO = "/models/props/escola-medicina-direcao.glb";
 const ESQUELETO = "/models/props/esqueleto-estudo.glb";
@@ -100,17 +101,20 @@ export function IluminacaoEscola() {
   </>;
 }
 
-export function AmbienteEscola({ detalhado, alternar }: { detalhado: boolean; alternar: () => void }) {
+// A revisão aprovada é o padrão; false permite recuperar a sala anterior sem apagar seus assets.
+export function AmbienteEscola({ detalhado, alternar, revisao = true }: {
+  detalhado: boolean; alternar: () => void; revisao?: boolean;
+}) {
   const estado = useEstadoArena();
   const sinal = sinalDaArena(estado);
   return <>
     <group pointerEvents="none">
       <group position={[0, ESCOLA.piso, 0]}>
         <ErrorBoundary fallback={<Bloco pos={[.36, 1.18, -1.12]} tam={[1.35, 1.02, .08]} cor="#193c2f" />}>
-          <Suspense fallback={null}><SalaAutoral /></Suspense>
+          <Suspense fallback={null}>{revisao ? <SalaEscolaRevisao /> : <SalaAutoral />}</Suspense>
         </ErrorBoundary>
         <SinalizacaoCenario sala="escola" />
-        <PisoCenario sala="escola" />
+        {!revisao && <PisoCenario sala="escola" />}
       </group>
       <SinalEscola />
       <ContatoEscola />
@@ -141,5 +145,5 @@ export function AmbienteEscola({ detalhado, alternar }: { detalhado: boolean; al
   </>;
 }
 
-useGLTF.preload(CENARIO);
+// Sem preload da sala anterior: preservada para recuperação, não é baixada na versão padrão.
 // Sem preload do esqueleto: no Quest ele só é pedido por escolha explícita.

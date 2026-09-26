@@ -1,5 +1,26 @@
 # VRmed — contexto do projeto
 
+## Escola aprovada como cenário padrão (2026-09-26)
+
+Após avaliar a cópia isolada, o usuário aprovou a Escola revisada e autorizou
+substituir a versão em uso, commitar na `master` de `viniciusadrian1/VRMed2` e
+publicar pela Vercel para teste físico no Quest. `AmbienteEscola` passa a usar
+`SalaEscolaRevisao` por padrão. O comparador experimental não foi incorporado à
+produção, e `DueloApp` permanece sem alterações nesta promoção.
+
+A sala e o piso anteriores continuam disponíveis, sem preload desnecessário;
+`revisao={false}` recupera a implementação anterior. A cópia comparativa também
+foi preservada. Arena Médica, centro da Escola, alternativas, esqueleto, órgãos,
+controles, pontuação e protocolo online não receberam alterações.
+
+Escola revisada: 63.376 triângulos, 19 malhas, 5.142.160 bytes; piso: dois triângulos,
+uma malha, 105.416 bytes. Texturas locais incorporadas e nenhuma luz dinâmica,
+dependência ou pós-processamento novos. `verify:escola-revisao` integra agora
+`verify:core`, com regressões de UVs, normais, espaço dos jogadores e mira.
+O detalhamento aumenta o custo do cenário; desempenho/legibilidade no Quest
+continuam pendentes de teste físico. Resultados e limites da promoção em
+`docs/ESCOLA-REVISAO-ISOLADA-2026-09-25.md`. As seções abaixo são históricas.
+
 ## Arena aprovada como cenário padrão (2026-09-25)
 
 O usuário comparou a revisão isolada no navegador, aprovou o resultado e autorizou

@@ -22,9 +22,10 @@
     "verify:sinalizacao": "node --experimental-strip-types scripts/verificar-sinalizacao-duelo.ts",
     "verify:acabamento": "node --experimental-strip-types scripts/verificar-acabamento-duelo.ts",
     "verify:arena-revisao": "node --experimental-strip-types scripts/verificar-arena-revisao.ts",
+    "verify:escola-revisao": "node --experimental-strip-types scripts/verificar-escola-revisao.ts",
     "verify:paineis-xr": "node --experimental-strip-types scripts/verificar-paineis-estudo-xr.ts && node --experimental-strip-types scripts/verificar-janelas-estudo-xr.ts && node --experimental-strip-types scripts/verificar-paineis-site-xr.ts && node --experimental-strip-types scripts/verificar-gestos-estudo-xr.ts",
     "verify:duelo-http": "node --experimental-strip-types scripts/verificar-duelo-http.ts",
-    "verify:core": "npm run verify:xr && npm run verify:duelo && npm run verify:audio && npm run verify:apresentacao && npm run verify:botoes-xr && npm run verify:escola && npm run verify:retaguarda && npm run verify:tutor && npm run verify:perguntas && npm run verify:tipografia && npm run verify:sinalizacao && npm run verify:acabamento && npm run verify:arena-revisao && npm run verify:paineis-xr"
+    "verify:core": "npm run verify:xr && npm run verify:duelo && npm run verify:audio && npm run verify:apresentacao && npm run verify:botoes-xr && npm run verify:escola && npm run verify:retaguarda && npm run verify:tutor && npm run verify:perguntas && npm run verify:tipografia && npm run verify:sinalizacao && npm run verify:acabamento && npm run verify:arena-revisao && npm run verify:escola-revisao && npm run verify:paineis-xr"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
