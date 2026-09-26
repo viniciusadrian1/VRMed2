@@ -10,6 +10,7 @@ import { playClique, playHover } from "@/lib/arena-audio";
 import { pulsar } from "@/lib/xr-haptica";
 import { CAMADAS_UI3D, deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "@/lib/botao3d-interacao";
 import { ocuparPonteiroUI, liberarPonteiroUI } from "@/lib/xr-foco-interface";
+import { criarMaterialTexto3D, layoutRotuloBotao, TIPOGRAFIA_3D, type TratamentoTexto3D } from "@/lib/tipografia-3d";
 
 /**
  * Primitivas de interface em espaço 3D para a Arena.
@@ -95,16 +96,12 @@ const TEXTO_DESABILITADO = "#7b8894";
  * também cairia no array. Quem anima entrada de tela usa `Entrada` (escala e
  * profundidade), nunca opacidade.
  */
-const TEXT_MATERIAL = new THREE.MeshBasicMaterial({
-  transparent: true,
-  side: THREE.DoubleSide,
-  // A interface nunca pode ser engolida pelo modelo — o jogador pode
-  // escalá-lo até 6× e cobrir o painel que ele precisa clicar.
-  depthTest: false,
-  depthWrite: false,
-  // Sem tonemapping o texto mantém o contraste dentro do headset.
-  toneMapped: false,
-});
+const MATERIAIS_TEXTO = {
+  sobreposto: criarMaterialTexto3D("sobreposto"),
+  interface: criarMaterialTexto3D("interface"),
+  placa: criarMaterialTexto3D("placa"),
+  tela: criarMaterialTexto3D("tela"),
+};
 
 interface Text3DProps {
   children: ReactNode;
@@ -114,6 +111,10 @@ interface Text3DProps {
   /** Largura máxima antes de quebrar a linha, em metros. */
   maxWidth?: number;
   anchorY?: "top" | "middle" | "bottom";
+  anchorX?: "left" | "center" | "right";
+  align?: "left" | "center" | "right";
+  /** Opt-in: os demais modos preservam o texto sobreposto anterior. */
+  tratamento?: TratamentoTexto3D;
 }
 
 /** Texto 3D com a fonte local já aplicada. Use sempre este, nunca o <Text> direto. */
@@ -124,7 +125,11 @@ export function Text3D({
   color = ARENA_COLORS.text,
   maxWidth,
   anchorY = "middle",
+  anchorX = "center",
+  align = "center",
+  tratamento = "sobreposto",
 }: Text3DProps) {
+  const estilo = TIPOGRAFIA_3D[tratamento];
   return (
     <Text
       font={ARENA_FONT}
@@ -132,14 +137,15 @@ export function Text3D({
       fontSize={size}
       color={color}
       maxWidth={maxWidth}
-      anchorX="center"
+      anchorX={anchorX}
       anchorY={anchorY}
-      textAlign="center"
-      // Contorno escuro: o texto passa por cima de um modelo claro.
-      outlineWidth={size * 0.05}
+      textAlign={align}
+      lineHeight={estilo.entrelinha}
+      // Placas e interfaces apoiadas dispensam a borda que engrossava os glifos.
+      outlineWidth={size * estilo.contorno}
       outlineColor="#04070c"
-      material={TEXT_MATERIAL}
-      renderOrder={CAMADAS_UI3D.texto}
+      material={MATERIAIS_TEXTO[tratamento]}
+      renderOrder={estilo.profundidade ? estilo.ordem : CAMADAS_UI3D.texto}
       // Texto não intercepta o laser: o clique atravessa até o modelo.
       raycast={() => null}
     >
@@ -277,6 +283,8 @@ export function Button3D({
   desabilitado = false,
   tamanhoTexto,
   corRotulo = ARENA_COLORS.text,
+  tratamentoTexto = "sobreposto",
+  alinharRotulo = "center",
 }: {
   label: string;
   onClick: () => void;
@@ -299,6 +307,8 @@ export function Button3D({
   /** A lousa usa a mesma interação, com tipografia de giz dimensionada à placa. */
   tamanhoTexto?: number;
   corRotulo?: string;
+  tratamentoTexto?: "sobreposto" | "interface";
+  alinharRotulo?: "left" | "center";
 }) {
   const group = useRef<THREE.Group>(null);
   const hovered = useRef(new Set<number>());
@@ -339,7 +349,7 @@ export function Button3D({
   // ficam mudas e imóveis (não respondem a clique nem a hover), mas a certa
   // precisa continuar acesa — senão o cinza apagaria justamente a informação
   // pela qual a tela existe.
-  const corFundo =
+  const corEstado =
     destaque === "certo"
       ? "#3fd49a"
       : destaque === "errado"
@@ -347,10 +357,15 @@ export function Button3D({
         : desabilitado
           ? COLOR_DESABILITADO
           : color;
+  // No Duelo, o texto sem contorno precisa de uma superfície escura estável.
+  // Mantém matiz e borda de acerto/erro; outros modos conservam sua aparência.
+  const corFundo = tratamentoTexto === "interface" && (!desabilitado || destaque)
+    ? sombra(corEstado, 0.22) : corEstado;
   const corTexto = desabilitado && !destaque ? TEXTO_DESABILITADO : destaque ? ARENA_COLORS.text : corRotulo;
   // Ícone e selo ocupam a esquerda da placa; sem eles o rótulo volta ao centro.
   const seloLado = height * 0.52;
-  const rotuloX = selo ? height * 0.2 : icone ? height * 0.14 : 0;
+  const layout = layoutRotuloBotao(width, height, Boolean(selo), icone);
+  const rotuloX = alinharRotulo === "left" ? layout.x : selo ? height * 0.2 : icone ? height * 0.14 : 0;
 
   return (
     <group
@@ -406,10 +421,10 @@ export function Button3D({
           map={panelTexture(
             width / height,
             corFundo,
-            // Borda quase branca no destaque: a 3 m, o verde do fundo sozinho
-            // se confunde com as placas vizinhas — a moldura é o que separa.
+            // No Duelo, a borda preserva a cor de estado sobre a face escura.
+            // Os demais modos mantêm o contorno claro anterior.
             destaque
-              ? "rgba(255,255,255,0.95)"
+              ? tratamentoTexto === "interface" ? corEstado : "rgba(255,255,255,0.95)"
               : desabilitado
                 ? "rgba(255,255,255,0.18)"
                 : "rgba(255,255,255,0.55)",
@@ -465,7 +480,7 @@ export function Button3D({
               depthTest={false}
             />
           </mesh>
-          <Text3D position={[0, 0, 0.002]} size={seloLado * 0.62} color={corFundo}>
+          <Text3D position={[0, 0, 0.002]} size={seloLado * 0.62} color={corFundo} tratamento={tratamentoTexto}>
             {selo}
           </Text3D>
         </group>
@@ -479,7 +494,10 @@ export function Button3D({
         // quebre transborda. Quem tem rótulo longo passa uma largura maior.
         size={tamanhoTexto ?? height * 0.42}
         color={corTexto}
-        maxWidth={width * 0.86}
+        maxWidth={alinharRotulo === "left" ? layout.largura : width * 0.86}
+        anchorX={alinharRotulo === "left" ? "left" : "center"}
+        align={alinharRotulo}
+        tratamento={tratamentoTexto}
       >
         {label}
       </Text3D>
@@ -526,7 +544,7 @@ export function Floater({
  *
  * Anima escala e profundidade, nunca opacidade: com `outlineWidth` o troika
  * expõe `material` como array e `material-opacity` cairia no array sem nunca
- * chegar ao shader (ver o comentário de TEXT_MATERIAL).
+ * chegar ao shader (ver o comentário de MATERIAIS_TEXTO).
  *
  * Use com `key={fase}` para a animação recomeçar a cada tela.
  */

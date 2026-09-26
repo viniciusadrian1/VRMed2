@@ -109,8 +109,8 @@ export function PalcoAnatomico() {
         <ringGeometry args={[0.40, 0.425, 64]} /><meshBasicMaterial color={sinal.cor} toneMapped={false} />
       </mesh>
       <Bloco pos={[0, 0.635, 0.535]} tam={[1.02, 0.20, 0.035]} cor="#102c35" />
-      <Text3D position={[0, 0.683, 0.558]} size={0.038} color="#c3dfe6">ESTAÇÃO ANATÔMICA</Text3D>
-      <Text3D position={[0, 0.605, 0.558]} size={0.034} color={sinal.cor} maxWidth={0.98}>{estado.fase === "menu" ? "MODELO DE DEMONSTRAÇÃO" : sinal.rotulo}</Text3D>
+      <Text3D tratamento="placa" position={[0, 0.683, 0.558]} size={0.038} color="#c3dfe6">Estação anatômica</Text3D>
+      <Text3D tratamento="tela" position={[0, 0.605, 0.558]} size={0.034} color={sinal.cor} maxWidth={0.98}>{estado.fase === "menu" ? "Modelo de demonstração" : sinal.rotulo}</Text3D>
     </group>
   );
 }
@@ -125,9 +125,9 @@ export function ConsoleArena() {
       <FaixaReativa pos={[0, 0.84, -0.02]} tam={[1.82, 0.026, 0.08]} />
       <Bloco pos={[0, -1.29, -0.15]} tam={[0.3, 0.35, 0.24]} />
       <Bloco pos={[0, -1.4, 0]} tam={[1.15, 0.10, 0.7]} cor="#183440" />
-      <Text3D position={[-0.50, 0.77, 0.006]} size={0.035} color="#97cad4">VRmed / DUELO</Text3D>
-      <Text3D position={[0.47, 0.77, 0.006]} size={0.032} color={estado.combo > 1 ? "#f5c781" : "#97cad4"}>
-        {estado.combo > 1 ? `SEQUÊNCIA ×${estado.combo}` : "TREINAMENTO 1×1"}
+      <Text3D tratamento="tela" position={[-0.76, 0.77, 0.006]} anchorX="left" align="left" size={0.039} color="#c3dfe6">VRmed / Duelo</Text3D>
+      <Text3D tratamento="tela" position={[0.76, 0.77, 0.006]} anchorX="right" align="right" size={0.032} color={estado.combo > 1 ? "#f5c781" : "#97cad4"}>
+        {estado.combo > 1 ? `Sequência ×${estado.combo}` : "Treinamento 1×1"}
       </Text3D>
     </group>
   );
@@ -139,10 +139,10 @@ export function MonitorArena({ pos, titulo }: { pos: [number, number, number]; t
   const sinal = sinalDaArena(estado);
   return <group position={pos}>
     <Bloco pos={[0, 0, 0]} tam={[1.08, 0.69, 0.14]} cor="#102732" />
-    <Text3D position={[0, 0.22, 0.08]} size={0.045} color="#abcdd6">{titulo}</Text3D>
-    <Text3D position={[0, 0.03, 0.08]} size={0.056} color={sinal.cor} maxWidth={0.94}>{sinal.rotulo}</Text3D>
+    <Text3D tratamento="tela" position={[-0.46, 0.22, 0.08]} anchorX="left" align="left" size={0.033} maxWidth={0.92} color="#abcdd6">{titulo}</Text3D>
+    <Text3D tratamento="tela" position={[0, 0.03, 0.08]} size={0.056} color={sinal.cor} maxWidth={0.94}>{sinal.rotulo}</Text3D>
     <FaixaReativa pos={[0, -0.23, 0.08]} tam={[0.88, 0.022, 0.015]} />
-    <Text3D position={[0, -0.44, 0.08]} size={0.033} color="#9cb2ba">ESTADO DA PARTIDA · NÃO É UM SINAL CLÍNICO</Text3D>
+    <Text3D tratamento="tela" position={[0, -0.29, 0.08]} size={0.028} maxWidth={0.96} color="#9cb2ba">Sinal de jogo · não clínico</Text3D>
   </group>;
 }
 
@@ -151,6 +151,6 @@ export function SinalEscola() {
   const sinal = sinalDaArena(useEstadoArena());
   return <group>
     <FaixaReativa pos={[0.36, 0.31, -1.065]} tam={[1.12, 0.012, 0.01]} />
-    <Text3D position={[0.36, 0.35, -1.06]} size={0.023} color={sinal.cor}>{sinal.rotulo}</Text3D>
+    <Text3D tratamento="interface" position={[0.36, 0.35, -1.06]} size={0.023} color={sinal.cor}>{sinal.rotulo}</Text3D>
   </group>;
 }

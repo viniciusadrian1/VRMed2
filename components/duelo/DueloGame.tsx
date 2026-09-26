@@ -15,14 +15,13 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
-  Text3D,
   Panel,
-  Button3D,
   BarraTempo,
   Entrada,
   Floater,
   ARENA_COLORS,
 } from "@/components/arena/ui3d";
+import { TextoDuelo as Text3D, BotaoDuelo as Button3D } from "./tipografia";
 import {
   detectStructures,
   disposeMaterials,
@@ -34,6 +33,7 @@ import { montarRodadasDuelo } from "@/lib/duelo-perguntas";
 import { PublicarEstadoArena } from "./EstadoArena";
 import { CONSOLE_POS, CONSOLE_ROT, LETREIRO_POS } from "./ArenaMedica";
 import { BotaoLousa } from "./BotaoLousa";
+import { TelaoDuelo } from "./TelaoDuelo";
 import { ESCOLA, posicaoCompetidorEscola, ROTACAO_ADVERSARIO_ESCOLA } from "@/lib/escola-apresentacao";
 import {
   desbloquearAudio,
@@ -199,7 +199,7 @@ function Placar({
   return (
     <group position={position}>
       <Text3D position={[-0.42 * s, 0, 0.002]} size={0.042 * s} color={CORES.meu}>
-        VOCÊ
+        Você
       </Text3D>
       <Text3D position={[-0.17 * s, 0, 0.002]} size={0.082 * s} color={CORES.meu}>
         {String(meus)}
@@ -216,7 +216,7 @@ function Placar({
         color={CORES.dele}
         maxWidth={0.42 * s}
       >
-        {nomeDele.toUpperCase()}
+        {nomeDele}
       </Text3D>
       {/* Fita das rodadas: o andamento da partida lido de relance, sem texto. */}
       {Array.from({ length: TOTAL_RODADAS }, (_, i) => (
@@ -1255,10 +1255,7 @@ export function DueloGame({
     return errados.includes(opcao) || enviado === opcao ? "errado" : null;
   };
 
-  /**
-   * Telão do hospital: nunca mais apagado. Ele está a 5,76 m com texto de
-   * 0,34 — é o elemento mais legível da cena e ficava preto fora da rodada.
-   */
+  // O telão mantém o estado atual, agora desenhado na própria superfície do monitor.
   const partidaViva = !(emSala && (online.conexao === "perdida" || fase === "encerrada"));
   const led =
     !partidaViva
@@ -1273,12 +1270,6 @@ export function DueloGame({
           : fase === "feedback" || fase === "fim"
             ? { texto: `${pontosJogador} × ${pontosBot}`, cor: CORES.giz }
             : { texto: "DUELO 1×1", cor: CORES.tempo };
-  /**
-   * A tela acesa do telão tem 1,38 m (AmbienteHospital, TelaoLed) e o texto
-   * não quebra linha — "1200 × 1000" a 0,34 saía 26 cm para fora da moldura
-   * de cada lado. O corpo encolhe conforme o texto cresce.
-   */
-  const ledSize = led.texto.length <= 3 ? 0.34 : led.texto.length <= 7 ? 0.24 : 0.19;
 
   /**
    * O oponente fica em cena o tempo todo. Antes ele só existia em 2 das 7
@@ -1836,7 +1827,7 @@ export function DueloGame({
               <Text3D position={[0.12, 0.31, 0.01]} size={0.055} color={ARENA_COLORS.muted}>
                 {`Rodada ${indice + 1}/${TOTAL_RODADAS} · vale ${rodada.pontos}`}
               </Text3D>
-              <Text3D position={[0, 0.17, 0.01]} size={0.053} maxWidth={1.5}>
+              <Text3D position={[-0.745, 0.17, 0.01]} anchorX="left" align="left" size={0.058} maxWidth={1.49}>
                 {revelar
                   ? feedback
                   : rodada.pergunta ?? (rodada.tipo === "orgao"
@@ -1851,6 +1842,7 @@ export function DueloGame({
                   key={`opcao-hospital-${i}-${opcao}`}
                   label={opcao}
                   selo={["A", "B", "C", "D"][i]}
+                  alinharRotulo="left"
                   width={1.55}
                   height={0.18}
                   tamanhoTexto={Math.min(0.069, 1.22 / Math.max(1, opcao.length * 0.55))}
@@ -1882,7 +1874,7 @@ export function DueloGame({
                 </Text3D>
               )}
             </Panel>
-            {revelar && rodada.explicacao && <Text3D position={[0, -0.94, 0.02]} size={0.046} maxWidth={1.6} color="#cfe7dd">
+            {revelar && rodada.explicacao && <Text3D position={[-0.745, -0.94, 0.02]} anchorX="left" align="left" size={0.046} maxWidth={1.49} color="#cfe7dd">
               {rodada.explicacao}
             </Text3D>}
           </group>
@@ -1919,8 +1911,10 @@ export function DueloGame({
               </>
             )}
             <Text3D
-              position={[LOUSA_X, 0.024, LOUSA_Z]}
-              size={0.033}
+              position={[LOUSA_X - 0.54, 0.024, LOUSA_Z]}
+              anchorX="left"
+              align="left"
+              size={0.036}
               maxWidth={1.08}
               color={CORES.giz}
             >
@@ -1942,7 +1936,8 @@ export function DueloGame({
             {rodada.opcoes.map((opcao, i) => (
               <BotaoLousa
                 key={`opcao-escola-${i}-${opcao}`}
-                texto={`${["A", "B", "C", "D"][i]})  ${opcao}`}
+                texto={opcao}
+                selo={["A", "B", "C", "D"][i]}
                 position={[LOUSA_X, -0.055 - i * ESCOLA.passoOpcao, LOUSA_Z]}
                 cor={
                   revelar
@@ -1962,11 +1957,11 @@ export function DueloGame({
               />
             ))}
             {erroJogador && !revelar && (
-               <Text3D position={[LOUSA_X - 0.53, 0.022, LOUSA_Z]} size={0.036} color="#ffb0a0">
+               <Text3D position={[LOUSA_X - 0.54, 0.082, LOUSA_Z]} anchorX="left" align="left" size={0.028} color="#ffb0a0">
                 Errado!
               </Text3D>
             )}
-            {revelar && rodada.explicacao && <Text3D position={[LOUSA_X, -0.515, LOUSA_Z]} size={0.029} maxWidth={1.1} color="#d1e7cc">
+            {revelar && rodada.explicacao && <Text3D position={[LOUSA_X - 0.54, -0.515, LOUSA_Z]} anchorX="left" align="left" size={0.029} maxWidth={1.08} color="#d1e7cc">
               {rodada.explicacao}
             </Text3D>}
           </>
@@ -1992,9 +1987,7 @@ export function DueloGame({
       />
       {oponente}
       {hosp && (
-        <Text3D position={HOSP_LED} size={ledSize} color={led.cor}>
-          {led.texto}
-        </Text3D>
+        <TelaoDuelo position={HOSP_LED} texto={led.texto} cor={led.cor} />
       )}
     </group>
   );

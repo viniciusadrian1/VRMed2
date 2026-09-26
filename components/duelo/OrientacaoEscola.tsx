@@ -22,10 +22,10 @@ export function OrientacaoEscola() {
       <Bloco pos={[0, -.075, -.025]} tam={[.93, .12, .09]} cor="#28443f" />
       <Bloco pos={[0, 0, 0]} tam={[1.04, .18, .035]} cor="#142f30" />
       <Bloco pos={[-.485, 0, .023]} tam={[.02, .15, .008]} cor={local ? "#81d4e6" : "#ebbc72"} />
-      <Text3D position={[0, .038, .025]} size={.041} color={local ? "#c8f2f7" : "#ffe2b0"}>
-        {local ? "01 · SEU POSTO" : "02 · ADVERSÁRIO"}
+      <Text3D tratamento="placa" position={[-.435, .038, .025]} anchorX="left" align="left" size={.041} color={local ? "#c8f2f7" : "#ffe2b0"}>
+        {local ? "01 · Seu posto" : "02 · Adversário"}
       </Text3D>
-      <Text3D position={[0, -.026, .025]} size={.027} maxWidth={.95} color={local ? sinal.cor : "#d9e6dd"}>
+      <Text3D tratamento="tela" position={[-.435, -.026, .025]} anchorX="left" align="left" size={.027} maxWidth={.88} color={local ? sinal.cor : "#d9e6dd"}>
         {local ? orientacaoDaEscola(estado) : "Mesmo desafio · ao seu lado"}
       </Text3D>
       {local && <FaixaReativa pos={[0, -.074, .022]} tam={[.86, .006, .008]} />}
@@ -33,7 +33,7 @@ export function OrientacaoEscola() {
   </group>;
 }
 
-/** Contato suave estilizado, não shadow map: planos de baixo custo no piso. */
+/** Apenas o avatar móvel usa contato aproximado; móveis têm contatos gravados no piso. */
 export function ContatoEscola() {
   const { fase } = useEstadoArena();
   const mascara = useMemo(() => {
@@ -46,9 +46,6 @@ export function ContatoEscola() {
     return pixels;
   }, []);
   const apoios = [
-    { x: -.78, z: -.95, w: 1.35, h: 1.0, opacidade: .32 },
-    { x: 1.82, z: -2.44, w: 1.5, h: .9, opacidade: .26 },
-    ...[ESCOLA.jogadorX, ESCOLA.adversarioX].map((x) => ({ x, z: ESCOLA.postoZ - ESCOLA.mesaRecuo, w: 1.85, h: 1.1, opacidade: .24 })),
     ...(!["menu", "codigo", "sala"].includes(fase)
       ? [{ x: ESCOLA.adversarioX, z: ESCOLA.postoZ, w: .7, h: .6, opacidade: .32 }] : []),
   ];

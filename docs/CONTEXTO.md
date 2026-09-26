@@ -1,5 +1,82 @@
 # VRmed — contexto do projeto
 
+## Arena aprovada como cenário padrão (2026-09-25)
+
+O usuário comparou a revisão isolada no navegador, aprovou o resultado e autorizou
+substituir a Arena em uso e publicar na `master` de `viniciusadrian1/VRMed2` para
+testar no Quest pela Vercel. `DueloApp` agora monta `ArenaMedicaRevisao` no ambiente
+hospital, sem seletor experimental. A Escola mantém exatamente a versão local
+anterior; não recebeu outra remodelagem nesta promoção.
+
+`AmbienteHospital` e os assets anteriores continuam guardados para recuperação.
+Palco central, alternativas, controles, anatomia, pontuação e protocolo online
+foram preservados. Os ajustes locais anteriores de sinalização e materiais são
+parte da versão aprovada e acompanham esta publicação. Sem dependência nova.
+
+A nova Arena tem 94.040 triângulos/13 malhas/7.995.460 bytes; piso com duas faces
+triangulares/uma malha/84.408 bytes. Sem nova luz dinâmica ou pós-processamento.
+O teste `verify:arena-revisao` integra `verify:core` e exige a revisão como padrão,
+a implementação anterior preservada, corredor livre e decoração sem capturar raios.
+Validação em Quest físico ainda pendente; não prometer desempenho pelo desktop.
+Relatório de autoria e inspeção: `docs/ARENA-REVISAO-ISOLADA-2026-09-25.md`.
+Os estados de publicação nas seções abaixo descrevem etapas anteriores.
+
+## Direção de arte da Escola (2026-09-25, revisão local)
+
+A pedido do usuário, a Escola recebeu a mesma abordagem de remodelagem autoral
+do Hospital: biblioteca única, bancada curva, microscópios binoculares, vitrine,
+painéis acústicos, forro e armazenamento ao fundo. Identidade própria de madeira,
+verde e cerâmica. `escola-medicina-direcao.glb`: 38.366 triângulos, 11 malhas,
+3.072.104 bytes; piso recalculado e reflexos locais somente no cenário.
+
+Autoria pelo Blender MCP em cena separada; 42 peças centrais/postos mantiveram
+geometria e posição. Alternativas, placas, órgãos, controles e regras preservados.
+Vistas de inspeção da Escola são restritas ao desenvolvimento desktop, sem XR.
+Typecheck, lint, testes centrais, build e HTTP/SSE local passaram; inspeção desktop
+realizada. Quest físico e aprovação visual pendentes, sem commit/push.
+Custos, arquivos e limites: `docs/DIRECAO-ESCOLA-2026-09-25.md`.
+
+## Direção de arte da Arena Médica (2026-09-25, segunda revisão local)
+
+Após o usuário considerar o acabamento anterior sutil, o Hospital recebeu nova
+modelagem de carrinho/estação de exame, nicho aberto de preparo, armários curvos,
+revestimentos laterais e forro integrado. `entorno-arena-direcao.glb`: 32.628
+triângulos, oito malhas, 2.327.476 bytes. Piso recalculado para as novas peças.
+Reflexos locais compartilhados somente no cenário, sem alterar órgãos/UI.
+Centro, placas, cadeira, controles e regras preservados. Escola sem nova remodelagem.
+
+Typecheck, lint, testes centrais, build e HTTP/SSE local passaram. Inspeção desktop
+realizada; avaliação visual do usuário e Quest físico pendentes. Nenhum commit/push.
+Método, custo adicional e limitações em `docs/DIRECAO-ARENA-2026-09-25.md`.
+
+## Acabamento integrado das salas (2026-09-25, revisão local)
+
+Variantes autoradas no Blender acrescentam oclusão de proximidade gravada,
+materiais diferenciados e contatos nos pisos da Escola/Hospital. Escola mantém
+a geometria original e recebe textura discreta de carvalho. Hospital recebe
+luminária articulada no leito, cobertura com caimento e difusor de janela.
+Monitor do leito acompanha o estado da partida; centro, alternativas, câmera XR,
+órgãos e regras online preservados. GLBs originais mantidos, nenhuma luz dinâmica nova.
+
+Novo `verify:acabamento` integrado ao `verify:core`. Orçamento, autoria, arquivos,
+testes e limites em `docs/ACABAMENTO-AMBIENTES-2026-09-25.md`.
+Typecheck, lint, build, testes centrais e HTTP/SSE local passaram; inspeção desktop realizada.
+Validação física/performance no Quest pendente; revisão ainda não publicada.
+
+## Sinalização física do Duelo (2026-09-25, revisão local)
+
+Placas autoradas/exportadas pelo Blender MCP substituem os letreiros principais
+que pareciam sobrepostos. São oito placas no Hospital e cinco na Escola, agrupadas
+em três malhas por ambiente, com atlas local incorporado, bordas e fixadores.
+Arena Médica fica centralizada com marca discreta no canto; entrada sem marca.
+O telão Duelo 1×1/tempo/placar usa uma superfície única, sem letras flutuantes.
+Alternativas, controles, regras online, órgãos e câmera XR preservados.
+
+Build, lint, typecheck, testes centrais e HTTP/SSE local passaram. Inspeção desktop
+realizada; nitidez, conforto e desempenho no Quest físico continuam pendentes.
+Autoria, orçamento e limites: `docs/SINALIZACAO-CENARIO-2026-09-25.md`.
+Esta revisão não foi commitada nem publicada.
+
 ## Arena médica — ambientação em 360 graus (2026-09-23)
 
 A frente aprovada permanece intacta. As laterais e o fundo receberam apoio

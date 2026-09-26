@@ -3,8 +3,9 @@
 import { useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { useReflexosCenario } from "./useReflexosCenario";
 
-const CAMINHO = "/models/props/entorno-arena.glb";
+const CAMINHO = "/models/props/entorno-arena-direcao.glb";
 
 /** Oito malhas agrupadas por material; equipamentos autorais em escala métrica. */
 export function EntornoHospital() {
@@ -16,6 +17,7 @@ export function EntornoHospital() {
     });
     return clone;
   }, [gltf.scene]);
+  useReflexosCenario(cena);
   return <group pointerEvents="none"><primitive object={cena} dispose={null} /></group>;
 }
 

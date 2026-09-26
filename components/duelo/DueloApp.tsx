@@ -14,7 +14,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
 import { DueloGame, type Ambiente } from "./DueloGame";
-import { AmbienteHospital } from "./AmbienteHospital";
+import { ArenaMedicaRevisao } from "./ArenaMedicaRevisao";
 import { useDueloOnline, type DueloOnline } from "./useDueloOnline";
 import { ProvedorArena } from "./EstadoArena";
 import { IluminacaoArena } from "./ArenaMedica";
@@ -28,6 +28,10 @@ const FLOOR_Y = -1.3;
 const VISTAS_ARENA: Record<string, [number, number, number]> = {
   fundo: [0, .3, 4.5], esquerda: [-4.5, .3, 2.1], direita: [4.5, .3, 2.1],
   "fundo-esquerda": [-3.4, .3, 4.3], "fundo-direita": [3.4, .3, 4.3],
+};
+const VISTAS_ESCOLA: Record<string, [number, number, number]> = {
+  fundo: [0, .3, 3.8], esquerda: [-3.3, .3, .2], direita: [3.3, .05, .15],
+  "fundo-esquerda": [-2.3, .3, 3.7], "fundo-direita": [2.3, .3, 3.7],
 };
 
 /** Chão escuro por baixo/fora da sala (a sala de aula ambienta o resto). */
@@ -47,9 +51,10 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
 }) {
   const inSession = useXR((state) => Boolean(state.session));
   const escola = ambiente === "escola";
-  const nomeVista = process.env.NODE_ENV === "development" && !escola && typeof window !== "undefined"
+  const nomeVista = process.env.NODE_ENV === "development" && !inSession && typeof window !== "undefined"
     ? new URLSearchParams(window.location.search).get("inspecao") ?? "" : "";
-  const vistaLocal = Object.hasOwn(VISTAS_ARENA, nomeVista) ? VISTAS_ARENA[nomeVista] : undefined;
+  const vistas = escola ? VISTAS_ESCOLA : VISTAS_ARENA;
+  const vistaLocal = Object.hasOwn(vistas, nomeVista) ? vistas[nomeVista] : undefined;
   // Tela em pé, o órgão vai para cima da lousa/do painel (ver DueloGame).
   // Escola: paisagem usa olhos a 1,60m do piso; retrato preserva o espaço
   // acima da lousa para o órgão, longe do seletor e do botão de VR do canto.
@@ -62,7 +67,7 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
   // o celular: a câmera é reposicionada aqui. Na sessão XR quem manda é o óculos.
   useEffect(() => {
     if (inSession) return;
-    const [x, y, z] = vistaLocal ? [0, .3, 2.55] : escola
+    const [x, y, z] = vistaLocal ? (escola ? [.28, .3, .99] : [0, .3, 2.55]) : escola
       ? retrato
         ? [0.28, 0.15, 1.6]
         : [0.28, 0.3, 1.65]
@@ -93,7 +98,7 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
           para a troca de ambiente dar nova chance ao outro cenário. */}
       <ErrorBoundary key={ambiente} fallback={null}>
         <Suspense fallback={null}>
-          {escola ? <AmbienteEscola detalhado={esqueleto3D} alternar={alternarEsqueleto} /> : <AmbienteHospital />}
+          {escola ? <AmbienteEscola detalhado={esqueleto3D} alternar={alternarEsqueleto} /> : <ArenaMedicaRevisao />}
         </Suspense>
       </ErrorBoundary>
       <mesh>

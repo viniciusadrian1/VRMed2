@@ -1,0 +1,168 @@
+{
+  "placas": {
+    "hospital": [
+      {
+        "id": "arena",
+        "titulo": "Arena Médica",
+        "marca": true,
+        "posicao": [
+          0,
+          3.415,
+          -3.1
+        ],
+        "largura": 3.64,
+        "altura": 0.28
+      },
+      {
+        "id": "preparo",
+        "titulo": "Preparo",
+        "posicao": [
+          -3.32,
+          3.18,
+          -4.224
+        ],
+        "largura": 1.89,
+        "altura": 0.26
+      },
+      {
+        "id": "suprimentos",
+        "titulo": "Suprimentos",
+        "posicao": [
+          3.32,
+          3.18,
+          -4.224
+        ],
+        "largura": 1.89,
+        "altura": 0.26
+      },
+      {
+        "id": "leito",
+        "titulo": "Leito de treinamento",
+        "subtitulo": "Apoio à simulação",
+        "posicao": [
+          -2.95,
+          2.46,
+          4.345
+        ],
+        "largura": 2.46,
+        "altura": 0.4,
+        "giro": 3.141592653589793
+      },
+      {
+        "id": "apoio",
+        "titulo": "Apoio / materiais",
+        "posicao": [
+          2.98,
+          2.64,
+          4.345
+        ],
+        "largura": 2.28,
+        "altura": 0.25,
+        "giro": 3.141592653589793
+      },
+      {
+        "id": "entrada",
+        "titulo": "Centro de simulação",
+        "posicao": [
+          0,
+          2.78,
+          4.29
+        ],
+        "largura": 2.36,
+        "altura": 0.29,
+        "giro": 3.141592653589793
+      },
+      {
+        "id": "higienizacao",
+        "titulo": "Higienização",
+        "posicao": [4.323, 2.30, 2.46],
+        "largura": 1.46,
+        "altura": 0.24,
+        "giro": -1.5707963267948966
+      },
+      {
+        "id": "posto-apoio",
+        "titulo": "Posto de apoio",
+        "posicao": [4.323, 2.25, 0.20],
+        "largura": 1.43,
+        "altura": 0.24,
+        "giro": -1.5707963267948966
+      }
+    ],
+    "escola": [
+      {
+        "id": "laboratorio",
+        "titulo": "Laboratório de anatomia",
+        "marca": true,
+        "posicao": [
+          0,
+          2.83,
+          -3.623
+        ],
+        "largura": 4.64,
+        "altura": 0.29
+      },
+      {
+        "id": "lousa",
+        "titulo": "Responda na lousa",
+        "posicao": [
+          0.36,
+          1.8,
+          -1.238
+        ],
+        "largura": 1.46,
+        "altura": 0.18
+      },
+      {
+        "id": "osteologia",
+        "titulo": "Osteologia",
+        "apoios": true,
+        "posicao": [
+          1.82,
+          2.36,
+          -2.414
+        ],
+        "largura": 1.08,
+        "altura": 0.19
+      },
+      {
+        "id": "microscopia",
+        "titulo": "Microscopia",
+        "subtitulo": "Preparo de lâminas",
+        "posicao": [
+          2.705,
+          1.89,
+          -0.633
+        ],
+        "largura": 0.98,
+        "altura": 0.24
+      },
+      {
+        "id": "atlas",
+        "titulo": "Atlas / estudo",
+        "apoios": true,
+        "posicao": [
+          -2.4,
+          2.2,
+          -3.244
+        ],
+        "largura": 0.86,
+        "altura": 0.18
+      }
+    ]
+  },
+  "acabamentos": {
+    "hospital": {
+      "papel": "#d7dacf",
+      "tinta": "#183a43",
+      "acento": "#327987",
+      "metal": "#455c63"
+    },
+    "escola": {
+      "papel": "#d8ceb5",
+      "tinta": "#263e31",
+      "acento": "#6a6143",
+      "metal": "#6e6450"
+    }
+  }
+}

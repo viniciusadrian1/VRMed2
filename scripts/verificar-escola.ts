@@ -107,10 +107,11 @@ function glb(nome: string) {
     s + m.primitives.reduce((n, p) => n + json.accessors[p.indices].count / 3, 0), 0);
   return { dados, json, triangulos };
 }
-const escola = glb("escola-medicina");
+const escola = glb("escola-medicina-direcao");
 assert.equal(escola.json.meshes.length, 11);
-assert.ok(escola.triangulos < 25000 && escola.dados.length < 2_000_000);
-assert.equal(escola.json.images?.length ?? 0, 0);
+assert.ok(escola.triangulos < 40000 && escola.dados.length < 3_400_000);
+assert.equal(escola.json.images?.length ?? 0, 1, "somente a madeira local incorporada");
+assert.ok(readFileSync("components/duelo/AmbienteEscola.tsx", "utf8").includes("escola-medicina-direcao.glb"));
 
 // O gerador e o runtime compartilham os postos, sem mudar a distância da lousa.
 const app = readFileSync("components/duelo/DueloApp.tsx", "utf8");
@@ -126,7 +127,10 @@ const direcao = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1
 assert.ok(direcao.dot(new THREE.Vector3(ESCOLA.lousaX - ESCOLA.adversarioX, 0, ESCOLA.lousaZ - ESCOLA.postoZ).normalize()) > .999);
 
 // Verifica triângulos do GLB exportado, não só nomes (as malhas são agrupadas).
-const sala = await new GLTFLoader().parseAsync(Uint8Array.from(escola.dados).buffer, "");
+// Aqui são testados triângulos/ponteiros; os pixels da madeira são conferidos no navegador.
+const loader = new GLTFLoader().register(() => ({ name: "ImagemTesteGeometrico",
+  loadTexture: () => Promise.resolve(new THREE.Texture()) }));
+const sala = await loader.parseAsync(Uint8Array.from(escola.dados).buffer, "");
 sala.scene.position.y = ESCOLA.piso;
 sala.scene.updateMatrixWorld(true);
 // O cenário real, incluindo as mesas, não rouba os alvos da interface.

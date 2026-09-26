@@ -4,15 +4,19 @@ import { Suspense, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import { Button3D, Text3D } from "@/components/arena/ui3d";
+import { Text3D } from "@/components/arena/ui3d";
+import { BotaoDuelo as Button3D } from "./tipografia";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { sinalDaArena } from "@/lib/duelo-apresentacao";
 import { ESCOLA, mostrarEsqueleto3D } from "@/lib/escola-apresentacao";
 import { useEstadoArena } from "./EstadoArena";
 import { Bloco, FaixaReativa, SinalEscola } from "./ArenaMedica";
 import { ContatoEscola, OrientacaoEscola } from "./OrientacaoEscola";
+import { SinalizacaoCenario } from "./SinalizacaoCenario";
+import { PisoCenario } from "./PisoCenario";
+import { useReflexosCenario } from "./useReflexosCenario";
 
-const CENARIO = "/models/props/escola-medicina.glb";
+const CENARIO = "/models/props/escola-medicina-direcao.glb";
 const ESQUELETO = "/models/props/esqueleto-estudo.glb";
 const PRANCHA = "/models/props/esqueleto-prancha.png";
 const SEM_RAYCAST = () => null;
@@ -24,6 +28,7 @@ function SalaAutoral() {
     clone.traverse((o) => { if (o instanceof THREE.Mesh) o.raycast = SEM_RAYCAST; });
     return clone;
   }, [gltf.scene]);
+  useReflexosCenario(cena);
   return <primitive object={cena} dispose={null} />;
 }
 
@@ -67,11 +72,12 @@ function VitrineOsteologia({ detalhado, alternar }: { detalhado: boolean; altern
           <Suspense fallback={<PranchaOsteologia />}><ModeloExposto url={ESQUELETO} altura={1.73} /></Suspense>
         </ErrorBoundary> : <PranchaOsteologia />}
       </Suspense>
-      <Text3D position={[0, 1.89, 0.13]} size={0.035} color="#d9d9bf">
-        {mostrar ? "OSSOS E DENTES · ACERVO 3D" : "PRANCHA DO ACERVO · MODO LEVE"}
+      <Bloco pos={[0, 1.89, .105]} tam={[1.08, .12, .025]} cor="#193c2f" />
+      <Text3D tratamento="placa" position={[0, 1.89, 0.13]} size={0.035} maxWidth={1.02} color="#d9d9bf">
+        {mostrar ? "Ossos e dentes · acervo 3D" : "Prancha de osteologia"}
       </Text3D>
       <Bloco pos={[.86, .78, .19]} tam={[.69, .34, .08]} cor="#193c2f" />
-      <Text3D position={[.86, .68, .25]} size={0.026} maxWidth={.60} color="#c9d4c3">
+      <Text3D tratamento="placa" position={[.86, .68, .25]} size={0.026} maxWidth={.60} color="#c9d4c3">
         {disponivel ? "Detalhado · maior custo" : "Partida · órgão em foco"}
       </Text3D>
     </group>
@@ -103,6 +109,8 @@ export function AmbienteEscola({ detalhado, alternar }: { detalhado: boolean; al
         <ErrorBoundary fallback={<Bloco pos={[.36, 1.18, -1.12]} tam={[1.35, 1.02, .08]} cor="#193c2f" />}>
           <Suspense fallback={null}><SalaAutoral /></Suspense>
         </ErrorBoundary>
+        <SinalizacaoCenario sala="escola" />
+        <PisoCenario sala="escola" />
       </group>
       <SinalEscola />
       <ContatoEscola />
@@ -116,11 +124,13 @@ export function AmbienteEscola({ detalhado, alternar }: { detalhado: boolean; al
           <ModeloExposto url="/models/healthy/coracao.glb" altura={.63} />
         </Suspense></ErrorBoundary>
       </group>}
-      <Text3D position={[-.78, -.66, -.59]} size={.048} color="#ede5cf">OBSERVE O ÓRGÃO</Text3D>
-      <Text3D position={[.36, -.72, -1.04]} size={.034} color={sinal.cor}>
-        {estado.combo > 1 ? `SEQUÊNCIA ×${estado.combo} · CONTINUE ASSIM` : "OBSERVE · IDENTIFIQUE · APRENDA"}
+      <Bloco pos={[-.78, -.63, -.587]} tam={[.72, .10, .016]} cor="#193c2f" />
+      <Text3D tratamento="placa" position={[-.78, -.63, -.575]} size={.041} color="#ede5cf">Observe o órgão</Text3D>
+      <Bloco pos={[.36, -.775, -.985]} tam={[1.08, .17, .027]} cor="#193c2f" />
+      <Text3D tratamento="tela" position={[.36, -.735, -.965]} size={.034} color={sinal.cor}>
+        {estado.combo > 1 ? `Sequência ×${estado.combo} · continue assim` : "Observe · identifique · aprenda"}
       </Text3D>
-      {Array.from({ length: 8 }, (_, i) => <mesh key={i} position={[.08 + i * .08, -.79, -1.045]} raycast={SEM_RAYCAST}>
+      {Array.from({ length: 8 }, (_, i) => <mesh key={i} position={[.08 + i * .08, -.81, -.965]} raycast={SEM_RAYCAST}>
         <circleGeometry args={[.018, 12]} />
         <meshBasicMaterial color={estado.fase === "menu" ? "#657567" : i < estado.rodada ? sinal.cor : "#657567"} toneMapped={false} />
       </mesh>)}
