@@ -20,7 +20,7 @@ import { ProvedorArena } from "./EstadoArena";
 import { IluminacaoArena } from "./ArenaMedica";
 import { AmbienteEscola, IluminacaoEscola } from "./AmbienteEscola";
 import { MedidorDuelo } from "./MedidorDuelo";
-import { posicaoCompetidorEscola } from "@/lib/escola-apresentacao";
+import { ESCOLA, posicaoCompetidorEscola } from "@/lib/escola-apresentacao";
 
 const FLOOR_Y = -1.3;
 
@@ -30,6 +30,7 @@ const VISTAS_ARENA: Record<string, [number, number, number]> = {
   "fundo-esquerda": [-3.4, .3, 4.3], "fundo-direita": [3.4, .3, 4.3],
 };
 const VISTAS_ESCOLA: Record<string, [number, number, number]> = {
+  sentado: [.36, 0, -1.06],
   fundo: [0, .3, 3.8], esquerda: [-3.3, .3, .2], direita: [3.3, .05, .15],
   "fundo-esquerda": [-2.3, .3, 3.7], "fundo-direita": [2.3, .3, 3.7],
 };
@@ -67,9 +68,11 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
   // o celular: a câmera é reposicionada aqui. Na sessão XR quem manda é o óculos.
   useEffect(() => {
     if (inSession) return;
-    const [x, y, z] = vistaLocal ? (escola ? [.28, .3, .99] : [0, .3, 2.55]) : escola
+    const [x, y, z] = vistaLocal ? (escola
+      ? [ESCOLA.jogadorX, nomeVista === "sentado" ? ESCOLA.piso + 1.15 : .3, ESCOLA.postoZ]
+      : [0, .3, 2.55]) : escola
       ? retrato
-        ? [0.28, 0.15, 1.6]
+        ? [0.28, 0.15 + ESCOLA.elevacaoLousa, 1.6]
         : [0.28, 0.3, 1.65]
       : retrato
         ? [0.85, 0.48, 3.8]
@@ -81,7 +84,7 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
       camera.fov = vistaLocal ? 75 : escola ? 55 : retrato ? 54 : 50;
       camera.updateProjectionMatrix();
     }
-  }, [escola, retrato, inSession, get, vistaLocal]);
+  }, [escola, retrato, inSession, get, vistaLocal, nomeVista]);
 
   return (
     <>
@@ -131,7 +134,7 @@ function CenaDuelo({ ambiente, online, esqueleto3D, alternarEsqueleto }: {
           dampingFactor={0.08}
           target={
             vistaLocal ?? (escola
-              ? [0.36, 0, -1.06]
+              ? [0.36, ESCOLA.elevacaoLousa, -1.06]
               : retrato
                 ? [0.85, 0.35, -0.65]
                 : [0, 0.15, -0.6])

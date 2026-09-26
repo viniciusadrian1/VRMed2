@@ -78,7 +78,7 @@ const LARINGE = "/models/organs/larynx.glb";
 // wifi de evento; o nome "Pulmão" ainda aparece como alternativa errada.
 const ORGAOS_DUELO = ORGANS.filter((o) => o.id !== "pulmao");
 
-// A sala autoral preserva a face da lousa e a origem XR já ajustadas no Quest.
+// X/Z e origem XR preservados; o grupo da interface acompanha a elevação da lousa.
 const LOUSA_X = ESCOLA.lousaX;
 const LOUSA_Z = ESCOLA.lousaZ;
 
@@ -1744,7 +1744,7 @@ export function DueloGame({
                 ? // 0.42 punha a base do órgão em cima do placar (a laringe é
                   // mais alta que larga); 0.56 deixa o placar livre.
                   [LOUSA_X, 0.56, -0.95]
-                : [-0.78, -0.08, -0.95]
+                : [-0.78, -0.08 - ESCOLA.elevacaoLousa, -0.95]
           }
           scale={hosp ? (empilhar ? 0.35 : 0.6) : empilhar ? 0.26 : 0.36}
         >
@@ -1978,7 +1978,11 @@ export function DueloGame({
         junta "rodada" e "feedback" de propósito — trocá-la ali remontaria o
         modelo 3D no meio da revelação.
       */}
-      <Entrada key={fase === "feedback" ? "rodada" : fase}>{tela()}</Entrada>
+      {/* Todas as fases e seus alvos sobem juntos. O órgão lateral compensa a
+          elevação para permanecer na bancada; no retrato acompanha a lousa. */}
+      <group name="conteudo-lousa" position={[0, hosp ? 0 : ESCOLA.elevacaoLousa, 0]}>
+        <Entrada key={fase === "feedback" ? "rodada" : fase}>{tela()}</Entrada>
+      </group>
       <PublicarEstadoArena
         fase={fase} resultado={resultado} erro={erroJogador}
         tempo={tempoRestante} rodada={indice + 1}

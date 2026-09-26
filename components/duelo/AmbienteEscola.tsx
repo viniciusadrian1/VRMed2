@@ -110,7 +110,7 @@ export function AmbienteEscola({ detalhado, alternar, revisao = true }: {
   return <>
     <group pointerEvents="none">
       <group position={[0, ESCOLA.piso, 0]}>
-        <ErrorBoundary fallback={<Bloco pos={[.36, 1.18, -1.12]} tam={[1.35, 1.02, .08]} cor="#193c2f" />}>
+        <ErrorBoundary fallback={<Bloco pos={[.36, 1.18 + ESCOLA.elevacaoLousa, -1.12]} tam={[1.35, 1.02, .08]} cor="#193c2f" />}>
           <Suspense fallback={null}>{revisao ? <SalaEscolaRevisao /> : <SalaAutoral />}</Suspense>
         </ErrorBoundary>
         <SinalizacaoCenario sala="escola" />

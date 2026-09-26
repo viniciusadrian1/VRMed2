@@ -7,6 +7,39 @@ import { ESCOLA, posicaoCompetidorEscola } from "../lib/escola-apresentacao.ts";
 import { ORDEM_PONTEIRO_UI } from "../lib/botao3d-interacao.ts";
 
 const decoracao = new THREE.Group();
+function validarLousaSentado(sala: THREE.Object3D) {
+  // Geometria exportada em metros acima do piso, antes de aplicar ESCOLA.piso.
+  const tampo = new THREE.Raycaster(new THREE.Vector3(-1.22, 1.1, -.95), new THREE.Vector3(0, -1, 0))
+    .intersectObject(sala, true)[0];
+  assert.ok(tampo && Math.abs(tampo.point.y - .83) < .001, "tampo branco preservado a 83 cm");
+  const moldura = new THREE.Raycaster(new THREE.Vector3(.36, .835, -.8), new THREE.Vector3(0, 0, -1))
+    .intersectObject(sala, true)[0];
+  assert.ok(moldura && moldura.point.z > -1.18 && moldura.point.z < -1.07,
+    "moldura deve começar junto ao tampo, não permanecer na altura anterior");
+  const giz = new THREE.Raycaster(new THREE.Vector3(.36, 1.7, -.8), new THREE.Vector3(0, 0, -1))
+    .intersectObject(sala, true)[0];
+  assert.ok(giz && Math.abs(giz.point.z + 1.054) < .001, "face elevada preserva a profundidade de interação");
+
+  // Mesma placa física de OrientacaoEscola, incluindo inclinação e espessura.
+  const placa = new THREE.Mesh(new THREE.BoxGeometry(1.04, .18, .035), new THREE.MeshBasicMaterial());
+  placa.position.set(ESCOLA.jogadorX, .90, ESCOLA.postoZ - ESCOLA.mesaRecuo + .12);
+  placa.rotation.x = -.35; placa.updateMatrixWorld(true);
+  let casos = 0;
+  for (const alturaOlhos of [1.05, 1.15, 1.25, 1.65]) {
+    const olhos = new THREE.Vector3(ESCOLA.jogadorX, alturaOlhos, ESCOLA.postoZ);
+    const linhas = [-.055, -.170, -.285, -.400, -.435]; // alternativas e botões online do menu
+    for (const y of linhas) for (const [dx, dy] of [[0, 0], [-.50, -.044], [.50, .044]]) {
+      const alvo = new THREE.Vector3(ESCOLA.lousaX + dx, -ESCOLA.piso + ESCOLA.elevacaoLousa + y + dy, ESCOLA.lousaZ);
+      const distancia = olhos.distanceTo(alvo);
+      const raio = new THREE.Raycaster(olhos, alvo.clone().sub(olhos).normalize(), 0, distancia - .025);
+      assert.equal(raio.intersectObject(placa).length, 0, "placa do posto não deve encobrir o botão");
+      assert.equal(raio.intersectObject(sala, true).length, 0, "móveis não devem encobrir o botão");
+      casos++;
+    }
+  }
+  placa.geometry.dispose(); (placa.material as THREE.Material).dispose();
+  console.log(`ok: alinhamento lousa/tampo e ${casos} linhas de visão a 1,05–1,65 m dos olhos`);
+}
 for (const [nome, maxMalhas, maxTris, maxBytes] of [
   ["escola-medicina-revisao", 19, 75_000, 6_500_000],
   ["piso-escola-revisao", 1, 2, 150_000],
@@ -37,6 +70,7 @@ for (const [nome, maxMalhas, maxTris, maxBytes] of [
   scene.updateMatrixWorld(true);
   const piso = nome.startsWith("piso-");
   if (!piso) {
+    validarLousaSentado(scene);
     const raio = new THREE.Raycaster(new THREE.Vector3(-3.05, .95, 0), new THREE.Vector3(0, 0, -1));
     const hit = raio.intersectObject(scene, true)[0];
     assert.ok(hit?.uv && hit.object instanceof THREE.Mesh);
@@ -84,11 +118,11 @@ for (const [nome, maxMalhas, maxTris, maxBytes] of [
 const cena = new THREE.Scene(); decoracao.position.y = ESCOLA.piso; decoracao.pointerEvents = "none"; cena.add(decoracao);
 const alvos = Array.from({ length: 4 }, (_, i) => {
   const o = new THREE.Mesh(new THREE.PlaneGeometry(ESCOLA.larguraOpcao, ESCOLA.alturaOpcao), new THREE.MeshBasicMaterial());
-  o.position.set(ESCOLA.lousaX, -.055 - i * ESCOLA.passoOpcao, ESCOLA.lousaZ);
+  o.position.set(ESCOLA.lousaX, ESCOLA.elevacaoLousa - .055 - i * ESCOLA.passoOpcao, ESCOLA.lousaZ);
   o.pointerEventsOrder = ORDEM_PONTEIRO_UI; o.addEventListener("click", () => undefined); cena.add(o); return o;
 });
-for (const dx of [-.2, .2]) {
-  const controle = new THREE.Object3D(); controle.position.set(ESCOLA.jogadorX + dx, -.05, ESCOLA.postoZ - .1); cena.add(controle);
+for (const alturaControle of [.85, 1.25]) for (const dx of [-.2, .2]) {
+  const controle = new THREE.Object3D(); controle.position.set(ESCOLA.jogadorX + dx, ESCOLA.piso + alturaControle, ESCOLA.postoZ - .1); cena.add(controle);
   const ponteiro = createRayPointer(() => new THREE.PerspectiveCamera(), { current: controle }, {});
   for (const alvo of alvos) for (const [x, y] of [[0, 0], [-.54, -.044], [.54, .044]]) {
     cena.updateMatrixWorld(true); const ponto = alvo.localToWorld(new THREE.Vector3(x, y, 0));
@@ -110,7 +144,12 @@ assert.ok(modelo.includes("dispose={null}") && !/castShadow|onClick|onPointer/.t
 const app = readFileSync("components/duelo/DueloApp.tsx", "utf8");
 assert.ok(!app.includes("revisão experimental"), "não publicar o comparador de desenvolvimento");
 assert.ok(!/revisao=\{false\}/.test(app), "não desativar a revisão aprovada no Duelo");
+const jogo = readFileSync("components/duelo/DueloGame.tsx", "utf8");
+assert.match(jogo, /name="conteudo-lousa" position=\{\[0, hosp \? 0 : ESCOLA.elevacaoLousa, 0\]\}/,
+  "todas as telas e alvos da Escola sobem juntos, Hospital permanece no lugar");
+assert.ok(jogo.includes("[-0.78, -0.08 - ESCOLA.elevacaoLousa, -0.95]"), "órgão lateral permanece na bancada");
+assert.ok(app.includes("if (inSession) return;"), "inspeção de altura não movimenta câmera XR");
 for (const arquivo of ["escola-medicina-direcao.glb", "piso-escola-direcao.glb", "esqueleto-estudo.glb"]) {
   assert.ok(readFileSync(`public/models/props/${arquivo}`).length > 0, "preservar acervo anterior");
 }
-console.log("ok: Escola revisada como padrão, anterior preservada, anatomia e 24 alvos de dois controles preservados");
+console.log("ok: Escola revisada como padrão, acervo anterior preservado, anatomia e 48 alvos de dois controles em duas alturas");

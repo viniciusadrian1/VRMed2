@@ -11,6 +11,7 @@ from mathutils import Vector
 
 RAIZ = Path(__file__).resolve().parents[1]
 CONFIG = json.loads((RAIZ / "lib/sinalizacao-duelo.json").read_text(encoding="utf-8"))
+LAYOUT_ESCOLA = json.loads((RAIZ / "lib/escola-layout.json").read_text(encoding="utf-8"))
 TRABALHO = RAIZ / "tmp_sinalizacao"
 anterior = bpy.context.window.scene
 resumo = []
@@ -36,6 +37,8 @@ def material(nome, cor, metal=0, rugosidade=.8):
 
 try:
     for sala, placas in CONFIG["placas"].items():
+        if sala not in globals().get("SALAS", ("hospital", "escola")):
+            continue
         cena = bpy.data.scenes.new(f"VRmed_Placas_{sala}")
         cena.unit_settings.system = "METRIC"
         bpy.context.window.scene = cena
@@ -56,6 +59,8 @@ try:
             ang = placa.get("giro", 0)
             c, s = math.cos(ang), math.sin(ang)
             px, py, pz = placa["posicao"]
+            if sala == "escola" and placa["id"] == "lousa":
+                py += LAYOUT_ESCOLA["elevacaoLousa"]
 
             def pos(x, y, z):
                 return ponto((px + c*x + s*z, py+y, pz-s*x+c*z))

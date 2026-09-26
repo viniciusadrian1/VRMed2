@@ -19,7 +19,7 @@ assert.ok(ESCOLA.alturaOpcao < ESCOLA.passoOpcao, "intervalo neutro entre as alt
 const cena = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera();
 const quadro = new THREE.Group();
-quadro.position.set(ESCOLA.lousaX, 0, ESCOLA.lousaZ);
+quadro.position.set(ESCOLA.lousaX, ESCOLA.elevacaoLousa, ESCOLA.lousaZ);
 cena.add(quadro);
 const escolhas: string[] = [];
 let bloqueado = false;

@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createRayPointer } from "@pmndrs/pointer-events";
 import { ORDEM_PONTEIRO_UI } from "../lib/botao3d-interacao.ts";
+import { ESCOLA } from "../lib/escola-apresentacao.ts";
 
 interface Placa { id: string; posicao: [number, number, number]; largura: number; altura: number; giro?: number }
 const config = JSON.parse(readFileSync("lib/sinalizacao-duelo.json", "utf8")) as { placas: Record<string, Placa[]> };
@@ -74,10 +75,12 @@ for (const [sala, placas] of Object.entries(config.placas)) {
   assert.ok(triangulos < 2500);
   assert.ok(face);
   for (const placa of placas) {
+    const posicao = new THREE.Vector3(...placa.posicao);
+    if (sala === "escola" && placa.id === "lousa") posicao.y += ESCOLA.elevacaoLousa;
     const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), placa.giro ?? 0);
     const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(q);
     for (const dx of [-.4, 0, .4]) for (const dy of [-.25, 0, .25]) {
-      const origem = new THREE.Vector3(dx * placa.largura, dy * placa.altura, 1).applyQuaternion(q).add(new THREE.Vector3(...placa.posicao));
+      const origem = new THREE.Vector3(dx * placa.largura, dy * placa.altura, 1).applyQuaternion(q).add(posicao);
       const hits = new THREE.Raycaster(origem, normal.clone().negate()).intersectObject(scene, true);
       assert.equal(hits[0]?.object, face, `${placa.id}: inscrição opaca à frente da carcaça`);
       assert.ok(Math.abs(hits[0].distance - .9727) < .0001, `${placa.id}: escala, frente e profundidade corretas`);
@@ -88,7 +91,7 @@ for (const [sala, placas] of Object.entries(config.placas)) {
   const cena = new THREE.Scene(); scene.position.y = -1.3; scene.pointerEvents = "none"; cena.add(scene);
   const painel = new THREE.Group();
   const escola = sala === "escola";
-  painel.position.set(escola ? .36 : .85, escola ? 0 : .15, escola ? -1.06 : -.65);
+  painel.position.set(escola ? .36 : .85, escola ? ESCOLA.elevacaoLousa : .15, escola ? -1.06 : -.65);
   painel.rotation.y = escola ? 0 : -.14; cena.add(painel);
   const largura = escola ? 1.1 : 1.55, altura = escola ? .094 : .18;
   const alvos = Array.from({ length: 4 }, (_, i) => {

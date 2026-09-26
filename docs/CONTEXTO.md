@@ -1,5 +1,40 @@
 # VRmed — contexto do projeto
 
+## Lousa da Escola elevada para uso sentado (2026-09-26)
+
+Após o teste no Quest, o usuário relatou a placa "Seu posto / Escolha seu desafio"
+encobrindo a lousa e pediu alinhar sua borda inferior ao topo branco da bancada
+do coração. A moldura subiu 16 cm: base de 67 para 83 cm acima do piso, mesmo
+nível do tampo anatômico. `lib/escola-layout.json:elevacaoLousa` é a referência
+compartilhada da modelagem, interface e testes.
+
+Blender MCP reexportou apenas Escola, piso e sinalização da Escola. Moldura,
+face, bandeja/giz/apagador e cabeçalho sobem juntos; o suporte foi alongado sem
+tirar sua base do chão. A placa física acompanha o cabeçalho. Todas as fases,
+textos, botões, placar e sinal reativo usam a mesma elevação. Órgão lateral,
+mesas, postos, origem/câmera XR, regras e Hospital permanecem nas posições atuais.
+No retrato desktop, órgão empilhado e enquadramento acompanham o quadro.
+
+Escola: 63.376 triângulos/19 malhas/5.142.156 bytes; piso: 105.332 bytes;
+sinalização: 280.624 bytes. Sem novas malhas, luzes ou dependências. Backup dos
+três GLBs antes desta correção em `tmp_lousa_sentado/`, ignorado pelo Git;
+a revisão aprovada completa também é recuperável no commit `7c404e6`.
+
+`verify:escola-revisao` verifica o GLB real, o alinhamento e 60 linhas de visão
+para olhos a 1,05/1,15/1,25/1,65 m, além de 48 alvos de dois controles em duas
+alturas. Os testes de Escola e sinalização também usam a nova altura.
+`?inspecao=sentado` simula olhos a 1,15 m somente no desenvolvimento desktop,
+sem atuar na câmera do headset. Antes/depois em `tmp_lousa_sentado/`.
+
+Typecheck, lint, build, `verify:core` e HTTP/SSE de dois clientes no build local
+passaram. Uma execução paralela de testes falhou com `Array buffer allocation
+failed`; a repetição completa e o teste específico passaram separadamente.
+Inspeção desktop confirmou menu, cliques, alternativas, troca de órgãos e tela
+final. Isso não substitui reteste sentado no Quest físico. O usuário autorizou
+commit e push desta correção na `master` de `viniciusadrian1/VRMed2`, acionando
+o deploy da Vercel. Os testes de Escola revisada e sinalização foram repetidos
+antes do envio e passaram. As seções seguintes registram versões anteriores.
+
 ## Escola aprovada como cenário padrão (2026-09-26)
 
 Após avaliar a cópia isolada, o usuário aprovou a Escola revisada e autorizou

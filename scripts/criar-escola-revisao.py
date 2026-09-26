@@ -1,6 +1,6 @@
 """Escola versionada: marcenaria, encadernação e laboratório, em cena independente.
 
-Nunca exporta sobre a Escola aprovada. Preserva a geometria dos postos e lousa.
+Preserva as versões anteriores e os postos. Elevação da lousa vem do layout compartilhado.
 Execute texturas-escola-revisao.py antes; depois execute este script via Blender.
 """
 import ast
@@ -16,6 +16,7 @@ from mathutils.bvhtree import BVHTree
 RAIZ = Path(__file__).resolve().parents[1]
 TEMP = RAIZ/'tmp_escola_revisao'
 PASTA = RAIZ/'public/models/props'
+LAYOUT = json.loads((RAIZ/'lib/escola-layout.json').read_text(encoding='utf-8'))
 ANTERIOR = bpy.context.window.scene
 
 def extrair(caminho, nomes):
@@ -324,6 +325,25 @@ try:
     curva('Maçaneta de retorno',[(.33,1.08,3.73),(.33,1.08,3.68),(.46,1.08,3.68)],.012,latao)
     for o,antes in protegidos.items():
         assert vertices_mundo(o)==antes, f'Geometria protegida alterada: {o.name}'
+    # Subir somente o conjunto da lousa: borda inferior a .83 m, nivelada ao
+    # tampo branco anatômico. O suporte cresce para continuar apoiado no piso.
+    elevacao = LAYOUT['elevacaoLousa']
+    nomes_lousa = ('Moldura da lousa', 'Superfície de giz', 'Bandeja de giz',
+                   'Apagador', 'Giz', 'Cabeçalho do desafio')
+    movidos = []
+    for o in protegidos:
+        if o.name.startswith(nomes_lousa):
+            o.location.z += elevacao
+            movidos.append(o.name)
+        elif o.name.startswith('Fundo da estação'):
+            o.scale.z *= (1.82 + elevacao) / 1.82
+            o.location.z += elevacao / 2
+    bpy.context.view_layer.update()
+    moldura = next(o for o in protegidos if o.name.startswith('Moldura da lousa'))
+    tampo = next(o for o in protegidos if o.name.startswith('Tampo anatômico'))
+    inferior = min((moldura.matrix_world @ v.co).z for v in moldura.data.vertices)
+    superior = max((tampo.matrix_world @ v.co).z for v in tampo.data.vertices)
+    assert abs(inferior - superior) < .001, 'Lousa deve começar no topo branco da bancada'
     objetos=[o for o in CENA.objects if o.type=='MESH']
     for o in objetos:
         o.data.transform(o.matrix_world); o.matrix_world.identity(); o.data.update()
@@ -353,6 +373,8 @@ try:
     ambiente=env['exportar']('escola-medicina-revisao',env['agrupar'](objetos))
     solo=env['exportar']('piso-escola-revisao',[piso])
     result={'ambiente':ambiente,'piso':solo,'objetos_autorados':len(objetos),
+            'elevacao_lousa':elevacao,'borda_inferior_lousa':inferior,'topo_tampo':superior,
+            'pecas_lousa_elevadas':movidos,
             'elementos_protegidos':len(protegidos),'cena_original_preservada':ANTERIOR.name}
     bpy.data.libraries.write(str(TEMP/'escola-revisao.blend'),{CENA})
     (TEMP/'resumo.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')

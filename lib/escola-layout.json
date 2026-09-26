@@ -1,5 +1,6 @@
 {
   "piso": -1.3,
+  "elevacaoLousa": 0.16,
   "jogadorX": 0.28,
   "adversarioX": -1.42,
   "postoZ": 0.99,

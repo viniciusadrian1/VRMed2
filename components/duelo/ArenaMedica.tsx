@@ -8,6 +8,7 @@ import * as THREE from "three";
 import { Text3D } from "@/components/arena/ui3d";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { sinalDaArena } from "@/lib/duelo-apresentacao";
+import { ESCOLA } from "@/lib/escola-apresentacao";
 import { useEstadoArena } from "./EstadoArena";
 
 export const CONSOLE_POS: [number, number, number] = [0.85, 0.15, -0.65];
@@ -149,7 +150,7 @@ export function MonitorArena({ pos, titulo }: { pos: [number, number, number]; t
 /** A lousa também participa do feedback; o cenário Escola continua disponível. */
 export function SinalEscola() {
   const sinal = sinalDaArena(useEstadoArena());
-  return <group>
+  return <group position={[0, ESCOLA.elevacaoLousa, 0]}>
     <FaixaReativa pos={[0.36, 0.31, -1.065]} tam={[1.12, 0.012, 0.01]} />
     <Text3D tratamento="interface" position={[0.36, 0.35, -1.06]} size={0.023} color={sinal.cor}>{sinal.rotulo}</Text3D>
   </group>;
