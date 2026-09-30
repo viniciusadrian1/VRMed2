@@ -1,6 +1,7 @@
 import { AUDIO_MAX_BYTES, formatoAudio, TRANSCRICAO_MAX_CARACTERES } from "./transcricao.ts";
+import { contextoTranscricao } from "./transcricao-contexto.ts";
 
-type Transcrever = (arquivo: File, sinal: AbortSignal) => Promise<string>;
+type Transcrever = (arquivo: File, sinal: AbortSignal, contexto: string) => Promise<string>;
 class ErroAudio extends Error {
   status: number;
   constructor(status: number, mensagem: string) { super(mensagem); this.status = status; }
@@ -69,7 +70,8 @@ export function criarHandlerTranscricao(transcrever: Transcrever, agora = Date.n
       const partes = await lerAudio(request, sinal);
       sinal.throwIfAborted();
       const arquivo = new File(partes, `pergunta.${formato.extensao}`, { type: formato.mime });
-      const texto = (await transcrever(arquivo, sinal)).trim();
+      const contexto = contextoTranscricao(request.headers.get("x-vrmed-modelo"));
+      const texto = (await transcrever(arquivo, sinal, contexto)).trim();
       sinal.throwIfAborted();
       if (!texto) return json({ error: "Não foi possível identificar uma fala. Tente novamente." }, 422);
       if (texto.length > TRANSCRICAO_MAX_CARACTERES) return json({ error: "A transcrição ficou longa demais. Grave uma pergunta mais curta." }, 422);

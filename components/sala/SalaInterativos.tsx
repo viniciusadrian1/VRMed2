@@ -286,14 +286,13 @@ function MonitorGLB() {
 
 // Modos do hub da Sala. Segue a ordem do NAV_ITEMS de
 // components/layout/Sidebar.tsx, mas não é cópia literal: aqui o rótulo é
-// "Estudo 3D" (lá "Visualizador") e há "Arena VR" (ausente na Sidebar).
+// "Estudo 3D" (lá "Visualizador"). Arena VR foi retirada do menu.
 // Manter em sincronia com as rotas de app/ ao adicionar/remover um modo.
 const MODOS_HUB = [
   { rotulo: "Estudo 3D", href: "/viewer" },
   { rotulo: "Comparar", href: "/compare" },
   { rotulo: "Quiz", href: "/quiz" },
   { rotulo: "Clínica", href: "/clinica" },
-  { rotulo: "Arena VR", href: "/arena" },
   { rotulo: "Duelo 1×1", href: "/duelo" },
 ];
 
@@ -345,7 +344,7 @@ function Computador({ aberto, onAbrir, onFechar }: PropsPainel) {
               Modos do VRmed
             </Text3D>
             <BotaoFechar position={[0.5, 0.31, 0.01]} onClick={onFechar} />
-            {/* Duas colunas para os 6 modos caberem no painel (0.78 de altura):
+            {/* Duas colunas para os modos caberem no painel (0.78 de altura):
                 colunas em x ±0.28, linhas a cada 0.16 em y. */}
             {MODOS_HUB.map((modo, i) => (
               <Button3D

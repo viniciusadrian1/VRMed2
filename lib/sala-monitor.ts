@@ -5,7 +5,6 @@ export const MODOS_ESTUDO = [
   { rotulo: "Comparar", detalhe: "Observe as diferenças", href: "/compare" },
   { rotulo: "Quiz", detalhe: "Teste o que aprendeu", href: "/quiz" },
   { rotulo: "Clínica", detalhe: "Investigue um caso", href: "/clinica" },
-  { rotulo: "Arena VR", detalhe: "Desafio individual", href: "/arena" },
   { rotulo: "Duelo 1×1", detalhe: "Aprenda competindo", href: "/duelo" },
 ] as const;
 

@@ -4,9 +4,10 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { criarDitadoTutor } from "@/lib/ditado-tutor";
 import { CANCELAR_DITADO } from "@/lib/transcricao";
 
-export function useDitadoTutor(aoTexto: (texto: string) => void, ativo = true, sessao?: XRSession) {
+export function useDitadoTutor(aoTexto: (texto: string) => void, ativo = true, sessao?: XRSession, modeloId: string | null = null) {
   const [controle] = useState(() => criarDitadoTutor(() => {}));
   useEffect(() => { controle.atualizarRetorno(aoTexto); }, [controle, aoTexto]);
+  useEffect(() => { controle.atualizarModelo(modeloId); }, [controle, modeloId]);
   const estado = useSyncExternalStore(controle.subscribe, controle.getSnapshot, controle.getSnapshot);
   useEffect(() => {
     if (!ativo) controle.cancelar();

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { criarHandlerTranscricao } from "../lib/transcricao-servidor.ts";
 import { criarDitadoTutor } from "../lib/ditado-tutor.ts";
 import { anexarDitado, AUDIO_MAX_BYTES, formatoAudio, paginasDitado, TRANSCRICAO_MAX_CARACTERES } from "../lib/transcricao.ts";
+import { contextoTranscricao } from "../lib/transcricao-contexto.ts";
 
 // Somente dados e adaptadores sintéticos: não captura microfone nem chama a OpenAI.
 const tick = async () => { for (let i = 0; i < 10; i++) await Promise.resolve(); };
@@ -20,7 +21,7 @@ function requisicao(opcoes: { headers?: Record<string, string>; bytes?: number; 
     ...{ duplex: "half" },
   });
 }
-function gravacao(opcoes: { obter?: () => Promise<MediaStream>; enviar?: (blob: Blob, sinal: AbortSignal) => Promise<string>; falhaStop?: boolean } = {}) {
+function gravacao(opcoes: { obter?: () => Promise<MediaStream>; enviar?: (blob: Blob, sinal: AbortSignal, modelo: string | null) => Promise<string>; falhaStop?: boolean } = {}) {
   let interrompido = false, envios = 0;
   const textos: string[] = [];
   const track = { stop: () => { interrompido = true; }, onended: null as (() => void) | null };
@@ -38,7 +39,7 @@ function gravacao(opcoes: { obter?: () => Promise<MediaStream>; enviar?: (blob: 
   const controle = criarDitadoTutor((texto) => textos.push(texto), {
     obterMicrofone: opcoes.obter ?? (() => Promise.resolve(stream)),
     gravador: () => gravador as unknown as MediaRecorder,
-    enviar: async (blob, sinal) => { envios++; assert.ok(interrompido, "captura termina antes do upload"); return opcoes.enviar ? opcoes.enviar(blob, sinal) : "Qual a função do coração?"; },
+    enviar: async (blob, sinal, modelo) => { envios++; assert.ok(interrompido, "captura termina antes do upload"); return opcoes.enviar ? opcoes.enviar(blob, sinal, modelo) : "Qual a função do coração?"; },
   });
   return { controle, textos, gravador, stream, track, interrompido: () => interrompido, envios: () => envios };
 }
@@ -52,6 +53,28 @@ await test("API: arquivo nomeado, conteúdo e texto; resposta sem cache", async 
   const resposta = await handler(requisicao());
   assert.equal(resposta.status, 200); assert.equal(resposta.headers.get("cache-control"), "no-store");
   assert.deepEqual(await resposta.json(), { texto: "Qual a função do coração?" });
+});
+await test("API: vocabulário do catálogo, sem aceitar prompt ou dados livres do cliente", async () => {
+  assert.match(contextoTranscricao("larynx"), /cartilagem tireóidea/);
+  assert.match(contextoTranscricao("cranio"), /esfenoide/);
+  assert.doesNotMatch(contextoTranscricao("rim"), /epiglote/);
+  assert.equal(contextoTranscricao("INJETAR_CONTEUDO"), contextoTranscricao(null));
+  assert.equal(contextoTranscricao("a".repeat(10000)), contextoTranscricao(null));
+  const handler = criarHandlerTranscricao(async (_, __, contexto) => {
+    assert.equal(contexto, contextoTranscricao("coracao")); return "Qual a função do miocárdio?";
+  });
+  assert.equal((await handler(requisicao({ headers: { "x-vrmed-modelo": "coracao", "x-prompt": "INJETAR_CONTEUDO" } }))).status, 200);
+});
+await test("Ditado: modelo acompanha a gravação e troca cancela respostas antigas", async () => {
+  let recebido: string | null = null;
+  const g = gravacao({ enviar: async (_, __, modelo) => { recebido = modelo; return "Qual a função da epiglote?"; } });
+  g.controle.atualizarModelo("larynx"); await g.controle.iniciar(); g.controle.parar(); await tick();
+  assert.equal(recebido, "larynx"); g.controle.cancelar();
+  const tardio = adiado<string>();
+  const outro = gravacao({ enviar: async () => tardio.promise });
+  outro.controle.atualizarModelo("rim"); await outro.controle.iniciar(); outro.controle.parar(); await tick();
+  outro.controle.atualizarModelo("coracao"); tardio.resolve("Resposta do rim"); await tick();
+  assert.equal(outro.textos.length, 0); assert.equal(outro.controle.getSnapshot().fase, "pronto"); outro.controle.cancelar();
 });
 await test("API: origem, proxy HTTPS, MIME e limites bloqueiam antes do provedor", async () => {
   let chamadas = 0;

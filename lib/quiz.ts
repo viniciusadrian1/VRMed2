@@ -1,4 +1,4 @@
-import { genId } from "@/lib/format";
+import { genId } from "./format.ts";
 import type { Annotation, QuizQuestion } from "@/types";
 
 /** Tempo por questão no modo cronometrado (segundos). */

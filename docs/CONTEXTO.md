@@ -859,3 +859,22 @@ Tipos, lint, `verify:core` e build passaram; interação/temas/rolagem e troca d
 sugestões inspecionados no navegador. Usuário autorizou commit/push na master e
 publicação desta revisão na CX33 para reteste; homologação no Quest pendente.
 Detalhes e limites em `docs/AJUSTES-ESTUDO-2026-09-30.md`.
+
+### Comparar/Quiz dentro do monitor e ditado contextual — 30/09/2026
+
+Usuário confirmou melhoria de usabilidade dos painéis no Quest, mas pediu melhor
+transcrição e atividades dentro do monitor da Sala. Comparar e Quiz
+abre na tela física, com pares reais, controles de vista e notas, sem sair de `/sala`
+ou encerrar XR. Dois render targets no Comparar, um no Quiz, sob demanda, sem
+HTML/canvas adicional. Quiz reutiliza anotações e regras existentes, salva o
+resultado e permite revisão. Tempo pausa ao carregar ou ocultar a sessão.
+Usuário definiu: Estudo 3D, Clínica e Duelo continuam redirecionando com aviso;
+Arena VR removida dos menus da Sala (rota legada preservada). Sala clássica mantida.
+
+Ditado mantém API/modelo e recebe contexto anatômico permitido pelo catálogo;
+troca de órgão cancela pedido anterior. Sem manipular permissões do headset.
+Build, tipos, lint, verify:core, comparação no navegador e HTTP/SSE passaram.
+Transcrição real de áudio sintético passou; ganho com voz do usuário não medido.
+Commit/push e publicação na CX33 autorizados para os dois incrementos juntos.
+Teste físico de microfone/mira/FPS permanece pendente. Ver
+`docs/MONITOR-COMPARACAO-2026-09-30.md` e tag Docker ativa para a versão publicada.

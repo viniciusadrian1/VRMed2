@@ -5,7 +5,7 @@ export interface EstadoDitado { fase: FaseDitado; segundos: number; mensagem: st
 interface Dependencias {
   obterMicrofone: () => Promise<MediaStream>;
   gravador: (stream: MediaStream) => MediaRecorder;
-  enviar: (audio: Blob, signal: AbortSignal) => Promise<string>;
+  enviar: (audio: Blob, signal: AbortSignal, modeloId: string | null) => Promise<string>;
 }
 let donoMicrofone: object | null = null;
 const pronto: EstadoDitado = { fase: "pronto", segundos: 0, mensagem: "" };
@@ -23,8 +23,10 @@ export function criarDitadoTutor(aoTexto: (texto: string) => void, deps: Depende
     if (!mimeType) throw new Error("Este navegador não grava em um formato compatível. Use a digitação.");
     return new MediaRecorder(stream, { mimeType, audioBitsPerSecond: 64_000 });
   },
-  enviar: async (audio, signal) => {
-    const resposta = await fetch("/api/transcricao", { method: "POST", headers: { "Content-Type": audio.type }, body: audio, signal });
+  enviar: async (audio, signal, modeloId) => {
+    const headers: Record<string, string> = { "Content-Type": audio.type };
+    if (modeloId && /^[a-z0-9_]{1,64}$/.test(modeloId)) headers["X-VRMed-Modelo"] = modeloId;
+    const resposta = await fetch("/api/transcricao", { method: "POST", headers, body: audio, signal });
     const dados = await resposta.json().catch(() => null);
     if (!resposta.ok || typeof dados?.texto !== "string") throw new Error(dados?.error || "Não foi possível transcrever. Tente novamente.");
     return dados.texto;
@@ -33,6 +35,7 @@ export function criarDitadoTutor(aoTexto: (texto: string) => void, deps: Depende
   const dono = {};
   const ouvintes = new Set<() => void>();
   let estado = pronto, geracao = 0;
+  let modeloId: string | null = null;
   let stream: MediaStream | null = null, gravador: MediaRecorder | null = null;
   let timer: ReturnType<typeof setInterval> | undefined;
   let espera: ReturnType<typeof setTimeout> | undefined;
@@ -65,6 +68,7 @@ export function criarDitadoTutor(aoTexto: (texto: string) => void, deps: Depende
     if (donoMicrofone && donoMicrofone !== dono) { atualizar("erro", "Já há uma gravação em outro painel."); return; }
     donoMicrofone = dono;
     const id = ++geracao;
+    const modeloGravado = modeloId;
     atualizar("permissao", "Autorize o microfone no navegador. No Quest, pode ser necessário sair do VR e autorizar primeiro.", 0);
     try {
       espera = setTimeout(() => { if (id === geracao) falhar("A permissão demorou demais. Autorize o microfone e tente novamente."); }, 30_000);
@@ -93,7 +97,7 @@ export function criarDitadoTutor(aoTexto: (texto: string) => void, deps: Depende
         const pedido = new AbortController(); aborto = pedido;
         espera = setTimeout(() => { if (id === geracao) falhar("A transcrição demorou demais. Tente novamente."); }, 50_000);
         try {
-          const texto = (await deps.enviar(audio, pedido.signal)).trim();
+          const texto = (await deps.enviar(audio, pedido.signal, modeloGravado)).trim();
           if (id !== geracao) return;
           if (!texto) throw new Error("Não foi possível identificar uma fala. Tente novamente.");
           aoTexto(texto);
@@ -121,5 +125,6 @@ export function criarDitadoTutor(aoTexto: (texto: string) => void, deps: Depende
     }
   };
   return { iniciar, parar, cancelar, atualizarRetorno: (retorno: (texto: string) => void) => { aoTexto = retorno; },
+    atualizarModelo: (id: string | null) => { if (id !== modeloId) { cancelar(); modeloId = id; } },
     getSnapshot: () => estado, subscribe: (fn: () => void) => { ouvintes.add(fn); return () => { ouvintes.delete(fn); }; } };
 }

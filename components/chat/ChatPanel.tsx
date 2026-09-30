@@ -37,7 +37,7 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
   const sessao = useSessaoDOMXR();
   const janelaAberta = useJanelasEstudoXR((s) => s.abertas.tutor);
   const ditado = useDitadoTutor((texto) => setInput((atual) => anexarDitado(atual, texto)),
-    !isStreaming && (!imersivo || janelaAberta), sessao);
+    !isStreaming && (!imersivo || janelaAberta), sessao, organId);
 
   useEffect(() => {
     const element = textareaRef.current;
