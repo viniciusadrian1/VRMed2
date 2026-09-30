@@ -1,4 +1,5 @@
 import { createXRStore } from "@react-three/xr";
+import { CONTROLE_XR, MIRA_XR } from "./xr-mira";
 
 let store: ReturnType<typeof createXRStore> | undefined;
 
@@ -21,8 +22,8 @@ export function obterXRStore() {
       typeof window !== "undefined"
         ? `${window.location.origin}/webxr-profiles/`
         : "https://localhost/webxr-profiles/",
-    controller: { grabPointer: false, teleportPointer: false },
-    hand: { model: false, grabPointer: false, touchPointer: false },
+    controller: CONTROLE_XR,
+    hand: { model: false, grabPointer: false, touchPointer: false, rayPointer: MIRA_XR },
     anchors: false,
     meshDetection: false,
     planeDetection: false,

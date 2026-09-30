@@ -10,6 +10,11 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Message } from "./Message";
 import { useTutor3D } from "@/lib/tutor-3d-store";
+import { useDitadoTutor } from "@/hooks/use-ditado-tutor";
+import { anexarDitado } from "@/lib/transcricao";
+import { ControlesDitado } from "./ControlesDitado";
+import { useDOMImersivo, useSessaoDOMXR } from "@/components/viewer/ContextoDOMXR";
+import { useJanelasEstudoXR } from "@/lib/janelas-estudo-xr";
 
 const EXAMPLE_QUESTIONS = [
   "O que é a valva mitral e qual a sua função?",
@@ -29,6 +34,16 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
   const erro = useConversaTutor((s) => s.erro);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const imersivo = useDOMImersivo();
+  const sessao = useSessaoDOMXR();
+  const janelaAberta = useJanelasEstudoXR((s) => s.abertas.tutor);
+  const ditado = useDitadoTutor((texto) => setInput((atual) => anexarDitado(atual, texto)),
+    !isStreaming && (!imersivo || janelaAberta), sessao);
+
+  useEffect(() => {
+    const element = textareaRef.current;
+    if (element) { element.style.height = "auto"; element.style.height = `${Math.min(element.scrollHeight, 160)}px`; }
+  }, [input]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -36,10 +51,10 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
 
   // Fechar apenas o DOM não cancela o pedido que está sendo lido no XR.
   // A saída do visualizador encerra a conversa através de Scene.
-  const handleClearChat = limparConversaTutor;
+  const handleClearChat = () => { ditado.cancelar(); limparConversaTutor(); };
   const retry = repetirPerguntaTutor;
   const sendMessage = async (text: string) => {
-    if (!text.trim() || isStreaming) return;
+    if (!text.trim() || isStreaming || ditado.ocupado) return;
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
     await enviarPerguntaTutor(text);
@@ -70,7 +85,7 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
         <Button
           variant="ghost"
           size="icon-sm"
-          onClick={() => onClose ? onClose() : setChatOpen(false)}
+          onClick={() => { ditado.cancelar(); if (onClose) onClose(); else setChatOpen(false); }}
           aria-label="Fechar chat"
         >
           <X />
@@ -110,6 +125,7 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
                   key={question}
                   type="button"
                   onClick={() => sendMessage(question)}
+                  disabled={ditado.ocupado}
                   className="rounded-lg border border-border px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
                 >
                   {question}
@@ -146,12 +162,15 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
             </Button>
           </p>
         )}
+        <ControlesDitado ditado={ditado} desabilitado={isStreaming} />
         <div className="flex items-end gap-2">
           <Textarea
             ref={textareaRef}
             value={input}
             rows={1}
             placeholder="Escreva sua dúvida…"
+            aria-label="Sua pergunta ao tutor"
+            maxLength={8000}
             className="max-h-40 min-h-9 resize-none"
             onChange={(event) => {
               setInput(event.target.value);
@@ -170,7 +189,7 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
           <Button
             size="icon"
             onClick={() => isStreaming ? cancelarConversaTutor() : void sendMessage(input)}
-            disabled={!isStreaming && input.trim().length === 0}
+            disabled={!isStreaming && (input.trim().length === 0 || ditado.ocupado)}
             aria-label={isStreaming ? "Parar resposta" : "Enviar mensagem"}
           >
             {isStreaming ? <Square /> : <Send />}

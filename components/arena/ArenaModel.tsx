@@ -12,6 +12,7 @@ import {
 import { XRManipulation } from "@/components/viewer/XRManipulation";
 import { ARENA_COLORS } from "./ui3d";
 import type { ArenaStructure } from "./types";
+import { deveAcionarBotao3D } from "@/lib/botao3d-interacao";
 
 /** Decodificador Draco local — o mesmo do visualizador, funciona offline. */
 const DRACO_PATH = "/draco/";
@@ -184,7 +185,8 @@ export function ArenaModel({
             por cima com depthTest desligado, mas atrás dele no raio). */}
         <group
           ref={content}
-          onClick={handleClick}
+          onClick={(event) => { if (deveAcionarBotao3D("clicar", event)) handleClick(event); }}
+          onPointerDown={(event) => { if (deveAcionarBotao3D("pressionar", event)) handleClick(event); }}
           pointerEvents={interactive ? "auto" : "none"}
         >
           <primitive object={scene} />

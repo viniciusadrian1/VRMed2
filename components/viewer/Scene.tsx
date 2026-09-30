@@ -16,11 +16,13 @@ import { NOME_DO_ROOT } from "@/lib/model-utils";
 import { useVRMedStore } from "@/lib/store";
 import { viewerBridge } from "@/lib/viewer-bridge";
 import { entrarNoXR } from "@/lib/xr-sessao";
+import { CONTROLE_XR, MIRA_XR } from "@/lib/xr-mira";
 import { useMounted } from "@/hooks/use-mounted";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrganModel } from "./OrganModel";
 import { SafeEnvironment } from "./SafeEnvironment";
 import { PaineisEstudoXR, type InspecaoPaineis } from "./PaineisEstudoXR";
+import { CANCELAR_DITADO } from "@/lib/transcricao";
 
 const DEFAULT_CAMERA: [number, number, number] = [3.2, 2.3, 4.6];
 const MIN_DISTANCE = 1.7;
@@ -313,6 +315,11 @@ export function Scene() {
   const xrStore = useMemo(
     () =>
       createXRStore({
+        baseAssetPath: typeof window !== "undefined"
+          ? `${window.location.origin}/webxr-profiles/`
+          : "https://localhost/webxr-profiles/",
+        controller: CONTROLE_XR,
+        hand: { grabPointer: false, touchPointer: false, rayPointer: MIRA_XR },
         emulate: false,
         offerSession: false,
         enterGrantedSession: false,
@@ -345,6 +352,8 @@ export function Scene() {
       const active = Boolean(state.session);
       setInXR(active);
       if (active && enteredAt === 0) {
+        // O microfone do painel desktop não continua oculto dentro do headset.
+        window.dispatchEvent(new Event(CANCELAR_DITADO));
         enteredAt = Date.now();
         modoAtivo = state.mode === "immersive-ar" ? "ar" : "vr";
         track(modoAtivo === "ar" ? "ar_entered" : "vr_entered");

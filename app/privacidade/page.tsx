@@ -31,7 +31,7 @@ export default function PrivacyPage() {
           Política de Privacidade
         </h1>
         <p className="mt-1 text-xs text-muted-foreground">
-          Última atualização: 3 de setembro de 2026
+          Última atualização: 30 de setembro de 2026
         </p>
         <p className="mt-3 text-muted-foreground">
           O VRmed é um projeto de Iniciação Científica em educação médica. Esta
@@ -123,14 +123,36 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-serif text-xl font-medium">
+              Ditado de perguntas (microfone opcional)
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              O microfone só é solicitado ao selecionar Ditar pergunta. A captura
+              dura até 60 segundos; ao parar ou atingir esse limite, o áudio é
+              transmitido pelo nosso servidor à API da OpenAI para transcrição.
+              Você revisa o texto antes de enviá-lo ao tutor — não há envio
+              automático da pergunta. Não dite dados pessoais ou de pacientes.
+            </p>
+            <p className="mt-2 text-muted-foreground">
+              O VRmed não salva o arquivo de áudio nem o inclui na telemetria.
+              Cancelar durante a gravação descarta o áudio sem enviá-lo. Se o
+              envio já começou, o cancelamento interrompe a espera, mas não
+              desfaz o que o provedor já recebeu. O tratamento pelo provedor
+              segue as políticas da API da OpenAI. Fechar o painel, ocultar a
+              página ou interromper a sessão VR/AR encerra a captura.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-serif text-xl font-medium">
               Serviços de terceiros
             </h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>
                 <strong className="font-medium text-foreground">OpenAI</strong>{" "}
-                — as perguntas ao tutor são processadas pela API da OpenAI, nos
-                Estados Unidos, exclusivamente para gerar a resposta. Não inclua
-                dados pessoais nas perguntas.
+                — as perguntas ao tutor e, quando você usa o ditado, o áudio
+                gravado são processados pela API da OpenAI para gerar respostas
+                e transcrições. Não inclua dados pessoais. Consulte os{" "}
+                <a href="https://developers.openai.com/api/docs/guides/your-data" className="underline">controles de dados da API</a>.
               </li>
               <li>
                 <strong className="font-medium text-foreground">Umami</strong> —

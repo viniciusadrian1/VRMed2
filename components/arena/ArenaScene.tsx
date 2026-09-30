@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin, createXRStore } from "@react-three/xr";
 import { entrarNoXR } from "@/lib/xr-sessao";
+import { CONTROLE_XR, MIRA_XR } from "@/lib/xr-mira";
 import { SairDoVR } from "@/components/xr/SairDoVR";
 import * as THREE from "three";
 import { useMounted } from "@/hooks/use-mounted";
@@ -120,10 +121,10 @@ export function ArenaScene() {
         // (analógico ↕) e ele envolve a mão, o grab vence e o raio é
         // DESATIVADO — o gatilho para de clicar onde a mira aponta. A nossa
         // manipulação lê o grip direto do gamepad, então não perde nada.
-        controller: { grabPointer: false, teleportPointer: false },
+        controller: CONTROLE_XR,
         // O modelo 3D da mão vem de outro CDN; o rastreamento (pinça)
         // funciona igual sem ele. Mesma regra do grab vale para o toque.
-        hand: { model: false, grabPointer: false, touchPointer: false },
+        hand: { model: false, grabPointer: false, touchPointer: false, rayPointer: MIRA_XR },
         // Os modelos 3D dos controles ficam LIGADOS e são servidos daqui.
         // Ver o controle desenhado na frente do rosto é o que ensina um leigo
         // qual botão apertar — sem isso ele fica com um raio saindo do nada.

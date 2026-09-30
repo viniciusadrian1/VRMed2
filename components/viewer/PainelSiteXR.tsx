@@ -8,7 +8,8 @@ import { CanvasTexture, DoubleSide, LinearFilter, SRGBColorSpace, type Mesh } fr
 import { ToolsPanelContent } from "./ToolsPanel";
 import { ChatPanelContent } from "@/components/chat/ChatPanel";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ContextoDOMXR, ContextoPortalDOMXR } from "./ContextoDOMXR";
+import { ContextoDOMXR, ContextoPortalDOMXR, ContextoSessaoDOMXR } from "./ContextoDOMXR";
+import { CANCELAR_DITADO } from "@/lib/transcricao";
 import { ContextoJanelaXR, useJanelaXR } from "./ContextoJanelaXR";
 import { PainelXRBase, BotaoXR, TecladoXR } from "./PainelXRBase";
 import { TextoPainelXR, SuperficieXR } from "./EstiloPainelXR";
@@ -27,10 +28,10 @@ type Evento = ThreeEvent<PointerEvent>;
 type Entrada = { elemento: HTMLInputElement | HTMLTextAreaElement; texto: string; cor: boolean };
 type Gesto = { id: number; alvo: AlvoDOMXR; captura: { releasePointerCapture: (id: number) => void }; ultimoY: number };
 
-export function ConteudoSiteXR({ id, aoFechar, portal = null }: { id: JanelaXR; aoFechar: () => void; portal?: HTMLElement | null }) {
-  return <TooltipProvider><ContextoDOMXR.Provider value={true}><ContextoPortalDOMXR.Provider value={portal}>
+export function ConteudoSiteXR({ id, aoFechar, portal = null, sessao }: { id: JanelaXR; aoFechar: () => void; portal?: HTMLElement | null; sessao?: XRSession }) {
+  return <TooltipProvider><ContextoDOMXR.Provider value={true}><ContextoPortalDOMXR.Provider value={portal}><ContextoSessaoDOMXR.Provider value={sessao}>
     {id === "ferramentas" ? <ToolsPanelContent onClose={aoFechar} /> : <ChatPanelContent onClose={aoFechar} />}
-  </ContextoPortalDOMXR.Provider></ContextoDOMXR.Provider></TooltipProvider>;
+  </ContextoSessaoDOMXR.Provider></ContextoPortalDOMXR.Provider></ContextoDOMXR.Provider></TooltipProvider>;
 }
 
 /** O HTML/CSS do site é a única fonte de desenho e de áreas interativas. */
@@ -66,7 +67,7 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
     }
     const dom = createRoot(host, { identifierPrefix: "xr-" + id + "-" });
     const fecharJanela = () => useJanelasEstudoXR.getState().abrir(id, false);
-    dom.render(<ConteudoSiteXR id={id} aoFechar={fecharJanela} portal={host} />);
+    dom.render(<ConteudoSiteXR id={id} aoFechar={fecharJanela} portal={host} sessao={sessao} />);
     let fim = false, ocupado = false, sujo = true, urgente = false, timer = 0, ultimo = 0;
     let mapa: CanvasTexture | null = null;
     let ultimoErro = "";
@@ -97,6 +98,7 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
             if (codigo !== ultimoErro) console.warn("[VRmed/XR]", id, codigo);
             ultimoErro = codigo;
             quadro.current = null; cancelarInteracao.current();
+            if (id === "tutor") window.dispatchEvent(new Event(CANCELAR_DITADO));
             setErro(codigo); invalidate();
           }
         } finally { ocupado = false; if (sujo && !fim) atualizar(); }
@@ -118,7 +120,7 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
       queueMicrotask(() => { dom.unmount(); host.remove(); });
       useVRMedStore.getState().setAnnotationMode(false);
     };
-  }, [id, dimensao.largura, dimensao.altura, invalidate, gl]);
+  }, [id, dimensao.largura, dimensao.altura, invalidate, gl, sessao]);
 
   useEffect(() => {
     const d = dono.current;

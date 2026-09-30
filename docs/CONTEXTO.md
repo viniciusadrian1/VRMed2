@@ -1,5 +1,73 @@
 # VRmed — contexto do projeto
 
+## Ditado no tutor (30/09/2026 — implementação local)
+
+Transcrição usando a chave OpenAI existente, com reutilização autorizada pelo
+usuário. `POST /api/transcricao` usa `gpt-4o-mini-transcribe`, idioma pt e JSON;
+sem nova dependência e sem chave no cliente. Gravação explícita até 60s/2MiB,
+parar/transcrever, cancelar e revisar antes de enviar a pergunta. Não é conversa
+por voz em tempo real nem envio automático ao tutor.
+
+`ControlesDitado` serve ao `ChatPanelContent` original (DOM e AR/VR) e à gaveta
+da Sala de Estudos. No livro `TutorVR`, há ditado, revisão paginada, descarte,
+nova gravação e envio explícito; respostas também são paginadas. Sem teclado
+novo no livro: para corrigir ali, ditar novamente; o painel XR do visualizador
+mantém seu teclado existente. As perguntas prontas continuam disponíveis.
+
+`useDitadoTutor` recebe a sessão XR real: a Sala e o visualizador não usam a
+mesma store. `ContextoSessaoDOMXR` repassa a sessão à raiz HTML separada.
+Minimizar/fechar tutor, ocultar documento, sair/interromper XR ou desmontar
+cancela a captura; entrada em XR cancela o ditado desktop. Falha de captura
+do painel também cancela. Uma captura de microfone por página; respostas e
+permissões tardias são descartadas após cancelamento. Contador atualizado
+uma vez por segundo; sem análise de áudio/onda por frame.
+
+Servidor lê o tamanho real do corpo, limita upload+API a 45s, não registra o
+áudio/transcrição e retorna erros sanitizados. Limites em memória por processo:
+6 pedidos/min/IP, 60 globais/min, 4 simultâneos. Não substituem autenticação e
+proteção no proxy; o proxy deve sobrescrever os cabeçalhos encaminhados. A
+política de privacidade explica envio do áudio à OpenAI, revisão e cancelamento
+(cancelar não desfaz dados já recebidos pelo provedor).
+
+Validação: `verify:transcricao` (15 casos com adaptadores sintéticos), tipos,
+lint, build e `verify:core` passaram; painéis XR novamente conferidos após
+repassar a sessão. Chamada HTTP real à OpenAI transcreveu corretamente
+“Explique o ciclo pulmonar.”, gerada pelo sintetizador do Windows, sem captar
+o usuário. Inspeção desktop da gaveta e da superfície 3D do tutor sem erros
+no console. Permissão/captura real, qualidade da fala humana e controles no
+Quest físico continuam pendentes; se a permissão não aparecer na imersão,
+autorizar o microfone no site antes de entrar em VR/AR.
+
+Ainda sem commit/push/deploy desta feature. Na futura publicação na CX33,
+incluir `/api/transcricao` na proteção de API e permitir corpo de até 2MiB
+nessa rota (o Nginx atual limita a 512KiB). Não alterar a VPS só para testar
+localmente. A recentralização anterior continua preservada no working tree.
+
+Documentação consultada: [transcrição OpenAI](https://developers.openai.com/api/docs/guides/speech-to-text).
+O modelo usado já estava no rascunho e foi validado com a conta existente;
+há [descontinuação anunciada para 26/02/2027](https://developers.openai.com/api/docs/deprecations).
+Planejar migração para a família recomendada antes dessa data, com teste de
+acesso/qualidade/custo; não houve migração silenciosa do tutor de texto.
+
+## Hospedagem na CX33 (30/09/2026 UTC)
+
+VRmed disponível em `https://2.28.109.190`, com certificado público de IP e
+renovação automática. Servidor Hetzner `vrmed-prod` (`168031840`), Ubuntu 26.04,
+Docker/Node 22 e Nginx. Uma única instância preserva o protocolo de salas em
+memória; reinícios interrompem partidas. Vercel mantida intacta.
+
+Foi implantado o commit publicado `0888dbb` mais empacotamento de infraestrutura,
+sem incorporar a recentralização local nem a transcrição incompleta. Arquivos e
+roteiro estão na cópia Git isolada `../vrmed-cx33/infra/hetzner/README.md`, ainda
+sem commit/push. Não perder essa cópia antes de integrar a infraestrutura.
+
+Tutor real, modelos, build/tipos/testes centrais, HTTP/SSE de dois jogadores pelo
+HTTPS público, navegador desktop, reinício e renovação simulada foram validados.
+Quest físico continua pendente. Feedback persistente com cópias diárias locais;
+admin bloqueado até definir senha própria. Histórico do navegador da Vercel não
+migra automaticamente entre origens. A chave OpenAI existente foi reutilizada
+com autorização, somente no ambiente da máquina, sem exposição no Git/build.
+
 ## Lousa da Escola elevada para uso sentado (2026-09-26)
 
 Após o teste no Quest, o usuário relatou a placa "Seu posto / Escolha seu desafio"
@@ -360,6 +428,12 @@ todos os modos com sessão (Sala, Duelo, Clínica, Arena, Estudo 3D): encerra a 
 `history.back()`. Dentro da sessão o DOM some, então antes não havia como voltar. Posição
 relativa aos pés: `[-0.45, 0.95, -0.5]` sentado, `1.25` de pé. O emulador iwer do modo dev
 quebra com three 0.184 (`material.onBuild is not a function`) — testar só no headset.
+
+**Recentralizar na Sala de Estudos (2026-09-29):** `/sala` tem botão Recentralizar
+e atalhos Y/B. `SalaRecentravelXR` alinha o assento à pose real, movendo a sala no
+plano do chão, sem alterar a câmera ou a altura do usuário. Nesta rota, Sair do VR
+fica na faixa de controles da sala, ainda fora do ErrorBoundary e montado durante
+todo o ciclo XR. Ver `docs/SALA-RECENTRALIZAR.md`; validação física no Quest pendente.
 
 **Spotify no rádio da Sala (2026-09-02):** modo "controle remoto" (Spotify Connect pela Web
 API, login PKCE no navegador, `lib/spotify.ts`, `docs/SALA-SPOTIFY.md`). Regras de 2026 que
@@ -723,3 +797,17 @@ bloqueado pelo sandbox), nem medição/homologação no Quest. Diagnóstico, arq
 roteiro atualizado na última seção de `docs/PAINEIS-ESTUDO-XR.md`.
 O usuário autorizou o commit e envio desta revisão à `master` de
 `viniciusadrian1/VRMed2` para reteste físico no Quest; homologação visual pendente.
+
+### Mira unificada e seleção XR — 30/09/2026 (local)
+
+Relato de raio curto no Quest: o padrão desenhava só 1 m e o cursor podia ser
+coberto pela UI. `lib/xr-mira.ts` agora configura as três stores: linha até o
+alvo (teto visual 12 m), cursor contrastado sobre os painéis, sem fade na ponta,
+sem grab concorrente no visualizador. Linha/cursor/clique usam a mesma interseção.
+Grip e analógicos preservados. Itens/flashcards da Sala e seleção Arena/Clínica
+também confirmam no aperto XR, sem exigir soltura em menos de 300 ms.
+
+`verify:mira-xr` integra `verify:core`; tipos, lint, build e suíte passaram.
+Materiais testados em bancada WebGL no navegador, incluindo gatilho pressionado.
+Quest físico, precisão/conforto e FPS pendentes. Sem publicação nesta etapa.
+Diagnóstico, arquivos e roteiro em `docs/MIRA-XR.md`.

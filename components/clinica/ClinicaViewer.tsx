@@ -20,6 +20,7 @@ import {
   prepareModel,
 } from "@/lib/model-utils";
 import { obterXRStore } from "@/lib/xr-store";
+import { deveAcionarBotao3D } from "@/lib/botao3d-interacao";
 import { entrarNoXR } from "@/lib/xr-sessao";
 import { XRManipulation } from "@/components/viewer/XRManipulation";
 import { SafeEnvironment } from "@/components/viewer/SafeEnvironment";
@@ -159,7 +160,9 @@ function ModeloPaciente({
     // Meia-volta: o pipeline exporta a frente do paciente em −Z; a câmera e
     // o XROrigin ficam em +Z, então sem isto a primeira vista era das costas.
     <group ref={pivot} scale={1.4} rotation={[0, Math.PI, 0]}>
-      <group ref={content} onClick={handleClick}>
+      <group ref={content}
+        onClick={(event) => { if (deveAcionarBotao3D("clicar", event)) handleClick(event); }}
+        onPointerDown={(event) => { if (deveAcionarBotao3D("pressionar", event)) handleClick(event); }}>
         <primitive object={scene} />
       </group>
       <XRManipulation target={pivot} />

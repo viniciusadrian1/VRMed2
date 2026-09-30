@@ -14,6 +14,9 @@
     "verify:audio": "node --experimental-strip-types scripts/verificar-audio-duelo.ts",
     "verify:apresentacao": "node --experimental-strip-types scripts/verificar-apresentacao-duelo.ts",
     "verify:botoes-xr": "node --experimental-strip-types scripts/verificar-botoes-xr.ts",
+    "verify:mira-xr": "node --experimental-strip-types scripts/verificar-mira-xr.ts",
+    "verify:sala-recentrar": "node --experimental-strip-types scripts/verificar-sala-recentrar.ts",
+    "verify:transcricao": "node --experimental-strip-types scripts/verificar-transcricao.ts",
     "verify:escola": "node --experimental-strip-types scripts/verificar-escola.ts",
     "verify:retaguarda": "node --experimental-strip-types scripts/verificar-retaguarda.ts",
     "verify:tutor": "node --experimental-strip-types scripts/verificar-tutor-3d.ts",
@@ -25,7 +28,7 @@
     "verify:escola-revisao": "node --experimental-strip-types scripts/verificar-escola-revisao.ts",
     "verify:paineis-xr": "node --experimental-strip-types scripts/verificar-paineis-estudo-xr.ts && node --experimental-strip-types scripts/verificar-janelas-estudo-xr.ts && node --experimental-strip-types scripts/verificar-paineis-site-xr.ts && node --experimental-strip-types scripts/verificar-gestos-estudo-xr.ts",
     "verify:duelo-http": "node --experimental-strip-types scripts/verificar-duelo-http.ts",
-    "verify:core": "npm run verify:xr && npm run verify:duelo && npm run verify:audio && npm run verify:apresentacao && npm run verify:botoes-xr && npm run verify:escola && npm run verify:retaguarda && npm run verify:tutor && npm run verify:perguntas && npm run verify:tipografia && npm run verify:sinalizacao && npm run verify:acabamento && npm run verify:arena-revisao && npm run verify:escola-revisao && npm run verify:paineis-xr"
+    "verify:core": "npm run verify:xr && npm run verify:duelo && npm run verify:audio && npm run verify:apresentacao && npm run verify:botoes-xr && npm run verify:mira-xr && npm run verify:sala-recentrar && npm run verify:transcricao && npm run verify:escola && npm run verify:retaguarda && npm run verify:tutor && npm run verify:perguntas && npm run verify:tipografia && npm run verify:sinalizacao && npm run verify:acabamento && npm run verify:arena-revisao && npm run verify:escola-revisao && npm run verify:paineis-xr"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

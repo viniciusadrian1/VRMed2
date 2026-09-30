@@ -255,6 +255,7 @@ function EnquadrarCamera2D() {
  */
 export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
   const inSession = useXR((state) => Boolean(state.session));
+  const alvoLuz = useMemo(() => new THREE.Object3D(), []);
 
   return (
     <>
@@ -270,10 +271,13 @@ export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
         color="#ffd9a0"
       />
       <directionalLight
+        target={alvoLuz}
         position={[-4, 2.2, -0.5]}
         intensity={0.8}
         color="#bcd6e8"
       />
+      {/* O alvo gira junto da sala; fora dela a luz mudaria ao recentralizar. */}
+      <primitive object={alvoLuz} />
 
       <Quarto />
       <SalaInterativos onAbrirTutorDom={onAbrirTutorDom} />

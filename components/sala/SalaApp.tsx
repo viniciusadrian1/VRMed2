@@ -13,13 +13,17 @@ import { Canvas } from "@react-three/fiber";
 import { XR, XROrigin } from "@react-three/xr";
 import { obterXRStore } from "@/lib/xr-store";
 import { entrarNoXR } from "@/lib/xr-sessao";
-import { SairDoVR } from "@/components/xr/SairDoVR";
 import { useMounted } from "@/hooks/use-mounted";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Text3D } from "@/components/arena/ui3d";
 import { streamChatResponse } from "@/lib/chat-client";
 import * as spotify from "@/lib/spotify";
 import { CenaSala } from "./SalaScene";
+import { SalaRecentravelXR } from "./SalaRecentravelXR";
+import { ASSENTO_SALA } from "@/lib/sala-recentrar";
+import { useDitadoTutor } from "@/hooks/use-ditado-tutor";
+import { anexarDitado } from "@/lib/transcricao";
+import { ControlesDitado } from "@/components/chat/ControlesDitado";
 
 interface Mensagem {
   role: "user" | "assistant";
@@ -42,6 +46,7 @@ export function SalaApp() {
   const [pergunta, setPergunta] = useState("");
   const [ocupado, setOcupado] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const ditado = useDitadoTutor((texto) => setPergunta((atual) => anexarDitado(atual, texto)), tutorAberto && !inSession && !ocupado);
   // Spotify (opcional; docs/SALA-SPOTIFY.md). O login é um redirect, então
   // acontece aqui, na tela 2D, nunca dentro da sessão XR.
   const [spotifyEstado, setSpotifyEstado] = useState<"desconectado" | "conectado" | "erro">(
@@ -81,7 +86,7 @@ export function SalaApp() {
   const enviar = (event: FormEvent) => {
     event.preventDefault();
     const texto = pergunta.trim();
-    if (!texto || ocupado) return;
+    if (!texto || ocupado || ditado.ocupado) return;
     setPergunta("");
     setOcupado(true);
     const historico: Mensagem[] = [...mensagens, { role: "user", content: texto }];
@@ -143,6 +148,10 @@ export function SalaApp() {
             >
               Entrar em VR
             </button>
+            <p className="max-w-md px-4 text-center text-xs text-white/75">
+              No VR, sente-se e olhe para a frente. Use Recentralizar ou aperte
+              Y (controle esquerdo) ou B (direito) para alinhar a mesa.
+            </p>
             <button
               type="button"
               onClick={() => setTutorAberto(true)}
@@ -237,23 +246,27 @@ export function SalaApp() {
                   </div>
                 ))}
               </div>
-              <form onSubmit={enviar} className="flex gap-2 border-t border-white/10 p-3">
+              <form onSubmit={enviar} className="border-t border-white/10 p-3">
+                <ControlesDitado ditado={ditado} desabilitado={ocupado} escuro />
+                <div className="flex gap-2">
                 <input
                   value={pergunta}
                   onChange={(event) => setPergunta(event.target.value)}
                   aria-label="Sua dúvida de estudo"
+                  maxLength={8000}
                   autoFocus
                   placeholder="Sua dúvida de estudo…"
-                  className="flex-1 rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#c8935a]/60"
+                  className="min-w-0 flex-1 rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#c8935a]/60"
                 />
                 <button
                   type="submit"
-                  disabled={ocupado}
+                  disabled={ocupado || ditado.ocupado || !pergunta.trim()}
                   className="rounded-lg bg-[#c8935a] px-3 text-[#221507] disabled:opacity-50"
                   aria-label="Enviar pergunta"
                 >
                   <Send className="size-4" />
                 </button>
+                </div>
               </form>
             </aside>
           )}
@@ -272,27 +285,22 @@ export function SalaApp() {
         onCreated={({ gl }) => gl.setClearColor("#1a140d")}
       >
         <XR store={store}>
-          {/* Origem (pés) no CENTRO DO ASSENTO da cadeira (cadeira ocupa z −1,55..−0,75,
-              encosto do lado +z; mesa começa em z ≈ −1,5). Antes ficava em z −0,55,
-              atrás do encosto: qualquer passo à frente punha a cabeça dentro dele.
-              Quem senta de verdade fica sentado na cadeira; quem fica de pé fica
-              "no lugar" dela, olhando a mesa de cima.
-              Fica FORA do boundary (como no Duelo e na Clínica): se a cena cair no
-              fallback, o "Sair do VR" continua existindo dentro do headset. */}
-          <XROrigin position={[0, 0, -1.15]}>
-            <SairDoVR position={[-0.8, 1.05, -0.2]} />
-          </XROrigin>
-          {/* Sem o boundary, qualquer erro na árvore 3D (ex.: carta de IA
-              malformada) subia até o error.tsx e derrubava a rota inteira. */}
-          <ErrorBoundary
-            fallback={
-              <Text3D position={[0, 1.3, -1.5]} size={0.08} color="#e06a5c">
-                Algo quebrou na sala — recarregue a página
-              </Text3D>
-            }
-          >
-            <CenaSala onAbrirTutorDom={() => setTutorAberto(true)} />
-          </ErrorBoundary>
+          {/* A origem e o rastreio não são movidos pela recentralização: a sala
+              alinha o centro do assento à cabeça, mantendo a altura real. */}
+          <XROrigin position={ASSENTO_SALA} />
+          <SalaRecentravelXR>
+            {/* Sem o boundary, qualquer erro na árvore 3D (ex.: carta de IA
+                malformada) subia até o error.tsx e derrubava a rota inteira. */}
+            <ErrorBoundary
+              fallback={
+                <Text3D position={[0, 1.3, -1.5]} size={0.08} color="#e06a5c">
+                  Algo quebrou na sala — recarregue a página
+                </Text3D>
+              }
+            >
+              <CenaSala onAbrirTutorDom={() => setTutorAberto(true)} />
+            </ErrorBoundary>
+          </SalaRecentravelXR>
         </XR>
       </Canvas>
     </main>

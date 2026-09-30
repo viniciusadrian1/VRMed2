@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { normalizeContent, prepareModel } from "@/lib/model-utils";
 import { translateMeshName } from "@/lib/anatomy-labels";
 import { XRManipulation } from "@/components/viewer/XRManipulation";
+import { deveAcionarBotao3D } from "@/lib/botao3d-interacao";
 
 /** Saída do scripts/achados-pulmao.py. */
 export interface AchadosPulmao {
@@ -135,7 +136,9 @@ export function MapaAchados({
     <group ref={pivot} scale={1.4}>
       <group ref={content}>
         <primitive object={scene} />
-        <group ref={zonas} onClick={clicou} />
+        <group ref={zonas}
+          onClick={(event) => { if (deveAcionarBotao3D("clicar", event)) clicou(event); }}
+          onPointerDown={(event) => { if (deveAcionarBotao3D("pressionar", event)) clicou(event); }} />
       </group>
       <XRManipulation target={pivot} />
     </group>

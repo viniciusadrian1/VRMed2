@@ -11,6 +11,10 @@ import * as spotify from "@/lib/spotify";
 import { streamChatResponse } from "@/lib/chat-client";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { sairENavegar } from "@/lib/xr-sessao";
+import { useDitadoTutor } from "@/hooks/use-ditado-tutor";
+import { paginasDitado } from "@/lib/transcricao";
+import { deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "@/lib/botao3d-interacao";
+import { pulsar } from "@/lib/xr-haptica";
 
 /**
  * Os quatro itens interativos da mesa: rádio, computador (hub), flashcards e
@@ -44,13 +48,13 @@ function Interativo({
   children: ReactNode;
 }) {
   const group = useRef<THREE.Group>(null);
-  const hovered = useRef(false);
+  const hovered = useRef(new Set<number>());
   const [mostrarRotulo, setMostrarRotulo] = useState(false);
   const escala = useRef(1);
 
   useFrame((_, delta) => {
     if (!group.current) return;
-    const alvo = hovered.current ? 1.06 : 1;
+    const alvo = hovered.current.size > 0 ? 1.06 : 1;
     escala.current += (alvo - escala.current) * Math.min(1, delta * 12);
     group.current.scale.setScalar(escala.current);
   });
@@ -60,16 +64,27 @@ function Interativo({
       ref={group}
       onClick={(event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation();
-        onClick();
+        if (deveAcionarBotao3D("clicar", event)) onClick();
+      }}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        if (deveAcionarBotao3D("pressionar", event)) {
+          pulsar(fonteDoPonteiro(event), 0.3, 25);
+          onClick();
+        }
       }}
       onPointerOver={(event) => {
         event.stopPropagation();
-        hovered.current = true;
+        hovered.current.add(event.pointerId);
         setMostrarRotulo(true);
       }}
-      onPointerOut={() => {
-        hovered.current = false;
-        setMostrarRotulo(false);
+      onPointerOut={(event) => {
+        hovered.current.delete(event.pointerId);
+        setMostrarRotulo(hovered.current.size > 0);
+      }}
+      onPointerCancel={(event) => {
+        hovered.current.delete(event.pointerId);
+        setMostrarRotulo(hovered.current.size > 0);
       }}
     >
       {children}
@@ -508,8 +523,17 @@ function Flashcards({ aberto: painel, onAbrir, onFechar }: PropsPainel) {
           <BotaoFechar position={[0.42, 0.36, 0.02]} onClick={onFechar} />
           <group
             ref={carta}
+            pointerEventsOrder={ORDEM_PONTEIRO_UI}
             onClick={(event) => {
               event.stopPropagation();
+              if (!deveAcionarBotao3D("clicar", event)) return;
+              pop.current = 0;
+              setVirada((v) => !v);
+            }}
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              if (!deveAcionarBotao3D("pressionar", event)) return;
+              pulsar(fonteDoPonteiro(event), 0.3, 25);
               pop.current = 0;
               setVirada((v) => !v);
             }}
@@ -610,12 +634,20 @@ const PERGUNTAS_RAPIDAS = [
   "O que é a hematose e onde ocorre?",
 ];
 
-/** Painel de tutor DENTRO do VR: perguntas prontas + resposta em texto 3D. */
+/** Tutor no livro: ditado revisável, perguntas prontas e respostas paginadas. */
 function TutorVR({ onFechar }: { onFechar: () => void }) {
   const [resposta, setResposta] = useState("");
   const [ocupado, setOcupado] = useState(false);
+  const [rascunho, setRascunho] = useState("");
+  const [pagina, setPagina] = useState(0);
+  const pedido = useRef<AbortController | null>(null);
+  const sessao = useXR((s) => s.session);
+  const ditado = useDitadoTutor((texto) => { setRascunho(texto); setPagina(0); }, !ocupado, sessao);
+  const paginas = paginasDitado(rascunho || resposta);
+  const paginaAtual = Math.min(pagina, paginas.length - 1);
   const buffer = useRef("");
   const ultimaAtualizacao = useRef(0);
+  useEffect(() => () => pedido.current?.abort(), []);
 
   // Streaming com atualização limitada (re-layout do troika a cada chunk
   // engasgaria o headset — atualiza a cada ~300ms).
@@ -632,7 +664,9 @@ function TutorVR({ onFechar }: { onFechar: () => void }) {
   });
 
   const perguntar = (texto: string) => {
-    if (ocupado) return;
+    if (ocupado || ditado.ocupado || !texto.trim()) return;
+    ditado.cancelar(); setRascunho(""); setPagina(0);
+    const abort = new AbortController(); pedido.current = abort;
     buffer.current = "";
     setResposta("…");
     setOcupado(true);
@@ -641,48 +675,64 @@ function TutorVR({ onFechar }: { onFechar: () => void }) {
       (chunk) => {
         buffer.current += chunk;
       },
+      abort.signal,
     )
-      .then(() => setResposta(buffer.current))
+      .then(() => { if (!abort.signal.aborted) setResposta(buffer.current); })
       .catch((error: unknown) =>
-        setResposta(
+        !abort.signal.aborted && setResposta(
           error instanceof Error
             ? error.message
             : "Não foi possível contatar o tutor de IA.",
         ),
       )
-      .finally(() => setOcupado(false));
+      .finally(() => { if (!abort.signal.aborted) setOcupado(false); });
   };
 
   return (
     // À direita, sobre a mesa, ~1,1 m dos olhos de quem está no assento.
     <group position={[0.85, 1.35, -2.0]} rotation={[0, -0.55, 0]}>
-      <Panel width={1.25} height={1.15}>
-        <Text3D position={[0, 0.48, 0.01]} size={0.05}>
+      <Panel width={1.3} height={1.5}>
+        <Text3D position={[0, 0.65, 0.01]} size={0.05}>
           Tutor de IA
         </Text3D>
-        <BotaoFechar position={[0.55, 0.5, 0.01]} onClick={onFechar} />
-        {PERGUNTAS_RAPIDAS.map((p, i) => (
+        <BotaoFechar position={[0.57, 0.66, 0.01]} onClick={() => { ditado.cancelar(); onFechar(); }} />
+        <Button3D label={ditado.fase === "gravando" ? `Parar · ${ditado.segundos}s` : ditado.ocupado ? "Aguarde…" : rascunho ? "Ditar novamente" : "Ditar pergunta"}
+          desabilitado={ocupado || ditado.fase === "permissao" || ditado.fase === "transcrevendo"}
+          position={[ditado.ocupado ? -0.25 : 0, 0.47, 0.01]} width={ditado.ocupado ? 0.65 : 1.05} height={0.12}
+          color={ditado.fase === "gravando" ? "#a83e34" : "#245e7d"}
+          onClick={() => { if (ocupado) return; if (ditado.fase === "gravando") ditado.parar(); else ditado.iniciar(); }} />
+        {ditado.ocupado && <Button3D label="Cancelar" position={[0.37, 0.47, 0.01]} width={0.43} height={0.12} onClick={ditado.cancelar} />}
+        <Text3D position={[0, 0.355, 0.01]} size={0.027} maxWidth={1.15} anchorY="top" color={ARENA_COLORS.muted}>
+          {ditado.mensagem || "Até 60s · Áudio enviado à OpenAI. Não dite dados pessoais. Revise antes de enviar."}
+        </Text3D>
+        {!rascunho && !resposta && !ditado.ocupado && PERGUNTAS_RAPIDAS.map((p, i) => (
           <Button3D
             key={p}
             label={p.length > 34 ? `${p.slice(0, 33)}…` : p}
             width={1.05}
             height={0.11}
-            position={[0, 0.31 - i * 0.14, 0.01]}
+            position={[0, 0.07 - i * 0.14, 0.01]}
             onClick={() => perguntar(p)}
           />
         ))}
-        {/* Ancorado no topo, abaixo do último chip; teto de 572
-            caracteres (~11 linhas) para caber no painel. */}
-        <Text3D
-          position={[0, -0.065, 0.01]}
-          size={0.036}
-          maxWidth={1.1}
-          anchorY="top"
-        >
-          {resposta.length > 572
-            ? `${resposta.slice(0, 572)}…`
-            : resposta || "Escolha uma pergunta — ou use o teclado no desktop."}
-        </Text3D>
+        {(rascunho || resposta) && <>
+          <Text3D position={[0, 0.17, 0.01]} size={0.03} color={ARENA_COLORS.muted}>{rascunho ? "Revise sua pergunta" : "Resposta do tutor"}</Text3D>
+          <Text3D position={[0, 0.11, 0.01]} size={0.032} maxWidth={1.15} anchorY="top">{paginas[paginaAtual]}</Text3D>
+          {paginas.length > 1 && <>
+            <Button3D label="Anterior" desabilitado={paginaAtual === 0} width={0.34} height={0.1} position={[-0.4, -0.3, 0.01]} onClick={() => setPagina(Math.max(0, paginaAtual - 1))} />
+            <Text3D position={[0, -0.3, 0.01]} size={0.027}>{`${paginaAtual + 1}/${paginas.length}`}</Text3D>
+            <Button3D label="Próxima" desabilitado={paginaAtual === paginas.length - 1} width={0.34} height={0.1} position={[0.4, -0.3, 0.01]} onClick={() => setPagina(Math.min(paginas.length - 1, paginaAtual + 1))} />
+          </>}
+        </>}
+        {rascunho && !ditado.ocupado && <>
+          <Button3D label="Descartar" width={0.49} height={0.12} position={[-0.29, -0.49, 0.01]} onClick={() => { setRascunho(""); ditado.cancelar(); setPagina(0); }} />
+          <Button3D label="Enviar pergunta" width={0.57} height={0.12} position={[0.28, -0.49, 0.01]} color="#245e7d" onClick={() => perguntar(rascunho)} />
+        </>}
+        {!rascunho && resposta && !ocupado && !ditado.ocupado && <Button3D label="Perguntas prontas" width={0.85} height={0.12} position={[0, -0.49, 0.01]}
+          onClick={() => { setResposta(""); setPagina(0); ditado.cancelar(); }} />}
+        {ocupado && <Button3D label="Parar resposta" width={0.85} height={0.12} position={[0, -0.49, 0.01]}
+          onClick={() => { pedido.current?.abort(); setOcupado(false); setResposta(buffer.current || "Resposta interrompida."); }} />}
+        <Text3D position={[0, -0.65, 0.01]} size={0.024} maxWidth={1.15} color={ARENA_COLORS.muted}>Ferramenta de estudo — não substitui avaliação clínica.</Text3D>
       </Panel>
     </group>
   );
