@@ -6,7 +6,7 @@ import { useXR, useXRInputSourceState } from "@react-three/xr";
 import { Group, Quaternion, Vector3 } from "three";
 import { Button3D, Panel, Text3D } from "@/components/arena/ui3d";
 import { SairDoVR } from "@/components/xr/SairDoVR";
-import { apertouRecentralizarSala, calcularRecentralizacaoSala, type EstadoAtalhoSala } from "@/lib/sala-recentrar";
+import { CONTROLES_SALA, apertouRecentralizarSala, calcularRecentralizacaoSala, type EstadoAtalhoSala } from "@/lib/sala-recentrar";
 
 const INSTRUCAO = "Olhe para a frente · Y (esquerdo) ou B (direito)";
 
@@ -91,14 +91,15 @@ export function SalaRecentravelXR({ children }: { children: ReactNode }) {
       {children}
       {/* Fora do ErrorBoundary da cena. SairDoVR permanece montado também no
           desktop, preservando a limpeza da sessão ao navegar para outra rota. */}
-      <group ref={controles} position={[0, 0.9, -1.95]} visible={Boolean(session)}>
-        <SairDoVR position={[0.3, 0, 0.01]} rotationY={0} />
+      <group ref={controles} position={[CONTROLES_SALA.x, 0.9, CONTROLES_SALA.z]}
+        rotation={[0, CONTROLES_SALA.rotacaoY, 0]} visible={Boolean(session)}>
+        <SairDoVR position={CONTROLES_SALA.sair} rotationY={0} />
         {session && (
-          <Panel width={1.08} height={0.24} color="#34291f">
+          <Panel width={CONTROLES_SALA.largura} height={CONTROLES_SALA.altura} color="#34291f">
             <Button3D label="Recentralizar" width={0.52} height={0.11}
-              position={[-0.23, 0, 0.01]} color="#73502c" onClick={solicitar} />
-            <Text3D position={[0, 0.09, 0.01]} size={0.027}>Ajustar o assento</Text3D>
-            <Text3D position={[0, -0.086, 0.01]} size={0.023} maxWidth={1.01}>{aviso}</Text3D>
+              position={CONTROLES_SALA.recentralizar} color="#73502c" onClick={solicitar} />
+            <Text3D position={[0, 0.145, 0.01]} size={0.027}>Controles da sala</Text3D>
+            <Text3D position={[0, -0.165, 0.01]} size={0.017} maxWidth={0.56}>{aviso}</Text3D>
           </Panel>
         )}
       </group>

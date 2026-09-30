@@ -35,7 +35,7 @@ interface MessageProps {
 function MessageComponent({ message, isStreaming }: MessageProps) {
   if (message.role === "user") {
     return (
-      <div className="flex justify-end">
+      <div data-xr-item className="flex justify-end">
         <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-primary px-3.5 py-2 text-sm text-primary-foreground">
           {message.content}
         </div>
@@ -44,7 +44,7 @@ function MessageComponent({ message, isStreaming }: MessageProps) {
   }
 
   return (
-    <div className="flex gap-2.5">
+    <div data-xr-item className="flex gap-2.5">
       <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
         <Sparkles className="size-4" />
       </span>

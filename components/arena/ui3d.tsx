@@ -11,6 +11,7 @@ import { pulsar } from "@/lib/xr-haptica";
 import { CAMADAS_UI3D, deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "@/lib/botao3d-interacao";
 import { ocuparPonteiroUI, liberarPonteiroUI } from "@/lib/xr-foco-interface";
 import { criarMaterialTexto3D, layoutRotuloBotao, TIPOGRAFIA_3D, type TratamentoTexto3D } from "@/lib/tipografia-3d";
+import { raioPlacaXR } from "@/lib/raio-placa-xr";
 
 /**
  * Primitivas de interface em espaço 3D para a Arena.
@@ -409,7 +410,7 @@ export function Button3D({
       }}
     >
       {/* Este é o único alvo: nunca encolhe, cresce ou muda de profundidade. */}
-      <mesh name={`alvo-botao-${selo ?? label}`}>
+      <mesh name={`alvo-botao-${selo ?? label}`} raycast={raioPlacaXR}>
         <planeGeometry args={[width, height]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>

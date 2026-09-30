@@ -21,7 +21,7 @@ export function valorFaixaXR(fracao: number, minimo: number, maximo: number, pas
   const valor = minimo + Math.round(Math.max(0, Math.min(1, fracao)) * (maximo - minimo) / passo) * passo;
   return Math.max(minimo, Math.min(maximo, Number(valor.toFixed(6))));
 }
-type FaixaDOM = { min: number; max: number; step: number; disabled?: boolean; mudar: (valor: number) => void };
+type FaixaDOM = { min: number; max: number; step: number; valor?: number; disabled?: boolean; mudar: (valor: number) => void };
 export const faixasDOMXR = new WeakMap<HTMLElement, FaixaDOM>();
 export type AlvoDOMXR = {
   elemento: HTMLElement; retangulo: RetanguloXR; tipo: "botao" | "entrada" | "cor" | "slider" | "rolagem";
@@ -49,7 +49,7 @@ export function colherAlvosDOM(raiz: HTMLElement): AlvoDOMXR[] {
   const modal = raiz.querySelector<HTMLElement>("[data-xr-modal]");
   const escopo = modal ?? raiz;
   const alvos: AlvoDOMXR[] = [];
-  const elementos = [...escopo.querySelectorAll<HTMLElement>('button,input:not([type="hidden"]),textarea,[data-slot="slider"],label,a[href],[data-xr-scroll]')];
+  const elementos = [...escopo.querySelectorAll<HTMLElement>('button,input:not([type="hidden"]),textarea,[data-slot="slider"],label,summary,a[href],[data-xr-scroll]')];
   if (modal?.hasAttribute("data-xr-scroll")) elementos.unshift(modal);
   for (const elemento of elementos) {
     const estilo = getComputedStyle(elemento);

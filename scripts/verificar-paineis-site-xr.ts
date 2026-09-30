@@ -160,7 +160,7 @@ for (const id of ["ferramentas", "tutor"] as const) {
 }
 assert.equal(contemPonto({ x: 0, y: 50, largura: 340, altura: 400 }, 170, 25), false, "conteúdo acima do recorte não recebe clique");
 const implementacao = readFileSync("components/viewer/PainelSiteXR.tsx", "utf8");
-assert.match(implementacao, /renderizarPainelDOM\(host, PAINEL_SITE_XR.resolucao\)/);
+assert.match(implementacao, /renderizarPainelDOM\(host, PAINEL_SITE_XR.resolucao, podeCapturar\)/);
 assert.match(implementacao, /alvoAindaValido/);
 assert.match(implementacao, /pointerEventsOrder=\{janela.ordem \+ 1\}/);
 assert.match(implementacao, /process.env.NODE_ENV === "development"/);

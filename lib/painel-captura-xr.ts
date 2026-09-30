@@ -22,3 +22,26 @@ export function validarPixelsPainel(pixels: Uint8ClampedArray) {
   }
   return opacos >= pixels.length / 16 && contraste >= Math.max(24, opacos / 2000);
 }
+/** Propriedades visuais usadas pelos painéis. Não copiar os ~450 defaults do navegador por nó. */
+export const ESTILOS_CAPTURA = [
+  "display", "position", "top", "right", "bottom", "left", "z-index", "box-sizing",
+  "width", "height", "min-width", "max-width", "min-height", "max-height", "aspect-ratio",
+  "margin-top", "margin-right", "margin-bottom", "margin-left", "padding-top", "padding-right", "padding-bottom", "padding-left",
+  "flex-direction", "flex-wrap", "flex-grow", "flex-shrink", "flex-basis", "order", "align-items", "align-self", "align-content", "justify-content", "justify-items", "justify-self", "gap",
+  "grid-template-columns", "grid-template-rows", "grid-auto-flow", "grid-column", "grid-row",
+  "overflow-x", "overflow-y", "scrollbar-width", "scrollbar-color", "visibility", "opacity", "clip", "clip-path",
+  "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-clip",
+  "border-top", "border-right", "border-bottom", "border-left", "border-radius", "box-shadow", "outline", "outline-offset",
+  "color", "font-family", "font-size", "font-weight", "font-style", "font-variant-numeric", "font-feature-settings", "font-variation-settings",
+  "line-height", "letter-spacing", "word-spacing", "text-align", "text-indent", "text-transform", "text-decoration", "text-shadow", "text-overflow",
+  "white-space", "overflow-wrap", "word-break", "vertical-align", "direction", "writing-mode", "tab-size", "text-rendering",
+  "list-style-type", "list-style-position", "border-collapse", "border-spacing", "table-layout",
+  "transform", "transform-origin", "translate", "rotate", "scale", "object-fit", "object-position", "filter",
+  "fill", "fill-opacity", "fill-rule", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-dasharray", "stroke-dashoffset", "stroke-opacity", "vector-effect",
+  "appearance", "accent-color", "color-scheme", "-webkit-text-fill-color", "-webkit-text-stroke-width", "-webkit-text-stroke-color",
+] as const;
+
+/** Retém o espaço de itens fora da janela de rolagem; não altera o DOM original. */
+export function itemForaDaCaptura(item: { top: number; bottom: number }, janela: { top: number; bottom: number }) {
+  return item.bottom < janela.top - 2 || item.top > janela.bottom + 2;
+}

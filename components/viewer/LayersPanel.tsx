@@ -114,6 +114,7 @@ export function LayersPanel() {
         {layers.map((layer) => (
           <li
             key={layer.name}
+            data-xr-item
             className="rounded-lg border border-border p-2.5"
           >
             <div className="flex items-center gap-2">

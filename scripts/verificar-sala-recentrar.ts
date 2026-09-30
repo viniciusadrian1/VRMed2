@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { Group, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneGeometry, Quaternion, Scene, Vector3 } from "three";
+import { DoubleSide, Group, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneGeometry, Quaternion, Raycaster, Scene, Vector3 } from "three";
 import { createRayPointer } from "@pmndrs/pointer-events";
-import { ASSENTO_SALA, apertouRecentralizarSala, calcularRecentralizacaoSala, type EstadoAtalhoSala } from "../lib/sala-recentrar.ts";
+import { ASSENTO_SALA, CONTROLES_SALA, apertouRecentralizarSala, calcularRecentralizacaoSala, type EstadoAtalhoSala } from "../lib/sala-recentrar.ts";
 import { ORDEM_PONTEIRO_UI, deveAcionarBotao3D } from "../lib/botao3d-interacao.ts";
+import { raioPlacaXR } from "../lib/raio-placa-xr.ts";
 
 function perto(a: number, b: number, descricao: string) {
   assert.ok(Math.abs(a - b) < 1e-8, `${descricao}: ${a} != ${b}`);
@@ -43,17 +44,20 @@ for (const altura of [0.95, 1.2, 1.75]) {
 
       // O alvo via Button3D continua clicável para ambas as mãos após a rotação.
       const controles = new Group();
-      controles.position.set(0, ajuste.alturaControles, -1.95);
+      controles.position.set(CONTROLES_SALA.x, ajuste.alturaControles, CONTROLES_SALA.z);
+      controles.rotation.y = CONTROLES_SALA.rotacaoY;
       sala.add(controles);
       let cliques = 0;
-      const botao = new Mesh(new PlaneGeometry(0.52, 0.11), new MeshBasicMaterial());
-      botao.position.set(-0.23, 0, 0.01);
+      const botao = new Mesh(new PlaneGeometry(0.52, 0.11), new MeshBasicMaterial({ side: DoubleSide }));
+      botao.raycast = raioPlacaXR;
+      botao.position.fromArray(CONTROLES_SALA.recentralizar);
       botao.pointerEventsOrder = ORDEM_PONTEIRO_UI;
       botao.addEventListener("pointerdown", (evento) => {
         if (deveAcionarBotao3D("pressionar", evento)) cliques++;
       });
       controles.add(botao);
-      for (const mao of [-1, 1]) {
+      for (const posicao of [CONTROLES_SALA.recentralizar, CONTROLES_SALA.sair]) for (const mao of [-1, 1]) {
+        botao.position.fromArray(posicao);
         const controle = new Group();
         controle.position.copy(cabeca).add(new Vector3(mao * 0.22, -0.25, 0.05));
         cena.add(controle);
@@ -63,17 +67,48 @@ for (const altura of [0.95, 1.2, 1.75]) {
         cena.updateMatrixWorld(true);
         const raio = createRayPointer(() => new PerspectiveCamera(), { current: controle }, {});
         raio.move(cena, { timeStamp: 1 });
-        assert.equal(raio.getIntersection()?.object, botao, "mira acerta o botão transformado");
+        assert.ok(raio.getIntersection()?.object === botao, `mira: altura=${altura}, giro=${angulo}, piso=${piso}, mão=${mao}, botão=${posicao}`);
         raio.down({ timeStamp: 2, button: 0 });
         raio.up({ timeStamp: 702, button: 0 });
       }
-      assert.equal(cliques, 2, "um disparo por mão, inclusive com gatilho longo");
+      assert.equal(cliques, 4, "os dois botões respondem às duas mãos, inclusive com gatilho longo");
       poses++;
     }
   }
 }
 
 const cabeca = new Vector3(0, 1.2, -1.15);
+// A faixa inteira fica fora da projeção do monitor e do eixo central da mesa.
+const xMin = CONTROLES_SALA.x - Math.abs(Math.cos(CONTROLES_SALA.rotacaoY)) * CONTROLES_SALA.largura / 2;
+assert.ok(xMin > 0.78, "borda interna não invade a área central de trabalho");
+const painelLateral = new Group();
+painelLateral.position.set(CONTROLES_SALA.x, 0.9, CONTROLES_SALA.z);
+painelLateral.rotation.y = CONTROLES_SALA.rotacaoY;
+painelLateral.updateMatrixWorld(true);
+const normal = new Vector3(0, 0, 1).transformDirection(painelLateral.matrixWorld);
+const paraAluno = new Vector3(0, 0.9, ASSENTO_SALA[2]).sub(painelLateral.position).normalize();
+perto(normal.dot(paraAluno), 1, "painel lateral voltado ao assento");
+// Linhas de visão para a frente da mesa em três alturas sentadas/em pé.
+// A posição lateral não basta: um painel muito à frente ainda encobre o rádio.
+const superficie = new Mesh(new PlaneGeometry(CONTROLES_SALA.largura, CONTROLES_SALA.altura), new MeshBasicMaterial({ side: DoubleSide }));
+superficie.raycast = raioPlacaXR;
+painelLateral.add(superficie);
+for (const altura of [0.95, 1.2, 1.75]) {
+  painelLateral.position.y = Math.max(0.5, altura - 0.38);
+  painelLateral.updateMatrixWorld(true);
+  const olho = new Vector3(0, altura, ASSENTO_SALA[2]);
+  for (const [nome, pontos] of [
+    ["monitor", [[-0.52, 1, -2.046], [0.52, 1, -2.046], [-0.52, 1.7, -2.046], [0.52, 1.7, -2.046]]],
+    ["rádio", [[0.7, 0.77, -2.01], [1.16, 0.77, -2.01], [0.7, 1, -2.01], [1.16, 1, -2.01]]],
+    ["livro", [[-0.75, 0.82, -1.85], [-0.22, 0.82, -1.85]]],
+  ] as const) for (const ponto of pontos) {
+    const direcao = new Vector3(...ponto).sub(olho);
+    const raio = new Raycaster(olho, direcao.clone().normalize(), 0, direcao.length());
+    assert.equal(raio.intersectObject(superficie).length, 0, `painel não encobre ${nome} na altura ${altura}`);
+  }
+}
+superficie.geometry.dispose();
+superficie.material.dispose();
 assert.equal(calcularRecentralizacaoSala(cabeca, new Vector3(0, 1, 0), 0), null);
 assert.equal(calcularRecentralizacaoSala(new Vector3(NaN, 1, 0), new Vector3(0, 0, -1), 0), null);
 assert.equal(calcularRecentralizacaoSala(cabeca, new Vector3(0, 0, -1), Infinity), null);
@@ -93,6 +128,7 @@ assert.equal(apertouRecentralizarSala(estado, undefined, false), false);
 assert.equal(apertouRecentralizarSala(estado, {}, true), false, "reconectar não dispara");
 
 const componente = readFileSync("components/sala/SalaRecentravelXR.tsx", "utf8");
+assert.match(readFileSync("components/arena/ui3d.tsx", "utf8"), /name=\{`alvo-botao-\$\{selo \?\? label\}`\} raycast=\{raioPlacaXR\}/);
 const app = readFileSync("components/sala/SalaApp.tsx", "utf8");
 assert.match(componente, /pose\.emulatedPosition/);
 assert.match(componente, /session\.visibilityState !== "visible"/);

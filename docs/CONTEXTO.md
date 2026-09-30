@@ -838,3 +838,24 @@ antes da promoção, com backup de Compose/Nginx e retorno automático em falha.
 Segredos e feedback não entram na release. Reinício interrompe partidas em memória.
 Detalhes em `docs/SALA-ESTUDOS-REVISAO.md` e `infra/hetzner/README.md`.
 Quest físico, FPS, conforto e permissão de microfone no headset seguem pendentes.
+
+### Controles laterais e custo dos painéis — 30/09/2026 (local)
+
+Recentralizar/Sair de `/sala` foram movidos para um painel compacto à direita,
+voltado ao assento. Atalhos Y/B e câmera preservados. Testes cobrem 30 poses,
+120 seleções e linhas de visão para monitor/rádio/livro. `Button3D` reutiliza
+o raycast retangular contínuo para evitar falha na diagonal dos triângulos.
+
+Captura HTML dos painéis AR/VR agora compartilha estilos visuais, pula conteúdo
+oculto/fora da rolagem, reutiliza canvases e suspende solicitações minimizadas
+ou com sessão oculta. Hover não relê layout por frame; clique continua validado.
+Mesmos componentes do site, resolução, alças e redimensionamento mantidos.
+Em amostras locais desktop, preparação das ferramentas caiu de 914–1004 ms para
+25–27 ms por captura. Não é medida de FPS ou homologação no Quest.
+
+Tutor oferece três dúvidas específicas para cada um dos 19 modelos, inclusive
+num grupo expansível após conversa existente, compartilhadas entre desktop/XR.
+Tipos, lint, `verify:core` e build passaram; interação/temas/rolagem e troca das
+sugestões inspecionados no navegador. Usuário autorizou commit/push na master e
+publicação desta revisão na CX33 para reteste; homologação no Quest pendente.
+Detalhes e limites em `docs/AJUSTES-ESTUDO-2026-09-30.md`.

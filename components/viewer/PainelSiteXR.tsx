@@ -41,6 +41,7 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
   const raiz = useRef<HTMLDivElement | null>(null), quadro = useRef<QuadroPainelDOM | null>(null);
   const plano = useRef<Mesh>(null), realce = useRef<Mesh>(null), dono = useRef({}), gesto = useRef<Gesto | null>(null);
   const solicitar = useRef<(urgente?: boolean) => void>(() => {}), sobre = useRef<AlvoDOMXR | null>(null);
+  const revisaoDOM = useRef(0), revisaoDoQuadro = useRef(-1);
   const cancelarInteracao = useRef(() => {});
   const [textura, setTextura] = useState<CanvasTexture | null>(null), [erro, setErro] = useState<string | null>(null);
   const [entrada, setEntrada] = useState<Entrada | null>(null);
@@ -68,23 +69,31 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
     const dom = createRoot(host, { identifierPrefix: "xr-" + id + "-" });
     const fecharJanela = () => useJanelasEstudoXR.getState().abrir(id, false);
     dom.render(<ConteudoSiteXR id={id} aoFechar={fecharJanela} portal={host} sessao={sessao} />);
-    let fim = false, ocupado = false, sujo = true, urgente = false, timer = 0, ultimo = 0;
+    let fim = false, ocupado = false, sujo = true, urgente = false, timer = 0, ultimo = -Infinity;
+    let revisao = 0;
+    revisaoDOM.current = 0; revisaoDoQuadro.current = -1;
+    const podeCapturar = () => !fim && useJanelasEstudoXR.getState().abertas[id] &&
+      (sessao ? sessao.visibilityState === "visible" : !document.hidden);
     let mapa: CanvasTexture | null = null;
     let ultimoErro = "";
     const atualizar = (prioritario = false) => {
       sujo = true; urgente ||= prioritario;
-      if (fim || ocupado || !useJanelasEstudoXR.getState().abertas[id]) return;
+      if (!podeCapturar() || ocupado) return;
       if (timer && !urgente) return;
       if (timer) clearTimeout(timer);
       timer = window.setTimeout(async () => {
-        timer = 0; ocupado = true; sujo = false; urgente = false; ultimo = performance.now();
+        timer = 0;
+        if (!podeCapturar()) return;
+        ocupado = true; sujo = false; urgente = false;
         try {
           // O DOM auxiliar não entra na navegação Tab do site; a inspeção visível continua acessível.
-          if (host.getAttribute("aria-hidden") === "true") for (const foco of host.querySelectorAll<HTMLElement>("button,input,textarea,a[href],[tabindex]")) {
+          if (host.getAttribute("aria-hidden") === "true") for (const foco of host.querySelectorAll<HTMLElement>("button,input,textarea,summary,a[href],[tabindex]")) {
             if (foco.tabIndex !== -1) foco.tabIndex = -1;
           }
-          const proximo = await renderizarPainelDOM(host, PAINEL_SITE_XR.resolucao);
-          if (fim) return;
+          const versao = revisao;
+          const proximo = await renderizarPainelDOM(host, PAINEL_SITE_XR.resolucao, podeCapturar);
+          if (!proximo || !podeCapturar()) return;
+          revisaoDoQuadro.current = versao;
           if (!mapa) {
             mapa = new CanvasTexture(proximo.canvas); mapa.colorSpace = SRGBColorSpace;
             mapa.minFilter = LinearFilter; mapa.magFilter = LinearFilter; mapa.generateMipmaps = false;
@@ -101,20 +110,35 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
             if (id === "tutor") window.dispatchEvent(new Event(CANCELAR_DITADO));
             setErro(codigo); invalidate();
           }
-        } finally { ocupado = false; if (sujo && !fim) atualizar(); }
-      }, Math.max(0, (urgente ? 80 : 250) - (performance.now() - ultimo)));
+        } finally {
+          ultimo = performance.now(); ocupado = false;
+          // Espaço entre o fim de uma captura e a próxima: uma operação lenta
+          // não pode emendar outra e monopolizar o processamento do Quest.
+          if (sujo && !fim) atualizar();
+        }
+      }, Math.max(0, (urgente ? 120 : 350) - (performance.now() - ultimo)));
     };
     solicitar.current = atualizar;
-    const mudanca = () => atualizar();
-    const observer = new MutationObserver(mudanca);
+    const mudanca = () => { revisao++; revisaoDOM.current = revisao; atualizar(); };
+    // Tabindex é ajustado por nós, não muda os pixels; não gerar outra captura.
+    const observer = new MutationObserver((registros) => {
+      if (registros.some((r) => r.type !== "attributes" || r.attributeName !== "tabindex")) mudanca();
+    });
     observer.observe(host, { subtree: true, childList: true, attributes: true, characterData: true });
     const tema = new MutationObserver(mudanca); tema.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     host.addEventListener("scroll", mudanca, true); host.addEventListener("input", mudanca, true);
-    const remover = useJanelasEstudoXR.subscribe((atual, anterior) => { if (atual.abertas[id] && !anterior.abertas[id]) atualizar(); });
+    const visibilidade = () => {
+      clearTimeout(timer); timer = 0;
+      if (podeCapturar()) atualizar(true);
+    };
+    const remover = useJanelasEstudoXR.subscribe((atual, anterior) => { if (atual.abertas[id] !== anterior.abertas[id]) visibilidade(); });
+    document.addEventListener("visibilitychange", visibilidade);
+    sessao?.addEventListener("visibilitychange", visibilidade);
     atualizar();
     return () => {
       fim = true; clearTimeout(timer); observer.disconnect(); tema.disconnect(); remover();
       host.removeEventListener("scroll", mudanca, true); host.removeEventListener("input", mudanca, true); css.remove();
+      document.removeEventListener("visibilitychange", visibilidade); sessao?.removeEventListener("visibilitychange", visibilidade);
       raiz.current = null; quadro.current = null; solicitar.current = () => {}; mapa?.dispose();
       // Raiz DOM independente: desmontar após o commit do reconciliador 3D.
       queueMicrotask(() => { dom.unmount(); host.remove(); });
@@ -153,13 +177,18 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
     const host = raiz.current; if (!host) return;
     const modal = host.querySelector<HTMLElement>("[data-xr-modal]");
     const scroller = modal ?? (alvo && host.contains(alvo.elemento) ? alvo.elemento.closest<HTMLElement>("[data-xr-scroll]") : null) ?? host.querySelector<HTMLElement>("[data-xr-scroll]");
-    if (scroller) { scroller.scrollTop += delta; solicitar.current(true); }
+    if (scroller) {
+      const antes = scroller.scrollTop; scroller.scrollTop += delta;
+      if (antes !== scroller.scrollTop) solicitar.current(true);
+    }
   };
   const slider = (alvo: AlvoDOMXR, x: number) => {
     if (!raiz.current) return;
     const faixa = faixasDOMXR.get(alvo.elemento), r = retanguloDOM(alvo.elemento, raiz.current);
-    if (faixa && !faixa.disabled) faixa.mudar(valorFaixaXR((x - r.x) / r.largura, faixa.min, faixa.max, faixa.step));
-    solicitar.current(true);
+    if (faixa && !faixa.disabled) {
+      const valor = valorFaixaXR((x - r.x) / r.largura, faixa.min, faixa.max, faixa.step);
+      if (valor !== faixa.valor) { faixa.valor = valor; faixa.mudar(valor); solicitar.current(true); }
+    }
   };
   const apontar = (e: Evento) => {
     e.stopPropagation(); ocuparPonteiroUI(dono.current, e);
@@ -168,12 +197,19 @@ export function PainelSiteXR({ id }: { id: JanelaXR }) {
     const fonte = fonteDoPonteiro(e); if (fonte) mira.current.set(e.pointerId, { lado: fonte.handedness, ...p });
     if (atual?.id === e.pointerId) {
       if (atual.alvo.tipo === "slider") slider(atual.alvo, p.x);
-      else { atual.alvo.elemento.scrollTop -= p.y - atual.ultimoY; atual.ultimoY = p.y; solicitar.current(true); }
+      else {
+        const antes = atual.alvo.elemento.scrollTop;
+        atual.alvo.elemento.scrollTop -= p.y - atual.ultimoY; atual.ultimoY = p.y;
+        if (antes !== atual.alvo.elemento.scrollTop) solicitar.current(true);
+      }
       return;
     }
     const alvo = alvoNoPixel(quadro.current.alvos, p.x, p.y);
     sobre.current = alvo;
-    const valido = alvo && alvoAindaValido(alvo, host, p.x, p.y);
+    // O clique continua validando o DOM atual. Hover só consulta o mapa do quadro,
+    // sem getComputedStyle/getBoundingClientRect dezenas de vezes por segundo.
+    const valido = alvo && revisaoDoQuadro.current === revisaoDOM.current && host.contains(alvo.elemento) &&
+      !alvo.elemento.matches(":disabled,[aria-disabled=true],[data-disabled]");
     if (realce.current) {
       realce.current.visible = Boolean(valido);
       if (valido) {

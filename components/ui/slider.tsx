@@ -19,6 +19,7 @@ function Slider({
       ref={(elemento) => {
         if (elemento) faixasDOMXR.set(elemento, {
           min: props.min ?? 0, max: props.max ?? 100, step: props.step ?? 1, disabled: props.disabled,
+          valor: values[0],
           mudar: (valor) => props.onValueChange?.([valor]),
         });
       }}

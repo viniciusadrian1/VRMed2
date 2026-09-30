@@ -15,16 +15,15 @@ import { anexarDitado } from "@/lib/transcricao";
 import { ControlesDitado } from "./ControlesDitado";
 import { useDOMImersivo, useSessaoDOMXR } from "@/components/viewer/ContextoDOMXR";
 import { useJanelasEstudoXR } from "@/lib/janelas-estudo-xr";
-
-const EXAMPLE_QUESTIONS = [
-  "O que é a valva mitral e qual a sua função?",
-  "Explique a circulação pulmonar passo a passo.",
-  "Quais são as camadas da parede do estômago?",
-];
+import { perguntasDoModelo } from "@/lib/tutor-perguntas";
+import { getOrganById } from "@/lib/organs";
 
 /** O DOM e os painéis XR usam a mesma conversa e o mesmo pedido em andamento. */
 export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
   const chat = useVRMedStore((s) => s.chat);
+  const organId = useVRMedStore((s) => s.currentOrganId);
+  const modelo = getOrganById(organId);
+  const perguntas = perguntasDoModelo(organId);
   const setChatOpen = useVRMedStore((s) => s.setChatOpen);
   const guia = useTutor3D((s) => s.ativo);
   const contexto = useTutor3D((s) => s.contexto);
@@ -120,7 +119,8 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
               </p>
             </div>
             <div className="flex w-full flex-col gap-2">
-              {EXAMPLE_QUESTIONS.map((question) => (
+              <p className="text-xs text-muted-foreground">{modelo ? `Dúvidas sobre ${modelo.name}` : "Selecione um modelo para ver sugestões."}</p>
+              {perguntas.map((question) => (
                 <button
                   key={question}
                   type="button"
@@ -146,6 +146,12 @@ export function ChatPanelContent({ onClose }: { onClose?: () => void } = {}) {
                 }
               />
             ))}
+            {perguntas.length > 0 && !isStreaming && <details className="rounded-lg border border-border p-3">
+              <summary className="cursor-pointer text-sm font-medium">Dúvidas sobre {modelo?.name}</summary>
+              <div className="mt-2 flex flex-col gap-2">{perguntas.map((question) => <button key={question} type="button"
+                onClick={() => sendMessage(question)} disabled={ditado.ocupado}
+                className="rounded-lg border border-border px-3 py-2 text-left text-sm transition-colors hover:bg-muted">{question}</button>)}</div>
+            </details>}
           </div>
         )}
       </div>
