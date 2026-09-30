@@ -1,0 +1,7 @@
+[Unit]
+Description=Cópia diária local do feedback do VRmed
+
+[Service]
+Type=oneshot
+ExecStart=/opt/vrmed/backup-feedback.sh
+UMask=0077

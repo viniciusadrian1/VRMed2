@@ -1,0 +1,31 @@
+name: vrmed
+services:
+  web:
+    image: vrmed:cx33-0888dbb-1
+    container_name: vrmed-web
+    restart: unless-stopped
+    init: true
+    # Uma instância: as salas online vivem na memória do processo.
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - path: /opt/vrmed/.env
+        format: raw
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=2048
+    volumes:
+      - /opt/vrmed/data/feedback.jsonl:/app/feedback.jsonl
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 3g
+    cpus: 3
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

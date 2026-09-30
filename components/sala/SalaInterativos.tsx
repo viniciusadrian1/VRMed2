@@ -15,6 +15,8 @@ import { useDitadoTutor } from "@/hooks/use-ditado-tutor";
 import { paginasDitado } from "@/lib/transcricao";
 import { deveAcionarBotao3D, fonteDoPonteiro, ORDEM_PONTEIRO_UI } from "@/lib/botao3d-interacao";
 import { pulsar } from "@/lib/xr-haptica";
+import { MonitorEstudos } from "./MonitorEstudos";
+import layout from "@/lib/sala-estudos-layout.json";
 
 /**
  * Os quatro itens interativos da mesa: rádio, computador (hub), flashcards e
@@ -104,7 +106,7 @@ function Interativo({
 // decorativo pode) + texturas 1024/webp: 29MB -> 321KB.
 const RADIO_GLB = "/models/props/radio.glb";
 
-function Radio() {
+function Radio({ revisao = false }: { revisao?: boolean }) {
   const [nome, setNome] = useState<string>("");
   // Spotify como controle remoto (docs/SALA-SPOTIFY.md): conectado = o rádio
   // mostra e controla o que toca no dispositivo do usuário; o lo-fi desliga
@@ -185,7 +187,7 @@ function Radio() {
       : "Rádio lo-fi — clique para ligar";
 
   return (
-    <group position={[0.68, 0.765, -2.1]}>
+    <group position={revisao ? layout.radio as [number, number, number] : [0.68, 0.765, -2.1]}>
       {viaSpotify && (
         <group position={[0, 0.46, 0.05]}>
           {/* Atribuição exigida pelo Spotify (Design Guidelines); o logo
@@ -281,7 +283,6 @@ function MonitorGLB() {
     </group>
   );
 }
-useGLTF.preload(MONITOR_GLB, "/draco/");
 
 // Modos do hub da Sala. Segue a ordem do NAV_ITEMS de
 // components/layout/Sidebar.tsx, mas não é cópia literal: aqui o rótulo é
@@ -740,17 +741,18 @@ function TutorVR({ onFechar }: { onFechar: () => void }) {
 
 function Livro({
   onAbrirTutorDom,
+  revisao = false,
   aberto,
   onAbrir,
   onFechar,
-}: PropsPainel & { onAbrirTutorDom: () => void }) {
+}: PropsPainel & { onAbrirTutorDom: () => void; revisao?: boolean }) {
   const inSession = useXR((state) => Boolean(state.session));
   const gltf = useGLTF(LIVRO_GLB, "/draco/");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
   return (
     <>
-      <group position={[-0.72, 0.765, -1.95]} rotation={[0, 0.25, 0]}>
+      <group position={revisao ? layout.livro as [number, number, number] : [-0.72, 0.765, -1.95]} rotation={[0, 0.25, 0]}>
         <Interativo
           rotulo="Livro — pergunte ao tutor de IA"
           posRotulo={[0, 0.16, 0]}
@@ -779,8 +781,10 @@ useGLTF.preload(LIVRO_GLB, "/draco/");
 
 export function SalaInterativos({
   onAbrirTutorDom,
+  revisao = true,
 }: {
   onAbrirTutorDom: () => void;
+  revisao?: boolean;
 }) {
   // Um pop-up por vez: abrir um fecha o outro (pedido do teste no Quest).
   const [aberto, setAberto] = useState<PainelAberto>(null);
@@ -798,18 +802,18 @@ export function SalaInterativos({
           (o Suspense só cobre a espera): o item some, a sala continua. */}
       <ErrorBoundary fallback={null}>
         <Suspense fallback={null}>
-          <Radio />
+          <Radio revisao={revisao} />
         </Suspense>
       </ErrorBoundary>
       <ErrorBoundary fallback={null}>
         <Suspense fallback={null}>
-          <Computador {...props("hub")} />
+          {revisao ? <MonitorEstudos {...props("hub")} /> : <Computador {...props("hub")} />}
         </Suspense>
       </ErrorBoundary>
       <Flashcards {...props("flashcards")} />
       <ErrorBoundary fallback={null}>
         <Suspense fallback={null}>
-          <Livro onAbrirTutorDom={onAbrirTutorDom} {...props("tutor")} />
+          <Livro onAbrirTutorDom={onAbrirTutorDom} revisao={revisao} {...props("tutor")} />
         </Suspense>
       </ErrorBoundary>
     </group>

@@ -1,0 +1,10 @@
+[Unit]
+Description=Renovação automática do certificado HTTPS do VRmed
+After=network-online.target docker.service nginx.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/vrmed/renovar-certificado.sh
+TimeoutStartSec=300

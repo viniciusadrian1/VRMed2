@@ -811,3 +811,30 @@ também confirmam no aperto XR, sem exigir soltura em menos de 300 ms.
 Materiais testados em bancada WebGL no navegador, incluindo gatilho pressionado.
 Quest físico, precisão/conforto e FPS pendentes. Sem publicação nesta etapa.
 Diagnóstico, arquivos e roteiro em `docs/MIRA-XR.md`.
+
+### Sala de estudos renovada e publicação CX33 — 30/09/2026
+
+Usuário autorizou preservar a sala anterior, renovar a `/sala`, integrar o menu
+ao próprio monitor e publicar também as melhorias locais de mira, recentralização
+e ditado. Não confundir esta sala individual com a Escola do modo Duelo.
+
+Baseline salvo em `0c97726`, branch `backup/sala-estudos-20260930`. A versão
+clássica continua em `/sala?versao=classica`, com botão de comparação fora do VR.
+Biblioteca e monitor autorais foram gerados pelo Blender MCP em cena separada;
+Cube/Camera/Light da cena original não foram modificados. GLBs originais mantidos.
+Novos assets: `sala-estudos-revisao.glb` e `monitor-estudos-revisao.glb`.
+
+Monitor com tela útil 1,04 × 0,57 m, seis modos desenhados dentro da moldura e
+seleção estável no gatilho. Sem pop-up do hub, sem captura HTML, câmera XR intacta.
+Preservados livro/tutor, flashcards, rádio/Spotify, cadeira e altura da mesa.
+`verify:sala-estudos` integra a suíte: geometria, UVs/normais, espaço do aluno,
+216 alvos/cantos com duas mãos, linha de visão sentada e profundidade da tela.
+Também verificada visualmente a versão clássica e a navegação no navegador.
+
+Infra da CX33 integrada do worktree `vrmed-cx33` sem apagar aquele diretório.
+Standalone só com `VRMED_STANDALONE=1`; Nginx libera 2 MiB apenas na rota de
+transcrição, sem buffering do áudio em disco. Deploy por imagem candidata local
+antes da promoção, com backup de Compose/Nginx e retorno automático em falha.
+Segredos e feedback não entram na release. Reinício interrompe partidas em memória.
+Detalhes em `docs/SALA-ESTUDOS-REVISAO.md` e `infra/hetzner/README.md`.
+Quest físico, FPS, conforto e permissão de microfone no headset seguem pendentes.

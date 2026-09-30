@@ -7,6 +7,7 @@ import { useXR } from "@react-three/xr";
 import * as THREE from "three";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SalaInterativos } from "./SalaInterativos";
+import layout from "@/lib/sala-estudos-layout.json";
 
 /**
  * O quarto da Sala de Estudos — 100% geometria procedural (caixas, cilindros,
@@ -67,7 +68,6 @@ function TecladoMouseGLB() {
   );
 }
 
-useGLTF.preload(MESA_GLB, "/draco/");
 useGLTF.preload(CADEIRA_GLB, "/draco/");
 useGLTF.preload(TECLADO_GLB, "/draco/");
 
@@ -228,7 +228,7 @@ function Quarto() {
  * A posição fixa do VR sentado deixava baralho, livro e rádio fora do quadro
  * no celular e no navegador 2D do Quest.
  */
-function EnquadrarCamera2D() {
+function EnquadrarCamera2D({ revisao }: { revisao: boolean }) {
   const get = useThree((s) => s.get);
   const retrato = useThree((s) => s.size.width < s.size.height);
   useEffect(() => {
@@ -239,13 +239,13 @@ function EnquadrarCamera2D() {
     // react-hooks/immutability.
     const camera = get().camera as THREE.PerspectiveCamera;
     if (retrato) camera.position.set(0, 1.8, 1.2);
-    else camera.position.set(0, 1.5, -0.3);
+    else camera.position.set(0, revisao ? 1.6 : 1.5, revisao ? .05 : -.3);
     // Com fov 55 a carta de flashcards abria fora da tela no retrato (o
     // maxDistance 3,4 não deixa recuar) e o 4:3 do Quest cortava a borda dela.
     // Na sessão XR o three usa a projeção do óculos; ao sair, isto remonta.
     camera.fov = retrato ? 85 : 62;
     camera.updateProjectionMatrix();
-  }, [get, retrato]);
+  }, [get, retrato, revisao]);
   return null;
 }
 
@@ -253,7 +253,25 @@ function EnquadrarCamera2D() {
  * Conteúdo 3D da Sala (dentro do <XR>): quarto + itens interativos + luzes.
  * OrbitControls só fora da sessão (regra do projeto: disputa a câmera do headset).
  */
-export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
+function BibliotecaRevisada() {
+  const { scene } = useGLTF(layout.ambiente);
+  const copia = useMemo(() => scene.clone(true), [scene]);
+  return <group pointerEvents="none"><primitive object={copia} /></group>;
+}
+
+/** Mantém chão e mesa durante o download ou falha, sem carregar a sala antiga. */
+function SalaReserva() {
+  return <group pointerEvents="none">
+    <mesh rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[5, 5]} /><meshStandardMaterial color="#897657" />
+    </mesh>
+    <mesh position={layout.tampo.posicao as [number, number, number]}>
+      <boxGeometry args={layout.tampo.tamanho as [number, number, number]} /><meshStandardMaterial color="#a48761" />
+    </mesh>
+  </group>;
+}
+
+export function CenaSala({ onAbrirTutorDom, revisao = true }: { onAbrirTutorDom: () => void; revisao?: boolean }) {
   const inSession = useXR((state) => Boolean(state.session));
   const alvoLuz = useMemo(() => new THREE.Object3D(), []);
 
@@ -262,13 +280,13 @@ export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
       {/* XROrigin + "Sair do VR" moram no SalaApp, fora do ErrorBoundary. */}
 
       {/* Luz: quente da luminária + fria fraca da janela + ambiente baixa. */}
-      <ambientLight intensity={0.45} color="#f5ead8" />
+      <ambientLight intensity={revisao ? .7 : .45} color={revisao ? "#edf0e6" : "#f5ead8"} />
       <pointLight
-        position={[0, 2.6, -1.2]}
-        intensity={11}
+        position={revisao ? [0, 2.30, -.8] : [0, 2.6, -1.2]}
+        intensity={revisao ? 7 : 11}
         distance={7}
         decay={1.6}
-        color="#ffd9a0"
+        color={revisao ? "#ffe6be" : "#ffd9a0"}
       />
       <directionalLight
         target={alvoLuz}
@@ -279,19 +297,31 @@ export function CenaSala({ onAbrirTutorDom }: { onAbrirTutorDom: () => void }) {
       {/* O alvo gira junto da sala; fora dela a luz mudaria ao recentralizar. */}
       <primitive object={alvoLuz} />
 
-      <Quarto />
-      <SalaInterativos onAbrirTutorDom={onAbrirTutorDom} />
+      {revisao ? <>
+        <ErrorBoundary fallback={<SalaReserva />}>
+          <Suspense fallback={<SalaReserva />}><BibliotecaRevisada /></Suspense>
+        </ErrorBoundary>
+        <Suspense fallback={null}>
+          <ErrorBoundary fallback={null}><CadeiraGLB /></ErrorBoundary>
+          <ErrorBoundary fallback={null}><TecladoMouseGLB /></ErrorBoundary>
+        </Suspense>
+      </> : <Quarto />}
+      <SalaInterativos onAbrirTutorDom={onAbrirTutorDom} revisao={revisao} />
 
       {!inSession && (
         <>
-          <EnquadrarCamera2D />
+          <EnquadrarCamera2D revisao={revisao} />
           <OrbitControls
             makeDefault
             enableDamping
             dampingFactor={0.08}
-            target={[0, 1.1, -1.9]}
+            target={[0, revisao ? 1.28 : 1.1, -1.9]}
             minDistance={0.4}
             maxDistance={3.4}
+            // Somente desktop: mantém a órbita dentro das paredes da biblioteca.
+            minAzimuthAngle={revisao ? -.65 : -Infinity}
+            maxAzimuthAngle={revisao ? .65 : Infinity}
+            minPolarAngle={revisao ? Math.PI * .35 : 0}
             // Não deixa a câmera atravessar o chão nem o teto.
             maxPolarAngle={Math.PI * 0.55}
           />

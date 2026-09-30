@@ -1,0 +1,9 @@
+{
+  "ambiente": "/models/props/sala-estudos-revisao.glb",
+  "monitor": "/models/props/monitor-estudos-revisao.glb",
+  "tela": { "posicao": [0, 1.22, -2.046], "largura": 1.04, "altura": 0.57 },
+  "botao": { "largura": 0.458, "altura": 0.104, "coluna": 0.245, "linha": 0.12, "primeiraLinha": 0.076 },
+  "radio": [0.93, 0.765, -2.01],
+  "livro": [-0.87, 0.765, -1.95],
+  "tampo": { "posicao": [0, 0.736, -1.91], "tamanho": [2.55, 0.058, 0.95] }
+}

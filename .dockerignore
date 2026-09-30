@@ -1,0 +1,16 @@
+.git
+.next
+node_modules
+.env
+.env.*
+!.env.example
+feedback.jsonl
+.vercel
+.claude
+.venv*
+.clinica-dados
+tmp_*
+*.blend
+*.blend1
+*.tsbuildinfo
+infra/hetzner/*.tar.gz

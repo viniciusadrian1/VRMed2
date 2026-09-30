@@ -86,3 +86,12 @@ não-comercial) e "Hospital Stuff" (1,67M triângulos — inviável em VR).
   `scripts/preparar-esqueleto-escola.py`. A derivação não altera nem concede
   novos direitos sobre o acervo original; mantém-se a responsabilidade de
   documentar a licença de origem antes de redistribuí-lo fora do projeto.
+# Biblioteca de estudos autoral (revisão de 30/09/2026)
+
+`sala-estudos-revisao.glb` e `monitor-estudos-revisao.glb`: modelagem autoral do
+VRmed pelo Blender, scripts versionados em `scripts/criar-sala-estudos-revisao.py`.
+Reutilizam os mapas autorais de encadernação/carvalho da Escola. Não contêm
+modelos anatômicos gerados nem novos assets externos. A inscrição foi convertida
+em contorno geométrico usando Segoe UI Bold instalada no sistema; o arquivo de
+fonte não é distribuído. Mesa, cadeira, livro e rádio originais continuam com
+as atribuições abaixo, inclusive na versão clássica.

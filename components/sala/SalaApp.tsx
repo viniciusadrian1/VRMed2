@@ -24,6 +24,7 @@ import { ASSENTO_SALA } from "@/lib/sala-recentrar";
 import { useDitadoTutor } from "@/hooks/use-ditado-tutor";
 import { anexarDitado } from "@/lib/transcricao";
 import { ControlesDitado } from "@/components/chat/ControlesDitado";
+import { MODOS_ESTUDO } from "@/lib/sala-monitor";
 
 interface Mensagem {
   role: "user" | "assistant";
@@ -39,6 +40,7 @@ interface Mensagem {
  */
 export function SalaApp() {
   const mounted = useMounted();
+  const [revisao, setRevisao] = useState(() => typeof window === "undefined" || new URLSearchParams(window.location.search).get("versao") !== "classica");
   const [inSession, setInSession] = useState(false);
   const [xrError, setXrError] = useState<string | null>(null);
   const [tutorAberto, setTutorAberto] = useState(false);
@@ -139,6 +141,19 @@ export function SalaApp() {
             <ArrowLeft className="size-4" />
             VRmed
           </Link>
+
+          <button type="button" onClick={() => {
+            const nova = !revisao;
+            setRevisao(nova);
+            const url = new URL(window.location.href);
+            if (nova) url.searchParams.delete("versao"); else url.searchParams.set("versao", "classica");
+            window.history.replaceState(null, "", url);
+          }} className="absolute right-4 top-4 z-20 rounded-full border border-white/15 bg-black/60 px-4 py-2 text-xs text-white hover:bg-black/80">
+            {revisao ? "Ver sala clássica" : "Ver sala renovada"}
+          </button>
+          <nav aria-label="Modos de estudo" className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-4 focus-within:top-16 focus-within:z-30 focus-within:flex focus-within:flex-wrap focus-within:gap-3 focus-within:rounded-xl focus-within:bg-slate-950 focus-within:p-4 focus-within:text-white">
+            {MODOS_ESTUDO.map((modo) => <Link key={modo.href} href={modo.href} className="rounded px-3 py-2 focus:outline-2 focus:outline-amber-300">{modo.rotulo}</Link>)}
+          </nav>
 
           <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-3">
             <button
@@ -298,7 +313,7 @@ export function SalaApp() {
                 </Text3D>
               }
             >
-              <CenaSala onAbrirTutorDom={() => setTutorAberto(true)} />
+              <CenaSala onAbrirTutorDom={() => setTutorAberto(true)} revisao={revisao} />
             </ErrorBoundary>
           </SalaRecentravelXR>
         </XR>
